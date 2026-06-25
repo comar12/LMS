@@ -1,0 +1,39 @@
+'use client'
+import { Radio, FileText, GraduationCap, ChevronRight } from 'lucide-react'
+import { upcoming } from '@/data/student'
+import { relativeDay } from '@/lib/utils'
+import { Card, CardBody, CardHeader } from '@/components/ui/card'
+
+const typeMeta: Record<string, { icon: typeof Radio; tone: string; bg: string; label: string }> = {
+  live: { icon: Radio, tone: 'text-coral', bg: 'bg-coral-soft', label: 'Live' },
+  deadline: { icon: FileText, tone: 'text-gold', bg: 'bg-gold-soft', label: 'Due' },
+  exam: { icon: GraduationCap, tone: 'text-violet', bg: 'bg-surface-2', label: 'Exam' },
+}
+
+export function UpcomingList() {
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between">
+        <h3 className="font-display text-base font-semibold">This week</h3>
+        <button className="ring-focus rounded-md text-xs font-medium text-teal-fg hover:underline">View calendar</button>
+      </CardHeader>
+      <CardBody className="space-y-1 pt-3">
+        {upcoming.map((u) => {
+          const m = typeMeta[u.type]
+          return (
+            <button key={u.id} className="ring-focus group flex w-full items-center gap-3 rounded-lg p-2.5 text-left transition hover:bg-surface-2">
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${m.bg}`}>
+                <m.icon className={`h-[18px] w-[18px] ${m.tone}`} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{u.title}</p>
+                <p className="truncate text-xs text-ink-3">{relativeDay(u.date)} · {u.time} · {u.course}</p>
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-ink-3 transition group-hover:translate-x-0.5 group-hover:text-ink-2" />
+            </button>
+          )
+        })}
+      </CardBody>
+    </Card>
+  )
+}

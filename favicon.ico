@@ -1,0 +1,71 @@
+'use client'
+import { motion } from 'framer-motion'
+import { skills } from '@/data/student'
+
+// Skills positioned around a center node; radius scales with mastery.
+const positions = [
+  { x: 50, y: 14 }, { x: 82, y: 32 }, { x: 80, y: 70 },
+  { x: 50, y: 86 }, { x: 18, y: 70 }, { x: 20, y: 32 },
+]
+const toneColor: Record<string, string> = {
+  teal: 'var(--teal)', coral: 'var(--coral)', gold: 'var(--gold)', violet: 'var(--violet)',
+}
+
+export function Constellation() {
+  return (
+    <div className="relative aspect-square w-full max-w-[280px]">
+      <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
+        {/* connections from center to each skill */}
+        {positions.map((p, i) => (
+          <motion.line
+            key={`line-${i}`}
+            x1="50" y1="50" x2={p.x} y2={p.y}
+            stroke={`hsl(${toneColor[skills[i].tone]} / 0.35)`}
+            strokeWidth="0.5"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 + i * 0.08 }}
+          />
+        ))}
+        {/* skill nodes */}
+        {positions.map((p, i) => {
+          const s = skills[i]
+          const r = 2 + (s.value / 100) * 3.5
+          return (
+            <g key={`node-${i}`}>
+              <motion.circle
+                cx={p.x} cy={p.y} r={r + 2.5}
+                fill={`hsl(${toneColor[s.tone]} / 0.15)`}
+                initial={{ scale: 0 }} animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 + i * 0.08, type: 'spring' }}
+                style={{ transformOrigin: `${p.x}px ${p.y}px` }}
+              />
+              <motion.circle
+                cx={p.x} cy={p.y} r={r}
+                fill={`hsl(${toneColor[s.tone]})`}
+                initial={{ scale: 0 }} animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 + i * 0.08, type: 'spring' }}
+                style={{ transformOrigin: `${p.x}px ${p.y}px` }}
+              />
+              <text x={p.x} y={p.y - r - 2.5} textAnchor="middle"
+                className="fill-ink-2 font-mono" style={{ fontSize: '3.2px' }}>
+                {s.name}
+              </text>
+              <text x={p.x} y={p.y + 1} textAnchor="middle"
+                className="fill-[hsl(222_32%_7%)] font-semibold" style={{ fontSize: '2.6px' }}>
+                {s.value}
+              </text>
+            </g>
+          )
+        })}
+        {/* center node */}
+        <motion.circle cx="50" cy="50" r="6"
+          fill="hsl(var(--surface))" stroke="hsl(var(--teal))" strokeWidth="1"
+          initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.1 }}
+          style={{ transformOrigin: '50px 50px' }} />
+        <text x="50" y="49" textAnchor="middle" className="fill-ink font-display font-bold" style={{ fontSize: '3px' }}>B2</text>
+        <text x="50" y="53" textAnchor="middle" className="fill-ink-3" style={{ fontSize: '2.2px' }}>level</text>
+      </svg>
+    </div>
+  )
+}
