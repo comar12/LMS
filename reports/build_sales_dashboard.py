@@ -37,7 +37,7 @@ def map_hrid(x):
     return None
 
 s["ct"] = pd.to_datetime(s["Completion time"])
-s["Date"] = s["ct"].dt.normalize()
+s["Date"] = (s["ct"] - pd.Timedelta(hours=12)).dt.normalize()  # business day: 15:00 Cairo -> 07:00 next day
 s["hr_raw"] = s["HRID"].fillna("").astype(str).str.strip()
 s["hr"] = s["hr_raw"].apply(map_hrid)
 s["in_roster"] = s["hr"].notna().astype(int)
@@ -149,7 +149,7 @@ def metric_choose(sel, extra_crit):
 wb = Workbook()
 # ================================================================= Sales_Data
 sd = wb.active; sd.title = "Sales_Data"
-cols = ["ID","Completion Time","Date","Weekday","HRID (Raw)","HRID (Mapped)","Agent Name","Team Leader","Ops Manager","Phase","Tenure Bucket","Entry Type","XM Lines","GSR Units","Total Units","Speed Upgrade","X-PRO","Adding LOB","Mobile Plus Plan","XMC (GSR)","Added XMC?","SIM Type","E-SIM Activated?","Device Sold","Promotion","Account Number","Order Number","Order Valid","Duplicate Flag","In Roster","Include","Agent-Day First"]
+cols = ["ID","Completion Time","Business Date","Weekday","HRID (Raw)","HRID (Mapped)","Agent Name","Team Leader","Ops Manager","Phase","Tenure Bucket","Entry Type","XM Lines","GSR Units","Total Units","Speed Upgrade","X-PRO","Adding LOB","Mobile Plus Plan","XMC (GSR)","Added XMC?","SIM Type","E-SIM Activated?","Device Sold","Promotion","Account Number","Order Number","Order Valid","Duplicate Flag","In Roster","Include","Agent-Day First"]
 header_row(sd, 1, 1, cols)
 rows = []
 for i, x in s.iterrows():
@@ -190,7 +190,7 @@ widths(li, {"A":20,"B":18,"C":14,"D":42,"E":8}); li.sheet_properties.tabColor = 
 
 # ================================================================= Daily_Account
 da = wb.create_sheet("Daily_Account")
-title(da, "Account Level – Day-over-Day (Cairo Repair TSX)", "Whole-account view, every day in the tracker. Duplicate handling follows the Dashboard toggle. 7-Day Avg and WoW % are trailing calculations.", 26)
+title(da, "Account Level – Day-over-Day (Cairo Repair TSX)", "Whole-account view, every business day (15:00 → 07:00 next day) in the tracker. Duplicate handling follows the Dashboard toggle. 7-Day Avg and WoW % are trailing calculations.", 26)
 dcols = ["Date","Weekday","Submissions","XM Lines","GSR Units","Total Units","DoD Δ Units","DoD %","7-Day Avg","WoW %","Active Sellers","Units / Seller","XMC Yes","XMC Asked","XMC Attach %","E-SIM Activated","E-SIM Asked","E-SIM Act. %","Speed Upgrade","X-PRO","Adding LOB","Mobile Plus","XMC (GSR)","Devices Sold","Not-in-Roster Entries","Duplicates Flagged"]
 header_row(da, 3, 1, dcols); da.row_dimensions[3].height = 32
 DA1 = 4; DAL = DA1 + ND - 1
@@ -489,7 +489,7 @@ lt.sheet_properties.tabColor = TEAL
 # ================================================================= Dashboard
 db = wb.create_sheet("Dashboard", 0)
 db.sheet_view.showGridLines = False
-title(db, "Cairo Repair TSX – Sales Performance Dashboard", f"Source: Sales Tracker (Microsoft Forms) {min(dates):%d %b %Y} – {MAXD:%d %b %Y} + TSX Roster. Change the yellow cells; every table, rank and chart recalculates.", 14)
+title(db, "Cairo Repair TSX – Sales Performance Dashboard", f"Source: Sales Tracker (Microsoft Forms) {min(dates):%d %b %Y} – {MAXD:%d %b %Y} + TSX Roster. Days are business days (shift 15:00 → 07:00 next morning). Change the yellow cells; every table, rank and chart recalculates.", 14)
 section(db, 4, "CONTROL PANEL", 1, 3)
 ctrl = [("From Date", DEF_FROM, "dd-mmm-yy"), ("To Date", DEF_TO, "dd-mmm-yy"), ("Ops Manager", "All", None), ("Team Leader", "All", None), ("Exclude Duplicates?", "Yes", None)]
 for i, (lab, v, fmt) in enumerate(ctrl):
@@ -724,7 +724,7 @@ line("1. ACCOUNT TREND (day-over-day)", "head")
 line(f"Volume has stepped up every month: average units per day went {' → '.join(f'{m.strftime(chr(37)+chr(98))} {x:.1f}' for m, x in mavg.items())}. The tracker started on {min(dates):%d %b}, so July is a partial month.")
 line(f"Last 7 days ({dates[-7]:%d %b}–{MAXD:%d %b}): {int(last7):,} units vs {int(prev7):,} the 7 days before ({l7c:+.0%}). Peak day so far: {peak:%a %d %b} with {int(daily.max()):,} units; {MAXD:%d %b} closed at {int(daily.iloc[-1]):,}.")
 line(f"Weekday pattern (avg units per day): strongest {wk.idxmax()} ({wk.max():.0f}), weakest {wk.idxmin()} ({wk.min():.0f}). Use the Daily_Account WoW % column to compare like-for-like weekdays instead of raw DoD on weekends.")
-line(f"Entries are logged between 14:00 and 07:00 Cairo time (US shift). A 'day' in this file is the form completion date, so late-shift sales after midnight count toward the next calendar day – keep that in mind when reading DoD swings.")
+line(f"Dates in this file are business days: the shift runs 15:00 Cairo to 07:00 the next morning (US hours), so a sale logged at 02:00 on 5 Oct counts toward the 4 Oct business day. Day-over-day figures therefore compare full shifts, not calendar days.")
 gap()
 line("2. PRODUCT MIX & QUALITY OF SALE", "head")
 line(f"GSRs are {gshare:.0%} of all units ({int(v.gsr.sum()):,}) vs XM Lines {1-gshare:.0%} ({int(v.xm.sum()):,}). GSR type mix: " + ", ".join(f"{k} {int(x):,}" for k, x in sorted(gt.items(), key=lambda z: -z[1])) + ". Speed Upgrade alone is {:.0%} of GSR type counts.".format(gt['Speed Upgrade']/sum(gt.values())))
@@ -778,6 +778,7 @@ rows_g = [
  ("Submissions", "Number of form entries (after the duplicate toggle)."),
  ("Active Sellers / Participation", "Roster agents with at least one unit in the period; participation = active ÷ headcount in scope. Agents not on the roster are shown separately as 'Not in Roster'."),
  ("XMC Attach %", "'Did you add XMC?' = Yes ÷ (Yes + No). E-SIM Activation % = 'Did you Activate the E-SIM?' Yes ÷ (Yes + No)."),
+ ("Business Date", "The shift day, not the calendar day. The team works US hours from Cairo: a business day starts at 15:00 and ends at 07:00 the next morning, so any form submitted before 12:00 noon is assigned to the previous day (e.g. 4 Oct = 4 Oct 15:00 to 5 Oct 07:00). The original timestamp is kept in 'Completion Time'."),
  ("Prior period", "The same number of days immediately before the From Date (shown in C11)."),
  ("Duplicate", "Same mapped HRID + account number + order number + entry type, where the order number is a 6-20 digit number. The first occurrence is kept."),
  ("HRID mapping", "Digits only; 8-digit IDs starting with 100 and 10-digit IDs starting with 1000 are repaired when a unique roster match exists. Everything else is 'Not in Roster'."),
