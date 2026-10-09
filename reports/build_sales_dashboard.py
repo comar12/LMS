@@ -435,6 +435,57 @@ ch.set_categories(Reference(at, min_col=1, min_row=TL1, max_row=TLL)); ch.y_axis
 at.add_chart(ch, "L4")
 at.sheet_properties.tabColor = TEAL
 
+# ================================================================= Leader_Trend
+LS1 = 30; LSL = LS1 + len(tls) - 1
+lt = wb.create_sheet("Leader_Trend")
+title(lt, "Single Leader – Day-over-Day Trend", "Pick a Team Leader in B3. Every day in the tracker with DoD change, 7-day average, week-over-week, participation and share of the account.", 14)
+put(lt, "A3", "Team Leader ▶", F(11, True), LIGHT); lt.merge_cells("B3:C3"); put(lt, "B3", "Omar Mansour" if "Omar Mansour" in tls else tls[0], F(11, True, "0000FF"), INPUT)
+dv_lt = DataValidation(type="list", formula1=f"=Lists!$A$3:$A${2+NT}", allow_blank=False); lt.add_data_validation(dv_lt); dv_lt.add("B3")
+LTR = 12; LT1 = LTR + 1; LTL = LT1 + ND - 1
+linfo = [("Ops Manager", f'=IFERROR(INDEX({R_OM},MATCH($B$3,{R_TL},0)),"")', None), ("Headcount", f"=COUNTIF({R_TL},$B$3)", "0"),
+         ("Production / Training", f'=COUNTIFS({R_TL},$B$3,{R_PHASE},"Production")&" / "&COUNTIFS({R_TL},$B$3,{R_PHASE},"Training")', None),
+         ("Period Units (Dashboard range)", f'=IFERROR(INDEX(Dashboard!$H${LS1}:$H${LSL},MATCH($B$3,Dashboard!$B${LS1}:$B${LSL},0)),0)', "#,##0"),
+         ("Rank (Period)", f'=IFERROR(INDEX(Dashboard!$A${LS1}:$A${LSL},MATCH($B$3,Dashboard!$B${LS1}:$B${LSL},0)),"-")', "0"),
+         ("All-time Units", f"=SUMIFS({C_U},{C_TL},$B$3,{C_INC},1)", "#,##0"),
+         ("Best Day (units)", f"=MAX($E${LT1}:$E${LTL})", "#,##0")]
+for i, (lab, fml, fmt) in enumerate(linfo):
+    rr = 4 + i; put(lt, f"A{rr}", lab, F(10, True), LIGHT); lt.merge_cells(f"B{rr}:C{rr}"); put(lt, f"B{rr}", fml, F(10, True), fmt=fmt)
+LTR = 12; LT1 = LTR + 1; LTL = LT1 + ND - 1
+header_row(lt, LTR, 1, ["Date","Submissions","XM Lines","GSR Units","Total Units","DoD Δ","DoD %","7-Day Avg","WoW %","Active Sellers","Participation %","Units / HC","Account Units","Share of Account"]); lt.row_dimensions[LTR].height = 30
+for k, d in enumerate(dates):
+    rr = LT1 + k
+    put(lt, f"A{rr}", d, F(10, True), fmt="ddd dd-mmm")
+    f = {"B": f"=SUMIFS({C_INC},{C_TL},$B$3,{C_DATE},$A{rr})", "C": f"=SUMIFS({C_XM},{C_TL},$B$3,{C_DATE},$A{rr},{C_INC},1)",
+         "D": f"=SUMIFS({C_GSR},{C_TL},$B$3,{C_DATE},$A{rr},{C_INC},1)", "E": f"=C{rr}+D{rr}", "F": (f"=E{rr}-E{rr-1}" if k else "-"),
+         "G": (f'=IF(E{rr-1}=0,"-",(E{rr}-E{rr-1})/E{rr-1})' if k else "-"), "H": f"=AVERAGE(E{max(LT1, rr-6)}:E{rr})",
+         "I": (f'=IF(E{rr-7}=0,"-",(E{rr}-E{rr-7})/E{rr-7})' if k >= 7 else "-"),
+         "J": f"=SUMIFS({C_DF},{C_TL},$B$3,{C_DATE},$A{rr})", "K": f"=IFERROR(J{rr}/$B$5,0)", "L": f"=IFERROR(E{rr}/$B$5,0)",
+         "M": f"=SUMIFS({C_U},{C_DATE},$A{rr},{C_INC},1)", "N": f"=IFERROR(E{rr}/M{rr},0)"}
+    fm = {"F":"+#,##0;-#,##0;0","G":"+0.0%;-0.0%;0.0%","H":"0.0","I":"+0.0%;-0.0%;0.0%","K":"0%","L":"0.00","N":"0.0%"}
+    for col, v in f.items(): put(lt, f"{col}{rr}", v, F(10, col == "E"), fmt=fm.get(col, "#,##0"))
+ltt = LTL + 1
+put(lt, f"A{ltt}", "TOTAL", F(10, True, "FFFFFF"), NAVY)
+for col in "BCDEJM": put(lt, f"{col}{ltt}", f"=SUM({col}{LT1}:{col}{LTL})", F(10, True), LIGHT, "#,##0")
+put(lt, f"F{ltt}", "", fl=LIGHT); put(lt, f"G{ltt}", "", fl=LIGHT); put(lt, f"I{ltt}", "", fl=LIGHT)
+put(lt, f"H{ltt}", f"=AVERAGE(E{LT1}:E{LTL})", F(10, True), LIGHT, "0.0"); put(lt, f"K{ltt}", f"=IFERROR(AVERAGE(K{LT1}:K{LTL}),0)", F(10, True), LIGHT, "0%")
+put(lt, f"L{ltt}", f"=IFERROR(E{ltt}/$B$5,0)", F(10, True), LIGHT, "0.00"); put(lt, f"N{ltt}", f"=IFERROR(E{ltt}/M{ltt},0)", F(10, True), LIGHT, "0.0%")
+lt.freeze_panes = f"B{LT1}"
+widths(lt, {"A":26,"B":12,"C":10,"D":10,"E":11,"F":9,"G":9,"H":10,"I":9,"J":11,"K":12,"L":10,"M":12,"N":13})
+for col in "FGI":
+    lt.conditional_formatting.add(f"{col}{LT1}:{col}{LTL}", CellIsRule(operator="greaterThan", formula=["0"], font=Font(name="Calibri", color=GREEN, bold=True)))
+    lt.conditional_formatting.add(f"{col}{LT1}:{col}{LTL}", CellIsRule(operator="lessThan", formula=["0"], font=Font(name="Calibri", color=RED, bold=True)))
+lt.conditional_formatting.add(f"E{LT1}:E{LTL}", ColorScaleRule(start_type="num", start_value=0, start_color="FFFFFF", end_type="max", end_color="63BE7B"))
+lt.conditional_formatting.add(f"K{LT1}:K{LTL}", ColorScaleRule(start_type="min", start_color="F8696B", mid_type="percentile", mid_value=50, mid_color="FFEB84", end_type="max", end_color="63BE7B"))
+lc1 = LineChart(); lc1.title = "Leader – daily Total Units with 7-day average"; lc1.height = 8; lc1.width = 20; lc1.style = 10
+lc1.add_data(Reference(lt, min_col=5, min_row=LTR, max_row=LTL), titles_from_data=True); lc1.add_data(Reference(lt, min_col=8, min_row=LTR, max_row=LTL), titles_from_data=True)
+lc1.set_categories(Reference(lt, min_col=1, min_row=LT1, max_row=LTL)); lc1.y_axis.title = "Units"; lc1.x_axis.number_format = "dd-mmm"; lc1.legend.position = "b"
+lt.add_chart(lc1, "P3")
+lc2 = LineChart(); lc2.title = "Leader – daily Participation % (active sellers ÷ headcount)"; lc2.height = 8; lc2.width = 20; lc2.style = 10
+lc2.add_data(Reference(lt, min_col=11, min_row=LTR, max_row=LTL), titles_from_data=True)
+lc2.set_categories(Reference(lt, min_col=1, min_row=LT1, max_row=LTL)); lc2.y_axis.number_format = "0%"; lc2.x_axis.number_format = "dd-mmm"; lc2.legend = None
+lt.add_chart(lc2, "P20")
+lt.sheet_properties.tabColor = TEAL
+
 # ================================================================= Dashboard
 db = wb.create_sheet("Dashboard", 0)
 db.sheet_view.showGridLines = False
@@ -530,8 +581,37 @@ for col in "MN":
     db.conditional_formatting.add(f"{col}{LS1}:{col}{LSL}", CellIsRule(operator="lessThan", formula=["0"], font=Font(name="Calibri", color=RED, bold=True)))
 db.conditional_formatting.add(f"H{LS1}:H{LSL}", DataBarRule(start_type="num", start_value=0, end_type="max", color="2E75B6"))
 
+# --- leader day-over-day matrix (last 7 days ending To Date)
+LD0 = nr + 2
+section(db, LD0, "LEADER DAY-OVER-DAY – Total Units per leader for the last 7 days ending at To Date (Ops Manager filter applies)")
+put(db, f"A{LD0+1}", "Rank (7d)", F(10, True, NAVY), LIGHT); put(db, f"B{LD0+1}", "Team Leader", F(10, True, NAVY), LIGHT)
+for k in range(7): put(db, f"{L(3+k)}{LD0+1}", f"=$C$6-{6-k}", F(10, True, NAVY), LIGHT, "ddd dd-mmm")
+for k, lab in enumerate(["DoD Δ (last day)","DoD %","7-Day Total","Avg / Day","vs Previous 7 Days"]): put(db, f"{L(10+k)}{LD0+1}", lab, F(10, True, NAVY), LIGHT)
+db.row_dimensions[LD0+1].height = 30
+LD1 = LD0 + 2; LDL = LD1 + NT - 1
+for j, tname in enumerate(tls):
+    rr = LD1 + j
+    put(db, f"A{rr}", f'=IF(L{rr}=0,"-",RANK(L{rr},$L${LD1}:$L${LDL}))', F(10, True), fmt="0"); put(db, f"B{rr}", tname, F(10, True))
+    for k in range(7):
+        col = L(3 + k)
+        put(db, f"{col}{rr}", f"=SUMIFS({C_U},{C_DATE},{col}${LD0+1},{C_TL},$B{rr},{C_OM},$C$15,{C_INC},1)", F(10), fmt="#,##0")
+    put(db, f"J{rr}", f"=I{rr}-H{rr}", F(10, True), fmt="+#,##0;-#,##0;0")
+    put(db, f"K{rr}", f'=IF(H{rr}=0,"-",(I{rr}-H{rr})/H{rr})', F(10), fmt="+0.0%;-0.0%;0.0%")
+    put(db, f"L{rr}", f"=SUM(C{rr}:I{rr})", F(10, True), fmt="#,##0")
+    put(db, f"M{rr}", f"=L{rr}/7", F(10), fmt="0.0")
+    put(db, f"N{rr}", f'=IF(SUMIFS({C_U},{C_DATE},">="&($C$6-13),{C_DATE},"<="&($C$6-7),{C_TL},$B{rr},{C_OM},$C$15,{C_INC},1)=0,"-",(L{rr}-SUMIFS({C_U},{C_DATE},">="&($C$6-13),{C_DATE},"<="&($C$6-7),{C_TL},$B{rr},{C_OM},$C$15,{C_INC},1))/SUMIFS({C_U},{C_DATE},">="&($C$6-13),{C_DATE},"<="&($C$6-7),{C_TL},$B{rr},{C_OM},$C$15,{C_INC},1))', F(10), fmt="+0.0%;-0.0%;0.0%")
+ldt = LDL + 1
+put(db, f"A{ldt}", "", fl=NAVY); put(db, f"B{ldt}", "ACCOUNT TOTAL (roster teams)", F(10, True, "FFFFFF"), NAVY)
+for k in range(7): put(db, f"{L(3+k)}{ldt}", f"=SUM({L(3+k)}{LD1}:{L(3+k)}{LDL})", F(10, True), LIGHT, "#,##0")
+put(db, f"J{ldt}", f"=I{ldt}-H{ldt}", F(10, True), LIGHT, "+#,##0;-#,##0;0"); put(db, f"K{ldt}", f'=IF(H{ldt}=0,"-",(I{ldt}-H{ldt})/H{ldt})', F(10, True), LIGHT, "+0.0%;-0.0%;0.0%")
+put(db, f"L{ldt}", f"=SUM(L{LD1}:L{LDL})", F(10, True), LIGHT, "#,##0"); put(db, f"M{ldt}", f"=L{ldt}/7", F(10, True), LIGHT, "0.0"); put(db, f"N{ldt}", "", F(10), LIGHT)
+db.conditional_formatting.add(f"C{LD1}:I{LDL}", ColorScaleRule(start_type="num", start_value=0, start_color="FFFFFF", end_type="max", end_color="63BE7B"))
+for col in "JKN":
+    db.conditional_formatting.add(f"{col}{LD1}:{col}{ldt}", CellIsRule(operator="greaterThan", formula=["0"], font=Font(name="Calibri", color=GREEN, bold=True)))
+    db.conditional_formatting.add(f"{col}{LD1}:{col}{ldt}", CellIsRule(operator="lessThan", formula=["0"], font=Font(name="Calibri", color=RED, bold=True)))
+
 # --- ops manager block
-OM0 = nr + 2
+OM0 = ldt + 2
 section(db, OM0, "OPS MANAGER VIEW – selected period")
 header_row(db, OM0 + 1, 1, ["Rank","Ops Manager","Teams","HC","Submissions","XM Lines","GSR Units","Total Units","Units / HC","Active Sellers","Participation %","Prior Period Units","Δ vs Prior","Δ %"], LIGHT, NAVY, 10); db.row_dimensions[OM0 + 1].height = 30
 OM1 = OM0 + 2; OML = OM1 + len(oms) - 1
@@ -670,7 +750,7 @@ line(f"{int(s.dup.sum()):,} entries are exact duplicates (same HRID + account + 
 line(f"The 'Count of GSR' field only exists since 24 Aug; before that GSR units are inferred from the number of GSR types ticked. 8-digit / 10-digit HRID typos were auto-corrected where a unique roster match existed; make HRID a validated 9-digit field in the Form.")
 gap()
 line("6. RECOMMENDED ACTIONS FOR THE 3 NEWLY-PROMOTED LEADERS", "head")
-line("Daily (10 min): open Daily_Agent with your team selected, read the DoD Δ row and the Rank-in-Team row; message every agent with 0 units by mid-shift and recognise the top mover publicly.")
+line("Daily (10 min): open Leader_Trend and Daily_Agent with your team selected, read the DoD Δ row and the Rank-in-Team row; message every agent with 0 units by mid-shift and recognise the top mover publicly.")
 line("Weekly: use the Dashboard with From/To set to the week and Team Leader set to your name – review Participation %, Units / Active Seller and the Bottom-10 list; pair each bottom-10 agent with a top-10 agent for a side-by-side on XMC attach and e-SIM activation.")
 line("Pitch focus: XMC attach is below 15% – build a one-line XMC offer into every XM Line close; e-SIM activation misses should be followed up the same shift, since an unactivated e-SIM is a sale at risk.")
 line("Hygiene: every agent submits the form before closing the interaction, HRID copied from the roster, order number from the system – one wrong HRID removes the sale from your scorecard.")
@@ -686,6 +766,7 @@ rows_g = [
  ("Daily_Account", "Whole-account day-over-day for every day in the tracker: units, DoD Δ and %, trailing 7-day average, week-over-week (same weekday), active sellers, XMC attach, e-SIM activation, GSR type split, devices and data-quality counts."),
  ("Daily_Leader", "Metric dropdown (B3). Summary rows 6-12 use the Dashboard date range; the matrix below shows each day for every Team Leader, with a day-over-day change block on the right."),
  ("Daily_Agent", "Team Leader dropdown (B3) + metric (B4). Agents of the chosen team populate automatically with period totals, last-day vs prior-day, rank in team, active days, then a daily matrix and a DoD block."),
+ ("Leader_Trend", "One Team Leader (B3): every day with submissions / XM / GSR / units, DoD Δ and %, 7-day average, week-over-week, active sellers, participation %, units per head and share of the account, with two charts. The Dashboard also has a 'Leader Day-over-Day' matrix for the last 7 days."),
  ("Agent_Trend", "One agent (B3): daily submissions / XM / GSR / units, DoD, 7-day average, cumulative and a comparison against the team's average per agent, with a chart."),
  ("Agent_Summary", "All roster agents for the Dashboard period & scope. Filter/sort with the header arrows. 'Rank (Scope)' ranks inside the current filter; 'Rank (Team)' ranks inside the agent's team. Red shading = no sale for more than 7 days."),
  ("Insights", "Top block is live (formulas). Numbered sections are the analyst commentary computed from the full history at build time."),
