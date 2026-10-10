@@ -15,7 +15,7 @@ for _, x in s.iterrows():
     rows.append([x["Date"].strftime("%Y-%m-%d"), x["hr_key"], x["TL"], x["OM"], int(x["xm"]), int(x["gsr"]), yn(x["Did you add XMC?"]), yn(x["Did you Activate the E-SIM?"]),
                  x["device"], x["promo"], int(x["dup"]), int(x["in_roster"]), int(x["order_valid"]), types, int(x["ID"])])
 roster = [[a["HRID"], a["Agent Name"], a["Team Leader"], a["Ops Manager"], a["Phase"], a["Tenure Bucket"], a["Wave"]] for _, a in r.iterrows()]
-data = {"meta": {"minDate": min(d["dates"]).isoformat(), "maxDate": d["MAXD"].isoformat(), "defFrom": d["DEF_FROM"].isoformat(), "built": dt.date.today().strftime("%d %b %Y"), "rows": len(rows)},
+data = {"meta": {"minDate": min(d["dates"]).isoformat(), "maxDate": d["MAXD"].isoformat(), "defFrom": d["DEF_FROM"].isoformat(), "built": dt.date.today().strftime("%d %b %Y"), "rows": len(rows), "source": "Source: Sales Tracker (Microsoft Forms)"},
         "rows": rows, "roster": roster, "tls": d["tls"], "oms": d["oms"]}
 js = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 html = open(TEMPLATE, encoding="utf-8").read()

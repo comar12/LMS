@@ -82,6 +82,9 @@ ul.ins li:last-child{border-bottom:0}
 .sec{background:var(--navy);color:#fff;font-weight:700;padding:6px 10px;border-radius:6px;margin:12px 0 6px;text-align:center}
 .search{font:inherit;padding:5px 8px;border:1px solid var(--axis);border-radius:6px;background:var(--surface);color:var(--ink);width:340px;max-width:100%}
 .small{font-size:12px;color:var(--muted)}
+.upload{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.btn.up{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.35);cursor:pointer}
+body.drag::after{content:"Drop the tracker export here";position:fixed;inset:0;background:rgba(31,56,100,.85);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;z-index:99}
 .theme{float:right;font:inherit;font-size:12px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:3px 8px;cursor:pointer}
 </style>
 </head>
@@ -90,6 +93,7 @@ ul.ins li:last-child{border-bottom:0}
   <button class="theme" id="themeBtn">Dark / light</button>
   <h1>Cairo Repair TSX – Sales Performance Dashboard</h1>
   <div class="sub" id="subtitle"></div>
+  <div class="upload" id="uploadBar"><label class="btn up">📂 Load new tracker export (.xlsx)<input type="file" id="fileTracker" accept=".xlsx" hidden></label><label class="btn up">👥 Load updated roster (.xlsx)<input type="file" id="fileRoster" accept=".xlsx" hidden></label><button class="btn up" id="resetData">Reset to built-in data</button><span id="dataNote" class="small" style="color:#fff;opacity:.85"></span><span id="uploadMsg" class="small" style="color:#ffd966"></span></div>
 </header>
 <div class="wrap">
   <div class="filters">
@@ -159,13 +163,9 @@ ul.ins li:last-child{border-bottom:0}
 </div>
 <div class="tip" id="tip"></div>
 <script>
-const D = __DATA__;
-/* ---------------------------------------------------------------- data */
-const rows = D.rows.map(a => ({d:a[0], hr:a[1], tl:a[2], om:a[3], xm:a[4], gsr:a[5], u:a[4]+a[5], xmc:a[6], esim:a[7], dev:a[8], promo:a[9], dup:a[10], inr:a[11], ov:a[12], ty:a[13], id:a[14]}));
-const roster = D.roster.map(a => ({hr:a[0], name:a[1], tl:a[2], om:a[3], phase:a[4], tenure:a[5], wave:a[6]}));
-const rosterBy = Object.fromEntries(roster.map(a => [a.hr, a]));
-const DATES = []; { let d = new Date(D.meta.minDate+'T00:00:00Z'); const e = new Date(D.meta.maxDate+'T00:00:00Z'); while (d <= e) { DATES.push(d.toISOString().slice(0,10)); d.setUTCDate(d.getUTCDate()+1); } }
-const DI = Object.fromEntries(DATES.map((d,i)=>[d,i]));
+const EMBEDDED = __DATA__;
+/* ---------------------------------------------------------------- data (mutable: embedded build or an uploaded export) */
+let rows, roster, rosterBy, DATES, DI, TLS, OMS, META, HIST;
 const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const fd = s => { const d = new Date(s+'T00:00:00Z'); return WD[d.getUTCDay()]+' '+String(d.getUTCDate()).padStart(2,'0')+'-'+MO[d.getUTCMonth()]; };
 const fds = s => { const d = new Date(s+'T00:00:00Z'); return String(d.getUTCDate()).padStart(2,'0')+'-'+MO[d.getUTCMonth()]; };
@@ -179,8 +179,17 @@ const sgn = (v,f=n0) => v>0 ? '+'+f(v) : v<0 ? '−'+f(-v) : f(0);
 const cls = v => v>0 ? 'up' : v<0 ? 'down' : 'flat';
 const arrow = v => v>0 ? '▲ ' : v<0 ? '▼ ' : '■ ';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function applyData(D){
+  rows = D.rows.map(a => ({d:a[0], hr:a[1], tl:a[2], om:a[3], xm:a[4], gsr:a[5], u:a[4]+a[5], xmc:a[6], esim:a[7], dev:a[8], promo:a[9], dup:a[10], inr:a[11], ov:a[12], ty:a[13], id:a[14]}));
+  roster = D.roster.map(a => ({hr:a[0], name:a[1], tl:a[2], om:a[3], phase:a[4], tenure:a[5], wave:a[6]}));
+  rosterBy = Object.fromEntries(roster.map(a => [a.hr, a]));
+  TLS = D.tls; OMS = D.oms; META = D.meta;
+  DATES = []; { let d = new Date(META.minDate+'T00:00:00Z'); const e = new Date(META.maxDate+'T00:00:00Z'); while (d <= e) { DATES.push(d.toISOString().slice(0,10)); d.setUTCDate(d.getUTCDate()+1); } }
+  DI = Object.fromEntries(DATES.map((d,i)=>[d,i]));
+  HIST = computeHist();
+}
 
-const state = { from: D.meta.defFrom, to: D.meta.maxDate, om:'All', tl:'All', exdup:true, tab:'overview', leader:null, agent:null, preset:'14' };
+const state = { from: null, to: null, om:'All', tl:'All', exdup:true, tab:'overview', leader:null, agent:null, preset:'14' };
 
 /* ---------------------------------------------------------------- compute */
 function daily(rs) { // per business day series over DATES
@@ -212,13 +221,13 @@ function compute() {
   const byHr = {}; for (const r of base) { (byHr[r.hr] ||= []).push(r); }
   const agents = agentsIn.map(a => { const rs = byHr[a.hr]||[]; const c = agg(rs.filter(per)), p = agg(rs.filter(pri));
     const days = new Set(rs.filter(per).map(r=>r.d)).size; const last = rs.length ? rs.reduce((m,r)=>r.d>m?r.d:m, '') : null;
-    return {...a, subs:c.subs, xm:c.xm, gsr:c.gsr, u:c.u, days, upd: days?c.u/days:0, prior:p.u, delta:c.u-p.u, last, since: last? (DI[D.meta.maxDate]-DI[last]) : null}; });
+    return {...a, subs:c.subs, xm:c.xm, gsr:c.gsr, u:c.u, days, upd: days?c.u/days:0, prior:p.u, delta:c.u-p.u, last, since: last? (DI[META.maxDate]-DI[last]) : null}; });
   const sortedU = [...agents].sort((a,b)=>b.u-a.u);
   agents.forEach(a => { a.rank = sortedU.filter(x=>x.u>a.u).length+1; a.rankTeam = agents.filter(x=>x.tl===a.tl && x.u>a.u).length+1; });
   // leaders (OM filter only)
   const omOnly = base.filter(r => state.om==='All'||r.om===state.om);
   const byTl = {}; for (const r of omOnly) { (byTl[r.tl] ||= []).push(r); }
-  const leaders = D.tls.map(t => { const rs = byTl[t]||[]; const c = agg(rs.filter(per)), p = agg(rs.filter(pri));
+  const leaders = TLS.map(t => { const rs = byTl[t]||[]; const c = agg(rs.filter(per)), p = agg(rs.filter(pri));
     const hc = roster.filter(a=>a.tl===t && (state.om==='All'||a.om===state.om)).length; const hcAll = roster.filter(a=>a.tl===t).length;
     const prod = roster.filter(a=>a.tl===t && a.phase==='Production').length;
     const om = [...new Set(roster.filter(a=>a.tl===t).map(a=>a.om))].join(' / ');
@@ -354,7 +363,7 @@ function renderLeaders(){ const {leaders, i0, i1, len, nrCur} = C; const tot = l
   const au = C.dy; h+=`<tr class="total"><td>Selected scope total</td>`+days.map((d,k)=>`<td>${n0(au.u[i0+k])}</td>`).join('')+`<td>${deltaHtml(au.u[i1]-(i1>0?au.u[i1-1]:0))}</td><td>${i1>0&&au.u[i1-1]?pctDeltaHtml((au.u[i1]-au.u[i1-1])/au.u[i1-1]):'-'}</td><td>${n0(C.cur.u)}</td><td>${n1(C.cur.u/len)}</td><td>${C.prev.u?pctDeltaHtml((C.cur.u-C.prev.u)/C.prev.u):'-'}</td></tr></table>`;
   document.getElementById('leaderMatrix').innerHTML=h;
   // leader trend
-  const sel=document.getElementById('leaderSel'); if (!sel.options.length){ for (const t of D.tls){ const o=document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o);} sel.value = state.leader || (D.tls.includes('Omar Mansour')?'Omar Mansour':D.tls[0]); sel.addEventListener('change',()=>{state.leader=sel.value; renderLeaderTrend();}); }
+  const sel=document.getElementById('leaderSel'); if (!sel.options.length){ for (const t of TLS){ const o=document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o);} sel.value = (state.leader && TLS.includes(state.leader)) ? state.leader : (TLS.includes('Omar Mansour')?'Omar Mansour':TLS[0]); }
   state.leader = sel.value; renderLeaderTrend(); }
 function renderLeaderTrend(){ const l = C.leaders.find(x=>x.tl===state.leader); if(!l) return; const {i0,i1,len}=C; const labels=DATES.slice(i0,i1+1); const sl=a=>a.slice(i0,i1+1);
   const best = Math.max(...l.dy.u); const bestD = DATES[l.dy.u.indexOf(best)];
@@ -366,8 +375,8 @@ function renderLeaderTrend(){ const l = C.leaders.find(x=>x.tl===state.leader); 
 function renderAgents(){ const {agents} = C; const top=[...agents].sort((a,b)=>b.u-a.u).slice(0,10); const bot=agents.filter(a=>a.phase==='Production').sort((a,b)=>a.u-b.u||(b.since||0)-(a.since||0)).slice(0,10);
   makeTable(document.getElementById('top10'), [{k:'rank',label:'#',html:r=>`<span class="rank ${r.rank===1?'r1':''}">${r.rank}</span>`},{k:'name',label:'Agent',cls:'name'},{k:'tl',label:'Team Leader'},{k:'u',label:'Units',html:r=>`<span class="bar" style="width:${Math.round(50*r.u/Math.max(1,top[0].u))}px"></span><b>${n0(r.u)}</b>`},{k:'xm',label:'XM',fmt:n0},{k:'gsr',label:'GSR',fmt:n0},{k:'days',label:'Active Days',fmt:n0}], top, {sortK:'u'});
   makeTable(document.getElementById('bottom10'), [{k:'name',label:'Agent',cls:'name'},{k:'tl',label:'Team Leader'},{k:'u',label:'Units',fmt:n0,style:r=>r.u===0?'background:#f8cbad;color:#0b0b0b':''},{k:'days',label:'Active Days',fmt:n0},{k:'last',label:'Last Sale',fmt:v=>v?fds(v):'never'},{k:'since',label:'Days Since',fmt:v=>v==null?'-':n0(v)},{k:'tenure',label:'Tenure'}], bot, {sortK:'u', sortDir:1});
-  const dl=document.getElementById('agentList'); if(!dl.options.length){ for (const a of [...roster].sort((x,y)=>x.name.localeCompare(y.name))){ const o=document.createElement('option'); o.value=`${a.name} (${a.hr})`; dl.appendChild(o);} const inp=document.getElementById('agentSel'); inp.value = state.agent || `${top[0].name} (${top[0].hr})`; inp.addEventListener('change',()=>{ state.agent=inp.value; renderAgentTrend(); }); }
-  if(!state.agent) state.agent=document.getElementById('agentSel').value; renderAgentTrend();
+  const dl=document.getElementById('agentList'); if(!dl.options.length){ for (const a of [...roster].sort((x,y)=>x.name.localeCompare(y.name))){ const o=document.createElement('option'); o.value=`${a.name} (${a.hr})`; dl.appendChild(o);} const inp=document.getElementById('agentSel'); const m=/\((\d+)\)\s*$/.exec(state.agent||''); inp.value = (m && rosterBy[m[1]]) ? state.agent : (top.length? `${top[0].name} (${top[0].hr})` : ''); state.agent=inp.value; }
+  renderAgentTrend();
   const search=document.getElementById('agentSearch'); const draw=()=>{ const q=search.value.trim().toLowerCase(); const data=agents.filter(a=>!q||`${a.name} ${a.tl} ${a.om} ${a.hr} ${a.phase}`.toLowerCase().includes(q));
     makeTable(document.getElementById('agentTable'), [{k:'hr',label:'HRID'},{k:'name',label:'Agent Name',cls:'name',asc:true},{k:'tl',label:'Team Leader',asc:true},{k:'om',label:'Ops Manager',asc:true},{k:'phase',label:'Phase',asc:true},{k:'tenure',label:'Tenure',asc:true},{k:'subs',label:'Submissions',fmt:n0},{k:'xm',label:'XM Lines',fmt:n0},{k:'gsr',label:'GSR Units',fmt:n0},{k:'u',label:'Total Units',html:r=>`<span class="bar" style="width:${Math.round(40*r.u/Math.max(1,...agents.map(x=>x.u)))}px"></span><b>${n0(r.u)}</b>`},{k:'days',label:'Active Days',fmt:n0},{k:'upd',label:'Units / Active Day',fmt:n2},{k:'prior',label:'Prior Period',fmt:n0},{k:'delta',label:'Δ vs Prior',html:r=>deltaHtml(r.delta)},{k:'last',label:'Last Sale',fmt:v=>v?fds(v):'never'},{k:'since',label:'Days Since',fmt:v=>v==null?'-':n0(v),style:r=>(r.since==null||r.since>7)?'background:#f8cbad;color:#0b0b0b':''},{k:'rank',label:'Rank (Scope)',fmt:n0},{k:'rankTeam',label:'Rank (Team)',fmt:n0}], data, {sortK:'u'}); };
   if(!search._wired){ search.addEventListener('input',draw); search._wired=true; } draw(); }
@@ -396,7 +405,7 @@ function renderQuality(){ const all=rows; const unm=all.filter(r=>!r.inr); const
   document.getElementById('defs').innerHTML=['Units = XM Lines sold + GSR units. XM Lines = "No. of XM Lines" (1 if blank). GSR units = "Count of GSR" when present, otherwise the number of GSR types ticked (the count field only exists since 24 Aug 2026).','Business day = 15:00 Cairo to 07:00 the next morning (US hours). Any submission before 12:00 noon belongs to the previous day\'s shift.','Active sellers = roster agents with at least one unit; participation = active ÷ headcount in scope. Agents not on the roster are shown separately as "not in roster".','XMC attach % = "Did you add XMC?" Yes ÷ (Yes + No). E-SIM activation % = "Did you activate the E-SIM?" Yes ÷ (Yes + No).','Prior period = the same number of days immediately before the From date.','Duplicate = same mapped HRID + account + order number + entry type where the order number is a 6–20 digit number; the first occurrence is kept.','HRID mapping: digits only; 8-digit IDs starting with 100 and 10-digit IDs starting with 1000 are repaired when a unique roster match exists.'].map(s=>`<li>${esc(s)}</li>`).join(''); }
 
 /* ---------------------------------------------------------------- full-history insights (whole account, duplicates excluded) */
-const HIST = (() => { const v = rows.filter(r=>!r.dup); const dy = daily(v); const L=[]; const n=DATES.length;
+function computeHist(){ const v = rows.filter(r=>!r.dup); const dy = daily(v); const L=[]; const n=DATES.length;
   const mon={}; DATES.forEach((d,i)=>{ const k=d.slice(0,7); (mon[k] ||= {u:0,n:0}); mon[k].u+=dy.u[i]; mon[k].n++; }); L.push('Average units per day by month: '+Object.entries(mon).map(([k,o])=>`${MO[+k.slice(5,7)-1]} ${n1(o.u/o.n)}`).join(' → ')+'. The tracker started on '+fds(DATES[0])+', so the first month is partial.');
   const l7=sum(dy.u,n-7,n-1), p7=sum(dy.u,n-14,n-8); const bi=dy.u.indexOf(Math.max(...dy.u)); L.push(`Last 7 business days (${fds(DATES[n-7])}–${fds(DATES[n-1])}): ${n0(l7)} units vs ${n0(p7)} the 7 days before (${p7?sgn((l7-p7)/p7,x=>(x*100).toFixed(0)+'%'):'n/a'}). Best day on record: ${fd(DATES[bi])} with ${n0(dy.u[bi])} units.`);
   const wk={}; DATES.forEach((d,i)=>{ const w=WD[new Date(d+'T00:00:00Z').getUTCDay()]; (wk[w] ||= {u:0,n:0}); wk[w].u+=dy.u[i]; wk[w].n++; }); const we=Object.entries(wk).map(([k,o])=>[k,o.u/o.n]).sort((a,b)=>b[1]-a[1]); L.push(`Weekday pattern (average units per business day): strongest ${we[0][0]} (${n0(we[0][1])}), weakest ${we[we.length-1][0]} (${n0(we[we.length-1][1])}). Use WoW % to compare like-for-like weekdays.`);
@@ -405,28 +414,93 @@ const HIST = (() => { const v = rows.filter(r=>!r.dup); const dy = daily(v); con
   L.push(`XMC attach on XM Line sales is ${pct(xa.length?xy/xa.length:0)} overall (${xy} of ${n0(xa.length)} answered) and ${pct(x30.length?x30.filter(r=>r.xmc==='Y').length/x30.length:0)} in the last 30 days – the single biggest upsell gap. E-SIM activation is ${pct(ea.length?ey/ea.length:0)} overall and ${pct(e30.length?e30.filter(r=>r.esim==='Y').length/e30.length:0)} in the last 30 days.`);
   const dev={}; for(const r of v) if(r.dev&&r.dev!=='No Device'&&r.dev!=='Other') dev[r.dev]=(dev[r.dev]||0)+1; L.push(`Device attach: ${Object.entries(dev).sort((a,b)=>b[1]-a[1]).map(([k,c])=>`${k} ${n0(c)}`).join(', ')}. "Free Line for 1 Year" is the dominant promotion (${n0(v.filter(r=>r.promo==='Free Line for 1 Year').length)} entries).`);
   const hc={}; for(const a of roster) hc[a.tl]=(hc[a.tl]||0)+1; const l30=v.filter(r=>r.inr&&r.d>=d30), p30=v.filter(r=>r.inr&&r.d<d30&&r.d>=DATES[Math.max(0,n-60)]); const tu={}, pu={}, ta={}; for(const r of l30){tu[r.tl]=(tu[r.tl]||0)+r.u; (ta[r.tl] ||= new Set()).add(r.hr);} for(const r of p30) pu[r.tl]=(pu[r.tl]||0)+r.u;
-  const per=D.tls.map(t=>[t,(tu[t]||0)/hc[t],hc[t],(ta[t]?ta[t].size:0)/hc[t]]).sort((a,b)=>b[1]-a[1]); L.push(`Last 30 days, units per head: top ${per.slice(0,3).map(x=>`${x[0]} ${n1(x[1])} (HC ${x[2]}, participation ${pct0(x[3])})`).join(', ')}. Bottom ${per.slice(-3).map(x=>`${x[0]} ${n1(x[1])} (participation ${pct0(x[3])})`).join(', ')} – teams still in Training phase naturally sit lower.`);
-  const mv=D.tls.map(t=>[t,(tu[t]||0)-(pu[t]||0)]).sort((a,b)=>b[1]-a[1]); L.push(`Biggest 30-day movers vs the previous 30 days – up: ${mv.filter(x=>x[1]>0).slice(0,3).map(x=>`${x[0]} ${sgn(x[1])}`).join(', ')}. Down: ${mv.filter(x=>x[1]<0).slice(-3).reverse().map(x=>`${x[0]} ${sgn(x[1])}`).join(', ')||'none'}.`);
+  const per=TLS.map(t=>[t,(tu[t]||0)/hc[t],hc[t],(ta[t]?ta[t].size:0)/hc[t]]).sort((a,b)=>b[1]-a[1]); L.push(`Last 30 days, units per head: top ${per.slice(0,3).map(x=>`${x[0]} ${n1(x[1])} (HC ${x[2]}, participation ${pct0(x[3])})`).join(', ')}. Bottom ${per.slice(-3).map(x=>`${x[0]} ${n1(x[1])} (participation ${pct0(x[3])})`).join(', ')} – teams still in Training phase naturally sit lower.`);
+  const mv=TLS.map(t=>[t,(tu[t]||0)-(pu[t]||0)]).sort((a,b)=>b[1]-a[1]); L.push(`Biggest 30-day movers vs the previous 30 days – up: ${mv.filter(x=>x[1]>0).slice(0,3).map(x=>`${x[0]} ${sgn(x[1])}`).join(', ')}. Down: ${mv.filter(x=>x[1]<0).slice(-3).reverse().map(x=>`${x[0]} ${sgn(x[1])}`).join(', ')||'none'}.`);
   const au={}; for(const r of l30) au[r.hr]=(au[r.hr]||0)+r.u; const as=Object.entries(au).sort((a,b)=>b[1]-a[1]); const t10=as.slice(0,10).reduce((s,x)=>s+x[1],0), tot30=l30.reduce((s,r)=>s+r.u,0); const prod=roster.filter(a=>a.phase==='Production'); const zp=prod.filter(a=>!au[a.hr]);
   L.push(`${t10/tot30>0.35?'Concentration risk':'Output is well spread'}: the top 10 agents produced ${pct0(t10/tot30)} of roster units in the last 30 days; #1 is ${rosterBy[as[0][0]].name} (${rosterBy[as[0][0]].tl}) with ${n0(as[0][1])} units. ${zp.length} of ${prod.length} Production-phase agents logged zero units in those 30 days.`);
   const unm=rows.filter(r=>!r.inr); L.push(`Data quality: ${n0(unm.length)} entries (${pct0(unm.length/rows.length)}) carry an HRID that is not on the roster (${n0(unm.reduce((s,r)=>s+r.u,0))} units unattributed), ${n0(rows.filter(r=>r.dup).length)} are exact duplicates and ${n0(rows.filter(r=>!r.ov).length)} have an unusable order number. Make HRID and order number validated fields in the form.`);
-  return L; })();
+  return L; }
 
 /* ---------------------------------------------------------------- wiring */
-function setPreset(p){ state.preset=p; const max=D.meta.maxDate; if (p==='all'){ state.from=D.meta.minDate; } else if (p==='mtd'){ state.from=max.slice(0,8)+'01'; } else { state.from=addDays(max, -(+p-1)); } state.to=max; if (DI[state.from]==null) state.from=D.meta.minDate; syncInputs(); renderAll(); }
+function setPreset(p){ state.preset=p; const max=META.maxDate; if (p==='all'){ state.from=META.minDate; } else if (p==='mtd'){ state.from=max.slice(0,8)+'01'; } else { state.from=addDays(max, -(+p-1)); } state.to=max; if (DI[state.from]==null) state.from=META.minDate; syncInputs(); renderAll(); }
 function syncInputs(){ document.getElementById('from').value=state.from; document.getElementById('to').value=state.to; document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on', c.dataset.p===state.preset)); }
-function init(){ document.getElementById('subtitle').textContent=`Source: Sales Tracker (Microsoft Forms) ${fds(D.meta.minDate)} – ${fds(D.meta.maxDate)} ${D.meta.maxDate.slice(0,4)} (${n0(rows.length)} entries) + TSX Roster (${roster.length} agents, ${D.tls.length} leaders). Business days run 15:00 Cairo → 07:00 next morning. Built ${D.meta.built}.`;
+
+/* ---------------------------------------------------------------- in-browser .xlsx reader (zip + SpreadsheetML, no libraries) */
+async function unzip(buf){ const dv=new DataView(buf), u8=new Uint8Array(buf); let e=-1; for (let i=u8.length-22; i>=Math.max(0,u8.length-70000); i--){ if (dv.getUint32(i,true)===0x06054b50){ e=i; break; } } if (e<0) throw new Error('Not a .xlsx file (zip directory not found)');
+  const count=dv.getUint16(e+10,true); let p=dv.getUint32(e+16,true); const files={}; for (let k=0;k<count;k++){ if (dv.getUint32(p,true)!==0x02014b50) break; const method=dv.getUint16(p+10,true), csize=dv.getUint32(p+20,true), nlen=dv.getUint16(p+28,true), elen=dv.getUint16(p+30,true), clen=dv.getUint16(p+32,true), loff=dv.getUint32(p+42,true); const name=new TextDecoder().decode(u8.subarray(p+46,p+46+nlen)); files[name]={method,csize,loff}; p+=46+nlen+elen+clen; }
+  const get=async name=>{ const f=files[name]; if(!f) return null; const q=f.loff; const nlen=dv.getUint16(q+26,true), elen=dv.getUint16(q+28,true); const data=u8.subarray(q+30+nlen+elen, q+30+nlen+elen+f.csize); if (f.method===0) return new TextDecoder().decode(data); if (f.method!==8) throw new Error('Unsupported zip compression '+f.method); if (typeof DecompressionStream==='undefined') throw new Error('This browser cannot unpack .xlsx files – use a current Chrome, Edge, Firefox or Safari'); const ds=new DecompressionStream('deflate-raw'); const w=ds.writable.getWriter(); w.write(data); w.close(); return new TextDecoder().decode(await new Response(ds.readable).arrayBuffer()); };
+  return {names:Object.keys(files), get}; }
+const colIdx = ref => { let n=0; for (const ch of ref){ if (ch>='A'&&ch<='Z') n=n*26+(ch.charCodeAt(0)-64); else break; } return n-1; };
+async function readXlsx(buf){ const z=await unzip(buf); const parse=s=>new DOMParser().parseFromString(s,'application/xml'); const byTag=(doc,tag)=>Array.from(doc.getElementsByTagNameNS('*',tag));
+  const sst=[]; const ss=await z.get('xl/sharedStrings.xml'); if (ss){ for (const si of byTag(parse(ss),'si')) sst.push(byTag(si,'t').map(x=>x.textContent).join('')); }
+  const wb=parse(await z.get('xl/workbook.xml')); const rels=parse(await z.get('xl/_rels/workbook.xml.rels')); const relMap={}; for (const r of byTag(rels,'Relationship')) relMap[r.getAttribute('Id')]=r.getAttribute('Target');
+  const sheets={}; for (const sh of byTag(wb,'sheet')){ const rid=sh.getAttribute('r:id')||Array.from(sh.attributes).find(a=>a.localName==='id')?.value; let target=relMap[rid]||''; target=target.replace(/^\//,''); if(!target.startsWith('xl/')) target='xl/'+target; const xml=await z.get(target); if(!xml) continue; const doc=parse(xml); const out=[];
+    for (const row of byTag(doc,'row')){ const arr=[]; for (const c of byTag(row,'c')){ const ci=colIdx(c.getAttribute('r')||''); const t=c.getAttribute('t'); const v=byTag(c,'v')[0]; let val=null; if (t==='s'){ val = v? sst[+v.textContent] : null; } else if (t==='inlineStr'){ val=byTag(c,'t').map(x=>x.textContent).join(''); } else if (t==='b'){ val = v? v.textContent==='1' : null; } else if (t==='str'||t==='e'){ val = v? v.textContent : null; } else { val = v? parseFloat(v.textContent) : null; } if (val==='') val=null; arr[ci]=val; } out.push(arr); }
+    sheets[sh.getAttribute('name')]=out; }
+  return sheets; }
+const serialToDate = v => { if (typeof v==='number') { const days=Math.floor(v), frac=v-days; return new Date(Date.UTC(1899,11,30)+days*86400000+Math.round(frac*86400000)); } if (typeof v==='string'){ const d=new Date(v.replace(' ','T')+(v.length<=10?'T00:00:00':'')+'Z'); return isNaN(d)?null:d; } return null; };
+const header = (sheet) => { const h={}; (sheet[0]||[]).forEach((v,i)=>{ if (v!=null) h[String(v).trim()]=i; }); return h; };
+const titleCase = s => String(s).trim().toLowerCase().replace(/(^|[^a-z])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+
+/* ---------------------------------------------------------------- cleaning (same rules as the Python builder) */
+function cleanRoster(sheet){ const h=header(sheet); const need=['HRID','Agent Name','LOB','Wave','Phase','Tenure Bucket','Team Leader','Ops Manager']; for (const n of need) if (h[n]==null) throw new Error(`Roster sheet is missing the column "${n}"`);
+  const out=[]; for (const r of sheet.slice(1)){ if (r[h['LOB']]==null || String(r[h['LOB']]).trim()==='') continue; const m=/(\d+)/.exec(String(r[h['HRID']]??'')); if(!m) continue; out.push([m[1], titleCase(r[h['Agent Name']]??''), String(r[h['Team Leader']]??'').trim(), String(r[h['Ops Manager']]??'').trim(), String(r[h['Phase']]??'').trim(), String(r[h['Tenure Bucket']]??'').trim(), String(r[h['Wave']]??'').trim()]); }
+  out.sort((a,b)=> a[2]<b[2]?-1:a[2]>b[2]?1: a[1]<b[1]?-1:a[1]>b[1]?1:0); return out; }
+const NA_SET=new Set(['','#N/A','#N/A N/A','#NA','-1.#IND','-1.#QNAN','-NaN','-nan','1.#IND','1.#QNAN','<NA>','N/A','NA','NULL','NaN','None','n/a','nan','null']); const isNA = v => v==null || NA_SET.has(String(v).trim());
+function cleanDevice(v){ if (isNA(v)) return ''; const t=String(v).trim().toLowerCase().replace(/ /g,' '); if (t.includes('iphone')) return 'iPhone'; if (t.includes('apple watch')) return 'Apple Watch'; if (t.includes('samsung watch')) return 'Samsung Watch'; if (t.includes('samsung')) return 'Samsung'; if (t.includes('ipad')) return 'iPad'; if (t.includes('motorola')) return 'Motorola'; if (t.includes('byod')) return 'BYOD'; if (['.','no','none','0','na','1','n/a'].includes(t) || t.includes('no device') || t.includes('not solved') || t.includes('own device') || t.includes('no devices') || t.includes('just the line')) return 'No Device'; return 'Other'; }
+function cleanPromo(v){ if (isNA(v)) return ''; const t=String(v).trim().toLowerCase(); if (t.includes('free line')) return 'Free Line for 1 Year'; if (t.includes('byod')) return 'BYOD'; if (t.includes('smart watch')||t.includes('watch')) return 'Smart Watch Discount'; if (t.includes('port')) return 'Port In'; if (t.includes('no promotion')) return 'New Line with no promotions'; if (t.includes('trade')) return 'Trade In'; return 'Other'; }
+function cleanTracker(sheet, rosterList){ const h=header(sheet); const need=['ID','Completion time','HRID','Account Number:','Order Number','Line or GSR','No. of XM Lines','Count of GSR','Type of GSR','Did you add XMC?','Did you Activate the E-SIM?','Sold Device Type','What was the promotion type']; for (const n of need) if (h[n]==null) throw new Error(`Tracker sheet is missing the column "${n}" – is this the Sales Tracker form export?`);
+  const rset=new Set(rosterList.map(a=>a[0])); const rmap=Object.fromEntries(rosterList.map(a=>[a[0],a]));
+  const mapHr = x => { x=x.replace(/\D/g,''); if (rset.has(x)) return x; if (x.length===8 && x.startsWith('100') && rset.has('1000'+x.slice(3))) return '1000'+x.slice(3); if (x.length===10 && x.startsWith('10000') && rset.has('1000'+x.slice(5))) return '1000'+x.slice(5); if (x.length===10 && x.startsWith('1000') && rset.has(x.slice(0,9))) return x.slice(0,9); return null; };
+  const recs=[]; for (const r of sheet.slice(1)){ const ct=serialToDate(r[h['Completion time']]); if(!ct) continue; const hrRaw=isNA(r[h['HRID']])?'':String(r[h['HRID']]).trim(); const hr=mapHr(hrRaw); const key = hr || ('UNMAPPED:'+hrRaw.replace(/\s+/g,' ')); const a=hr?rmap[hr]:null;
+    const type=String(r[h['Line or GSR']]??'').trim(); const num = v => { if (v==null) return null; const s=String(v).trim(); if (s===''||/^(none|null|nan|n\/a|na|#n\/a|<na>)$/i.test(s)) return null; const x=Number(s); return isNaN(x)?null:x; }; const nx=num(r[h['No. of XM Lines']]); const xm = type==='XM Lines' ? Math.trunc(nx==null?1:nx) : 0;
+    const tyRaw=String(r[h['Type of GSR']]??'').trim().replace(/^;+|;+$/g,''); const types=tyRaw? tyRaw.split(';').map(s=>s.trim()).filter(Boolean):[]; const cg=num(r[h['Count of GSR']]); const gsr = type==='GSRs' ? Math.trunc(cg==null? Math.max(types.length,1) : cg) : 0;
+    const yn = v => { const s=String(v??'').trim(); return s==='Yes'?'Y':s==='No'?'N':''; }; const bd=new Date(ct.getTime()-12*3600000).toISOString().slice(0,10);
+    const acct=isNA(r[h['Account Number:']])?'':String(r[h['Account Number:']]).trim(); const order=isNA(r[h['Order Number']])?'':String(r[h['Order Number']]).trim(); const ov=/^\d{6,20}$/.test(order)?1:0;
+    recs.push({ct:ct.getTime(), row:[bd, key, a?a[2]:'Not in Roster', a?a[3]:'Not in Roster', xm, gsr, yn(r[h['Did you add XMC?']]), yn(r[h['Did you Activate the E-SIM?']]), cleanDevice(r[h['Sold Device Type']]), cleanPromo(r[h['What was the promotion type']]), 0, hr?1:0, ov, types, Math.trunc(Number(r[h['ID']])||0)], k: key+'|'+acct+'|'+order+'|'+type, ov}); }
+  recs.sort((a,b)=>a.ct-b.ct); const seen=new Set(); for (const x of recs){ if (x.ov){ if (seen.has(x.k)) x.row[10]=1; else seen.add(x.k); } }
+  return recs.map(x=>x.row); }
+function buildData(trackerRows, rosterList, name){ if (!trackerRows.length) throw new Error('No entries found in the tracker sheet'); const ds=trackerRows.map(r=>r[0]); const minD=ds.reduce((a,b)=>a<b?a:b), maxD=ds.reduce((a,b)=>a>b?a:b); const tls=[...new Set(rosterList.map(a=>a[2]))].sort(), oms=[...new Set(rosterList.map(a=>a[3]))].sort();
+  return {meta:{minDate:minD, maxDate:maxD, defFrom:addDays(maxD,-6), built:EMBEDDED.meta.built, source:'Source: uploaded Sales Tracker export', uploaded:{name, when:new Date().toLocaleString()}}, rows:trackerRows, roster:rosterList, tls, oms}; }
+let pendingRoster = null;
+async function handleFiles(fileList){ const msg=document.getElementById('uploadMsg'); for (const f of fileList){ try { msg.textContent=`Reading ${f.name}…`; const sheets=await readXlsx(await f.arrayBuffer()); const names=Object.keys(sheets);
+      if (sheets['Roster'] || names.some(n=>sheets[n][0] && sheets[n][0].some(v=>String(v??'').trim()==='Agent Name'))){ const sh = sheets['Roster'] || sheets[names.find(n=>sheets[n][0] && sheets[n][0].some(v=>String(v??'').trim()==='Agent Name'))]; pendingRoster = cleanRoster(sh); const tr = META.rowsRaw; if (tr){ const data=buildData(cleanTracker(tr, pendingRoster), pendingRoster, META.uploaded?META.uploaded.name:'tracker'); data.meta.rowsRaw=tr; applyData(data); msg.textContent=`Roster loaded (${pendingRoster.length} agents) and applied to the current tracker data.`; } else { msg.textContent=`Roster loaded (${pendingRoster.length} agents). Now load the tracker export to apply it.`; continue; } }
+      else { const sh = sheets[names[0]]; const rl = pendingRoster || (META.rosterRaw ? META.rosterRaw : EMBEDDED.roster); const data = buildData(cleanTracker(sh, rl), rl, f.name); data.meta.rowsRaw = sh; applyData(data); }
+      try { localStorage.setItem('tsxDashData', JSON.stringify({meta:{...META, rowsRaw:undefined}, rows:rows.map(r=>[r.d,r.hr,r.tl,r.om,r.xm,r.gsr,r.xmc,r.esim,r.dev,r.promo,r.dup,r.inr,r.ov,r.ty,r.id]), roster:roster.map(a=>[a.hr,a.name,a.tl,a.om,a.phase,a.tenure,a.wave]), tls:TLS, oms:OMS})); } catch(e){ console.warn('Could not save to this browser', e); }
+      rebuildForData(); msg.textContent=`Loaded ${f.name}: ${n0(rows.length)} entries, ${fds(META.minDate)} – ${fds(META.maxDate)}.`;
+    } catch(e){ console.error(e); msg.textContent=`Could not read ${f.name}: ${e.message}`; } } }
+function wireUpload(){ document.getElementById('fileTracker').addEventListener('change',e=>{ handleFiles(e.target.files); e.target.value=''; }); document.getElementById('fileRoster').addEventListener('change',e=>{ handleFiles(e.target.files); e.target.value=''; });
+  document.getElementById('resetData').addEventListener('click',()=>{ try{ localStorage.removeItem('tsxDashData'); }catch(e){} pendingRoster=null; applyData(EMBEDDED); rebuildForData(); document.getElementById('uploadMsg').textContent='Back to the built-in data.'; });
+  let dc=0; document.addEventListener('dragenter',e=>{ e.preventDefault(); dc++; document.body.classList.add('drag'); }); document.addEventListener('dragover',e=>e.preventDefault()); document.addEventListener('dragleave',()=>{ if(--dc<=0){dc=0; document.body.classList.remove('drag');} }); document.addEventListener('drop',e=>{ e.preventDefault(); dc=0; document.body.classList.remove('drag'); if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); }); }
+
+function rebuildForData(){
+  document.getElementById('subtitle').textContent=`${META.source} ${fds(META.minDate)} – ${fds(META.maxDate)} ${META.maxDate.slice(0,4)} (${n0(rows.length)} entries) + roster (${roster.length} agents, ${TLS.length} leaders). Business days run 15:00 Cairo → 07:00 next morning.`;
+  const om=document.getElementById('om'), tl=document.getElementById('tl'); om.innerHTML=''; tl.innerHTML='';
+  for (const o of ['All',...OMS]){ const e=document.createElement('option'); e.value=o; e.textContent=o; om.appendChild(e);} for (const o of ['All',...TLS]){ const e=document.createElement('option'); e.value=o; e.textContent=o; tl.appendChild(e);} 
+  if (!OMS.includes(state.om)) state.om='All'; if (!TLS.includes(state.tl)) state.tl='All'; om.value=state.om; tl.value=state.tl;
+  document.getElementById('leaderSel').innerHTML=''; document.getElementById('agentList').innerHTML='';
+  for (const id of ['from','to']){ const e=document.getElementById(id); e.min=META.minDate; e.max=META.maxDate; }
+  document.getElementById('dataNote').textContent = META.uploaded ? `Showing uploaded file ${META.uploaded.name} (${META.uploaded.when}). Saved in this browser until you reset.` : `Showing the data built into this file (${META.built}).`;
+  document.getElementById('resetData').style.display = META.uploaded ? '' : 'none';
+  if (state.preset==='custom' && (DI[state.from]==null || DI[state.to]==null)) state.preset='14';
+  if (state.preset==='custom') { syncInputs(); renderAll(); } else setPreset(state.preset);
+}
+function init(){
   const pr=document.getElementById('presets'); for (const [p,l] of [['7','Last 7 days'],['14','Last 14 days'],['30','Last 30 days'],['mtd','Month to date'],['all','All history']]){ const b=document.createElement('button'); b.className='chip'; b.dataset.p=p; b.textContent=l; b.addEventListener('click',()=>setPreset(p)); pr.appendChild(b); }
-  const om=document.getElementById('om'), tl=document.getElementById('tl'); for (const o of ['All',...D.oms]){ const e=document.createElement('option'); e.value=o; e.textContent=o; om.appendChild(e);} for (const o of ['All',...D.tls]){ const e=document.createElement('option'); e.value=o; e.textContent=o; tl.appendChild(e);}
+  const om=document.getElementById('om'), tl=document.getElementById('tl');
   om.addEventListener('change',()=>{state.om=om.value; renderAll();}); tl.addEventListener('change',()=>{state.tl=tl.value; renderAll();}); document.getElementById('exdup').addEventListener('change',e=>{state.exdup=e.target.checked; renderAll();});
   const chg=()=>{ const f=document.getElementById('from').value, t=document.getElementById('to').value; if (DI[f]==null||DI[t]==null||f>t) return; state.from=f; state.to=t; state.preset='custom'; syncInputs(); renderAll(); }; document.getElementById('from').addEventListener('change',chg); document.getElementById('to').addEventListener('change',chg);
-  document.getElementById('from').min=D.meta.minDate; document.getElementById('from').max=D.meta.maxDate; document.getElementById('to').min=D.meta.minDate; document.getElementById('to').max=D.meta.maxDate;
-  const tabs=[['overview','Overview'],['leaders','Leaders'],['agents','Agents'],['insights','Insights'],['quality','Data quality']]; const tb=document.getElementById('tabs'); for (const [k,l] of tabs){ const b=document.createElement('button'); b.className='tab'; b.dataset.t=k; b.textContent=l; b.addEventListener('click',()=>{ state.tab=k; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.t===k)); document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+k)); renderAll(); }); tb.appendChild(b);}
+  document.getElementById('leaderSel').addEventListener('change',e=>{state.leader=e.target.value; renderLeaderTrend();});
+  document.getElementById('agentSel').addEventListener('change',e=>{ state.agent=e.target.value; renderAgentTrend(); });
+  const tabs=[['overview','Overview'],['leaders','Leaders'],['agents','Agents'],['insights','Insights'],['quality','Data quality']]; const tb=document.getElementById('tabs'); for (const [k,l] of tabs){ const b=document.createElement('button'); b.className='tab'; b.dataset.t=k; b.textContent=l; b.addEventListener('click',()=>{ state.tab=k; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.t===k)); document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+k)); renderAll(); }); tb.appendChild(b);} 
   document.querySelector('.tab').classList.add('on'); document.getElementById('p-overview').classList.add('on');
   document.querySelectorAll('button[data-tv]').forEach(b=>b.addEventListener('click',()=>{ const fig=document.getElementById(b.dataset.tv); if (fig._tv){ fig._tv(); b.classList.toggle('on'); } }));
   document.getElementById('themeBtn').addEventListener('click',()=>{ const r=document.documentElement; const dark = r.dataset.theme==='dark' || (!r.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches); r.dataset.theme = dark?'light':'dark'; });
   let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(renderAll,150); });
-  setPreset('14'); }
+  wireUpload();
+  let D = EMBEDDED; try { const saved = JSON.parse(localStorage.getItem('tsxDashData')||'null'); if (saved && saved.meta && saved.rows) D = saved; } catch(e){}
+  applyData(D); rebuildForData();
+}
 init();
 </script>
 </body>
