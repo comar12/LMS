@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TSX Sales Dashboard</title>
+<style>
+:root{
+  color-scheme:light;
+  --surface:#fcfcfb; --page:#f3f4f6; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781; --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --other:#b5b3ab;
+  --good:#006300; --bad:#d03b3b; --warn:#fab219;
+  --navy:#1f3864; --navy-ink:#ffffff; --head:#d9e1f2; --input:#fff2cc;
+  --seq1:#cde2fb; --seq2:#9ec5f4; --seq3:#6da7ec; --seq4:#3987e5; --seq5:#256abf; --seq6:#184f95; --seq7:#0d366b;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  color-scheme:dark; --surface:#1a1a19; --page:#0d0d0d; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781; --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --other:#5b5a55; --good:#0ca30c; --bad:#e66767; --navy:#101d33; --head:#22304a; --input:#4a4112;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark; --surface:#1a1a19; --page:#0d0d0d; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781; --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --other:#5b5a55; --good:#0ca30c; --bad:#e66767; --navy:#101d33; --head:#22304a; --input:#4a4112;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--page);color:var(--ink);font-family:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.35}
+header{background:var(--navy);color:var(--navy-ink);padding:14px 16px}
+header h1{margin:0;font-size:20px;font-weight:700}
+header .sub{opacity:.85;font-size:12px;margin-top:3px}
+.wrap{max-width:1500px;margin:0 auto;padding:12px 16px 40px}
+.filters{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:12px;position:sticky;top:0;z-index:5}
+.filters label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);white-space:nowrap}
+.filters input[type=date],.filters select,.filters input[type=text]{font:inherit;padding:5px 7px;border:1px solid var(--axis);border-radius:6px;background:var(--input);color:var(--ink)}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{font:inherit;font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--axis);background:var(--surface);color:var(--ink2);cursor:pointer}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+.tabs{display:flex;gap:2px;flex-wrap:wrap;margin:6px 0 12px;border-bottom:2px solid var(--axis)}
+.tab{font:inherit;font-size:14px;padding:8px 14px;border:0;background:transparent;color:var(--ink2);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab.on{color:var(--ink);font-weight:700;border-bottom-color:var(--s1)}
+.panel{display:none}.panel.on{display:block}
+.grid{display:grid;gap:12px}
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1100px){.g5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:800px){.g5,.g2,.g3{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;min-width:0}
+.card h3{margin:0 0 8px;font-size:14px;font-weight:700;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h3 .tools{display:flex;gap:6px}
+.card h3 button,.btn{font:inherit;font-size:12px;padding:3px 9px;border:1px solid var(--axis);border-radius:6px;background:var(--surface);color:var(--ink2);cursor:pointer}
+.card h3 button.on,.btn.on{background:var(--head);color:var(--ink)}
+.note{font-size:12px;color:var(--muted);margin:4px 0 8px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center}
+.tile .lab{font-size:12px;color:var(--ink2)}
+.tile .val{font-size:30px;font-weight:700;color:var(--navy);line-height:1.1;margin:4px 0 2px}
+:root[data-theme="dark"] .tile .val{color:var(--ink)} @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tile .val{color:var(--ink)}}
+.tile .delta{font-size:13px;font-weight:700}
+.tile .delta .vs{font-weight:400;color:var(--muted);font-size:11px}
+.up{color:var(--good)}.down{color:var(--bad)}.flat{color:var(--muted)}
+.tile svg{display:block;margin:6px auto 0}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border:1px solid var(--grid);padding:5px 7px;text-align:center;vertical-align:middle;white-space:nowrap}
+th{background:var(--navy);color:#fff;font-weight:700;position:sticky;top:0;cursor:pointer;user-select:none}
+th.sub{background:var(--head);color:var(--ink);cursor:default}
+tr.total td{background:var(--head);font-weight:700}
+td.name{text-align:center;font-weight:700}
+td.num{font-variant-numeric:tabular-nums}
+.tscroll{overflow:auto;max-height:560px;border:1px solid var(--grid);border-radius:6px}
+.rank{display:inline-block;min-width:22px;padding:1px 6px;border-radius:999px;background:var(--head);font-weight:700}
+.rank.r1{background:var(--s1);color:#fff}
+.bar{display:inline-block;height:10px;background:var(--s1);border-radius:0 3px 3px 0;vertical-align:middle;margin-right:6px}
+figure{margin:0}
+svg text{font-family:inherit}
+.tip{position:fixed;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,.18);border-radius:8px;padding:8px 10px;font-size:12px;z-index:50;display:none;min-width:150px}
+.tip .t{font-weight:700;margin-bottom:4px;color:var(--ink2)}
+.tip .r{display:flex;justify-content:space-between;gap:12px}
+.tip .k{display:inline-block;width:14px;height:0;border-top:3px solid;margin-right:6px;vertical-align:middle}
+.tip .v{font-weight:700}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:4px 0 2px;justify-content:center}
+.legend span i{display:inline-block;width:16px;height:0;border-top:3px solid;margin-right:5px;vertical-align:middle}
+.legend span i.rect{height:10px;border:0;border-radius:2px}
+ul.ins{margin:0;padding-left:0;list-style:none}
+ul.ins li{padding:8px 10px;border-bottom:1px solid var(--grid);text-align:center}
+ul.ins li:last-child{border-bottom:0}
+.sec{background:var(--navy);color:#fff;font-weight:700;padding:6px 10px;border-radius:6px;margin:12px 0 6px;text-align:center}
+.search{font:inherit;padding:5px 8px;border:1px solid var(--axis);border-radius:6px;background:var(--surface);color:var(--ink);width:340px;max-width:100%}
+.small{font-size:12px;color:var(--muted)}
+.theme{float:right;font:inherit;font-size:12px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:3px 8px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <button class="theme" id="themeBtn">Dark / light</button>
+  <h1>Cairo Repair TSX – Sales Performance Dashboard</h1>
+  <div class="sub" id="subtitle"></div>
+</header>
+<div class="wrap">
+  <div class="filters">
+    <div class="chips" id="presets"></div>
+    <label>From <input type="date" id="from"></label>
+    <label>To <input type="date" id="to"></label>
+    <label>Ops Manager <select id="om"></select></label>
+    <label>Team Leader <select id="tl"></select></label>
+    <label><input type="checkbox" id="exdup" checked> Exclude duplicates</label>
+    <span class="small" id="scopeNote"></span>
+  </div>
+  <div class="tabs" id="tabs"></div>
+
+  <section class="panel" id="p-overview">
+    <div class="grid g5" id="tiles"></div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card"><h3>Daily total units with 7-day average <span class="tools"><button data-tv="c1">Table</button></span></h3><figure id="c1"></figure></div>
+      <div class="card"><h3>Daily XM Lines vs GSR Units <span class="tools"><button data-tv="c2">Table</button></span></h3><figure id="c2"></figure></div>
+      <div class="card"><h3>XMC attach % and E-SIM activation % <span class="tools"><button data-tv="c3">Table</button></span></h3><div class="note">Fields exist in the form since 24 Aug; days with no answered entries show as gaps.</div><figure id="c3"></figure></div>
+      <div class="card"><h3>Active sellers and participation <span class="tools"><button data-tv="c4">Table</button></span></h3><div class="note">Active sellers = roster agents with at least one unit that business day.</div><figure id="c4"></figure></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Account day-over-day – every business day in the selected range</h3><div class="note">Business day = 15:00 Cairo to 07:00 next morning. DoD compares with the previous business day; 7-day average and WoW use history before the range too.</div><div class="tscroll" id="dodTable"></div></div>
+  </section>
+
+  <section class="panel" id="p-leaders">
+    <div class="card"><h3>Leader scorecard – selected period <span class="small">Ops Manager filter applies; Team Leader filter ignored so leaders stay comparable</span></h3><div class="tscroll" id="leaderTable"></div></div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card"><h3>Total units by leader <span class="tools"><button data-tv="c5">Table</button></span></h3><figure id="c5"></figure></div>
+      <div class="card"><h3>Units per head by leader <span class="tools"><button data-tv="c6">Table</button></span></h3><figure id="c6"></figure></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Leader day-over-day matrix – units per leader per business day</h3><div class="note">Colour = units (darker is more). Last columns: change on the last day vs the day before, period total, average per day and change vs the prior period.</div><div class="tscroll" id="leaderMatrix"></div></div>
+    <div class="card" style="margin-top:12px">
+      <h3>Single leader trend <span class="tools"><select id="leaderSel"></select><button data-tv="c7">Table</button></span></h3>
+      <div id="leaderInfo" class="note"></div>
+      <div class="grid g2"><figure id="c7"></figure><figure id="c8"></figure></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-agents">
+    <div class="grid g2">
+      <div class="card"><h3>Top 10 agents – selected period &amp; scope</h3><div class="tscroll" id="top10"></div></div>
+      <div class="card"><h3>Bottom 10 Production agents – coaching list</h3><div class="tscroll" id="bottom10"></div></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h3>Single agent trend <span class="tools"><input class="search" id="agentSel" list="agentList" placeholder="Type an agent name or HRID"><datalist id="agentList"></datalist><button data-tv="c9">Table</button></span></h3>
+      <div id="agentInfo" class="note"></div>
+      <figure id="c9"></figure>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>All roster agents in scope <span class="tools"><input class="search" id="agentSearch" placeholder="Filter by name, leader, HRID…"></span></h3><div class="note">Click a column header to sort. Rank (Scope) ranks inside the current filter; Rank (Team) inside the agent's team. Shaded = no sale for more than 7 days.</div><div class="tscroll" id="agentTable"></div></div>
+  </section>
+
+  <section class="panel" id="p-insights">
+    <div class="grid g2">
+      <div class="card"><h3>Live insights – follow the filters</h3><ul class="ins" id="liveIns"></ul></div>
+      <div class="card"><h3>Full-history insights – whole account</h3><ul class="ins" id="histIns"></ul></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Recommended routine for the newly promoted leaders</h3><ul class="ins" id="recs"></ul></div>
+  </section>
+
+  <section class="panel" id="p-quality">
+    <div class="grid g3" id="qTiles"></div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card"><h3>HRIDs not on the roster (all history)</h3><div class="note">Valid-looking 9-digit IDs are probably attrited or transferred agents; add them to a Leavers tab in the roster to attribute their sales.</div><div class="tscroll" id="unmapped"></div></div>
+      <div class="card"><h3>Definitions &amp; assumptions</h3><ul class="ins" id="defs"></ul></div>
+    </div>
+  </section>
+</div>
+<div class="tip" id="tip"></div>
+<script>
+const D = __DATA__;
+/* ---------------------------------------------------------------- data */
+const rows = D.rows.map(a => ({d:a[0], hr:a[1], tl:a[2], om:a[3], xm:a[4], gsr:a[5], u:a[4]+a[5], xmc:a[6], esim:a[7], dev:a[8], promo:a[9], dup:a[10], inr:a[11], ov:a[12], ty:a[13], id:a[14]}));
+const roster = D.roster.map(a => ({hr:a[0], name:a[1], tl:a[2], om:a[3], phase:a[4], tenure:a[5], wave:a[6]}));
+const rosterBy = Object.fromEntries(roster.map(a => [a.hr, a]));
+const DATES = []; { let d = new Date(D.meta.minDate+'T00:00:00Z'); const e = new Date(D.meta.maxDate+'T00:00:00Z'); while (d <= e) { DATES.push(d.toISOString().slice(0,10)); d.setUTCDate(d.getUTCDate()+1); } }
+const DI = Object.fromEntries(DATES.map((d,i)=>[d,i]));
+const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fd = s => { const d = new Date(s+'T00:00:00Z'); return WD[d.getUTCDay()]+' '+String(d.getUTCDate()).padStart(2,'0')+'-'+MO[d.getUTCMonth()]; };
+const fds = s => { const d = new Date(s+'T00:00:00Z'); return String(d.getUTCDate()).padStart(2,'0')+'-'+MO[d.getUTCMonth()]; };
+const addDays = (s,n) => { const d = new Date(s+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); };
+const n0 = v => v.toLocaleString('en-US',{maximumFractionDigits:0});
+const n1 = v => v.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+const n2 = v => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct = v => (v==null||isNaN(v)) ? '-' : (v*100).toFixed(1)+'%';
+const pct0 = v => (v==null||isNaN(v)) ? '-' : (v*100).toFixed(0)+'%';
+const sgn = (v,f=n0) => v>0 ? '+'+f(v) : v<0 ? '−'+f(-v) : f(0);
+const cls = v => v>0 ? 'up' : v<0 ? 'down' : 'flat';
+const arrow = v => v>0 ? '▲ ' : v<0 ? '▼ ' : '■ ';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const state = { from: D.meta.defFrom, to: D.meta.maxDate, om:'All', tl:'All', exdup:true, tab:'overview', leader:null, agent:null, preset:'14' };
+
+/* ---------------------------------------------------------------- compute */
+function daily(rs) { // per business day series over DATES
+  const n = DATES.length, z = () => new Array(n).fill(0);
+  const o = {u:z(), xm:z(), gsr:z(), subs:z(), xy:z(), xn:z(), ey:z(), en:z(), act:z(), nr:z(), dev:z()};
+  const sets = DATES.map(()=>new Set());
+  for (const r of rs) { const i = DI[r.d]; o.u[i]+=r.u; o.xm[i]+=r.xm; o.gsr[i]+=r.gsr; o.subs[i]++;
+    if (r.xmc==='Y') o.xy[i]++; else if (r.xmc==='N') o.xn[i]++;
+    if (r.esim==='Y') o.ey[i]++; else if (r.esim==='N') o.en[i]++;
+    if (r.inr) sets[i].add(r.hr); else o.nr[i]++;
+    if (r.dev && r.dev!=='No Device') o.dev[i]++; }
+  o.act = sets.map(s=>s.size);
+  o.avg7 = o.u.map((_,i)=>{ const a = o.u.slice(Math.max(0,i-6), i+1); return a.reduce((x,y)=>x+y,0)/a.length; });
+  return o;
+}
+function sum(a, i0, i1){ let s=0; for(let i=i0;i<=i1;i++) s+=a[i]||0; return s; }
+function compute() {
+  const base = rows.filter(r => !(state.exdup && r.dup));
+  const inScope = r => (state.om==='All'||r.om===state.om) && (state.tl==='All'||r.tl===state.tl);
+  const scoped = base.filter(inScope);
+  const i0 = DI[state.from], i1 = DI[state.to], len = i1-i0+1;
+  const p0 = i0-len, p1 = i0-1;
+  const per = r => DI[r.d]>=i0 && DI[r.d]<=i1, pri = r => DI[r.d]>=p0 && DI[r.d]<=p1;
+  const agentsIn = roster.filter(a => (state.om==='All'||a.om===state.om) && (state.tl==='All'||a.tl===state.tl));
+  const agg = rs => { const o={u:0,xm:0,gsr:0,subs:0,xy:0,xn:0,ey:0,en:0,set:new Set()}; for(const r of rs){o.u+=r.u;o.xm+=r.xm;o.gsr+=r.gsr;o.subs++; if(r.xmc==='Y')o.xy++; else if(r.xmc==='N')o.xn++; if(r.esim==='Y')o.ey++; else if(r.esim==='N')o.en++; if(r.inr)o.set.add(r.hr);} o.active=o.set.size; return o; };
+  const cur = agg(scoped.filter(per)), prev = agg(scoped.filter(pri));
+  const dy = daily(scoped);
+  // agents
+  const byHr = {}; for (const r of base) { (byHr[r.hr] ||= []).push(r); }
+  const agents = agentsIn.map(a => { const rs = byHr[a.hr]||[]; const c = agg(rs.filter(per)), p = agg(rs.filter(pri));
+    const days = new Set(rs.filter(per).map(r=>r.d)).size; const last = rs.length ? rs.reduce((m,r)=>r.d>m?r.d:m, '') : null;
+    return {...a, subs:c.subs, xm:c.xm, gsr:c.gsr, u:c.u, days, upd: days?c.u/days:0, prior:p.u, delta:c.u-p.u, last, since: last? (DI[D.meta.maxDate]-DI[last]) : null}; });
+  const sortedU = [...agents].sort((a,b)=>b.u-a.u);
+  agents.forEach(a => { a.rank = sortedU.filter(x=>x.u>a.u).length+1; a.rankTeam = agents.filter(x=>x.tl===a.tl && x.u>a.u).length+1; });
+  // leaders (OM filter only)
+  const omOnly = base.filter(r => state.om==='All'||r.om===state.om);
+  const byTl = {}; for (const r of omOnly) { (byTl[r.tl] ||= []).push(r); }
+  const leaders = D.tls.map(t => { const rs = byTl[t]||[]; const c = agg(rs.filter(per)), p = agg(rs.filter(pri));
+    const hc = roster.filter(a=>a.tl===t && (state.om==='All'||a.om===state.om)).length; const hcAll = roster.filter(a=>a.tl===t).length;
+    const prod = roster.filter(a=>a.tl===t && a.phase==='Production').length;
+    const om = [...new Set(roster.filter(a=>a.tl===t).map(a=>a.om))].join(' / ');
+    const dd = daily(rs);
+    return {tl:t, om, hc, hcAll, prod, subs:c.subs, xm:c.xm, gsr:c.gsr, u:c.u, uph: hc?c.u/hc:0, active:c.active, part: hc?c.active/hc:0, prior:p.u, delta:c.u-p.u, dpct: p.u? (c.u-p.u)/p.u : null, dy:dd}; });
+  const lsorted = [...leaders].sort((a,b)=>b.u-a.u); leaders.forEach(l => l.rank = l.u? lsorted.filter(x=>x.u>l.u).length+1 : null);
+  const nrCur = agg(base.filter(r=>!r.inr && per(r)));
+  return {base, scoped, i0, i1, len, p0, p1, cur, prev, dy, agents, leaders, nrCur, hcScope: agentsIn.length, byHr, byTl};
+}
+
+/* ---------------------------------------------------------------- tooltip */
+const tip = document.getElementById('tip');
+function showTip(x, y, title, items) { tip.innerHTML=''; const t=document.createElement('div'); t.className='t'; t.textContent=title; tip.appendChild(t);
+  for (const it of items) { const r=document.createElement('div'); r.className='r'; const l=document.createElement('span'); if (it.color){ const k=document.createElement('i'); k.className='k'; k.style.borderTopColor=it.color; l.appendChild(k);} l.appendChild(document.createTextNode(it.label)); const v=document.createElement('span'); v.className='v'; v.textContent=it.value; r.appendChild(l); r.appendChild(v); tip.appendChild(r); }
+  tip.style.display='block'; const w=tip.offsetWidth, h=tip.offsetHeight; tip.style.left=Math.min(x+14, window.innerWidth-w-8)+'px'; tip.style.top=Math.max(8, Math.min(y+14, window.innerHeight-h-8))+'px'; }
+function hideTip(){ tip.style.display='none'; }
+
+/* ---------------------------------------------------------------- charts (SVG) */
+const NS='http://www.w3.org/2000/svg';
+function el(tag, attrs, parent){ const e=document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function niceMax(m){ if (m<=0) return 1; const p=Math.pow(10, Math.floor(Math.log10(m))); const f=m/p; const n = f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10; return n*p; }
+function tableView(fig, cols, data){ let t=fig.querySelector('table.tv'); if (t){ t.remove(); return; } t=document.createElement('table'); t.className='tv'; const tr=document.createElement('tr'); for(const c of cols){const th=document.createElement('th'); th.className='sub'; th.textContent=c; tr.appendChild(th);} t.appendChild(tr); for (const r of data){ const tr2=document.createElement('tr'); for (const v of r){ const td=document.createElement('td'); td.textContent=v; tr2.appendChild(td);} t.appendChild(tr2);} const wrap=document.createElement('div'); wrap.className='tscroll'; wrap.style.maxHeight='260px'; wrap.appendChild(t); wrap.classList.add('tvwrap'); fig.appendChild(wrap); }
+function clearFig(fig){ fig.innerHTML=''; fig._tv=null; }
+function legend(fig, series, kind){ if (series.length<2) return; const lg=document.createElement('div'); lg.className='legend'; for (const s of series){ const sp=document.createElement('span'); const i=document.createElement('i'); i.style.borderTopColor=s.color; if(kind==='rect'){i.className='rect'; i.style.background=s.color;} sp.appendChild(i); sp.appendChild(document.createTextNode(s.name)); lg.appendChild(sp);} fig.appendChild(lg); }
+
+function lineChart(fig, cfg) { // cfg: {labels, series:[{name,values,color,fmt}], yfmt, pctAxis, h}
+  clearFig(fig); const W = Math.max(320, fig.clientWidth||600), H = cfg.h||260, m={t:16,r:60,b:34,l:44};
+  const svg = el('svg', {viewBox:`0 0 ${W} ${H}`, width:'100%', height:H, role:'img'}, fig); svg.style.display='block';
+  const n = cfg.labels.length; const vals = cfg.series.flatMap(s=>s.values.filter(v=>v!=null));
+  const ymax = cfg.pctAxis ? 1 : niceMax(Math.max(1, ...vals)); const NT = (ymax<=1 || ymax%4===0) ? 4 : 5; const px = i => m.l + (n<2?0:(W-m.l-m.r)*i/(n-1)), py = v => m.t + (H-m.t-m.b)*(1-v/ymax);
+  for (let k=0;k<=NT;k++){ const v=ymax*k/NT, y=py(v); el('line',{x1:m.l,x2:W-m.r,y1:y,y2:y,stroke:'var(--grid)','stroke-width':1},svg); const t=el('text',{x:m.l-6,y:y+4,'text-anchor':'end','font-size':11,fill:'var(--muted)'},svg); t.textContent = cfg.pctAxis? pct0(v) : (v>=1000? (v/1000)+'K' : n0(v)); }
+  el('line',{x1:m.l,x2:W-m.r,y1:py(0),y2:py(0),stroke:'var(--axis)'},svg);
+  const step = Math.max(1, Math.ceil(n/ Math.floor((W-m.l-m.r)/70)));
+  cfg.labels.forEach((d,i)=>{ if (i%step===0 || i===n-1){ const t=el('text',{x:px(i),y:H-m.b+16,'text-anchor':'middle','font-size':11,fill:'var(--muted)'},svg); t.textContent=fds(d);} });
+  const yv = v => cfg.pctAxis? Math.min(v,1): v;
+  const placed=[]; for (const s of cfg.series){ let path='', pen=false; s.values.forEach((v,i)=>{ if(v==null){pen=false;return;} path += (pen?'L':'M')+px(i).toFixed(1)+' '+py(yv(v)).toFixed(1)+' '; pen=true; }); el('path',{d:path,fill:'none',stroke:s.color,'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},svg);
+    if (s.area){ let a='', first=null,last=null; s.values.forEach((v,i)=>{ if(v==null) return; if(first===null) first=i; last=i; a += (a?'L':'M')+px(i).toFixed(1)+' '+py(yv(v)).toFixed(1)+' '; }); if (first!==null){ a += `L${px(last).toFixed(1)} ${py(0)} L${px(first).toFixed(1)} ${py(0)} Z`; el('path',{d:a,fill:s.color,opacity:.10},svg);} }
+    // end label
+    let li=-1; for(let i=n-1;i>=0;i--) if (s.values[i]!=null){li=i;break;} if (li>=0){ el('circle',{cx:px(li),cy:py(yv(s.values[li])),r:4,fill:s.color,stroke:'var(--surface)','stroke-width':2},svg); let ly=py(yv(s.values[li]))+4; while (placed.some(y=>Math.abs(y-ly)<13)) ly+=13; placed.push(ly); const t=el('text',{x:px(li)+8,y:ly,'font-size':11,'font-weight':700,fill:'var(--ink2)'},svg); t.textContent=(s.fmt||cfg.yfmt||n0)(s.values[li]); }
+  }
+  const cross = el('line',{x1:0,x2:0,y1:m.t,y2:H-m.b,stroke:'var(--muted)','stroke-width':1,visibility:'hidden'},svg);
+  const dots = cfg.series.map(s=>el('circle',{r:5,fill:s.color,stroke:'var(--surface)','stroke-width':2,visibility:'hidden'},svg));
+  const hit = el('rect',{x:m.l-10,y:m.t,width:W-m.l-m.r+20,height:H-m.t-m.b,fill:'transparent'},svg);
+  const move = e => { const r=svg.getBoundingClientRect(); const sx = (e.clientX - r.left) * W / r.width; let i = Math.round((sx-m.l)/((W-m.l-m.r)/Math.max(1,n-1))); i=Math.max(0,Math.min(n-1,i)); cross.setAttribute('x1',px(i)); cross.setAttribute('x2',px(i)); cross.setAttribute('visibility','visible');
+    cfg.series.forEach((s,k)=>{ const v=s.values[i]; if(v==null){dots[k].setAttribute('visibility','hidden');return;} dots[k].setAttribute('cx',px(i)); dots[k].setAttribute('cy',py(yv(v))); dots[k].setAttribute('visibility','visible'); });
+    showTip(e.clientX, e.clientY, fd(cfg.labels[i]), cfg.series.map(s=>({label:s.name, color:s.color, value: s.values[i]==null?'-':(s.fmt||cfg.yfmt||n0)(s.values[i])}))); };
+  hit.addEventListener('pointermove', move); hit.addEventListener('pointerleave', ()=>{ cross.setAttribute('visibility','hidden'); dots.forEach(d=>d.setAttribute('visibility','hidden')); hideTip(); });
+  legend(fig, cfg.series, 'line');
+  fig._tv = () => tableView(fig, ['Date', ...cfg.series.map(s=>s.name)], cfg.labels.map((d,i)=>[fd(d), ...cfg.series.map(s=>s.values[i]==null?'-':(s.fmt||cfg.yfmt||n0)(s.values[i]))]));
+}
+function stackedColumns(fig, cfg){ // cfg: {labels, series:[{name,values,color}], h}
+  clearFig(fig); const W = Math.max(320, fig.clientWidth||600), H = cfg.h||260, m={t:16,r:16,b:34,l:44};
+  const svg = el('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',height:H,role:'img'},fig); svg.style.display='block';
+  const n=cfg.labels.length; const tot = cfg.labels.map((_,i)=>cfg.series.reduce((a,s)=>a+(s.values[i]||0),0)); const ymax=niceMax(Math.max(1,...tot));
+  const NT=(ymax%4===0)?4:5; const slot=(W-m.l-m.r)/n, bw=Math.min(24, slot*0.7); const px=i=>m.l+slot*i+(slot-bw)/2, py=v=>m.t+(H-m.t-m.b)*(1-v/ymax);
+  for (let k=0;k<=NT;k++){ const v=ymax*k/NT,y=py(v); el('line',{x1:m.l,x2:W-m.r,y1:y,y2:y,stroke:'var(--grid)'},svg); const t=el('text',{x:m.l-6,y:y+4,'text-anchor':'end','font-size':11,fill:'var(--muted)'},svg); t.textContent=n0(v); }
+  el('line',{x1:m.l,x2:W-m.r,y1:py(0),y2:py(0),stroke:'var(--axis)'},svg);
+  const step=Math.max(1,Math.ceil(n/Math.floor((W-m.l-m.r)/70)));
+  cfg.labels.forEach((d,i)=>{ if(i%step===0||i===n-1){ const t=el('text',{x:px(i)+bw/2,y:H-m.b+16,'text-anchor':'middle','font-size':11,fill:'var(--muted)'},svg); t.textContent=fds(d);} });
+  cfg.labels.forEach((d,i)=>{ let y0=0; const g=el('g',{},svg); cfg.series.forEach((s,k)=>{ const v=s.values[i]||0; if(!v) return; const top=py(y0+v), bot=py(y0); const gap = k>0?2:0; const h=Math.max(0,bot-top-gap); const isTop = y0+v===tot[i]; const r=isTop?4:0;
+      const x=px(i), yT=top+gap; const path = isTop? `M${x} ${yT+r} a${r} ${r} 0 0 1 ${r} -${r} h${bw-2*r} a${r} ${r} 0 0 1 ${r} ${r} v${Math.max(0,h-r)} h-${bw} z` : `M${x} ${yT} h${bw} v${h} h-${bw} z`; const p=el('path',{d:path,fill:s.color},g); y0+=v; });
+    const hit=el('rect',{x:px(i)-(slot-bw)/2,y:m.t,width:slot,height:H-m.t-m.b,fill:'transparent'},g);
+    hit.addEventListener('pointermove',e=>{ g.setAttribute('opacity','0.8'); showTip(e.clientX,e.clientY,fd(d),[...cfg.series.map(s=>({label:s.name,color:s.color,value:n0(s.values[i]||0)})),{label:'Total',value:n0(tot[i])}]); }); hit.addEventListener('pointerleave',()=>{g.removeAttribute('opacity');hideTip();}); });
+  legend(fig, cfg.series, 'rect');
+  fig._tv = () => tableView(fig, ['Date',...cfg.series.map(s=>s.name),'Total'], cfg.labels.map((d,i)=>[fd(d),...cfg.series.map(s=>n0(s.values[i]||0)),n0(tot[i])]));
+}
+function hbars(fig, cfg){ // {cats, values, fmt, color, highlight}
+  clearFig(fig); const W=Math.max(320, fig.clientWidth||600), rowH=22, m={t:8,r:60,b:8,l:150}; const n=cfg.cats.length, H=m.t+m.b+rowH*n;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',height:H,role:'img'},fig); svg.style.display='block';
+  const vmax=Math.max(1e-9,...cfg.values); const px=v=>m.l+(W-m.l-m.r)*v/vmax;
+  el('line',{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,stroke:'var(--axis)'},svg);
+  cfg.cats.forEach((c,i)=>{ const y=m.t+rowH*i+4, bh=rowH-8; const t=el('text',{x:m.l-8,y:y+bh/2+4,'text-anchor':'end','font-size':12,fill:'var(--ink2)'},svg); t.textContent=c; const w=Math.max(0,px(cfg.values[i])-m.l); const r=Math.min(4,w);
+    const p=el('path',{d:`M${m.l} ${y} h${Math.max(0,w-r)} a${r} ${r} 0 0 1 ${r} ${r} v${Math.max(0,bh-2*r)} a${r} ${r} 0 0 1 -${r} ${r} h-${Math.max(0,w-r)} z`,fill:(cfg.highlight===c)?'var(--s2)':(cfg.color||'var(--s1)')},svg);
+    const v=el('text',{x:m.l+w+6,y:y+bh/2+4,'font-size':11,'font-weight':700,fill:'var(--ink2)'},svg); v.textContent=(cfg.fmt||n0)(cfg.values[i]);
+    const hit=el('rect',{x:0,y:m.t+rowH*i,width:W,height:rowH,fill:'transparent'},svg); hit.addEventListener('pointermove',e=>{p.setAttribute('opacity','.8'); showTip(e.clientX,e.clientY,c,[{label:cfg.label||'Value',value:(cfg.fmt||n0)(cfg.values[i])}]);}); hit.addEventListener('pointerleave',()=>{p.removeAttribute('opacity');hideTip();}); });
+  fig._tv = () => tableView(fig, ['Leader', cfg.label||'Value'], cfg.cats.map((c,i)=>[c,(cfg.fmt||n0)(cfg.values[i])]));
+}
+function spark(values, w=90, h=22){ const n=values.length; if(n<2) return ''; const mx=Math.max(1,...values); const pts=values.map((v,i)=>`${(w*i/(n-1)).toFixed(1)},${(h-2-(h-4)*v/mx).toFixed(1)}`); const last=pts[n-1].split(','); return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts.join(' ')}" fill="none" stroke="var(--other)" stroke-width="1.5"/><circle cx="${last[0]}" cy="${last[1]}" r="3" fill="var(--s1)"/></svg>`; }
+
+/* ---------------------------------------------------------------- tables */
+function makeTable(host, cols, data, opts={}){ // cols:[{k,label,fmt,cls,sort}] data: objects. sortable
+  host.innerHTML=''; let sortK = opts.sortK || null, sortDir = opts.sortDir || -1;
+  const render = () => { const rowsS=[...data]; if (sortK){ rowsS.sort((a,b)=>{ const x=a[sortK], y=b[sortK]; if (x==null && y==null) return 0; if (x==null) return 1; if (y==null) return -1; return (typeof x==='number'? x-y : String(x).localeCompare(String(y)))*sortDir; }); }
+    const t=document.createElement('table'); const tr=document.createElement('tr'); for (const c of cols){ const th=document.createElement('th'); th.textContent=c.label+(sortK===c.k?(sortDir>0?' ▲':' ▼'):''); th.addEventListener('click',()=>{ if(sortK===c.k) sortDir=-sortDir; else {sortK=c.k; sortDir=c.asc?1:-1;} render(); }); tr.appendChild(th);} t.appendChild(tr);
+    for (const r of rowsS){ const tr2=document.createElement('tr'); if (r._total) tr2.className='total'; for (const c of cols){ const td=document.createElement('td'); const v=r[c.k]; if (c.html) td.innerHTML=c.html(r); else td.textContent = c.fmt? c.fmt(v,r) : (v==null?'-':v); if (c.cls) td.className = typeof c.cls==='function'? c.cls(r): c.cls; if (c.style) td.setAttribute('style', c.style(r)); tr2.appendChild(td);} t.appendChild(tr2);}
+    if (opts.totalRow){ const tr3=document.createElement('tr'); tr3.className='total'; for (const c of cols){ const td=document.createElement('td'); const v=opts.totalRow[c.k]; if (v==null||v==='') td.textContent=''; else if (c.html && typeof v==='number') td.innerHTML=c.html(opts.totalRow); else td.textContent = (c.fmt && typeof v==='number'? c.fmt(v, opts.totalRow) : v); tr3.appendChild(td);} t.appendChild(tr3);}
+    host.appendChild(t); };
+  render(); }
+const deltaHtml = (v, f=n0) => `<span class="${cls(v)}">${arrow(v)}${sgn(v,f)}</span>`;
+const pctDeltaHtml = v => v==null? '-' : `<span class="${cls(v)}">${arrow(v)}${sgn(v, x=>(x*100).toFixed(1)+'%')}</span>`;
+function seqStyle(v, max){ if (!v) return 'background:transparent'; const steps=['var(--seq1)','var(--seq2)','var(--seq3)','var(--seq4)','var(--seq5)','var(--seq6)','var(--seq7)']; const k=Math.min(6, Math.floor(6.99*v/Math.max(1,max))); return `background:${steps[k]};color:${k>=3?'#fff':'var(--ink)'};font-weight:${k>=5?700:400}`; }
+
+/* ---------------------------------------------------------------- render */
+let C = null;
+function renderAll(){ C = compute(); document.getElementById('scopeNote').textContent = `${fd(state.from)} → ${fd(state.to)} (${C.len} days) · prior period ${fds(DATES[Math.max(0,C.p0)])} → ${fds(DATES[Math.max(0,C.p1)])} · ${C.hcScope} agents in scope`;
+  renderOverview(); renderLeaders(); renderAgents(); renderInsights(); renderQuality(); }
+
+function renderOverview(){ const {cur, prev, dy, i0, i1, len} = C;
+  const tiles = [
+    ['Total Units', cur.u, prev.u, n0, n0], ['XM Lines', cur.xm, prev.xm, n0, n0], ['GSR Units', cur.gsr, prev.gsr, n0, n0], ['Submissions', cur.subs, prev.subs, n0, n0], ['Active Sellers', cur.active, prev.active, n0, n0],
+    ['Units per active seller', cur.active?cur.u/cur.active:0, prev.active?prev.u/prev.active:0, n2, n2], ['Participation % (of HC in scope)', C.hcScope?cur.active/C.hcScope:0, C.hcScope?prev.active/C.hcScope:0, pct, v=>(v*100).toFixed(1)+' pts'],
+    ['XMC attach %', (cur.xy+cur.xn)?cur.xy/(cur.xy+cur.xn):0, (prev.xy+prev.xn)?prev.xy/(prev.xy+prev.xn):0, pct, v=>(v*100).toFixed(1)+' pts'], ['E-SIM activation %', (cur.ey+cur.en)?cur.ey/(cur.ey+cur.en):0, (prev.ey+prev.en)?prev.ey/(prev.ey+prev.en):0, pct, v=>(v*100).toFixed(1)+' pts'], ['Avg units per day', cur.u/len, prev.u/len, n1, n1]];
+  const sp = dy.u.slice(Math.max(0,i1-13), i1+1);
+  document.getElementById('tiles').innerHTML = tiles.map(([lab,v,p,f,df],i)=>`<div class="tile"><div class="lab">${lab}</div><div class="val">${f(v)}</div><div class="delta"><span class="${cls(v-p)}">${arrow(v-p)}${sgn(v-p,df)}</span> <span class="vs">vs prior period (${f(p)})</span></div>${i===0?spark(sp):''}</div>`).join('');
+  const labels = DATES.slice(i0,i1+1); const sl = a=>a.slice(i0,i1+1);
+  lineChart(document.getElementById('c1'), {labels, series:[{name:'Total Units',values:sl(dy.u),color:'var(--s1)',area:true},{name:'7-day avg',values:sl(dy.avg7),color:'var(--s2)',fmt:n1}]});
+  stackedColumns(document.getElementById('c2'), {labels, series:[{name:'XM Lines',values:sl(dy.xm),color:'var(--s1)'},{name:'GSR Units',values:sl(dy.gsr),color:'var(--s2)'}]});
+  const xmcS = labels.map((_,k)=>{ const i=i0+k; const d=dy.xy[i]+dy.xn[i]; return d? dy.xy[i]/d : null; }), esS = labels.map((_,k)=>{ const i=i0+k; const d=dy.ey[i]+dy.en[i]; return d? dy.ey[i]/d : null; });
+  lineChart(document.getElementById('c3'), {labels, series:[{name:'XMC attach %',values:xmcS,color:'var(--s1)'},{name:'E-SIM activation %',values:esS,color:'var(--s2)'}], yfmt:pct, pctAxis:true});
+  lineChart(document.getElementById('c4'), {labels, series:[{name:'Active sellers',values:sl(dy.act),color:'var(--s1)'}]});
+  const dod = labels.map((d,k)=>{ const i=i0+k; const prevU = i>0? dy.u[i-1] : null; const wk = i>=7? dy.u[i-7] : null; const xd=dy.xy[i]+dy.xn[i], ed=dy.ey[i]+dy.en[i];
+    return {d, wd:WD[new Date(d+'T00:00:00Z').getUTCDay()], subs:dy.subs[i], xm:dy.xm[i], gsr:dy.gsr[i], u:dy.u[i], dod: prevU==null?null:dy.u[i]-prevU, dodp: (prevU? (dy.u[i]-prevU)/prevU : null), avg7:dy.avg7[i], wow: (wk? (dy.u[i]-wk)/wk : null), act:dy.act[i], ups: dy.act[i]? dy.u[i]/dy.act[i]:0, xmc: xd? dy.xy[i]/xd : null, es: ed? dy.ey[i]/ed : null, nr:dy.nr[i]}; });
+  makeTable(document.getElementById('dodTable'), [
+    {k:'d',label:'Business Date',fmt:fds,asc:true},{k:'wd',label:'Weekday'},{k:'subs',label:'Submissions',fmt:n0},{k:'xm',label:'XM Lines',fmt:n0},{k:'gsr',label:'GSR Units',fmt:n0},{k:'u',label:'Total Units',fmt:n0,cls:'name'},
+    {k:'dod',label:'DoD Δ',html:r=>r.dod==null?'-':deltaHtml(r.dod)},{k:'dodp',label:'DoD %',html:r=>pctDeltaHtml(r.dodp)},{k:'avg7',label:'7-Day Avg',fmt:n1},{k:'wow',label:'WoW %',html:r=>pctDeltaHtml(r.wow)},
+    {k:'act',label:'Active Sellers',fmt:n0},{k:'ups',label:'Units / Seller',fmt:n2},{k:'xmc',label:'XMC Attach %',fmt:pct},{k:'es',label:'E-SIM Act. %',fmt:pct},{k:'nr',label:'Not-in-Roster',fmt:n0}],
+    dod, {sortK:'d', sortDir:1, totalRow:{d:'TOTAL', subs:cur.subs, xm:cur.xm, gsr:cur.gsr, u:cur.u, avg7:cur.u/len, act:cur.active, ups: cur.active?cur.u/cur.active:0, xmc:(cur.xy+cur.xn)?cur.xy/(cur.xy+cur.xn):null, es:(cur.ey+cur.en)?cur.ey/(cur.ey+cur.en):null, nr:C.nrCur.subs}});
+}
+
+function renderLeaders(){ const {leaders, i0, i1, len, nrCur} = C; const tot = leaders.reduce((a,l)=>({hc:a.hc+l.hc,subs:a.subs+l.subs,xm:a.xm+l.xm,gsr:a.gsr+l.gsr,u:a.u+l.u,active:a.active+l.active,prior:a.prior+l.prior}),{hc:0,subs:0,xm:0,gsr:0,u:0,active:0,prior:0});
+  const data = [...leaders].sort((a,b)=>b.u-a.u);
+  makeTable(document.getElementById('leaderTable'), [
+    {k:'rank',label:'Rank',html:r=>r.rank?`<span class="rank ${r.rank===1?'r1':''}">${r.rank}</span>`:'-'},{k:'tl',label:'Team Leader',cls:'name',asc:true},{k:'om',label:'Ops Manager',asc:true},{k:'hc',label:'HC',fmt:n0},{k:'subs',label:'Submissions',fmt:n0},{k:'xm',label:'XM Lines',fmt:n0},{k:'gsr',label:'GSR Units',fmt:n0},
+    {k:'u',label:'Total Units',html:r=>`<span class="bar" style="width:${Math.min(60,Math.round(60*r.u/Math.max(1,data[0].u)))}px"></span><b>${n0(r.u)}</b>`},{k:'uph',label:'Units / HC',fmt:n2,style:r=>seqStyle(r.uph, Math.max(...leaders.map(x=>x.uph)))},{k:'active',label:'Active Sellers',fmt:n0},{k:'part',label:'Participation %',fmt:pct,style:r=>seqStyle(r.part,1)},
+    {k:'prior',label:'Prior Period Units',fmt:n0},{k:'delta',label:'Δ vs Prior',html:r=>deltaHtml(r.delta)},{k:'dpct',label:'Δ %',html:r=>pctDeltaHtml(r.dpct)}], data,
+    {sortK:'u', totalRow:{rank:'', tl:'ACCOUNT TOTAL (roster teams)', om:`not in roster: ${n0(nrCur.u)} units`, hc:tot.hc, subs:tot.subs, xm:tot.xm, gsr:tot.gsr, u:tot.u, uph: tot.hc? tot.u/tot.hc:0, active:tot.active, part: tot.hc? tot.active/tot.hc:0, prior:tot.prior, delta: tot.u-tot.prior, dpct: tot.prior? (tot.u-tot.prior)/tot.prior : null}});
+  hbars(document.getElementById('c5'), {cats:data.map(l=>l.tl), values:data.map(l=>l.u), label:'Total Units', highlight: state.tl!=='All'? state.tl : null});
+  const d2=[...leaders].sort((a,b)=>b.uph-a.uph); hbars(document.getElementById('c6'), {cats:d2.map(l=>l.tl), values:d2.map(l=>l.uph), fmt:n2, label:'Units per head', highlight: state.tl!=='All'? state.tl : null});
+  // matrix
+  const days = DATES.slice(i0,i1+1); const mx = Math.max(1,...leaders.flatMap(l=>l.dy.u.slice(i0,i1+1)));
+  let h='<table><tr><th>Team Leader</th>'+days.map(d=>`<th>${fd(d)}</th>`).join('')+'<th>DoD Δ (last day)</th><th>DoD %</th><th>Period Total</th><th>Avg / Day</th><th>vs Prior Period</th></tr>';
+  for (const l of data){ const u=l.dy.u; const last=u[i1], pv=i1>0?u[i1-1]:0; h+=`<tr><td class="name">${esc(l.tl)}</td>`+days.map((d,k)=>`<td class="num" style="${seqStyle(u[i0+k],mx)}" title="${esc(l.tl)} · ${fd(d)}: ${u[i0+k]} units">${u[i0+k]}</td>`).join('')+`<td>${deltaHtml(last-pv)}</td><td>${pv?pctDeltaHtml((last-pv)/pv):'-'}</td><td class="name">${n0(l.u)}</td><td>${n1(l.u/len)}</td><td>${pctDeltaHtml(l.dpct)}</td></tr>`; }
+  const au = C.dy; h+=`<tr class="total"><td>Selected scope total</td>`+days.map((d,k)=>`<td>${n0(au.u[i0+k])}</td>`).join('')+`<td>${deltaHtml(au.u[i1]-(i1>0?au.u[i1-1]:0))}</td><td>${i1>0&&au.u[i1-1]?pctDeltaHtml((au.u[i1]-au.u[i1-1])/au.u[i1-1]):'-'}</td><td>${n0(C.cur.u)}</td><td>${n1(C.cur.u/len)}</td><td>${C.prev.u?pctDeltaHtml((C.cur.u-C.prev.u)/C.prev.u):'-'}</td></tr></table>`;
+  document.getElementById('leaderMatrix').innerHTML=h;
+  // leader trend
+  const sel=document.getElementById('leaderSel'); if (!sel.options.length){ for (const t of D.tls){ const o=document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o);} sel.value = state.leader || (D.tls.includes('Omar Mansour')?'Omar Mansour':D.tls[0]); sel.addEventListener('change',()=>{state.leader=sel.value; renderLeaderTrend();}); }
+  state.leader = sel.value; renderLeaderTrend(); }
+function renderLeaderTrend(){ const l = C.leaders.find(x=>x.tl===state.leader); if(!l) return; const {i0,i1,len}=C; const labels=DATES.slice(i0,i1+1); const sl=a=>a.slice(i0,i1+1);
+  const best = Math.max(...l.dy.u); const bestD = DATES[l.dy.u.indexOf(best)];
+  document.getElementById('leaderInfo').innerHTML = `<b>${esc(l.tl)}</b> · Ops Manager ${esc(l.om)} · HC ${l.hcAll} (${l.prod} Production / ${l.hcAll-l.prod} Training) · Period units <b>${n0(l.u)}</b> (rank ${l.rank||'-'}) · ${n2(l.uph)} per head · participation ${pct(l.part)} · best day ever ${fd(bestD)} with ${best} units`;
+  lineChart(document.getElementById('c7'), {labels, series:[{name:'Total Units',values:sl(l.dy.u),color:'var(--s1)',area:true},{name:'7-day avg',values:sl(l.dy.avg7),color:'var(--s2)',fmt:n1}]});
+  const part = sl(l.dy.act).map(a=>l.hcAll?a/l.hcAll:0);
+  lineChart(document.getElementById('c8'), {labels, series:[{name:'Participation % (active ÷ HC)',values:part,color:'var(--s3)'}], yfmt:pct, pctAxis:true}); }
+
+function renderAgents(){ const {agents} = C; const top=[...agents].sort((a,b)=>b.u-a.u).slice(0,10); const bot=agents.filter(a=>a.phase==='Production').sort((a,b)=>a.u-b.u||(b.since||0)-(a.since||0)).slice(0,10);
+  makeTable(document.getElementById('top10'), [{k:'rank',label:'#',html:r=>`<span class="rank ${r.rank===1?'r1':''}">${r.rank}</span>`},{k:'name',label:'Agent',cls:'name'},{k:'tl',label:'Team Leader'},{k:'u',label:'Units',html:r=>`<span class="bar" style="width:${Math.round(50*r.u/Math.max(1,top[0].u))}px"></span><b>${n0(r.u)}</b>`},{k:'xm',label:'XM',fmt:n0},{k:'gsr',label:'GSR',fmt:n0},{k:'days',label:'Active Days',fmt:n0}], top, {sortK:'u'});
+  makeTable(document.getElementById('bottom10'), [{k:'name',label:'Agent',cls:'name'},{k:'tl',label:'Team Leader'},{k:'u',label:'Units',fmt:n0,style:r=>r.u===0?'background:#f8cbad;color:#0b0b0b':''},{k:'days',label:'Active Days',fmt:n0},{k:'last',label:'Last Sale',fmt:v=>v?fds(v):'never'},{k:'since',label:'Days Since',fmt:v=>v==null?'-':n0(v)},{k:'tenure',label:'Tenure'}], bot, {sortK:'u', sortDir:1});
+  const dl=document.getElementById('agentList'); if(!dl.options.length){ for (const a of [...roster].sort((x,y)=>x.name.localeCompare(y.name))){ const o=document.createElement('option'); o.value=`${a.name} (${a.hr})`; dl.appendChild(o);} const inp=document.getElementById('agentSel'); inp.value = state.agent || `${top[0].name} (${top[0].hr})`; inp.addEventListener('change',()=>{ state.agent=inp.value; renderAgentTrend(); }); }
+  if(!state.agent) state.agent=document.getElementById('agentSel').value; renderAgentTrend();
+  const search=document.getElementById('agentSearch'); const draw=()=>{ const q=search.value.trim().toLowerCase(); const data=agents.filter(a=>!q||`${a.name} ${a.tl} ${a.om} ${a.hr} ${a.phase}`.toLowerCase().includes(q));
+    makeTable(document.getElementById('agentTable'), [{k:'hr',label:'HRID'},{k:'name',label:'Agent Name',cls:'name',asc:true},{k:'tl',label:'Team Leader',asc:true},{k:'om',label:'Ops Manager',asc:true},{k:'phase',label:'Phase',asc:true},{k:'tenure',label:'Tenure',asc:true},{k:'subs',label:'Submissions',fmt:n0},{k:'xm',label:'XM Lines',fmt:n0},{k:'gsr',label:'GSR Units',fmt:n0},{k:'u',label:'Total Units',html:r=>`<span class="bar" style="width:${Math.round(40*r.u/Math.max(1,...agents.map(x=>x.u)))}px"></span><b>${n0(r.u)}</b>`},{k:'days',label:'Active Days',fmt:n0},{k:'upd',label:'Units / Active Day',fmt:n2},{k:'prior',label:'Prior Period',fmt:n0},{k:'delta',label:'Δ vs Prior',html:r=>deltaHtml(r.delta)},{k:'last',label:'Last Sale',fmt:v=>v?fds(v):'never'},{k:'since',label:'Days Since',fmt:v=>v==null?'-':n0(v),style:r=>(r.since==null||r.since>7)?'background:#f8cbad;color:#0b0b0b':''},{k:'rank',label:'Rank (Scope)',fmt:n0},{k:'rankTeam',label:'Rank (Team)',fmt:n0}], data, {sortK:'u'}); };
+  if(!search._wired){ search.addEventListener('input',draw); search._wired=true; } draw(); }
+function renderAgentTrend(){ const m = /\((\d+)\)\s*$/.exec(state.agent||''); const a = m && rosterBy[m[1]]; const info=document.getElementById('agentInfo'); if(!a){ info.textContent='Pick an agent from the list.'; clearFig(document.getElementById('c9')); return; }
+  const {i0,i1}=C; const labels=DATES.slice(i0,i1+1); const rs=(C.byHr[a.hr]||[]); const dy=daily(rs); const team=C.leaders.find(l=>l.tl===a.tl); const hc=team?team.hcAll:1; const ag=C.agents.find(x=>x.hr===a.hr);
+  info.innerHTML=`<b>${esc(a.name)}</b> · HRID ${a.hr} · ${esc(a.tl)} / ${esc(a.om)} · ${a.phase}, tenure ${a.tenure} · period units <b>${ag?n0(ag.u):'-'}</b>${ag?` (rank ${ag.rank} in scope, ${ag.rankTeam} in team)`:' (outside current scope)'} · all-time ${n0(rs.reduce((s,r)=>s+r.u,0))} · last sale ${ag&&ag.last?fd(ag.last):(rs.length?fd(rs.reduce((m,r)=>r.d>m?r.d:m,'')):'never')}`;
+  lineChart(document.getElementById('c9'), {labels, series:[{name:'Agent units',values:dy.u.slice(i0,i1+1),color:'var(--s1)',area:true},{name:'Team avg per agent',values:team?team.dy.u.slice(i0,i1+1).map(v=>v/hc):labels.map(()=>0),color:'var(--s2)',fmt:n2}]}); }
+
+function renderInsights(){ const {cur, prev, leaders, agents, len, i0, i1, dy} = C; const L=[]; const d=cur.u-prev.u;
+  L.push(`Selected period ${fds(state.from)} to ${fds(state.to)}: ${n0(cur.u)} units (${sgn(d)} vs the prior ${len} days, ${prev.u?sgn((d/prev.u),v=>(v*100).toFixed(0)+'%'):'n/a'}), ${cur.active} active sellers out of ${C.hcScope} agents in scope (${pct0(C.hcScope?cur.active/C.hcScope:0)} participation).`);
+  const bestI = dy.u.slice(i0,i1+1).reduce((b,v,i,a)=>v>a[b]?i:b,0); const lastD=dy.u[i1], prevD=i1>0?dy.u[i1-1]:0;
+  L.push(`Best day in the range: ${fd(DATES[i0+bestI])} with ${n0(dy.u[i0+bestI])} units. Last day ${fd(DATES[i1])}: ${n0(lastD)} units (${sgn(lastD-prevD)} day-over-day).`);
+  const ls=[...leaders].filter(l=>l.hc).sort((a,b)=>b.u-a.u); if (ls.length){ const top=ls[0], low=ls[ls.length-1]; const uph=[...ls].sort((a,b)=>b.uph-a.uph); L.push(`Leaders: ${top.tl} leads on volume with ${n0(top.u)} units; ${uph[0].tl} leads on productivity with ${n2(uph[0].uph)} units per head. Lowest: ${low.tl} with ${n0(low.u)} units (${pct0(low.part)} of the team sold).`);
+    const movers=[...ls].sort((a,b)=>b.delta-a.delta); L.push(`Biggest movers vs the prior period: ${movers.slice(0,2).map(l=>`${l.tl} ${sgn(l.delta)}`).join(', ')} (up); ${movers.slice(-2).reverse().map(l=>`${l.tl} ${sgn(l.delta)}`).join(', ')} (down).`); }
+  const ta=[...agents].sort((a,b)=>b.u-a.u); if (ta.length && ta[0].u){ const top10=ta.slice(0,10).reduce((s,a)=>s+a.u,0); L.push(`Top agent: ${ta[0].name} (${ta[0].tl}) with ${n0(ta[0].u)} units. The top 10 agents hold ${pct0(cur.u?top10/cur.u:0)} of the period's units.`); }
+  const zero=agents.filter(a=>a.phase==='Production'&&a.u===0); L.push(`${zero.length} Production-phase agents in scope have zero units in the period${zero.length?` (${Object.entries(zero.reduce((o,a)=>(o[a.tl]=(o[a.tl]||0)+1,o),{})).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([t,n])=>`${t}: ${n}`).join(', ')})`:''}. Start the coaching list there.`);
+  const xr=(cur.xy+cur.xn)?cur.xy/(cur.xy+cur.xn):null, er=(cur.ey+cur.en)?cur.ey/(cur.ey+cur.en):null; L.push(`Mix: ${pct0(cur.u?cur.gsr/cur.u:0)} GSR / ${pct0(cur.u?cur.xm/cur.u:0)} XM Lines. XMC attach ${pct(xr)} and E-SIM activation ${pct(er)} on answered XM-line entries${xr!=null&&xr<0.2?' – XMC is still the biggest upsell gap':''}.`);
+  document.getElementById('liveIns').innerHTML = L.map(s=>`<li>${esc(s)}</li>`).join('');
+  document.getElementById('histIns').innerHTML = HIST.map(s=>`<li>${esc(s)}</li>`).join('');
+  document.getElementById('recs').innerHTML = ['Daily (10 minutes): open the Leaders tab with your team selected, read the day-over-day row and the single-leader trend; message every agent with 0 units by mid-shift and recognise the top mover publicly.','Weekly: set the range to the week and your name in the Team Leader filter; review participation %, units per active seller and the Bottom-10 list; pair each bottom-10 agent with a top-10 agent for a side-by-side on XMC attach and e-SIM activation.','Pitch focus: XMC attach is below 20% – build a one-line XMC offer into every XM Line close; chase every unactivated e-SIM the same shift, since an unactivated e-SIM is a sale at risk.','Hygiene: every agent submits the form before closing the interaction, HRID copied from the roster, order number from the system – one wrong HRID removes the sale from your scorecard.'].map(s=>`<li>${esc(s)}</li>`).join(''); }
+
+function renderQuality(){ const all=rows; const unm=all.filter(r=>!r.inr); const dups=all.filter(r=>r.dup).length; const junk=all.filter(r=>!r.ov).length;
+  document.getElementById('qTiles').innerHTML=[['Entries not matching the roster',`${n0(unm.length)} (${pct0(unm.length/all.length)})`,`${n0(unm.reduce((s,r)=>s+r.u,0))} units unattributed`],['Exact duplicate entries',n0(dups),state.exdup?'excluded by the filter toggle':'currently INCLUDED in all figures'],['Unusable order numbers',n0(junk),"e.g. '1', '0', '.', 'N/A', pasted work-order text"]].map(([a,b,c])=>`<div class="tile"><div class="lab">${a}</div><div class="val" style="font-size:24px">${b}</div><div class="small">${c}</div></div>`).join('');
+  const by={}; for(const r of unm){ const k=r.hr.replace(/^UNMAPPED:/,''); const o=(by[k] ||= {hr:k,n:0,u:0,first:r.d,last:r.d}); o.n++; o.u+=r.u; if(r.d<o.first)o.first=r.d; if(r.d>o.last)o.last=r.d; }
+  makeTable(document.getElementById('unmapped'), [{k:'hr',label:'HRID as typed'},{k:'n',label:'Entries',fmt:n0},{k:'u',label:'Units',fmt:n0},{k:'first',label:'First Entry',fmt:fds},{k:'last',label:'Last Entry',fmt:fds}], Object.values(by), {sortK:'n'});
+  document.getElementById('defs').innerHTML=['Units = XM Lines sold + GSR units. XM Lines = "No. of XM Lines" (1 if blank). GSR units = "Count of GSR" when present, otherwise the number of GSR types ticked (the count field only exists since 24 Aug 2026).','Business day = 15:00 Cairo to 07:00 the next morning (US hours). Any submission before 12:00 noon belongs to the previous day\'s shift.','Active sellers = roster agents with at least one unit; participation = active ÷ headcount in scope. Agents not on the roster are shown separately as "not in roster".','XMC attach % = "Did you add XMC?" Yes ÷ (Yes + No). E-SIM activation % = "Did you activate the E-SIM?" Yes ÷ (Yes + No).','Prior period = the same number of days immediately before the From date.','Duplicate = same mapped HRID + account + order number + entry type where the order number is a 6–20 digit number; the first occurrence is kept.','HRID mapping: digits only; 8-digit IDs starting with 100 and 10-digit IDs starting with 1000 are repaired when a unique roster match exists.'].map(s=>`<li>${esc(s)}</li>`).join(''); }
+
+/* ---------------------------------------------------------------- full-history insights (whole account, duplicates excluded) */
+const HIST = (() => { const v = rows.filter(r=>!r.dup); const dy = daily(v); const L=[]; const n=DATES.length;
+  const mon={}; DATES.forEach((d,i)=>{ const k=d.slice(0,7); (mon[k] ||= {u:0,n:0}); mon[k].u+=dy.u[i]; mon[k].n++; }); L.push('Average units per day by month: '+Object.entries(mon).map(([k,o])=>`${MO[+k.slice(5,7)-1]} ${n1(o.u/o.n)}`).join(' → ')+'. The tracker started on '+fds(DATES[0])+', so the first month is partial.');
+  const l7=sum(dy.u,n-7,n-1), p7=sum(dy.u,n-14,n-8); const bi=dy.u.indexOf(Math.max(...dy.u)); L.push(`Last 7 business days (${fds(DATES[n-7])}–${fds(DATES[n-1])}): ${n0(l7)} units vs ${n0(p7)} the 7 days before (${p7?sgn((l7-p7)/p7,x=>(x*100).toFixed(0)+'%'):'n/a'}). Best day on record: ${fd(DATES[bi])} with ${n0(dy.u[bi])} units.`);
+  const wk={}; DATES.forEach((d,i)=>{ const w=WD[new Date(d+'T00:00:00Z').getUTCDay()]; (wk[w] ||= {u:0,n:0}); wk[w].u+=dy.u[i]; wk[w].n++; }); const we=Object.entries(wk).map(([k,o])=>[k,o.u/o.n]).sort((a,b)=>b[1]-a[1]); L.push(`Weekday pattern (average units per business day): strongest ${we[0][0]} (${n0(we[0][1])}), weakest ${we[we.length-1][0]} (${n0(we[we.length-1][1])}). Use WoW % to compare like-for-like weekdays.`);
+  const U=v.reduce((s,r)=>s+r.u,0), G=v.reduce((s,r)=>s+r.gsr,0), X=v.reduce((s,r)=>s+r.xm,0); const ty={}; for(const r of v) for(const t of r.ty) ty[t]=(ty[t]||0)+1; L.push(`GSRs are ${pct0(G/U)} of all units (${n0(G)}) vs XM Lines ${pct0(X/U)} (${n0(X)}). GSR type mix: ${Object.entries(ty).sort((a,b)=>b[1]-a[1]).map(([k,c])=>`${k} ${n0(c)}`).join(', ')}.`);
+  const xa=v.filter(r=>r.xmc==='Y'||r.xmc==='N'), xy=xa.filter(r=>r.xmc==='Y').length; const ea=v.filter(r=>r.esim==='Y'||r.esim==='N'), ey=ea.filter(r=>r.esim==='Y').length; const d30=DATES[n-30]; const x30=xa.filter(r=>r.d>=d30), e30=ea.filter(r=>r.d>=d30);
+  L.push(`XMC attach on XM Line sales is ${pct(xa.length?xy/xa.length:0)} overall (${xy} of ${n0(xa.length)} answered) and ${pct(x30.length?x30.filter(r=>r.xmc==='Y').length/x30.length:0)} in the last 30 days – the single biggest upsell gap. E-SIM activation is ${pct(ea.length?ey/ea.length:0)} overall and ${pct(e30.length?e30.filter(r=>r.esim==='Y').length/e30.length:0)} in the last 30 days.`);
+  const dev={}; for(const r of v) if(r.dev&&r.dev!=='No Device'&&r.dev!=='Other') dev[r.dev]=(dev[r.dev]||0)+1; L.push(`Device attach: ${Object.entries(dev).sort((a,b)=>b[1]-a[1]).map(([k,c])=>`${k} ${n0(c)}`).join(', ')}. "Free Line for 1 Year" is the dominant promotion (${n0(v.filter(r=>r.promo==='Free Line for 1 Year').length)} entries).`);
+  const hc={}; for(const a of roster) hc[a.tl]=(hc[a.tl]||0)+1; const l30=v.filter(r=>r.inr&&r.d>=d30), p30=v.filter(r=>r.inr&&r.d<d30&&r.d>=DATES[Math.max(0,n-60)]); const tu={}, pu={}, ta={}; for(const r of l30){tu[r.tl]=(tu[r.tl]||0)+r.u; (ta[r.tl] ||= new Set()).add(r.hr);} for(const r of p30) pu[r.tl]=(pu[r.tl]||0)+r.u;
+  const per=D.tls.map(t=>[t,(tu[t]||0)/hc[t],hc[t],(ta[t]?ta[t].size:0)/hc[t]]).sort((a,b)=>b[1]-a[1]); L.push(`Last 30 days, units per head: top ${per.slice(0,3).map(x=>`${x[0]} ${n1(x[1])} (HC ${x[2]}, participation ${pct0(x[3])})`).join(', ')}. Bottom ${per.slice(-3).map(x=>`${x[0]} ${n1(x[1])} (participation ${pct0(x[3])})`).join(', ')} – teams still in Training phase naturally sit lower.`);
+  const mv=D.tls.map(t=>[t,(tu[t]||0)-(pu[t]||0)]).sort((a,b)=>b[1]-a[1]); L.push(`Biggest 30-day movers vs the previous 30 days – up: ${mv.filter(x=>x[1]>0).slice(0,3).map(x=>`${x[0]} ${sgn(x[1])}`).join(', ')}. Down: ${mv.filter(x=>x[1]<0).slice(-3).reverse().map(x=>`${x[0]} ${sgn(x[1])}`).join(', ')||'none'}.`);
+  const au={}; for(const r of l30) au[r.hr]=(au[r.hr]||0)+r.u; const as=Object.entries(au).sort((a,b)=>b[1]-a[1]); const t10=as.slice(0,10).reduce((s,x)=>s+x[1],0), tot30=l30.reduce((s,r)=>s+r.u,0); const prod=roster.filter(a=>a.phase==='Production'); const zp=prod.filter(a=>!au[a.hr]);
+  L.push(`${t10/tot30>0.35?'Concentration risk':'Output is well spread'}: the top 10 agents produced ${pct0(t10/tot30)} of roster units in the last 30 days; #1 is ${rosterBy[as[0][0]].name} (${rosterBy[as[0][0]].tl}) with ${n0(as[0][1])} units. ${zp.length} of ${prod.length} Production-phase agents logged zero units in those 30 days.`);
+  const unm=rows.filter(r=>!r.inr); L.push(`Data quality: ${n0(unm.length)} entries (${pct0(unm.length/rows.length)}) carry an HRID that is not on the roster (${n0(unm.reduce((s,r)=>s+r.u,0))} units unattributed), ${n0(rows.filter(r=>r.dup).length)} are exact duplicates and ${n0(rows.filter(r=>!r.ov).length)} have an unusable order number. Make HRID and order number validated fields in the form.`);
+  return L; })();
+
+/* ---------------------------------------------------------------- wiring */
+function setPreset(p){ state.preset=p; const max=D.meta.maxDate; if (p==='all'){ state.from=D.meta.minDate; } else if (p==='mtd'){ state.from=max.slice(0,8)+'01'; } else { state.from=addDays(max, -(+p-1)); } state.to=max; if (DI[state.from]==null) state.from=D.meta.minDate; syncInputs(); renderAll(); }
+function syncInputs(){ document.getElementById('from').value=state.from; document.getElementById('to').value=state.to; document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on', c.dataset.p===state.preset)); }
+function init(){ document.getElementById('subtitle').textContent=`Source: Sales Tracker (Microsoft Forms) ${fds(D.meta.minDate)} – ${fds(D.meta.maxDate)} ${D.meta.maxDate.slice(0,4)} (${n0(rows.length)} entries) + TSX Roster (${roster.length} agents, ${D.tls.length} leaders). Business days run 15:00 Cairo → 07:00 next morning. Built ${D.meta.built}.`;
+  const pr=document.getElementById('presets'); for (const [p,l] of [['7','Last 7 days'],['14','Last 14 days'],['30','Last 30 days'],['mtd','Month to date'],['all','All history']]){ const b=document.createElement('button'); b.className='chip'; b.dataset.p=p; b.textContent=l; b.addEventListener('click',()=>setPreset(p)); pr.appendChild(b); }
+  const om=document.getElementById('om'), tl=document.getElementById('tl'); for (const o of ['All',...D.oms]){ const e=document.createElement('option'); e.value=o; e.textContent=o; om.appendChild(e);} for (const o of ['All',...D.tls]){ const e=document.createElement('option'); e.value=o; e.textContent=o; tl.appendChild(e);}
+  om.addEventListener('change',()=>{state.om=om.value; renderAll();}); tl.addEventListener('change',()=>{state.tl=tl.value; renderAll();}); document.getElementById('exdup').addEventListener('change',e=>{state.exdup=e.target.checked; renderAll();});
+  const chg=()=>{ const f=document.getElementById('from').value, t=document.getElementById('to').value; if (DI[f]==null||DI[t]==null||f>t) return; state.from=f; state.to=t; state.preset='custom'; syncInputs(); renderAll(); }; document.getElementById('from').addEventListener('change',chg); document.getElementById('to').addEventListener('change',chg);
+  document.getElementById('from').min=D.meta.minDate; document.getElementById('from').max=D.meta.maxDate; document.getElementById('to').min=D.meta.minDate; document.getElementById('to').max=D.meta.maxDate;
+  const tabs=[['overview','Overview'],['leaders','Leaders'],['agents','Agents'],['insights','Insights'],['quality','Data quality']]; const tb=document.getElementById('tabs'); for (const [k,l] of tabs){ const b=document.createElement('button'); b.className='tab'; b.dataset.t=k; b.textContent=l; b.addEventListener('click',()=>{ state.tab=k; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.t===k)); document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+k)); renderAll(); }); tb.appendChild(b);}
+  document.querySelector('.tab').classList.add('on'); document.getElementById('p-overview').classList.add('on');
+  document.querySelectorAll('button[data-tv]').forEach(b=>b.addEventListener('click',()=>{ const fig=document.getElementById(b.dataset.tv); if (fig._tv){ fig._tv(); b.classList.toggle('on'); } }));
+  document.getElementById('themeBtn').addEventListener('click',()=>{ const r=document.documentElement; const dark = r.dataset.theme==='dark' || (!r.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches); r.dataset.theme = dark?'light':'dark'; });
+  let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(renderAll,150); });
+  setPreset('14'); }
+init();
+</script>
+</body>
+</html>
