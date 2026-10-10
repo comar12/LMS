@@ -1,0 +1,4772 @@
+{
+ "meta": {
+  "tracker_rows": 3695,
+  "rows_after_dedup": 3483,
+  "dups": 212,
+  "first_day": "2026-07-22",
+  "last_day": "2026-10-09",
+  "days": 80,
+  "hc_all": 250,
+  "hc_prod": 133,
+  "total_units": 4012,
+  "xm_units": 1132,
+  "gsr_units": 2880
+ },
+ "monthly": [
+  {
+   "month": "2026-07",
+   "units": 359,
+   "xm": 68,
+   "gsr": 291,
+   "rows": 311,
+   "sellers": 43,
+   "days": 10,
+   "units_per_day": 35.9,
+   "upad_all": 0.1436,
+   "upad_prod": 0.269924812,
+   "xm_share": 0.1894150418
+  },
+  {
+   "month": "2026-08",
+   "units": 995,
+   "xm": 276,
+   "gsr": 719,
+   "rows": 879,
+   "sellers": 89,
+   "days": 31,
+   "units_per_day": 32.0967741935,
+   "upad_all": 0.1283870968,
+   "upad_prod": 0.2413291293,
+   "xm_share": 0.2773869347
+  },
+  {
+   "month": "2026-09",
+   "units": 1836,
+   "xm": 565,
+   "gsr": 1271,
+   "rows": 1597,
+   "sellers": 183,
+   "days": 30,
+   "units_per_day": 61.2,
+   "upad_all": 0.2448,
+   "upad_prod": 0.4601503759,
+   "xm_share": 0.3077342048
+  },
+  {
+   "month": "2026-10",
+   "units": 822,
+   "xm": 223,
+   "gsr": 599,
+   "rows": 696,
+   "sellers": 183,
+   "days": 9,
+   "units_per_day": 91.3333333333,
+   "upad_all": 0.3653333333,
+   "upad_prod": 0.686716792,
+   "xm_share": 0.2712895377
+  }
+ ],
+ "weekly": [
+  {
+   "units": 139,
+   "xm": 39,
+   "gsr": 100,
+   "sellers": 30,
+   "days": 5,
+   "units_per_day": 27.8,
+   "week_start": "2026-07-20",
+   "wow_upd_pct": null
+  },
+  {
+   "units": 278,
+   "xm": 43,
+   "gsr": 235,
+   "sellers": 36,
+   "days": 7,
+   "units_per_day": 39.7142857143,
+   "week_start": "2026-07-27",
+   "wow_upd_pct": 42.8571428571
+  },
+  {
+   "units": 254,
+   "xm": 60,
+   "gsr": 194,
+   "sellers": 47,
+   "days": 7,
+   "units_per_day": 36.2857142857,
+   "week_start": "2026-08-03",
+   "wow_upd_pct": -8.6330935252
+  },
+  {
+   "units": 156,
+   "xm": 48,
+   "gsr": 108,
+   "sellers": 39,
+   "days": 7,
+   "units_per_day": 22.2857142857,
+   "week_start": "2026-08-10",
+   "wow_upd_pct": -38.5826771654
+  },
+  {
+   "units": 202,
+   "xm": 57,
+   "gsr": 145,
+   "sellers": 44,
+   "days": 7,
+   "units_per_day": 28.8571428571,
+   "week_start": "2026-08-17",
+   "wow_upd_pct": 29.4871794872
+  },
+  {
+   "units": 259,
+   "xm": 82,
+   "gsr": 177,
+   "sellers": 52,
+   "days": 7,
+   "units_per_day": 37.0,
+   "week_start": "2026-08-24",
+   "wow_upd_pct": 28.2178217822
+  },
+  {
+   "units": 399,
+   "xm": 126,
+   "gsr": 273,
+   "sellers": 69,
+   "days": 7,
+   "units_per_day": 57.0,
+   "week_start": "2026-08-31",
+   "wow_upd_pct": 54.0540540541
+  },
+  {
+   "units": 470,
+   "xm": 159,
+   "gsr": 311,
+   "sellers": 89,
+   "days": 7,
+   "units_per_day": 67.1428571429,
+   "week_start": "2026-09-07",
+   "wow_upd_pct": 17.7944862155
+  },
+  {
+   "units": 320,
+   "xm": 87,
+   "gsr": 233,
+   "sellers": 88,
+   "days": 7,
+   "units_per_day": 45.7142857143,
+   "week_start": "2026-09-14",
+   "wow_upd_pct": -31.914893617
+  },
+  {
+   "units": 491,
+   "xm": 160,
+   "gsr": 331,
+   "sellers": 109,
+   "days": 7,
+   "units_per_day": 70.1428571429,
+   "week_start": "2026-09-21",
+   "wow_upd_pct": 53.4375
+  },
+  {
+   "units": 469,
+   "xm": 122,
+   "gsr": 347,
+   "sellers": 105,
+   "days": 7,
+   "units_per_day": 67.0,
+   "week_start": "2026-09-28",
+   "wow_upd_pct": -4.4806517312
+  },
+  {
+   "units": 575,
+   "xm": 149,
+   "gsr": 426,
+   "sellers": 163,
+   "days": 5,
+   "units_per_day": 115.0,
+   "week_start": "2026-10-05",
+   "wow_upd_pct": 71.6417910448
+  }
+ ],
+ "trend": {
+  "slope_last30_units_per_day": 1.896,
+  "slope_last30_excl_last3": 0.361,
+  "slope_all_units_per_day": 0.807,
+  "cv_last30": 0.453,
+  "cv_prior30": 0.531,
+  "best_day": {
+   "date": "2026-10-09",
+   "units": 184
+  },
+  "worst_day": {
+   "date": "2026-08-14",
+   "units": 7
+  },
+  "mean_last30": 70.7,
+  "mean_last7": 101.6,
+  "mean_prior7": 63.6,
+  "mean_27_days_before_spike": 61.81
+ },
+ "anomalies": [
+  {
+   "date": "2026-08-11",
+   "units": 16,
+   "trailing14_mean": 36.6,
+   "trailing14_std": 9.4,
+   "z": -2.2
+  },
+  {
+   "date": "2026-08-14",
+   "units": 7,
+   "trailing14_mean": 31.7,
+   "trailing14_std": 10.3,
+   "z": -2.39
+  },
+  {
+   "date": "2026-08-23",
+   "units": 63,
+   "trailing14_mean": 22.6,
+   "trailing14_std": 7.1,
+   "z": 5.68
+  },
+  {
+   "date": "2026-08-29",
+   "units": 62,
+   "trailing14_mean": 29.9,
+   "trailing14_std": 11.6,
+   "z": 2.76
+  },
+  {
+   "date": "2026-08-31",
+   "units": 66,
+   "trailing14_mean": 32.9,
+   "trailing14_std": 14.5,
+   "z": 2.28
+  },
+  {
+   "date": "2026-09-08",
+   "units": 103,
+   "trailing14_mean": 48.5,
+   "trailing14_std": 15.0,
+   "z": 3.64
+  },
+  {
+   "date": "2026-10-07",
+   "units": 125,
+   "trailing14_mean": 65.7,
+   "trailing14_std": 12.2,
+   "z": 4.86
+  },
+  {
+   "date": "2026-10-08",
+   "units": 144,
+   "trailing14_mean": 70.0,
+   "trailing14_std": 20.0,
+   "z": 3.7
+  },
+  {
+   "date": "2026-10-09",
+   "units": 184,
+   "trailing14_mean": 74.4,
+   "trailing14_std": 28.1,
+   "z": 3.91
+  }
+ ],
+ "daily": [
+  {
+   "date": "2026-07-22",
+   "units": 20
+  },
+  {
+   "date": "2026-07-23",
+   "units": 37
+  },
+  {
+   "date": "2026-07-24",
+   "units": 43
+  },
+  {
+   "date": "2026-07-25",
+   "units": 17
+  },
+  {
+   "date": "2026-07-26",
+   "units": 22
+  },
+  {
+   "date": "2026-07-27",
+   "units": 48
+  },
+  {
+   "date": "2026-07-28",
+   "units": 46
+  },
+  {
+   "date": "2026-07-29",
+   "units": 48
+  },
+  {
+   "date": "2026-07-30",
+   "units": 38
+  },
+  {
+   "date": "2026-07-31",
+   "units": 40
+  },
+  {
+   "date": "2026-08-01",
+   "units": 25
+  },
+  {
+   "date": "2026-08-02",
+   "units": 33
+  },
+  {
+   "date": "2026-08-03",
+   "units": 46
+  },
+  {
+   "date": "2026-08-04",
+   "units": 38
+  },
+  {
+   "date": "2026-08-05",
+   "units": 30
+  },
+  {
+   "date": "2026-08-06",
+   "units": 35
+  },
+  {
+   "date": "2026-08-07",
+   "units": 54
+  },
+  {
+   "date": "2026-08-08",
+   "units": 29
+  },
+  {
+   "date": "2026-08-09",
+   "units": 22
+  },
+  {
+   "date": "2026-08-10",
+   "units": 29
+  },
+  {
+   "date": "2026-08-11",
+   "units": 16
+  },
+  {
+   "date": "2026-08-12",
+   "units": 20
+  },
+  {
+   "date": "2026-08-13",
+   "units": 27
+  },
+  {
+   "date": "2026-08-14",
+   "units": 7
+  },
+  {
+   "date": "2026-08-15",
+   "units": 29
+  },
+  {
+   "date": "2026-08-16",
+   "units": 28
+  },
+  {
+   "date": "2026-08-17",
+   "units": 24
+  },
+  {
+   "date": "2026-08-18",
+   "units": 19
+  },
+  {
+   "date": "2026-08-19",
+   "units": 26
+  },
+  {
+   "date": "2026-08-20",
+   "units": 17
+  },
+  {
+   "date": "2026-08-21",
+   "units": 18
+  },
+  {
+   "date": "2026-08-22",
+   "units": 35
+  },
+  {
+   "date": "2026-08-23",
+   "units": 63
+  },
+  {
+   "date": "2026-08-24",
+   "units": 39
+  },
+  {
+   "date": "2026-08-25",
+   "units": 30
+  },
+  {
+   "date": "2026-08-26",
+   "units": 28
+  },
+  {
+   "date": "2026-08-27",
+   "units": 37
+  },
+  {
+   "date": "2026-08-28",
+   "units": 25
+  },
+  {
+   "date": "2026-08-29",
+   "units": 62
+  },
+  {
+   "date": "2026-08-30",
+   "units": 38
+  },
+  {
+   "date": "2026-08-31",
+   "units": 66
+  },
+  {
+   "date": "2026-09-01",
+   "units": 62
+  },
+  {
+   "date": "2026-09-02",
+   "units": 50
+  },
+  {
+   "date": "2026-09-03",
+   "units": 66
+  },
+  {
+   "date": "2026-09-04",
+   "units": 59
+  },
+  {
+   "date": "2026-09-05",
+   "units": 56
+  },
+  {
+   "date": "2026-09-06",
+   "units": 40
+  },
+  {
+   "date": "2026-09-07",
+   "units": 60
+  },
+  {
+   "date": "2026-09-08",
+   "units": 103
+  },
+  {
+   "date": "2026-09-09",
+   "units": 40
+  },
+  {
+   "date": "2026-09-10",
+   "units": 55
+  },
+  {
+   "date": "2026-09-11",
+   "units": 70
+  },
+  {
+   "date": "2026-09-12",
+   "units": 85
+  },
+  {
+   "date": "2026-09-13",
+   "units": 57
+  },
+  {
+   "date": "2026-09-14",
+   "units": 62
+  },
+  {
+   "date": "2026-09-15",
+   "units": 32
+  },
+  {
+   "date": "2026-09-16",
+   "units": 50
+  },
+  {
+   "date": "2026-09-17",
+   "units": 28
+  },
+  {
+   "date": "2026-09-18",
+   "units": 39
+  },
+  {
+   "date": "2026-09-19",
+   "units": 60
+  },
+  {
+   "date": "2026-09-20",
+   "units": 49
+  },
+  {
+   "date": "2026-09-21",
+   "units": 85
+  },
+  {
+   "date": "2026-09-22",
+   "units": 77
+  },
+  {
+   "date": "2026-09-23",
+   "units": 65
+  },
+  {
+   "date": "2026-09-24",
+   "units": 83
+  },
+  {
+   "date": "2026-09-25",
+   "units": 69
+  },
+  {
+   "date": "2026-09-26",
+   "units": 61
+  },
+  {
+   "date": "2026-09-27",
+   "units": 51
+  },
+  {
+   "date": "2026-09-28",
+   "units": 72
+  },
+  {
+   "date": "2026-09-29",
+   "units": 79
+  },
+  {
+   "date": "2026-09-30",
+   "units": 71
+  },
+  {
+   "date": "2026-10-01",
+   "units": 52
+  },
+  {
+   "date": "2026-10-02",
+   "units": 59
+  },
+  {
+   "date": "2026-10-03",
+   "units": 87
+  },
+  {
+   "date": "2026-10-04",
+   "units": 49
+  },
+  {
+   "date": "2026-10-05",
+   "units": 69
+  },
+  {
+   "date": "2026-10-06",
+   "units": 53
+  },
+  {
+   "date": "2026-10-07",
+   "units": 125
+  },
+  {
+   "date": "2026-10-08",
+   "units": 144
+  },
+  {
+   "date": "2026-10-09",
+   "units": 184
+  }
+ ],
+ "target_gap_by_month": [
+  {
+   "level": "Account",
+   "name": "Account",
+   "month": "2026-07",
+   "units": 359,
+   "units_per_day": 35.9,
+   "hc_all": 250,
+   "hc_prod": 133,
+   "upad_all": 0.144,
+   "upad_prod": 0.27
+  },
+  {
+   "level": "OM",
+   "name": "Bishoy Mourad",
+   "month": "2026-07",
+   "units": 211,
+   "units_per_day": 21.1,
+   "hc_all": 104,
+   "hc_prod": 86,
+   "upad_all": 0.203,
+   "upad_prod": 0.245
+  },
+  {
+   "level": "OM",
+   "name": "Ramadan Gamal",
+   "month": "2026-07",
+   "units": 58,
+   "units_per_day": 5.8,
+   "hc_all": 120,
+   "hc_prod": 47,
+   "upad_all": 0.048,
+   "upad_prod": 0.123
+  },
+  {
+   "level": "TL",
+   "name": "Essam Medhat",
+   "month": "2026-07",
+   "units": 14,
+   "units_per_day": 1.4,
+   "hc_all": 13,
+   "hc_prod": 13,
+   "upad_all": 0.108,
+   "upad_prod": 0.108
+  },
+  {
+   "level": "TL",
+   "name": "Mina Milad",
+   "month": "2026-07",
+   "units": 61,
+   "units_per_day": 6.1,
+   "hc_all": 17,
+   "hc_prod": 17,
+   "upad_all": 0.359,
+   "upad_prod": 0.359
+  },
+  {
+   "level": "TL",
+   "name": "Mohamed Ashour",
+   "month": "2026-07",
+   "units": 7,
+   "units_per_day": 0.7,
+   "hc_all": 15,
+   "hc_prod": 15,
+   "upad_all": 0.047,
+   "upad_prod": 0.047
+  },
+  {
+   "level": "TL",
+   "name": "Rahma Samir",
+   "month": "2026-07",
+   "units": 23,
+   "units_per_day": 2.3,
+   "hc_all": 22,
+   "hc_prod": 22,
+   "upad_all": 0.105,
+   "upad_prod": 0.105
+  },
+  {
+   "level": "TL",
+   "name": "Salma Ahmed",
+   "month": "2026-07",
+   "units": 44,
+   "units_per_day": 4.4,
+   "hc_all": 17,
+   "hc_prod": 17,
+   "upad_all": 0.259,
+   "upad_prod": 0.259
+  },
+  {
+   "level": "TL",
+   "name": "Shereen Kamal",
+   "month": "2026-07",
+   "units": 120,
+   "units_per_day": 12.0,
+   "hc_all": 16,
+   "hc_prod": 16,
+   "upad_all": 0.75,
+   "upad_prod": 0.75
+  },
+  {
+   "level": "Account",
+   "name": "Account",
+   "month": "2026-08",
+   "units": 995,
+   "units_per_day": 32.1,
+   "hc_all": 250,
+   "hc_prod": 133,
+   "upad_all": 0.128,
+   "upad_prod": 0.241
+  },
+  {
+   "level": "OM",
+   "name": "Bishoy Mourad",
+   "month": "2026-08",
+   "units": 642,
+   "units_per_day": 20.71,
+   "hc_all": 104,
+   "hc_prod": 86,
+   "upad_all": 0.199,
+   "upad_prod": 0.241
+  },
+  {
+   "level": "OM",
+   "name": "Ramadan Gamal",
+   "month": "2026-08",
+   "units": 157,
+   "units_per_day": 5.06,
+   "hc_all": 120,
+   "hc_prod": 47,
+   "upad_all": 0.042,
+   "upad_prod": 0.108
+  },
+  {
+   "level": "TL",
+   "name": "Anas Sami",
+   "month": "2026-08",
+   "units": 72,
+   "units_per_day": 2.32,
+   "hc_all": 16,
+   "hc_prod": 16,
+   "upad_all": 0.145,
+   "upad_prod": 0.145
+  },
+  {
+   "level": "TL",
+   "name": "Essam Medhat",
+   "month": "2026-08",
+   "units": 41,
+   "units_per_day": 1.32,
+   "hc_all": 13,
+   "hc_prod": 13,
+   "upad_all": 0.102,
+   "upad_prod": 0.102
+  },
+  {
+   "level": "TL",
+   "name": "Mina Milad",
+   "month": "2026-08",
+   "units": 185,
+   "units_per_day": 5.97,
+   "hc_all": 17,
+   "hc_prod": 17,
+   "upad_all": 0.351,
+   "upad_prod": 0.351
+  },
+  {
+   "level": "TL",
+   "name": "Mohamed Ashour",
+   "month": "2026-08",
+   "units": 31,
+   "units_per_day": 1.0,
+   "hc_all": 15,
+   "hc_prod": 15,
+   "upad_all": 0.067,
+   "upad_prod": 0.067
+  },
+  {
+   "level": "TL",
+   "name": "Rahma Samir",
+   "month": "2026-08",
+   "units": 172,
+   "units_per_day": 5.55,
+   "hc_all": 22,
+   "hc_prod": 22,
+   "upad_all": 0.252,
+   "upad_prod": 0.252
+  },
+  {
+   "level": "TL",
+   "name": "Salma Ahmed",
+   "month": "2026-08",
+   "units": 116,
+   "units_per_day": 3.74,
+   "hc_all": 17,
+   "hc_prod": 17,
+   "upad_all": 0.22,
+   "upad_prod": 0.22
+  },
+  {
+   "level": "TL",
+   "name": "Shereen Kamal",
+   "month": "2026-08",
+   "units": 182,
+   "units_per_day": 5.87,
+   "hc_all": 16,
+   "hc_prod": 16,
+   "upad_all": 0.367,
+   "upad_prod": 0.367
+  },
+  {
+   "level": "Account",
+   "name": "Account",
+   "month": "2026-09",
+   "units": 1836,
+   "units_per_day": 61.2,
+   "hc_all": 250,
+   "hc_prod": 133,
+   "upad_all": 0.245,
+   "upad_prod": 0.46
+  },
+  {
+   "level": "OM",
+   "name": "Bishoy Mourad",
+   "month": "2026-09",
+   "units": 1023,
+   "units_per_day": 34.1,
+   "hc_all": 104,
+   "hc_prod": 86,
+   "upad_all": 0.328,
+   "upad_prod": 0.397
+  },
+  {
+   "level": "OM",
+   "name": "Mohamed Radwan",
+   "month": "2026-09",
+   "units": 19,
+   "units_per_day": 0.63,
+   "hc_all": 26,
+   "hc_prod": 0,
+   "upad_all": 0.024,
+   "upad_prod": null
+  },
+  {
+   "level": "OM",
+   "name": "Ramadan Gamal",
+   "month": "2026-09",
+   "units": 659,
+   "units_per_day": 21.97,
+   "hc_all": 120,
+   "hc_prod": 47,
+   "upad_all": 0.183,
+   "upad_prod": 0.467
+  },
+  {
+   "level": "TL",
+   "name": "Ahmed Aboelgoud",
+   "month": "2026-09",
+   "units": 153,
+   "units_per_day": 5.1,
+   "hc_all": 23,
+   "hc_prod": 16,
+   "upad_all": 0.222,
+   "upad_prod": 0.319
+  },
+  {
+   "level": "TL",
+   "name": "Anas Sami",
+   "month": "2026-09",
+   "units": 190,
+   "units_per_day": 6.33,
+   "hc_all": 16,
+   "hc_prod": 16,
+   "upad_all": 0.396,
+   "upad_prod": 0.396
+  },
+  {
+   "level": "TL",
+   "name": "Essam Medhat",
+   "month": "2026-09",
+   "units": 160,
+   "units_per_day": 5.33,
+   "hc_all": 13,
+   "hc_prod": 13,
+   "upad_all": 0.41,
+   "upad_prod": 0.41
+  },
+  {
+   "level": "TL",
+   "name": "Islam Farouk",
+   "month": "2026-09",
+   "units": 3,
+   "units_per_day": 0.1,
+   "hc_all": 15,
+   "hc_prod": 0,
+   "upad_all": 0.007,
+   "upad_prod": null
+  },
+  {
+   "level": "TL",
+   "name": "Mina Milad",
+   "month": "2026-09",
+   "units": 170,
+   "units_per_day": 5.67,
+   "hc_all": 17,
+   "hc_prod": 17,
+   "upad_all": 0.333,
+   "upad_prod": 0.333
+  },
+  {
+   "level": "TL",
+   "name": "Mohamed Ashour",
+   "month": "2026-09",
+   "units": 183,
+   "units_per_day": 6.1,
+   "hc_all": 15,
+   "hc_prod": 15,
+   "upad_all": 0.407,
+   "upad_prod": 0.407
+  },
+  {
+   "level": "TL",
+   "name": "Mohamed Kelany",
+   "month": "2026-09",
+   "units": 4,
+   "units_per_day": 0.13,
+   "hc_all": 18,
+   "hc_prod": 0,
+   "upad_all": 0.007,
+   "upad_prod": null
+  },
+  {
+   "level": "TL",
+   "name": "Omar Mansour",
+   "month": "2026-09",
+   "units": 64,
+   "units_per_day": 2.13,
+   "hc_all": 18,
+   "hc_prod": 1,
+   "upad_all": 0.119,
+   "upad_prod": 2.133
+  },
+  {
+   "level": "TL",
+   "name": "Omar Osama",
+   "month": "2026-09",
+   "units": 3,
+   "units_per_day": 0.1,
+   "hc_all": 22,
+   "hc_prod": 0,
+   "upad_all": 0.005,
+   "upad_prod": null
+  },
+  {
+   "level": "TL",
+   "name": "Rahma Samir",
+   "month": "2026-09",
+   "units": 175,
+   "units_per_day": 5.83,
+   "hc_all": 22,
+   "hc_prod": 22,
+   "upad_all": 0.265,
+   "upad_prod": 0.265
+  },
+  {
+   "level": "TL",
+   "name": "Salma Ahmed",
+   "month": "2026-09",
+   "units": 295,
+   "units_per_day": 9.83,
+   "hc_all": 17,
+   "hc_prod": 17,
+   "upad_all": 0.578,
+   "upad_prod": 0.578
+  },
+  {
+   "level": "TL",
+   "name": "Shereen Kamal",
+   "month": "2026-09",
+   "units": 301,
+   "units_per_day": 10.03,
+   "hc_all": 16,
+   "hc_prod": 16,
+   "upad_all": 0.627,
+   "upad_prod": 0.627
+  },
+  {
+   "level": "Account",
+   "name": "Account",
+   "month": "2026-10",
+   "units": 822,
+   "units_per_day": 91.33,
+   "hc_all": 250,
+   "hc_prod": 133,
+   "upad_all": 0.365,
+   "upad_prod": 0.687
+  },
+  {
+   "level": "OM",
+   "name": "Bishoy Mourad",
+   "month": "2026-10",
+   "units": 341,
+   "units_per_day": 37.89,
+   "hc_all": 104,
+   "hc_prod": 86,
+   "upad_all": 0.364,
+   "upad_prod": 0.441
+  },
+  {
+   "level": "OM",
+   "name": "Mohamed Radwan",
+   "month": "2026-10",
+   "units": 13,
+   "units_per_day": 1.44,
+   "hc_all": 26,
+   "hc_prod": 0,
+   "upad_all": 0.056,
+   "upad_prod": null
+  },
+  {
+   "level": "OM",
+   "name": "Ramadan Gamal",
+   "month": "2026-10",
+   "units": 407,
+   "units_per_day": 45.22,
+   "hc_all": 120,
+   "hc_prod": 47,
+   "upad_all": 0.377,
+   "upad_prod": 0.962
+  },
+  {
+   "level": "TL",
+   "name": "Ahmed Aboelgoud",
+   "month": "2026-10",
+   "units": 117,
+   "units_per_day": 13.0,
+   "hc_all": 23,
+   "hc_prod": 16,
+   "upad_all": 0.565,
+   "upad_prod": 0.812
+  },
+  {
+   "level": "TL",
+   "name": "Anas Sami",
+   "month": "2026-10",
+   "units": 65,
+   "units_per_day": 7.22,
+   "hc_all": 16,
+   "hc_prod": 16,
+   "upad_all": 0.451,
+   "upad_prod": 0.451
+  },
+  {
+   "level": "TL",
+   "name": "Essam Medhat",
+   "month": "2026-10",
+   "units": 40,
+   "units_per_day": 4.44,
+   "hc_all": 13,
+   "hc_prod": 13,
+   "upad_all": 0.342,
+   "upad_prod": 0.342
+  },
+  {
+   "level": "TL",
+   "name": "Islam Farouk",
+   "month": "2026-10",
+   "units": 23,
+   "units_per_day": 2.56,
+   "hc_all": 15,
+   "hc_prod": 0,
+   "upad_all": 0.17,
+   "upad_prod": null
+  },
+  {
+   "level": "TL",
+   "name": "Mina Milad",
+   "month": "2026-10",
+   "units": 28,
+   "units_per_day": 3.11,
+   "hc_all": 17,
+   "hc_prod": 17,
+   "upad_all": 0.183,
+   "upad_prod": 0.183
+  },
+  {
+   "level": "TL",
+   "name": "Mohamed Ashour",
+   "month": "2026-10",
+   "units": 65,
+   "units_per_day": 7.22,
+   "hc_all": 15,
+   "hc_prod": 15,
+   "upad_all": 0.481,
+   "upad_prod": 0.481
+  },
+  {
+   "level": "TL",
+   "name": "Mohamed Kelany",
+   "month": "2026-10",
+   "units": 33,
+   "units_per_day": 3.67,
+   "hc_all": 18,
+   "hc_prod": 0,
+   "upad_all": 0.204,
+   "upad_prod": null
+  },
+  {
+   "level": "TL",
+   "name": "Mostafa Mokhtar",
+   "month": "2026-10",
+   "units": 13,
+   "units_per_day": 1.44,
+   "hc_all": 19,
+   "hc_prod": 0,
+   "upad_all": 0.076,
+   "upad_prod": null
+  },
+  {
+   "level": "TL",
+   "name": "Omar Mansour",
+   "month": "2026-10",
+   "units": 109,
+   "units_per_day": 12.11,
+   "hc_all": 18,
+   "hc_prod": 1,
+   "upad_all": 0.673,
+   "upad_prod": 12.111
+  },
+  {
+   "level": "TL",
+   "name": "Omar Osama",
+   "month": "2026-10",
+   "units": 1,
+   "units_per_day": 0.11,
+   "hc_all": 22,
+   "hc_prod": 0,
+   "upad_all": 0.005,
+   "upad_prod": null
+  },
+  {
+   "level": "TL",
+   "name": "Rahma Samir",
+   "month": "2026-10",
+   "units": 76,
+   "units_per_day": 8.44,
+   "hc_all": 22,
+   "hc_prod": 22,
+   "upad_all": 0.384,
+   "upad_prod": 0.384
+  },
+  {
+   "level": "TL",
+   "name": "Salma Ahmed",
+   "month": "2026-10",
+   "units": 116,
+   "units_per_day": 12.89,
+   "hc_all": 17,
+   "hc_prod": 17,
+   "upad_all": 0.758,
+   "upad_prod": 0.758
+  },
+  {
+   "level": "TL",
+   "name": "Shereen Kamal",
+   "month": "2026-10",
+   "units": 74,
+   "units_per_day": 8.22,
+   "hc_all": 16,
+   "hc_prod": 16,
+   "upad_all": 0.514,
+   "upad_prod": 0.514
+  },
+  {
+   "level": "TL",
+   "name": "Taher Yehia",
+   "month": "2026-10",
+   "units": 1,
+   "units_per_day": 0.11,
+   "hc_all": 19,
+   "hc_prod": 0,
+   "upad_all": 0.006,
+   "upad_prod": null
+  }
+ ],
+ "target_gap_last30": {
+  "units_per_day": 70.73,
+  "upad_all": 0.283,
+  "upad_prod": 0.532,
+  "required_units_per_day_all": 500.0,
+  "required_units_per_day_prod": 266.0,
+  "productivity_multiplier_all": 7.07,
+  "productivity_multiplier_prod": 3.76,
+  "agents_needed_at_current_rate_for_500": 1767,
+  "agents_needed_for_266_at_prod_rate": 500,
+  "agent_days_total_possible_last30": 7500,
+  "agent_days_with_sale_last30": 1047,
+  "agent_days_ge2_last30": 514,
+  "pct_agent_days_ge2_all_hc": 6.85,
+  "pct_agent_days_ge2_prod_hc": 12.88,
+  "units_per_selling_agent_day": 1.9,
+  "median_units_per_selling_agent_day": 1.0,
+  "agents_avg_ge2_last30": 0,
+  "agents_avg_ge1_last30": 9,
+  "agents_any_sale_last30": 170
+ },
+ "team_days_meeting_target": [
+  {
+   "TL": "Ahmed Aboelgoud",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 1.22
+  },
+  {
+   "TL": "Anas Sami",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 1.19
+  },
+  {
+   "TL": "Essam Medhat",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 1.0
+  },
+  {
+   "TL": "Islam Farouk",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 0.6
+  },
+  {
+   "TL": "Mina Milad",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 0.76
+  },
+  {
+   "TL": "Mohamed Ashour",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 1.33
+  },
+  {
+   "TL": "Mohamed Kelany",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 0.67
+  },
+  {
+   "TL": "Mostafa Mokhtar",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 0.32
+  },
+  {
+   "TL": "Omar Mansour",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 17,
+   "max_upad_all": 1.78
+  },
+  {
+   "TL": "Omar Osama",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 0.09
+  },
+  {
+   "TL": "Rahma Samir",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 0.86
+  },
+  {
+   "TL": "Salma Ahmed",
+   "days_ge2_per_head_all": 1,
+   "days_ge2_per_head_prod": 1,
+   "max_upad_all": 2.71
+  },
+  {
+   "TL": "Shereen Kamal",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 1.44
+  },
+  {
+   "TL": "Taher Yehia",
+   "days_ge2_per_head_all": 0,
+   "days_ge2_per_head_prod": 0,
+   "max_upad_all": 0.05
+  }
+ ],
+ "mix_monthly": [
+  {
+   "month": "2026-07",
+   "xm": 68,
+   "gsr": 291,
+   "speed": 157,
+   "xpro": 106,
+   "lob": 22,
+   "mplus": 2,
+   "xmc_gsr": 4,
+   "xm_share": 0.189,
+   "speed_share_of_gsr": 0.54,
+   "xpro_share_of_gsr": 0.364,
+   "lob_share_of_gsr": 0.076,
+   "mplus_share_of_gsr": 0.007,
+   "xmc_gsr_share_of_gsr": 0.014
+  },
+  {
+   "month": "2026-08",
+   "xm": 276,
+   "gsr": 719,
+   "speed": 365,
+   "xpro": 200,
+   "lob": 106,
+   "mplus": 23,
+   "xmc_gsr": 21,
+   "xm_share": 0.277,
+   "speed_share_of_gsr": 0.508,
+   "xpro_share_of_gsr": 0.278,
+   "lob_share_of_gsr": 0.147,
+   "mplus_share_of_gsr": 0.032,
+   "xmc_gsr_share_of_gsr": 0.029
+  },
+  {
+   "month": "2026-09",
+   "xm": 565,
+   "gsr": 1271,
+   "speed": 733,
+   "xpro": 325,
+   "lob": 145,
+   "mplus": 37,
+   "xmc_gsr": 35,
+   "xm_share": 0.308,
+   "speed_share_of_gsr": 0.577,
+   "xpro_share_of_gsr": 0.256,
+   "lob_share_of_gsr": 0.114,
+   "mplus_share_of_gsr": 0.029,
+   "xmc_gsr_share_of_gsr": 0.028
+  },
+  {
+   "month": "2026-10",
+   "xm": 223,
+   "gsr": 599,
+   "speed": 277,
+   "xpro": 154,
+   "lob": 51,
+   "mplus": 46,
+   "xmc_gsr": 64,
+   "xm_share": 0.271,
+   "speed_share_of_gsr": 0.462,
+   "xpro_share_of_gsr": 0.257,
+   "lob_share_of_gsr": 0.085,
+   "mplus_share_of_gsr": 0.077,
+   "xmc_gsr_share_of_gsr": 0.107
+  }
+ ],
+ "quality_monthly": [
+  {
+   "month": "2026-07",
+   "xm_rows": 65,
+   "xmc_yes": 0,
+   "xmc_no": 0,
+   "xmc_attach": null,
+   "xmc_blank": 65,
+   "esim_yes": 0,
+   "esim_no": 0,
+   "esim_act": null,
+   "esim_blank": 65
+  },
+  {
+   "month": "2026-08",
+   "xm_rows": 258,
+   "xmc_yes": 13,
+   "xmc_no": 52,
+   "xmc_attach": 0.2,
+   "xmc_blank": 193,
+   "esim_yes": 57,
+   "esim_no": 6,
+   "esim_act": 0.905,
+   "esim_blank": 195
+  },
+  {
+   "month": "2026-09",
+   "xm_rows": 489,
+   "xmc_yes": 56,
+   "xmc_no": 433,
+   "xmc_attach": 0.115,
+   "xmc_blank": 0,
+   "esim_yes": 360,
+   "esim_no": 85,
+   "esim_act": 0.809,
+   "esim_blank": 44
+  },
+  {
+   "month": "2026-10",
+   "xm_rows": 198,
+   "xmc_yes": 46,
+   "xmc_no": 152,
+   "xmc_attach": 0.232,
+   "xmc_blank": 0,
+   "esim_yes": 126,
+   "esim_no": 56,
+   "esim_act": 0.692,
+   "esim_blank": 16
+  }
+ ],
+ "quality_by_team": [
+  {
+   "TL": "Mohamed Kelany",
+   "xm_rows": 10,
+   "xm_lines": 12,
+   "xmc_yes": 4,
+   "xmc_no": 6,
+   "xmc_attach": 0.4,
+   "esim_yes": 6,
+   "esim_no": 3,
+   "esim_act": 0.667
+  },
+  {
+   "TL": "Islam Farouk",
+   "xm_rows": 9,
+   "xm_lines": 9,
+   "xmc_yes": 3,
+   "xmc_no": 6,
+   "xmc_attach": 0.333,
+   "esim_yes": 5,
+   "esim_no": 4,
+   "esim_act": 0.556
+  },
+  {
+   "TL": "Omar Mansour",
+   "xm_rows": 41,
+   "xm_lines": 47,
+   "xmc_yes": 12,
+   "xmc_no": 29,
+   "xmc_attach": 0.293,
+   "esim_yes": 27,
+   "esim_no": 12,
+   "esim_act": 0.692
+  },
+  {
+   "TL": "Rahma Samir",
+   "xm_rows": 100,
+   "xm_lines": 117,
+   "xmc_yes": 16,
+   "xmc_no": 55,
+   "xmc_attach": 0.225,
+   "esim_yes": 47,
+   "esim_no": 16,
+   "esim_act": 0.746
+  },
+  {
+   "TL": "Not in Roster",
+   "xm_rows": 121,
+   "xm_lines": 165,
+   "xmc_yes": 11,
+   "xmc_no": 42,
+   "xmc_attach": 0.208,
+   "esim_yes": 39,
+   "esim_no": 8,
+   "esim_act": 0.83
+  },
+  {
+   "TL": "Ahmed Aboelgoud",
+   "xm_rows": 53,
+   "xm_lines": 55,
+   "xmc_yes": 9,
+   "xmc_no": 44,
+   "xmc_attach": 0.17,
+   "esim_yes": 36,
+   "esim_no": 13,
+   "esim_act": 0.735
+  },
+  {
+   "TL": "Shereen Kamal",
+   "xm_rows": 154,
+   "xm_lines": 161,
+   "xmc_yes": 18,
+   "xmc_no": 97,
+   "xmc_attach": 0.157,
+   "esim_yes": 86,
+   "esim_no": 19,
+   "esim_act": 0.819
+  },
+  {
+   "TL": "Mohamed Ashour",
+   "xm_rows": 60,
+   "xm_lines": 64,
+   "xmc_yes": 8,
+   "xmc_no": 46,
+   "xmc_attach": 0.148,
+   "esim_yes": 36,
+   "esim_no": 15,
+   "esim_act": 0.706
+  },
+  {
+   "TL": "Mostafa Mokhtar",
+   "xm_rows": 7,
+   "xm_lines": 7,
+   "xmc_yes": 1,
+   "xmc_no": 6,
+   "xmc_attach": 0.143,
+   "esim_yes": 3,
+   "esim_no": 4,
+   "esim_act": 0.429
+  },
+  {
+   "TL": "Anas Sami",
+   "xm_rows": 81,
+   "xm_lines": 83,
+   "xmc_yes": 9,
+   "xmc_no": 60,
+   "xmc_attach": 0.13,
+   "esim_yes": 45,
+   "esim_no": 14,
+   "esim_act": 0.763
+  },
+  {
+   "TL": "Salma Ahmed",
+   "xm_rows": 174,
+   "xm_lines": 196,
+   "xmc_yes": 12,
+   "xmc_no": 110,
+   "xmc_attach": 0.098,
+   "esim_yes": 100,
+   "esim_no": 16,
+   "esim_act": 0.862
+  },
+  {
+   "TL": "Mina Milad",
+   "xm_rows": 122,
+   "xm_lines": 129,
+   "xmc_yes": 7,
+   "xmc_no": 71,
+   "xmc_attach": 0.09,
+   "esim_yes": 60,
+   "esim_no": 11,
+   "esim_act": 0.845
+  },
+  {
+   "TL": "Essam Medhat",
+   "xm_rows": 77,
+   "xm_lines": 86,
+   "xmc_yes": 5,
+   "xmc_no": 64,
+   "xmc_attach": 0.072,
+   "esim_yes": 52,
+   "esim_no": 12,
+   "esim_act": 0.812
+  },
+  {
+   "TL": "Omar Osama",
+   "xm_rows": 1,
+   "xm_lines": 1,
+   "xmc_yes": 0,
+   "xmc_no": 1,
+   "xmc_attach": 0.0,
+   "esim_yes": 1,
+   "esim_no": 0,
+   "esim_act": 1.0
+  }
+ ],
+ "xmc_by_tenure_prod": [
+  {
+   "tenure": "120+",
+   "xm_rows": 197,
+   "xmc_yes": 15,
+   "xmc_no": 110,
+   "xmc_attach": 0.12
+  },
+  {
+   "tenure": "30-60",
+   "xm_rows": 345,
+   "xmc_yes": 36,
+   "xmc_no": 268,
+   "xmc_attach": 0.118
+  },
+  {
+   "tenure": "60-120",
+   "xm_rows": 290,
+   "xmc_yes": 32,
+   "xmc_no": 181,
+   "xmc_attach": 0.15
+  }
+ ],
+ "xmc_by_phase": [
+  {
+   "phase": "-",
+   "xm_rows": 121,
+   "xmc_yes": 11,
+   "xmc_no": 42,
+   "xmc_attach": 0.208
+  },
+  {
+   "phase": "Production",
+   "xm_rows": 832,
+   "xmc_yes": 83,
+   "xmc_no": 559,
+   "xmc_attach": 0.129
+  },
+  {
+   "phase": "Training",
+   "xm_rows": 57,
+   "xmc_yes": 21,
+   "xmc_no": 36,
+   "xmc_attach": 0.368
+  }
+ ],
+ "xmc_association": [
+  {
+   "var": "TL",
+   "chi2": 24.28,
+   "dof": 10,
+   "n": 735,
+   "cramers_v": 0.182,
+   "groups": 11
+  },
+  {
+   "var": "Tenure",
+   "chi2": 1.24,
+   "dof": 2,
+   "n": 642,
+   "cramers_v": 0.044,
+   "groups": 3
+  },
+  {
+   "var": "Phase",
+   "chi2": 24.42,
+   "dof": 2,
+   "n": 752,
+   "cramers_v": 0.18,
+   "groups": 3
+  },
+  {
+   "var": "OM",
+   "chi2": 1.8,
+   "dof": 2,
+   "n": 748,
+   "cramers_v": 0.049,
+   "groups": 3
+  }
+ ],
+ "xmc_agent_leaders": [
+  {
+   "hr_key": "100074089",
+   "Agent": "Yassin Mohamed Fawzy Mostafa",
+   "TL": "Rahma Samir",
+   "mean": 0.667,
+   "size": 6
+  },
+  {
+   "hr_key": "100070319",
+   "Agent": "Samuel Wadie Morgan Tawfik",
+   "TL": "Salma Ahmed",
+   "mean": 0.533,
+   "size": 15
+  },
+  {
+   "hr_key": "100075055",
+   "Agent": "Ahmed Mohamed",
+   "TL": "Anas Sami",
+   "mean": 0.4,
+   "size": 5
+  },
+  {
+   "hr_key": "100076815",
+   "Agent": "Fares Ahmed Mohamed Ahmed Abo Elmaaty",
+   "TL": "Mohamed Ashour",
+   "mean": 0.4,
+   "size": 5
+  },
+  {
+   "hr_key": "100071939",
+   "Agent": "Mostafa Mohye Eldin Fouad Younis",
+   "TL": "Shereen Kamal",
+   "mean": 0.333,
+   "size": 9
+  },
+  {
+   "hr_key": "100070308",
+   "Agent": "Samir Abdelaziz Farid Ali Salem",
+   "TL": "Rahma Samir",
+   "mean": 0.286,
+   "size": 7
+  },
+  {
+   "hr_key": "100076811",
+   "Agent": "Abanoub Reda Towadros Rofael",
+   "TL": "Salma Ahmed",
+   "mean": 0.286,
+   "size": 7
+  },
+  {
+   "hr_key": "100077677",
+   "Agent": "Nabil Mohamed Nabil Ibrahim",
+   "TL": "Mohamed Ashour",
+   "mean": 0.286,
+   "size": 7
+  },
+  {
+   "hr_key": "100077675",
+   "Agent": "Mina Ehab Nassif Kamel",
+   "TL": "Rahma Samir",
+   "mean": 0.286,
+   "size": 7
+  },
+  {
+   "hr_key": "100077685",
+   "Agent": "Abdelrahman Hassan Elsayed Katarya",
+   "TL": "Shereen Kamal",
+   "mean": 0.25,
+   "size": 12
+  }
+ ],
+ "devices": {
+  "iPhone": 433,
+  "(blank)": 285,
+  "Samsung": 93,
+  "Apple Watch": 58,
+  "No Device": 46,
+  "BYOD": 39,
+  "Other": 21,
+  "Motorola": 14,
+  "iPad": 11,
+  "Samsung Watch": 10
+ },
+ "promos": {
+  "Free Line for 1 Year": 455,
+  "(blank)": 259,
+  "BYOD": 137,
+  "Smart Watch Discount": 57,
+  "New Line with no promotions": 39,
+  "Port In": 36,
+  "Other": 15,
+  "Trade In": 12
+ },
+ "device_by_month": [
+  {
+   "month": "2026-07",
+   "(blank)": 1.0,
+   "Apple Watch": 0.0,
+   "BYOD": 0.0,
+   "Motorola": 0.0,
+   "No Device": 0.0,
+   "Other": 0.0,
+   "Samsung": 0.0,
+   "Samsung Watch": 0.0,
+   "iPad": 0.0,
+   "iPhone": 0.0
+  },
+  {
+   "month": "2026-08",
+   "(blank)": 0.748,
+   "Apple Watch": 0.008,
+   "BYOD": 0.016,
+   "Motorola": 0.0,
+   "No Device": 0.023,
+   "Other": 0.0,
+   "Samsung": 0.023,
+   "Samsung Watch": 0.004,
+   "iPad": 0.004,
+   "iPhone": 0.174
+  },
+  {
+   "month": "2026-09",
+   "(blank)": 0.033,
+   "Apple Watch": 0.08,
+   "BYOD": 0.051,
+   "Motorola": 0.014,
+   "No Device": 0.059,
+   "Other": 0.037,
+   "Samsung": 0.117,
+   "Samsung Watch": 0.012,
+   "iPad": 0.012,
+   "iPhone": 0.585
+  },
+  {
+   "month": "2026-10",
+   "(blank)": 0.056,
+   "Apple Watch": 0.086,
+   "BYOD": 0.051,
+   "Motorola": 0.035,
+   "No Device": 0.056,
+   "Other": 0.015,
+   "Samsung": 0.152,
+   "Samsung Watch": 0.015,
+   "iPad": 0.02,
+   "iPhone": 0.515
+  }
+ ],
+ "promo_by_month": [
+  {
+   "month": "2026-07",
+   "(blank)": 1.0,
+   "BYOD": 0.0,
+   "Free Line for 1 Year": 0.0,
+   "New Line with no promotions": 0.0,
+   "Other": 0.0,
+   "Port In": 0.0,
+   "Smart Watch Discount": 0.0,
+   "Trade In": 0.0
+  },
+  {
+   "month": "2026-08",
+   "(blank)": 0.748,
+   "BYOD": 0.023,
+   "Free Line for 1 Year": 0.182,
+   "New Line with no promotions": 0.019,
+   "Other": 0.004,
+   "Port In": 0.016,
+   "Smart Watch Discount": 0.004,
+   "Trade In": 0.004
+  },
+  {
+   "month": "2026-09",
+   "(blank)": 0.002,
+   "BYOD": 0.186,
+   "Free Line for 1 Year": 0.616,
+   "New Line with no promotions": 0.035,
+   "Other": 0.025,
+   "Port In": 0.041,
+   "Smart Watch Discount": 0.082,
+   "Trade In": 0.014
+  },
+  {
+   "month": "2026-10",
+   "(blank)": 0.0,
+   "BYOD": 0.202,
+   "Free Line for 1 Year": 0.54,
+   "New Line with no promotions": 0.086,
+   "Other": 0.01,
+   "Port In": 0.061,
+   "Smart Watch Discount": 0.081,
+   "Trade In": 0.02
+  }
+ ],
+ "xmc_by_device": [
+  {
+   "device": "(blank)",
+   "mean": 0.16,
+   "size": 25
+  },
+  {
+   "device": "Apple Watch",
+   "mean": 0.0666666667,
+   "size": 45
+  },
+  {
+   "device": "BYOD",
+   "mean": 0.1142857143,
+   "size": 35
+  },
+  {
+   "device": "Motorola",
+   "mean": 0.1,
+   "size": 10
+  },
+  {
+   "device": "No Device",
+   "mean": 0.1025641026,
+   "size": 39
+  },
+  {
+   "device": "Other",
+   "mean": 0.0555555556,
+   "size": 18
+  },
+  {
+   "device": "Samsung",
+   "mean": 0.0864197531,
+   "size": 81
+  },
+  {
+   "device": "Samsung Watch",
+   "mean": 0.375,
+   "size": 8
+  },
+  {
+   "device": "iPad",
+   "mean": 0.625,
+   "size": 8
+  },
+  {
+   "device": "iPhone",
+   "mean": 0.1367292225,
+   "size": 373
+  }
+ ],
+ "xmc_by_promo": [
+  {
+   "promo": "(blank)",
+   "mean": 0.0,
+   "size": 1
+  },
+  {
+   "promo": "BYOD",
+   "mean": 0.1415929204,
+   "size": 113
+  },
+  {
+   "promo": "Free Line for 1 Year",
+   "mean": 0.0648379052,
+   "size": 401
+  },
+  {
+   "promo": "New Line with no promotions",
+   "mean": 0.4545454545,
+   "size": 33
+  },
+  {
+   "promo": "Other",
+   "mean": 0.125,
+   "size": 8
+  },
+  {
+   "promo": "Port In",
+   "mean": 0.4333333333,
+   "size": 30
+  },
+  {
+   "promo": "Smart Watch Discount",
+   "mean": 0.0681818182,
+   "size": 44
+  },
+  {
+   "promo": "Trade In",
+   "mean": 0.75,
+   "size": 12
+  }
+ ],
+ "sim_type": {
+  "E-sim": 690,
+  "(blank)": 258,
+  "Physical SIM": 62
+ },
+ "hour_profile": [
+  {
+   "hour": 0,
+   "units": 328,
+   "rows": 289,
+   "share": 0.0818
+  },
+  {
+   "hour": 1,
+   "units": 294,
+   "rows": 260,
+   "share": 0.0733
+  },
+  {
+   "hour": 2,
+   "units": 263,
+   "rows": 235,
+   "share": 0.0656
+  },
+  {
+   "hour": 3,
+   "units": 284,
+   "rows": 235,
+   "share": 0.0708
+  },
+  {
+   "hour": 4,
+   "units": 187,
+   "rows": 162,
+   "share": 0.0466
+  },
+  {
+   "hour": 5,
+   "units": 149,
+   "rows": 129,
+   "share": 0.0371
+  },
+  {
+   "hour": 6,
+   "units": 105,
+   "rows": 91,
+   "share": 0.0262
+  },
+  {
+   "hour": 7,
+   "units": 31,
+   "rows": 29,
+   "share": 0.0077
+  },
+  {
+   "hour": 8,
+   "units": 0,
+   "rows": 0,
+   "share": 0.0
+  },
+  {
+   "hour": 9,
+   "units": 0,
+   "rows": 0,
+   "share": 0.0
+  },
+  {
+   "hour": 10,
+   "units": 0,
+   "rows": 0,
+   "share": 0.0
+  },
+  {
+   "hour": 11,
+   "units": 0,
+   "rows": 0,
+   "share": 0.0
+  },
+  {
+   "hour": 12,
+   "units": 0,
+   "rows": 0,
+   "share": 0.0
+  },
+  {
+   "hour": 13,
+   "units": 0,
+   "rows": 0,
+   "share": 0.0
+  },
+  {
+   "hour": 14,
+   "units": 30,
+   "rows": 28,
+   "share": 0.0075
+  },
+  {
+   "hour": 15,
+   "units": 87,
+   "rows": 77,
+   "share": 0.0217
+  },
+  {
+   "hour": 16,
+   "units": 138,
+   "rows": 120,
+   "share": 0.0344
+  },
+  {
+   "hour": 17,
+   "units": 205,
+   "rows": 168,
+   "share": 0.0511
+  },
+  {
+   "hour": 18,
+   "units": 227,
+   "rows": 204,
+   "share": 0.0566
+  },
+  {
+   "hour": 19,
+   "units": 274,
+   "rows": 239,
+   "share": 0.0683
+  },
+  {
+   "hour": 20,
+   "units": 321,
+   "rows": 285,
+   "share": 0.08
+  },
+  {
+   "hour": 21,
+   "units": 342,
+   "rows": 295,
+   "share": 0.0852
+  },
+  {
+   "hour": 22,
+   "units": 404,
+   "rows": 339,
+   "share": 0.1007
+  },
+  {
+   "hour": 23,
+   "units": 343,
+   "rows": 298,
+   "share": 0.0855
+  }
+ ],
+ "share_after_midnight": 0.409,
+ "share_after_midnight_last30": 0.3808,
+ "hour_band_by_om": [
+  {
+   "OM": "Bishoy Mourad",
+   "Early (14-18)": 0.141,
+   "Late (00-07)": 0.454,
+   "Prime (19-23)": 0.405
+  },
+  {
+   "OM": "Mohamed Radwan",
+   "Early (14-18)": 0.312,
+   "Late (00-07)": 0.094,
+   "Prime (19-23)": 0.594
+  },
+  {
+   "OM": "Ramadan Gamal",
+   "Early (14-18)": 0.212,
+   "Late (00-07)": 0.354,
+   "Prime (19-23)": 0.434
+  }
+ ],
+ "hour_band_by_tl": [
+  {
+   "TL": "Ahmed Aboelgoud",
+   "Early (14-18)": 0.426,
+   "Late (00-07)": 0.089,
+   "Prime (19-23)": 0.485
+  },
+  {
+   "TL": "Anas Sami",
+   "Early (14-18)": 0.061,
+   "Late (00-07)": 0.523,
+   "Prime (19-23)": 0.416
+  },
+  {
+   "TL": "Essam Medhat",
+   "Early (14-18)": 0.192,
+   "Late (00-07)": 0.322,
+   "Prime (19-23)": 0.486
+  },
+  {
+   "TL": "Islam Farouk",
+   "Early (14-18)": 0.0,
+   "Late (00-07)": 0.808,
+   "Prime (19-23)": 0.192
+  },
+  {
+   "TL": "Mina Milad",
+   "Early (14-18)": 0.264,
+   "Late (00-07)": 0.286,
+   "Prime (19-23)": 0.45
+  },
+  {
+   "TL": "Mohamed Ashour",
+   "Early (14-18)": 0.213,
+   "Late (00-07)": 0.339,
+   "Prime (19-23)": 0.448
+  },
+  {
+   "TL": "Mohamed Kelany",
+   "Early (14-18)": 0.0,
+   "Late (00-07)": 0.892,
+   "Prime (19-23)": 0.108
+  },
+  {
+   "TL": "Mostafa Mokhtar",
+   "Early (14-18)": 0.077,
+   "Late (00-07)": 0.231,
+   "Prime (19-23)": 0.692
+  },
+  {
+   "TL": "Omar Mansour",
+   "Early (14-18)": 0.046,
+   "Late (00-07)": 0.607,
+   "Prime (19-23)": 0.347
+  },
+  {
+   "TL": "Omar Osama",
+   "Early (14-18)": 0.25,
+   "Late (00-07)": 0.5,
+   "Prime (19-23)": 0.25
+  },
+  {
+   "TL": "Rahma Samir",
+   "Early (14-18)": 0.159,
+   "Late (00-07)": 0.43,
+   "Prime (19-23)": 0.41
+  },
+  {
+   "TL": "Salma Ahmed",
+   "Early (14-18)": 0.189,
+   "Late (00-07)": 0.382,
+   "Prime (19-23)": 0.429
+  },
+  {
+   "TL": "Shereen Kamal",
+   "Early (14-18)": 0.064,
+   "Late (00-07)": 0.572,
+   "Prime (19-23)": 0.365
+  },
+  {
+   "TL": "Taher Yehia",
+   "Early (14-18)": 0.0,
+   "Late (00-07)": 1.0,
+   "Prime (19-23)": 0.0
+  }
+ ],
+ "hour_profile_by_om": [
+  {
+   "hour": 0,
+   "Bishoy Mourad": 0.078,
+   "Mohamed Radwan": 0.031,
+   "Ramadan Gamal": 0.091
+  },
+  {
+   "hour": 1,
+   "Bishoy Mourad": 0.083,
+   "Mohamed Radwan": 0.031,
+   "Ramadan Gamal": 0.062
+  },
+  {
+   "hour": 2,
+   "Bishoy Mourad": 0.073,
+   "Mohamed Radwan": 0.031,
+   "Ramadan Gamal": 0.061
+  },
+  {
+   "hour": 3,
+   "Bishoy Mourad": 0.076,
+   "Mohamed Radwan": 0.0,
+   "Ramadan Gamal": 0.072
+  },
+  {
+   "hour": 4,
+   "Bishoy Mourad": 0.06,
+   "Mohamed Radwan": 0.0,
+   "Ramadan Gamal": 0.03
+  },
+  {
+   "hour": 5,
+   "Bishoy Mourad": 0.044,
+   "Mohamed Radwan": 0.0,
+   "Ramadan Gamal": 0.023
+  },
+  {
+   "hour": 6,
+   "Bishoy Mourad": 0.031,
+   "Mohamed Radwan": 0.0,
+   "Ramadan Gamal": 0.014
+  },
+  {
+   "hour": 7,
+   "Bishoy Mourad": 0.011,
+   "Mohamed Radwan": 0.0,
+   "Ramadan Gamal": 0.002
+  },
+  {
+   "hour": 14,
+   "Bishoy Mourad": 0.009,
+   "Mohamed Radwan": 0.0,
+   "Ramadan Gamal": 0.005
+  },
+  {
+   "hour": 15,
+   "Bishoy Mourad": 0.02,
+   "Mohamed Radwan": 0.0,
+   "Ramadan Gamal": 0.017
+  },
+  {
+   "hour": 16,
+   "Bishoy Mourad": 0.028,
+   "Mohamed Radwan": 0.125,
+   "Ramadan Gamal": 0.049
+  },
+  {
+   "hour": 17,
+   "Bishoy Mourad": 0.034,
+   "Mohamed Radwan": 0.094,
+   "Ramadan Gamal": 0.069
+  },
+  {
+   "hour": 18,
+   "Bishoy Mourad": 0.05,
+   "Mohamed Radwan": 0.094,
+   "Ramadan Gamal": 0.071
+  },
+  {
+   "hour": 19,
+   "Bishoy Mourad": 0.061,
+   "Mohamed Radwan": 0.125,
+   "Ramadan Gamal": 0.08
+  },
+  {
+   "hour": 20,
+   "Bishoy Mourad": 0.082,
+   "Mohamed Radwan": 0.156,
+   "Ramadan Gamal": 0.08
+  },
+  {
+   "hour": 21,
+   "Bishoy Mourad": 0.074,
+   "Mohamed Radwan": 0.219,
+   "Ramadan Gamal": 0.101
+  },
+  {
+   "hour": 22,
+   "Bishoy Mourad": 0.102,
+   "Mohamed Radwan": 0.031,
+   "Ramadan Gamal": 0.094
+  },
+  {
+   "hour": 23,
+   "Bishoy Mourad": 0.086,
+   "Mohamed Radwan": 0.062,
+   "Ramadan Gamal": 0.079
+  }
+ ],
+ "weekday_profile": [
+  {
+   "wd": "Mon",
+   "mean": 54.55,
+   "sum": 600,
+   "size": 11,
+   "trend_adj_vs_Mon": 0.0,
+   "trend_adj_vs_Mon_exSpike": 0.0
+  },
+  {
+   "wd": "Tue",
+   "mean": 50.45,
+   "sum": 555,
+   "size": 11,
+   "trend_adj_vs_Mon": -4.89,
+   "trend_adj_vs_Mon_exSpike": -4.67
+  },
+  {
+   "wd": "Wed",
+   "mean": 47.75,
+   "sum": 573,
+   "size": 12,
+   "trend_adj_vs_Mon": -5.59,
+   "trend_adj_vs_Mon_exSpike": -10.94
+  },
+  {
+   "wd": "Thu",
+   "mean": 51.58,
+   "sum": 619,
+   "size": 12,
+   "trend_adj_vs_Mon": -2.56,
+   "trend_adj_vs_Mon_exSpike": -9.06
+  },
+  {
+   "wd": "Fri",
+   "mean": 55.58,
+   "sum": 667,
+   "size": 12,
+   "trend_adj_vs_Mon": 0.64,
+   "trend_adj_vs_Mon_exSpike": -8.91
+  },
+  {
+   "wd": "Sat",
+   "mean": 49.64,
+   "sum": 546,
+   "size": 11,
+   "trend_adj_vs_Mon": -3.3,
+   "trend_adj_vs_Mon_exSpike": -3.76
+  },
+  {
+   "wd": "Sun",
+   "mean": 41.09,
+   "sum": 452,
+   "size": 11,
+   "trend_adj_vs_Mon": -12.65,
+   "trend_adj_vs_Mon_exSpike": -12.88
+  }
+ ],
+ "weekday_ols": {
+  "coef": {
+   "const": 22.39,
+   "t": 0.8,
+   "Tue": -4.89,
+   "Wed": -5.59,
+   "Thu": -2.56,
+   "Fri": 0.64,
+   "Sat": -3.3,
+   "Sun": -12.65
+  },
+  "r2": 0.445,
+  "coef_excl_spike": {
+   "const": 31.53,
+   "t": 0.58,
+   "Tue": -4.67,
+   "Wed": -10.94,
+   "Thu": -9.06,
+   "Fri": -8.91,
+   "Sat": -3.76,
+   "Sun": -12.88
+  }
+ },
+ "leader_quadrant_medians": {
+  "participation_all_30": 0.847,
+  "units_per_head_all_30": 8.64
+ },
+ "leaders": [
+  {
+   "TL": "Shereen Kamal",
+   "hc_all": 16,
+   "hc_prod": 16,
+   "units": 677,
+   "units_per_day": 8.46,
+   "units_per_head_all": 42.31,
+   "units_per_head_prod": 42.31,
+   "participation_all": 0.938,
+   "participation_prod": 0.938,
+   "sellers": 15,
+   "cv_daily_30": 0.58,
+   "units_last7": 61.0,
+   "units_prior7": 74.0,
+   "momentum_pct": -17.6,
+   "rank_last7": 5,
+   "rank_prior7": 1,
+   "rank_move": -4,
+   "units_aug": 182.0,
+   "units_sep": 301.0,
+   "units_oct": 74.0,
+   "rank_sep": 1,
+   "rank_aug": 2,
+   "rank_move_sep_vs_aug": 1,
+   "training_share": 0.0,
+   "OM": "Bishoy Mourad",
+   "units_30": 265,
+   "units_per_head_all_30": 16.56,
+   "units_per_head_prod_30": 16.56,
+   "participation_all_30": 0.938,
+   "participation_prod_30": 0.938,
+   "sellers_30": 15,
+   "quadrant": "Engine (broad & productive)"
+  },
+  {
+   "TL": "Salma Ahmed",
+   "hc_all": 17,
+   "hc_prod": 17,
+   "units": 571,
+   "units_per_day": 7.14,
+   "units_per_head_all": 33.59,
+   "units_per_head_prod": 33.59,
+   "participation_all": 0.941,
+   "participation_prod": 0.941,
+   "sellers": 16,
+   "cv_daily_30": 0.745,
+   "units_last7": 94.0,
+   "units_prior7": 71.0,
+   "momentum_pct": 32.4,
+   "rank_last7": 3,
+   "rank_prior7": 3,
+   "rank_move": 0,
+   "units_aug": 116.0,
+   "units_sep": 295.0,
+   "units_oct": 116.0,
+   "rank_sep": 2,
+   "rank_aug": 4,
+   "rank_move_sep_vs_aug": 2,
+   "training_share": 0.0,
+   "OM": "Ramadan Gamal",
+   "units_30": 324,
+   "units_per_head_all_30": 19.06,
+   "units_per_head_prod_30": 19.06,
+   "participation_all_30": 0.882,
+   "participation_prod_30": 0.882,
+   "sellers_30": 15,
+   "quadrant": "Engine (broad & productive)"
+  },
+  {
+   "TL": "Rahma Samir",
+   "hc_all": 22,
+   "hc_prod": 22,
+   "units": 446,
+   "units_per_day": 5.58,
+   "units_per_head_all": 20.27,
+   "units_per_head_prod": 20.27,
+   "participation_all": 0.864,
+   "participation_prod": 0.864,
+   "sellers": 19,
+   "cv_daily_30": 0.739,
+   "units_last7": 67.0,
+   "units_prior7": 34.0,
+   "momentum_pct": 97.1,
+   "rank_last7": 4,
+   "rank_prior7": 7,
+   "rank_move": 3,
+   "units_aug": 172.0,
+   "units_sep": 175.0,
+   "units_oct": 76.0,
+   "rank_sep": 5,
+   "rank_aug": 3,
+   "rank_move_sep_vs_aug": -2,
+   "training_share": 0.0,
+   "OM": "Bishoy Mourad",
+   "units_30": 173,
+   "units_per_head_all_30": 7.86,
+   "units_per_head_prod_30": 7.86,
+   "participation_all_30": 0.818,
+   "participation_prod_30": 0.818,
+   "sellers_30": 18,
+   "quadrant": "Lagging (narrow & low)"
+  },
+  {
+   "TL": "Mina Milad",
+   "hc_all": 17,
+   "hc_prod": 17,
+   "units": 444,
+   "units_per_day": 5.55,
+   "units_per_head_all": 26.12,
+   "units_per_head_prod": 26.12,
+   "participation_all": 1.0,
+   "participation_prod": 1.0,
+   "sellers": 17,
+   "cv_daily_30": 0.529,
+   "units_last7": 22.0,
+   "units_prior7": 30.0,
+   "momentum_pct": -26.7,
+   "rank_last7": 11,
+   "rank_prior7": 8,
+   "rank_move": -3,
+   "units_aug": 185.0,
+   "units_sep": 170.0,
+   "units_oct": 28.0,
+   "rank_sep": 6,
+   "rank_aug": 1,
+   "rank_move_sep_vs_aug": -5,
+   "training_share": 0.0,
+   "OM": "Bishoy Mourad",
+   "units_30": 137,
+   "units_per_head_all_30": 8.06,
+   "units_per_head_prod_30": 8.06,
+   "participation_all_30": 0.882,
+   "participation_prod_30": 0.882,
+   "sellers_30": 15,
+   "quadrant": "Broad but shallow"
+  },
+  {
+   "TL": "Anas Sami",
+   "hc_all": 16,
+   "hc_prod": 16,
+   "units": 327,
+   "units_per_day": 4.09,
+   "units_per_head_all": 20.44,
+   "units_per_head_prod": 20.44,
+   "participation_all": 1.0,
+   "participation_prod": 1.0,
+   "sellers": 16,
+   "cv_daily_30": 0.793,
+   "units_last7": 57.0,
+   "units_prior7": 35.0,
+   "momentum_pct": 62.9,
+   "rank_last7": 6,
+   "rank_prior7": 6,
+   "rank_move": 0,
+   "units_aug": 72.0,
+   "units_sep": 190.0,
+   "units_oct": 65.0,
+   "rank_sep": 3,
+   "rank_aug": 5,
+   "rank_move_sep_vs_aug": 2,
+   "training_share": 0.0,
+   "OM": "Bishoy Mourad",
+   "units_30": 206,
+   "units_per_head_all_30": 12.88,
+   "units_per_head_prod_30": 12.88,
+   "participation_all_30": 1.0,
+   "participation_prod_30": 1.0,
+   "sellers_30": 16,
+   "quadrant": "Engine (broad & productive)"
+  },
+  {
+   "TL": "Mohamed Ashour",
+   "hc_all": 15,
+   "hc_prod": 15,
+   "units": 286,
+   "units_per_day": 3.58,
+   "units_per_head_all": 19.07,
+   "units_per_head_prod": 19.07,
+   "participation_all": 0.933,
+   "participation_prod": 0.933,
+   "sellers": 14,
+   "cv_daily_30": 0.588,
+   "units_last7": 53.0,
+   "units_prior7": 43.0,
+   "momentum_pct": 23.3,
+   "rank_last7": 7,
+   "rank_prior7": 4,
+   "rank_move": -3,
+   "units_aug": 31.0,
+   "units_sep": 183.0,
+   "units_oct": 65.0,
+   "rank_sep": 4,
+   "rank_aug": 7,
+   "rank_move_sep_vs_aug": 3,
+   "training_share": 0.0,
+   "OM": "Bishoy Mourad",
+   "units_30": 219,
+   "units_per_head_all_30": 14.6,
+   "units_per_head_prod_30": 14.6,
+   "participation_all_30": 0.867,
+   "participation_prod_30": 0.867,
+   "sellers_30": 13,
+   "quadrant": "Engine (broad & productive)"
+  },
+  {
+   "TL": "Ahmed Aboelgoud",
+   "hc_all": 23,
+   "hc_prod": 16,
+   "units": 270,
+   "units_per_day": 3.38,
+   "units_per_head_all": 11.74,
+   "units_per_head_prod": 16.88,
+   "participation_all": 0.826,
+   "participation_prod": 1.188,
+   "sellers": 19,
+   "cv_daily_30": 1.065,
+   "units_last7": 95.0,
+   "units_prior7": 74.0,
+   "momentum_pct": 28.4,
+   "rank_last7": 2,
+   "rank_prior7": 1,
+   "rank_move": -1,
+   "units_aug": 0.0,
+   "units_sep": 153.0,
+   "units_oct": 117.0,
+   "rank_sep": 8,
+   "rank_aug": 8,
+   "rank_move_sep_vs_aug": 0,
+   "training_share": 0.3,
+   "OM": "Mohamed Radwan/Ramadan Gamal",
+   "units_30": 263,
+   "units_per_head_all_30": 11.43,
+   "units_per_head_prod_30": 16.44,
+   "participation_all_30": 0.826,
+   "participation_prod_30": 1.188,
+   "sellers_30": 19,
+   "quadrant": "Star-dependent (narrow but productive)"
+  },
+  {
+   "TL": "Essam Medhat",
+   "hc_all": 13,
+   "hc_prod": 13,
+   "units": 255,
+   "units_per_day": 3.19,
+   "units_per_head_all": 19.62,
+   "units_per_head_prod": 19.62,
+   "participation_all": 1.0,
+   "participation_prod": 1.0,
+   "sellers": 13,
+   "cv_daily_30": 0.599,
+   "units_last7": 32.0,
+   "units_prior7": 24.0,
+   "momentum_pct": 33.3,
+   "rank_last7": 9,
+   "rank_prior7": 9,
+   "rank_move": 0,
+   "units_aug": 41.0,
+   "units_sep": 160.0,
+   "units_oct": 40.0,
+   "rank_sep": 7,
+   "rank_aug": 6,
+   "rank_move_sep_vs_aug": -1,
+   "training_share": 0.0,
+   "OM": "Ramadan Gamal",
+   "units_30": 157,
+   "units_per_head_all_30": 12.08,
+   "units_per_head_prod_30": 12.08,
+   "participation_all_30": 1.0,
+   "participation_prod_30": 1.0,
+   "sellers_30": 13,
+   "quadrant": "Engine (broad & productive)"
+  },
+  {
+   "TL": "Omar Mansour",
+   "hc_all": 18,
+   "hc_prod": 1,
+   "units": 173,
+   "units_per_day": 2.16,
+   "units_per_head_all": 9.61,
+   "units_per_head_prod": 173.0,
+   "participation_all": 0.889,
+   "participation_prod": 16.0,
+   "sellers": 16,
+   "cv_daily_30": 1.507,
+   "units_last7": 100.0,
+   "units_prior7": 37.0,
+   "momentum_pct": 170.3,
+   "rank_last7": 1,
+   "rank_prior7": 5,
+   "rank_move": 4,
+   "units_aug": 0.0,
+   "units_sep": 64.0,
+   "units_oct": 109.0,
+   "rank_sep": 9,
+   "rank_aug": 8,
+   "rank_move_sep_vs_aug": -1,
+   "training_share": 0.94,
+   "OM": "Ramadan Gamal",
+   "units_30": 166,
+   "units_per_head_all_30": 9.22,
+   "units_per_head_prod_30": 166.0,
+   "participation_all_30": 0.889,
+   "participation_prod_30": 16.0,
+   "sellers_30": 16,
+   "quadrant": "Engine (broad & productive)"
+  },
+  {
+   "TL": "Mohamed Kelany",
+   "hc_all": 18,
+   "hc_prod": 0,
+   "units": 37,
+   "units_per_day": 0.46,
+   "units_per_head_all": 2.06,
+   "units_per_head_prod": null,
+   "participation_all": 0.611,
+   "participation_prod": null,
+   "sellers": 11,
+   "cv_daily_30": 2.387,
+   "units_last7": 33.0,
+   "units_prior7": 0.0,
+   "momentum_pct": null,
+   "rank_last7": 8,
+   "rank_prior7": 12,
+   "rank_move": 4,
+   "units_aug": 0.0,
+   "units_sep": 4.0,
+   "units_oct": 33.0,
+   "rank_sep": 10,
+   "rank_aug": 8,
+   "rank_move_sep_vs_aug": -2,
+   "training_share": 1.0,
+   "OM": "Bishoy Mourad",
+   "units_30": 37,
+   "units_per_head_all_30": 2.06,
+   "units_per_head_prod_30": null,
+   "participation_all_30": 0.611,
+   "participation_prod_30": null,
+   "sellers_30": 11,
+   "quadrant": "Lagging (narrow & low)"
+  },
+  {
+   "TL": "Islam Farouk",
+   "hc_all": 15,
+   "hc_prod": 0,
+   "units": 26,
+   "units_per_day": 0.32,
+   "units_per_head_all": 1.73,
+   "units_per_head_prod": null,
+   "participation_all": 0.6,
+   "participation_prod": null,
+   "sellers": 9,
+   "cv_daily_30": 2.475,
+   "units_last7": 23.0,
+   "units_prior7": 2.0,
+   "momentum_pct": 1050.0,
+   "rank_last7": 10,
+   "rank_prior7": 11,
+   "rank_move": 1,
+   "units_aug": 0.0,
+   "units_sep": 3.0,
+   "units_oct": 23.0,
+   "rank_sep": 11,
+   "rank_aug": 8,
+   "rank_move_sep_vs_aug": -3,
+   "training_share": 1.0,
+   "OM": "Ramadan Gamal",
+   "units_30": 26,
+   "units_per_head_all_30": 1.73,
+   "units_per_head_prod_30": null,
+   "participation_all_30": 0.6,
+   "participation_prod_30": null,
+   "sellers_30": 9,
+   "quadrant": "Lagging (narrow & low)"
+  },
+  {
+   "TL": "Mostafa Mokhtar",
+   "hc_all": 19,
+   "hc_prod": 0,
+   "units": 13,
+   "units_per_day": 0.16,
+   "units_per_head_all": 0.68,
+   "units_per_head_prod": null,
+   "participation_all": 0.316,
+   "participation_prod": null,
+   "sellers": 6,
+   "cv_daily_30": 3.302,
+   "units_last7": 13.0,
+   "units_prior7": 0.0,
+   "momentum_pct": null,
+   "rank_last7": 12,
+   "rank_prior7": 12,
+   "rank_move": 0,
+   "units_aug": 0.0,
+   "units_sep": 0.0,
+   "units_oct": 13.0,
+   "rank_sep": 13,
+   "rank_aug": 8,
+   "rank_move_sep_vs_aug": -5,
+   "training_share": 1.0,
+   "OM": "Ramadan Gamal",
+   "units_30": 13,
+   "units_per_head_all_30": 0.68,
+   "units_per_head_prod_30": null,
+   "participation_all_30": 0.316,
+   "participation_prod_30": null,
+   "sellers_30": 6,
+   "quadrant": "Lagging (narrow & low)"
+  },
+  {
+   "TL": "Omar Osama",
+   "hc_all": 22,
+   "hc_prod": 0,
+   "units": 4,
+   "units_per_day": 0.05,
+   "units_per_head_all": 0.18,
+   "units_per_head_prod": null,
+   "participation_all": 0.136,
+   "participation_prod": null,
+   "sellers": 3,
+   "cv_daily_30": 3.256,
+   "units_last7": 0.0,
+   "units_prior7": 4.0,
+   "momentum_pct": -100.0,
+   "rank_last7": 14,
+   "rank_prior7": 10,
+   "rank_move": -4,
+   "units_aug": 0.0,
+   "units_sep": 3.0,
+   "units_oct": 1.0,
+   "rank_sep": 11,
+   "rank_aug": 8,
+   "rank_move_sep_vs_aug": -3,
+   "training_share": 1.0,
+   "OM": "Ramadan Gamal",
+   "units_30": 4,
+   "units_per_head_all_30": 0.18,
+   "units_per_head_prod_30": null,
+   "participation_all_30": 0.136,
+   "participation_prod_30": null,
+   "sellers_30": 3,
+   "quadrant": "Lagging (narrow & low)"
+  },
+  {
+   "TL": "Taher Yehia",
+   "hc_all": 19,
+   "hc_prod": 0,
+   "units": 1,
+   "units_per_day": 0.01,
+   "units_per_head_all": 0.05,
+   "units_per_head_prod": null,
+   "participation_all": 0.053,
+   "participation_prod": null,
+   "sellers": 1,
+   "cv_daily_30": 5.477,
+   "units_last7": 1.0,
+   "units_prior7": 0.0,
+   "momentum_pct": null,
+   "rank_last7": 13,
+   "rank_prior7": 12,
+   "rank_move": -1,
+   "units_aug": 0.0,
+   "units_sep": 0.0,
+   "units_oct": 1.0,
+   "rank_sep": 13,
+   "rank_aug": 8,
+   "rank_move_sep_vs_aug": -5,
+   "training_share": 1.0,
+   "OM": "Mohamed Radwan",
+   "units_30": 1,
+   "units_per_head_all_30": 0.05,
+   "units_per_head_prod_30": null,
+   "participation_all_30": 0.053,
+   "participation_prod_30": null,
+   "sellers_30": 1,
+   "quadrant": "Lagging (narrow & low)"
+  }
+ ],
+ "oms": [
+  {
+   "OM": "Bishoy Mourad",
+   "hc_all": 104,
+   "hc_prod": 86,
+   "units": 2217,
+   "units_per_day": 27.71,
+   "units_per_head_all": 21.32,
+   "units_per_head_prod": 25.78,
+   "participation_all": 0.885,
+   "participation_prod": 1.07,
+   "sellers": 92,
+   "units_30": 1037,
+   "units_per_head_all_30": 9.97,
+   "units_per_head_prod_30": 12.06,
+   "participation_all_30": 0.846,
+   "cv_daily_30": 0.346,
+   "units_last7": 293.0,
+   "units_prior7": 216.0,
+   "momentum_pct": 35.6,
+   "share_after_midnight": 0.454
+  },
+  {
+   "OM": "Mohamed Radwan",
+   "hc_all": 26,
+   "hc_prod": 0,
+   "units": 32,
+   "units_per_day": 0.4,
+   "units_per_head_all": 1.23,
+   "units_per_head_prod": null,
+   "participation_all": 0.154,
+   "participation_prod": null,
+   "sellers": 4,
+   "units_30": 32,
+   "units_per_head_all_30": 1.23,
+   "units_per_head_prod_30": null,
+   "participation_all_30": 0.154,
+   "cv_daily_30": 1.575,
+   "units_last7": 10.0,
+   "units_prior7": 6.0,
+   "momentum_pct": 66.7,
+   "share_after_midnight": 0.094
+  },
+  {
+   "OM": "Ramadan Gamal",
+   "hc_all": 120,
+   "hc_prod": 47,
+   "units": 1281,
+   "units_per_day": 16.01,
+   "units_per_head_all": 10.68,
+   "units_per_head_prod": 27.26,
+   "participation_all": 0.658,
+   "participation_prod": 1.681,
+   "sellers": 79,
+   "units_30": 922,
+   "units_per_head_all_30": 7.68,
+   "units_per_head_prod_30": 19.62,
+   "participation_all_30": 0.65,
+   "cv_daily_30": 0.58,
+   "units_last7": 348.0,
+   "units_prior7": 206.0,
+   "momentum_pct": 68.9,
+   "share_after_midnight": 0.354
+  }
+ ],
+ "fairness_by_team_type": [
+  {
+   "team_type": "Production",
+   "teams": 8,
+   "hc": 139,
+   "units": 3276,
+   "units30": 1744,
+   "upd_head_30": 12.816,
+   "part30": 0.902
+  },
+  {
+   "team_type": "Training-heavy",
+   "teams": 6,
+   "hc": 111,
+   "units": 254,
+   "units30": 247,
+   "upd_head_30": 2.32,
+   "part30": 0.434
+  }
+ ],
+ "agent_distribution": {
+  "all_roster": {
+   "n": 250,
+   "gini": 0.681,
+   "top_decile_share": 0.464,
+   "top_20pct_share": 0.684,
+   "zero_sellers": 75,
+   "median_units": 5.0,
+   "mean_units": 14.12
+  },
+  "production": {
+   "n": 133,
+   "gini": 0.497,
+   "top_decile_share": 0.348,
+   "top_20pct_share": 0.523,
+   "zero_sellers": 6,
+   "median_units": 18.0,
+   "mean_units": 24.68
+  },
+  "sellers_only": {
+   "n": 175,
+   "gini": 0.544,
+   "top_decile_share": 0.379,
+   "top_20pct_share": 0.566,
+   "zero_sellers": 0,
+   "median_units": 12.0,
+   "mean_units": 20.17
+  },
+  "all_roster_last30": {
+   "n": 250,
+   "gini": 0.616,
+   "top_decile_share": 0.374,
+   "top_20pct_share": 0.596,
+   "zero_sellers": 80,
+   "median_units": 4.0,
+   "mean_units": 7.96
+  },
+  "production_last30": {
+   "n": 133,
+   "gini": 0.425,
+   "top_decile_share": 0.275,
+   "top_20pct_share": 0.451,
+   "zero_sellers": 11,
+   "median_units": 11.0,
+   "mean_units": 13.11
+  }
+ },
+ "ramp_by_tenure_prod": [
+  {
+   "Tenure Bucket": "30-60",
+   "hc": 57,
+   "units": 1327,
+   "units30": 823,
+   "sellers": 55,
+   "median_tenure_days": 44.0,
+   "units_per_head": 23.28,
+   "units_per_head_30": 14.44,
+   "participation": 0.96
+  },
+  {
+   "Tenure Bucket": "60-120",
+   "hc": 52,
+   "units": 1310,
+   "units30": 659,
+   "sellers": 52,
+   "median_tenure_days": 69.0,
+   "units_per_head": 25.19,
+   "units_per_head_30": 12.67,
+   "participation": 1.0
+  },
+  {
+   "Tenure Bucket": "120+",
+   "hc": 24,
+   "units": 646,
+   "units30": 262,
+   "sellers": 20,
+   "median_tenure_days": 195.0,
+   "units_per_head": 26.92,
+   "units_per_head_30": 10.92,
+   "participation": 0.83
+  }
+ ],
+ "ramp_by_wave": [
+  {
+   "Wave": "Wave 6",
+   "hc": 1,
+   "prod": 1,
+   "units": 52,
+   "units30": 13,
+   "sellers": 1,
+   "first_sale": "2026-07-30T00:00:00.000",
+   "units_per_head": 52.0,
+   "units_per_head_30": 13.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 7",
+   "hc": 1,
+   "prod": 1,
+   "units": 2,
+   "units30": 2,
+   "sellers": 1,
+   "first_sale": "2026-09-24T00:00:00.000",
+   "units_per_head": 2.0,
+   "units_per_head_30": 2.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 8",
+   "hc": 2,
+   "prod": 2,
+   "units": 60,
+   "units30": 8,
+   "sellers": 2,
+   "first_sale": "2026-07-27T00:00:00.000",
+   "units_per_head": 30.0,
+   "units_per_head_30": 4.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 9",
+   "hc": 2,
+   "prod": 2,
+   "units": 23,
+   "units30": 9,
+   "sellers": 1,
+   "first_sale": "2026-08-19T00:00:00.000",
+   "units_per_head": 11.5,
+   "units_per_head_30": 4.5,
+   "participation": 0.5
+  },
+  {
+   "Wave": "Wave 10",
+   "hc": 1,
+   "prod": 1,
+   "units": 69,
+   "units30": 30,
+   "sellers": 1,
+   "first_sale": "2026-07-22T00:00:00.000",
+   "units_per_head": 69.0,
+   "units_per_head_30": 30.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 12",
+   "hc": 3,
+   "prod": 3,
+   "units": 37,
+   "units30": 11,
+   "sellers": 1,
+   "first_sale": "2026-08-12T00:00:00.000",
+   "units_per_head": 12.33,
+   "units_per_head_30": 3.67,
+   "participation": 0.33
+  },
+  {
+   "Wave": "Wave 13",
+   "hc": 1,
+   "prod": 1,
+   "units": 0,
+   "units30": 0,
+   "sellers": 0,
+   "first_sale": null,
+   "units_per_head": 0.0,
+   "units_per_head_30": 0.0,
+   "participation": 0.0
+  },
+  {
+   "Wave": "Wave 14",
+   "hc": 1,
+   "prod": 1,
+   "units": 18,
+   "units30": 1,
+   "sellers": 1,
+   "first_sale": "2026-08-19T00:00:00.000",
+   "units_per_head": 18.0,
+   "units_per_head_30": 1.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 15",
+   "hc": 2,
+   "prod": 2,
+   "units": 4,
+   "units30": 0,
+   "sellers": 2,
+   "first_sale": "2026-07-23T00:00:00.000",
+   "units_per_head": 2.0,
+   "units_per_head_30": 0.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 17",
+   "hc": 6,
+   "prod": 6,
+   "units": 206,
+   "units30": 67,
+   "sellers": 6,
+   "first_sale": "2026-07-22T00:00:00.000",
+   "units_per_head": 34.33,
+   "units_per_head_30": 11.17,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 18",
+   "hc": 2,
+   "prod": 2,
+   "units": 57,
+   "units30": 47,
+   "sellers": 2,
+   "first_sale": "2026-08-03T00:00:00.000",
+   "units_per_head": 28.5,
+   "units_per_head_30": 23.5,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 19",
+   "hc": 1,
+   "prod": 1,
+   "units": 8,
+   "units30": 5,
+   "sellers": 1,
+   "first_sale": "2026-08-31T00:00:00.000",
+   "units_per_head": 8.0,
+   "units_per_head_30": 5.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 20",
+   "hc": 6,
+   "prod": 6,
+   "units": 336,
+   "units30": 146,
+   "sellers": 6,
+   "first_sale": "2026-07-22T00:00:00.000",
+   "units_per_head": 56.0,
+   "units_per_head_30": 24.33,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 21",
+   "hc": 1,
+   "prod": 1,
+   "units": 44,
+   "units30": 21,
+   "sellers": 1,
+   "first_sale": "2026-07-26T00:00:00.000",
+   "units_per_head": 44.0,
+   "units_per_head_30": 21.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 22",
+   "hc": 9,
+   "prod": 9,
+   "units": 335,
+   "units30": 81,
+   "sellers": 9,
+   "first_sale": "2026-07-22T00:00:00.000",
+   "units_per_head": 37.22,
+   "units_per_head_30": 9.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 23",
+   "hc": 4,
+   "prod": 4,
+   "units": 323,
+   "units30": 67,
+   "sellers": 4,
+   "first_sale": "2026-07-22T00:00:00.000",
+   "units_per_head": 80.75,
+   "units_per_head_30": 16.75,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 24",
+   "hc": 4,
+   "prod": 4,
+   "units": 99,
+   "units30": 80,
+   "sellers": 4,
+   "first_sale": "2026-08-09T00:00:00.000",
+   "units_per_head": 24.75,
+   "units_per_head_30": 20.0,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 25",
+   "hc": 4,
+   "prod": 4,
+   "units": 112,
+   "units30": 75,
+   "sellers": 3,
+   "first_sale": "2026-07-28T00:00:00.000",
+   "units_per_head": 28.0,
+   "units_per_head_30": 18.75,
+   "participation": 0.75
+  },
+  {
+   "Wave": "Wave 26",
+   "hc": 4,
+   "prod": 4,
+   "units": 173,
+   "units30": 81,
+   "sellers": 4,
+   "first_sale": "2026-08-07T00:00:00.000",
+   "units_per_head": 43.25,
+   "units_per_head_30": 20.25,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 27",
+   "hc": 9,
+   "prod": 9,
+   "units": 299,
+   "units30": 181,
+   "sellers": 9,
+   "first_sale": "2026-08-10T00:00:00.000",
+   "units_per_head": 33.22,
+   "units_per_head_30": 20.11,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 28",
+   "hc": 14,
+   "prod": 14,
+   "units": 318,
+   "units30": 197,
+   "sellers": 14,
+   "first_sale": "2026-08-03T00:00:00.000",
+   "units_per_head": 22.71,
+   "units_per_head_30": 14.07,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 29",
+   "hc": 13,
+   "prod": 13,
+   "units": 201,
+   "units30": 159,
+   "sellers": 13,
+   "first_sale": "2026-08-11T00:00:00.000",
+   "units_per_head": 15.46,
+   "units_per_head_30": 12.23,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 30",
+   "hc": 10,
+   "prod": 10,
+   "units": 104,
+   "units30": 100,
+   "sellers": 9,
+   "first_sale": "2026-08-17T00:00:00.000",
+   "units_per_head": 10.4,
+   "units_per_head_30": 10.0,
+   "participation": 0.9
+  },
+  {
+   "Wave": "Wave 31",
+   "hc": 16,
+   "prod": 16,
+   "units": 164,
+   "units30": 131,
+   "sellers": 16,
+   "first_sale": "2026-08-27T00:00:00.000",
+   "units_per_head": 10.25,
+   "units_per_head_30": 8.19,
+   "participation": 1.0
+  },
+  {
+   "Wave": "Wave 32",
+   "hc": 23,
+   "prod": 16,
+   "units": 270,
+   "units30": 263,
+   "sellers": 19,
+   "first_sale": "2026-09-07T00:00:00.000",
+   "units_per_head": 11.74,
+   "units_per_head_30": 11.43,
+   "participation": 0.83
+  },
+  {
+   "Wave": "Wave 33",
+   "hc": 10,
+   "prod": 0,
+   "units": 22,
+   "units30": 22,
+   "sellers": 7,
+   "first_sale": "2026-09-25T00:00:00.000",
+   "units_per_head": 2.2,
+   "units_per_head_30": 2.2,
+   "participation": 0.7
+  },
+  {
+   "Wave": "Wave 34",
+   "hc": 18,
+   "prod": 0,
+   "units": 37,
+   "units30": 37,
+   "sellers": 11,
+   "first_sale": "2026-09-25T00:00:00.000",
+   "units_per_head": 2.06,
+   "units_per_head_30": 2.06,
+   "participation": 0.61
+  },
+  {
+   "Wave": "Wave 35",
+   "hc": 19,
+   "prod": 0,
+   "units": 1,
+   "units30": 1,
+   "sellers": 1,
+   "first_sale": "2026-10-09T00:00:00.000",
+   "units_per_head": 0.05,
+   "units_per_head_30": 0.05,
+   "participation": 0.05
+  },
+  {
+   "Wave": "Wave Temp 1",
+   "hc": 17,
+   "prod": 0,
+   "units": 135,
+   "units30": 135,
+   "sellers": 15,
+   "first_sale": "2026-09-14T00:00:00.000",
+   "units_per_head": 7.94,
+   "units_per_head_30": 7.94,
+   "participation": 0.88
+  },
+  {
+   "Wave": "Wave Temp 2",
+   "hc": 24,
+   "prod": 0,
+   "units": 17,
+   "units30": 17,
+   "sellers": 8,
+   "first_sale": "2026-10-07T00:00:00.000",
+   "units_per_head": 0.71,
+   "units_per_head_30": 0.71,
+   "participation": 0.33
+  },
+  {
+   "Wave": "Wave Temp 3",
+   "hc": 22,
+   "prod": 0,
+   "units": 4,
+   "units30": 4,
+   "sellers": 3,
+   "first_sale": "2026-09-28T00:00:00.000",
+   "units_per_head": 0.18,
+   "units_per_head_30": 0.18,
+   "participation": 0.14
+  }
+ ],
+ "ramp_by_weeks_since_first_sale": [
+  {
+   "week_since_first_sale": 0,
+   "agents": 146,
+   "units_per_agent_week": 5.34
+  },
+  {
+   "week_since_first_sale": 1,
+   "agents": 132,
+   "units_per_agent_week": 3.75
+  },
+  {
+   "week_since_first_sale": 2,
+   "agents": 107,
+   "units_per_agent_week": 3.39
+  },
+  {
+   "week_since_first_sale": 3,
+   "agents": 93,
+   "units_per_agent_week": 4.06
+  },
+  {
+   "week_since_first_sale": 4,
+   "agents": 77,
+   "units_per_agent_week": 3.74
+  },
+  {
+   "week_since_first_sale": 5,
+   "agents": 60,
+   "units_per_agent_week": 3.92
+  },
+  {
+   "week_since_first_sale": 6,
+   "agents": 47,
+   "units_per_agent_week": 4.13
+  },
+  {
+   "week_since_first_sale": 7,
+   "agents": 39,
+   "units_per_agent_week": 4.13
+  },
+  {
+   "week_since_first_sale": 8,
+   "agents": 33,
+   "units_per_agent_week": 2.42
+  }
+ ],
+ "stale_by_team": [
+  {
+   "TL": "Ahmed Aboelgoud",
+   "hc": 23.0,
+   "prod": 16.0,
+   "never_sold": 4.0,
+   "stale7": 4.0,
+   "stale14": 4.0,
+   "active_last7": 19.0,
+   "stale7_pct": 0.17,
+   "stale14_pct": 0.17,
+   "prod_stale7": 0.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Anas Sami",
+   "hc": 16.0,
+   "prod": 16.0,
+   "never_sold": 0.0,
+   "stale7": 1.0,
+   "stale14": 0.0,
+   "active_last7": 15.0,
+   "stale7_pct": 0.06,
+   "stale14_pct": 0.0,
+   "prod_stale7": 1.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Essam Medhat",
+   "hc": 13.0,
+   "prod": 13.0,
+   "never_sold": 0.0,
+   "stale7": 2.0,
+   "stale14": 0.0,
+   "active_last7": 11.0,
+   "stale7_pct": 0.15,
+   "stale14_pct": 0.0,
+   "prod_stale7": 2.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Islam Farouk",
+   "hc": 15.0,
+   "prod": 0.0,
+   "never_sold": 6.0,
+   "stale7": 7.0,
+   "stale14": 6.0,
+   "active_last7": 8.0,
+   "stale7_pct": 0.47,
+   "stale14_pct": 0.4,
+   "prod_stale7": 0.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Mina Milad",
+   "hc": 17.0,
+   "prod": 17.0,
+   "never_sold": 0.0,
+   "stale7": 5.0,
+   "stale14": 2.0,
+   "active_last7": 12.0,
+   "stale7_pct": 0.29,
+   "stale14_pct": 0.12,
+   "prod_stale7": 5.0,
+   "prod_stale14": 2.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Mohamed Ashour",
+   "hc": 15.0,
+   "prod": 15.0,
+   "never_sold": 1.0,
+   "stale7": 4.0,
+   "stale14": 2.0,
+   "active_last7": 11.0,
+   "stale7_pct": 0.27,
+   "stale14_pct": 0.13,
+   "prod_stale7": 4.0,
+   "prod_stale14": 2.0,
+   "prod_never": 1.0
+  },
+  {
+   "TL": "Mohamed Kelany",
+   "hc": 18.0,
+   "prod": 0.0,
+   "never_sold": 7.0,
+   "stale7": 8.0,
+   "stale14": 8.0,
+   "active_last7": 10.0,
+   "stale7_pct": 0.44,
+   "stale14_pct": 0.44,
+   "prod_stale7": 0.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Mostafa Mokhtar",
+   "hc": 19.0,
+   "prod": 0.0,
+   "never_sold": 13.0,
+   "stale7": 13.0,
+   "stale14": 13.0,
+   "active_last7": 6.0,
+   "stale7_pct": 0.68,
+   "stale14_pct": 0.68,
+   "prod_stale7": 0.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Omar Mansour",
+   "hc": 18.0,
+   "prod": 1.0,
+   "never_sold": 2.0,
+   "stale7": 2.0,
+   "stale14": 2.0,
+   "active_last7": 16.0,
+   "stale7_pct": 0.11,
+   "stale14_pct": 0.11,
+   "prod_stale7": 0.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Omar Osama",
+   "hc": 22.0,
+   "prod": 0.0,
+   "never_sold": 19.0,
+   "stale7": 22.0,
+   "stale14": 19.0,
+   "active_last7": 0.0,
+   "stale7_pct": 1.0,
+   "stale14_pct": 0.86,
+   "prod_stale7": 0.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "Rahma Samir",
+   "hc": 22.0,
+   "prod": 22.0,
+   "never_sold": 3.0,
+   "stale7": 9.0,
+   "stale14": 8.0,
+   "active_last7": 13.0,
+   "stale7_pct": 0.41,
+   "stale14_pct": 0.36,
+   "prod_stale7": 9.0,
+   "prod_stale14": 8.0,
+   "prod_never": 3.0
+  },
+  {
+   "TL": "Salma Ahmed",
+   "hc": 17.0,
+   "prod": 17.0,
+   "never_sold": 1.0,
+   "stale7": 5.0,
+   "stale14": 3.0,
+   "active_last7": 12.0,
+   "stale7_pct": 0.29,
+   "stale14_pct": 0.18,
+   "prod_stale7": 5.0,
+   "prod_stale14": 3.0,
+   "prod_never": 1.0
+  },
+  {
+   "TL": "Shereen Kamal",
+   "hc": 16.0,
+   "prod": 16.0,
+   "never_sold": 1.0,
+   "stale7": 4.0,
+   "stale14": 2.0,
+   "active_last7": 12.0,
+   "stale7_pct": 0.25,
+   "stale14_pct": 0.12,
+   "prod_stale7": 4.0,
+   "prod_stale14": 2.0,
+   "prod_never": 1.0
+  },
+  {
+   "TL": "Taher Yehia",
+   "hc": 19.0,
+   "prod": 0.0,
+   "never_sold": 18.0,
+   "stale7": 18.0,
+   "stale14": 18.0,
+   "active_last7": 1.0,
+   "stale7_pct": 0.95,
+   "stale14_pct": 0.95,
+   "prod_stale7": 0.0,
+   "prod_stale14": 0.0,
+   "prod_never": 0.0
+  },
+  {
+   "TL": "TOTAL",
+   "hc": 250.0,
+   "prod": 133.0,
+   "never_sold": 75.0,
+   "stale7": 104.0,
+   "stale14": 87.0,
+   "active_last7": 146.0,
+   "stale7_pct": 0.42,
+   "stale14_pct": 0.35,
+   "prod_stale7": 30.0,
+   "prod_stale14": 17.0,
+   "prod_never": 6.0
+  }
+ ],
+ "streak_leaders": [
+  {
+   "HRID": "100074612",
+   "Agent Name": "Youssef Sherif Gamal Attya",
+   "TL": "Salma Ahmed",
+   "Phase": "Production",
+   "units": 77,
+   "active_days": 28,
+   "longest_streak": 12,
+   "current_streak": 0
+  },
+  {
+   "HRID": "100074076",
+   "Agent Name": "Gasser Osama Esmail Youssef",
+   "TL": "Shereen Kamal",
+   "Phase": "Production",
+   "units": 57,
+   "active_days": 28,
+   "longest_streak": 7,
+   "current_streak": 0
+  },
+  {
+   "HRID": "100074619",
+   "Agent Name": "Abdallah Mohamed Abdallah Mahmoud Hammam",
+   "TL": "Shereen Kamal",
+   "Phase": "Production",
+   "units": 28,
+   "active_days": 17,
+   "longest_streak": 7,
+   "current_streak": 0
+  },
+  {
+   "HRID": "100066502",
+   "Agent Name": "Ahmad Abdelftah Hanafy Etman",
+   "TL": "Salma Ahmed",
+   "Phase": "Production",
+   "units": 90,
+   "active_days": 35,
+   "longest_streak": 7,
+   "current_streak": 0
+  },
+  {
+   "HRID": "100074638",
+   "Agent Name": "Mohamed Abdelhamed Mohamed Abdelwahed Al Soda",
+   "TL": "Shereen Kamal",
+   "Phase": "Production",
+   "units": 53,
+   "active_days": 21,
+   "longest_streak": 7,
+   "current_streak": 1
+  },
+  {
+   "HRID": "100076216",
+   "Agent Name": "Amr Abdallah",
+   "TL": "Omar Mansour",
+   "Phase": "Production",
+   "units": 38,
+   "active_days": 13,
+   "longest_streak": 6,
+   "current_streak": 0
+  },
+  {
+   "HRID": "100071925",
+   "Agent Name": "Ali Hussien Ahmed Hameed",
+   "TL": "Shereen Kamal",
+   "Phase": "Production",
+   "units": 41,
+   "active_days": 25,
+   "longest_streak": 6,
+   "current_streak": 0
+  },
+  {
+   "HRID": "100070942",
+   "Agent Name": "Mohamed Ehab Ahmed Abdelrahman",
+   "TL": "Salma Ahmed",
+   "Phase": "Production",
+   "units": 32,
+   "active_days": 16,
+   "longest_streak": 6,
+   "current_streak": 0
+  },
+  {
+   "HRID": "100075068",
+   "Agent Name": "Seif Abdellah",
+   "TL": "Anas Sami",
+   "Phase": "Production",
+   "units": 81,
+   "active_days": 28,
+   "longest_streak": 6,
+   "current_streak": 0
+  },
+  {
+   "HRID": "100070308",
+   "Agent Name": "Samir Abdelaziz Farid Ali Salem",
+   "TL": "Rahma Samir",
+   "Phase": "Production",
+   "units": 77,
+   "active_days": 33,
+   "longest_streak": 6,
+   "current_streak": 0
+  }
+ ],
+ "consistency_prod_30_summary": {
+  "count": 133.0,
+  "mean": 0.229,
+  "std": 0.147,
+  "min": 0.0,
+  "25%": 0.1,
+  "50%": 0.233,
+  "75%": 0.333,
+  "max": 0.6
+ },
+ "coaching_priority_top15": [
+  {
+   "HRID": "100071349",
+   "Agent Name": "Abdelrahman Eid",
+   "TL": "Mina Milad",
+   "Tenure Bucket": "60-120",
+   "Tenure Days": 98.0,
+   "units": 9,
+   "units_30": 0,
+   "team_median_30": 9.0,
+   "active_days_30": 0,
+   "days_since_last": 31,
+   "longest_streak": 1,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100049619",
+   "Agent Name": "Bassant Mohamed",
+   "TL": "Mina Milad",
+   "Tenure Bucket": "120+",
+   "Tenure Days": null,
+   "units": 18,
+   "units_30": 0,
+   "team_median_30": 9.0,
+   "active_days_30": 0,
+   "days_since_last": 57,
+   "longest_streak": 4,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100073760",
+   "Agent Name": "Ramy Mohamed Ahmed Ahmed Sharaf",
+   "TL": "Mohamed Ashour",
+   "Tenure Bucket": "30-60",
+   "Tenure Days": 47.0,
+   "units": 0,
+   "units_30": 0,
+   "team_median_30": 16.0,
+   "active_days_30": 0,
+   "days_since_last": -1,
+   "longest_streak": 0,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100077674",
+   "Agent Name": "Seif Eldin Maged Saeed Mattar",
+   "TL": "Mohamed Ashour",
+   "Tenure Bucket": "60-120",
+   "Tenure Days": 69.0,
+   "units": 3,
+   "units_30": 0,
+   "team_median_30": 16.0,
+   "active_days_30": 0,
+   "days_since_last": 36,
+   "longest_streak": 2,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100064778",
+   "Agent Name": "Adham Tarek Kamal Elsherif",
+   "TL": "Rahma Samir",
+   "Tenure Bucket": "120+",
+   "Tenure Days": null,
+   "units": 1,
+   "units_30": 0,
+   "team_median_30": 5.0,
+   "active_days_30": 0,
+   "days_since_last": 70,
+   "longest_streak": 1,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100059949",
+   "Agent Name": "Ahd Mahmoud",
+   "TL": "Rahma Samir",
+   "Tenure Bucket": "120+",
+   "Tenure Days": null,
+   "units": 0,
+   "units_30": 0,
+   "team_median_30": 5.0,
+   "active_days_30": 0,
+   "days_since_last": -1,
+   "longest_streak": 0,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100053648",
+   "Agent Name": "Aliaa Adel Mahmoud Fahmy Behiry",
+   "TL": "Rahma Samir",
+   "Tenure Bucket": "120+",
+   "Tenure Days": null,
+   "units": 0,
+   "units_30": 0,
+   "team_median_30": 5.0,
+   "active_days_30": 0,
+   "days_since_last": -1,
+   "longest_streak": 0,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100059946",
+   "Agent Name": "Safwat Mohamed",
+   "TL": "Rahma Samir",
+   "Tenure Bucket": "120+",
+   "Tenure Days": 159.0,
+   "units": 0,
+   "units_30": 0,
+   "team_median_30": 5.0,
+   "active_days_30": 0,
+   "days_since_last": -1,
+   "longest_streak": 0,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100064783",
+   "Agent Name": "Gehad Khalaf Mohamed Ghanem",
+   "TL": "Salma Ahmed",
+   "Tenure Bucket": "30-60",
+   "Tenure Days": 50.0,
+   "units": 3,
+   "units_30": 0,
+   "team_median_30": 11.0,
+   "active_days_30": 0,
+   "days_since_last": 78,
+   "longest_streak": 1,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100061993",
+   "Agent Name": "Omar Wael Abdallah",
+   "TL": "Salma Ahmed",
+   "Tenure Bucket": "120+",
+   "Tenure Days": null,
+   "units": 0,
+   "units_30": 0,
+   "team_median_30": 11.0,
+   "active_days_30": 0,
+   "days_since_last": -1,
+   "longest_streak": 0,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "100076817",
+   "Agent Name": "Mohamed Saleh Hussein Mohamed (Hazem)",
+   "TL": "Shereen Kamal",
+   "Tenure Bucket": "30-60",
+   "Tenure Days": 36.0,
+   "units": 0,
+   "units_30": 0,
+   "team_median_30": 14.5,
+   "active_days_30": 0,
+   "days_since_last": -1,
+   "longest_streak": 0,
+   "P_gap": 1.0,
+   "P_stale": 1.0,
+   "P_inactive": 1.0,
+   "score": 100.0
+  },
+  {
+   "HRID": "4300729",
+   "Agent Name": "Youssef Yasser Gawdat Youssef",
+   "TL": "Rahma Samir",
+   "Tenure Bucket": "120+",
+   "Tenure Days": null,
+   "units": 8,
+   "units_30": 1,
+   "team_median_30": 5.0,
+   "active_days_30": 1,
+   "days_since_last": 27,
+   "longest_streak": 3,
+   "P_gap": 0.8,
+   "P_stale": 0.9,
+   "P_inactive": 0.967,
+   "score": 87.7
+  },
+  {
+   "HRID": "100062651",
+   "Agent Name": "Germen Shohdy",
+   "TL": "Rahma Samir",
+   "Tenure Bucket": "120+",
+   "Tenure Days": null,
+   "units": 18,
+   "units_30": 1,
+   "team_median_30": 5.0,
+   "active_days_30": 1,
+   "days_since_last": 25,
+   "longest_streak": 2,
+   "P_gap": 0.8,
+   "P_stale": 0.833,
+   "P_inactive": 0.967,
+   "score": 85.3
+  },
+  {
+   "HRID": "100066502",
+   "Agent Name": "Ahmad Abdelftah Hanafy Etman",
+   "TL": "Salma Ahmed",
+   "Tenure Bucket": "120+",
+   "Tenure Days": null,
+   "units": 90,
+   "units_30": 5,
+   "team_median_30": 11.0,
+   "active_days_30": 2,
+   "days_since_last": 28,
+   "longest_streak": 7,
+   "P_gap": 0.545,
+   "P_stale": 0.933,
+   "P_inactive": 0.933,
+   "score": 77.8
+  },
+  {
+   "HRID": "100076806",
+   "Agent Name": "Mohammed Marzouq Ismail",
+   "TL": "Mohamed Ashour",
+   "Tenure Bucket": "30-60",
+   "Tenure Days": 36.0,
+   "units": 4,
+   "units_30": 1,
+   "team_median_30": 16.0,
+   "active_days_30": 1,
+   "days_since_last": 13,
+   "longest_streak": 1,
+   "P_gap": 0.938,
+   "P_stale": 0.433,
+   "P_inactive": 0.967,
+   "score": 76.8
+  }
+ ],
+ "coaching_formula": "score = 100*(0.40*P_gap + 0.35*P_stale + 0.25*P_inactive); P_gap = clip((team_median_units30 - agent_units30)/team_median_units30, 0, 1); P_stale = min(days_since_last_sale,30)/30 (never sold = 1); P_inactive = 1 - active_days_last30/30. Production agents only; team median falls back to account median when the team median is 0.",
+ "coaching_score_summary": {
+  "count": 133.0,
+  "mean": 36.0,
+  "std": 25.4,
+  "min": 13.2,
+  "25%": 18.3,
+  "50%": 23.3,
+  "75%": 46.6,
+  "max": 100.0
+ },
+ "prod_agents_score_ge70": 16,
+ "prod_agents_zero_last30": 11,
+ "top_agents": [
+  {
+   "HRID": "100071936",
+   "Agent Name": "Omar Sayed Mohammed Abdelhamid",
+   "TL": "Shereen Kamal",
+   "Phase": "Production",
+   "units": 239,
+   "units_30": 29,
+   "xm": 42,
+   "gsr": 197,
+   "active_days": 39
+  },
+  {
+   "HRID": "100070307",
+   "Agent Name": "Mohamed Abdulghany Mohamed Elshafey",
+   "TL": "Essam Medhat",
+   "Phase": "Production",
+   "units": 92,
+   "units_30": 29,
+   "xm": 20,
+   "gsr": 72,
+   "active_days": 43
+  },
+  {
+   "HRID": "100071352",
+   "Agent Name": "Mohamed Hafez",
+   "TL": "Mina Milad",
+   "Phase": "Production",
+   "units": 91,
+   "units_30": 15,
+   "xm": 18,
+   "gsr": 73,
+   "active_days": 34
+  },
+  {
+   "HRID": "100066502",
+   "Agent Name": "Ahmad Abdelftah Hanafy Etman",
+   "TL": "Salma Ahmed",
+   "Phase": "Production",
+   "units": 90,
+   "units_30": 5,
+   "xm": 32,
+   "gsr": 58,
+   "active_days": 35
+  },
+  {
+   "HRID": "100075068",
+   "Agent Name": "Seif Abdellah",
+   "TL": "Anas Sami",
+   "Phase": "Production",
+   "units": 81,
+   "units_30": 37,
+   "xm": 16,
+   "gsr": 65,
+   "active_days": 28
+  },
+  {
+   "HRID": "100070308",
+   "Agent Name": "Samir Abdelaziz Farid Ali Salem",
+   "TL": "Rahma Samir",
+   "Phase": "Production",
+   "units": 77,
+   "units_30": 14,
+   "xm": 16,
+   "gsr": 61,
+   "active_days": 33
+  },
+  {
+   "HRID": "100074612",
+   "Agent Name": "Youssef Sherif Gamal Attya",
+   "TL": "Salma Ahmed",
+   "Phase": "Production",
+   "units": 77,
+   "units_30": 43,
+   "xm": 22,
+   "gsr": 55,
+   "active_days": 28
+  },
+  {
+   "HRID": "100055944",
+   "Agent Name": "Mohamed Ahmed",
+   "TL": "Salma Ahmed",
+   "Phase": "Production",
+   "units": 69,
+   "units_30": 30,
+   "xm": 19,
+   "gsr": 50,
+   "active_days": 27
+  },
+  {
+   "HRID": "100074089",
+   "Agent Name": "Yassin Mohamed Fawzy Mostafa",
+   "TL": "Rahma Samir",
+   "Phase": "Production",
+   "units": 57,
+   "units_30": 15,
+   "xm": 17,
+   "gsr": 40,
+   "active_days": 22
+  },
+  {
+   "HRID": "100074076",
+   "Agent Name": "Gasser Osama Esmail Youssef",
+   "TL": "Shereen Kamal",
+   "Phase": "Production",
+   "units": 57,
+   "units_30": 27,
+   "xm": 12,
+   "gsr": 45,
+   "active_days": 28
+  }
+ ],
+ "waterfall_last_day": {
+  "label": "2026-10-09 vs 2026-10-08",
+  "prev_total": 144,
+  "cur_total": 184,
+  "delta_total": 40,
+  "teams": [
+   {
+    "TL": "Ahmed Aboelgoud",
+    "prev": 15.0,
+    "cur": 28.0,
+    "delta": 13.0
+   },
+   {
+    "TL": "Not in Roster",
+    "prev": 18.0,
+    "cur": 30.0,
+    "delta": 12.0
+   },
+   {
+    "TL": "Salma Ahmed",
+    "prev": 5.0,
+    "cur": 15.0,
+    "delta": 10.0
+   },
+   {
+    "TL": "Essam Medhat",
+    "prev": 4.0,
+    "cur": 12.0,
+    "delta": 8.0
+   },
+   {
+    "TL": "Mohamed Kelany",
+    "prev": 6.0,
+    "cur": 12.0,
+    "delta": 6.0
+   },
+   {
+    "TL": "Shereen Kamal",
+    "prev": 4.0,
+    "cur": 8.0,
+    "delta": 4.0
+   },
+   {
+    "TL": "Mohamed Ashour",
+    "prev": 8.0,
+    "cur": 11.0,
+    "delta": 3.0
+   },
+   {
+    "TL": "Rahma Samir",
+    "prev": 14.0,
+    "cur": 17.0,
+    "delta": 3.0
+   },
+   {
+    "TL": "Taher Yehia",
+    "prev": 0.0,
+    "cur": 1.0,
+    "delta": 1.0
+   },
+   {
+    "TL": "Omar Osama",
+    "prev": 0.0,
+    "cur": 0.0,
+    "delta": 0.0
+   },
+   {
+    "TL": "Anas Sami",
+    "prev": 18.0,
+    "cur": 17.0,
+    "delta": -1.0
+   },
+   {
+    "TL": "Mostafa Mokhtar",
+    "prev": 5.0,
+    "cur": 2.0,
+    "delta": -3.0
+   },
+   {
+    "TL": "Mina Milad",
+    "prev": 6.0,
+    "cur": 2.0,
+    "delta": -4.0
+   },
+   {
+    "TL": "Islam Farouk",
+    "prev": 9.0,
+    "cur": 3.0,
+    "delta": -6.0
+   },
+   {
+    "TL": "Omar Mansour",
+    "prev": 32.0,
+    "cur": 26.0,
+    "delta": -6.0
+   }
+  ]
+ },
+ "waterfall_last7": {
+  "label": "2026-10-03..2026-10-09 vs 2026-09-26..2026-10-02",
+  "prev_total": 445,
+  "cur_total": 711,
+  "delta_total": 266,
+  "teams": [
+   {
+    "TL": "Omar Mansour",
+    "prev": 37.0,
+    "cur": 100.0,
+    "delta": 63.0
+   },
+   {
+    "TL": "Not in Roster",
+    "prev": 17.0,
+    "cur": 60.0,
+    "delta": 43.0
+   },
+   {
+    "TL": "Mohamed Kelany",
+    "prev": 0.0,
+    "cur": 33.0,
+    "delta": 33.0
+   },
+   {
+    "TL": "Rahma Samir",
+    "prev": 34.0,
+    "cur": 67.0,
+    "delta": 33.0
+   },
+   {
+    "TL": "Salma Ahmed",
+    "prev": 71.0,
+    "cur": 94.0,
+    "delta": 23.0
+   },
+   {
+    "TL": "Anas Sami",
+    "prev": 35.0,
+    "cur": 57.0,
+    "delta": 22.0
+   },
+   {
+    "TL": "Ahmed Aboelgoud",
+    "prev": 74.0,
+    "cur": 95.0,
+    "delta": 21.0
+   },
+   {
+    "TL": "Islam Farouk",
+    "prev": 2.0,
+    "cur": 23.0,
+    "delta": 21.0
+   },
+   {
+    "TL": "Mostafa Mokhtar",
+    "prev": 0.0,
+    "cur": 13.0,
+    "delta": 13.0
+   },
+   {
+    "TL": "Mohamed Ashour",
+    "prev": 43.0,
+    "cur": 53.0,
+    "delta": 10.0
+   },
+   {
+    "TL": "Essam Medhat",
+    "prev": 24.0,
+    "cur": 32.0,
+    "delta": 8.0
+   },
+   {
+    "TL": "Taher Yehia",
+    "prev": 0.0,
+    "cur": 1.0,
+    "delta": 1.0
+   },
+   {
+    "TL": "Omar Osama",
+    "prev": 4.0,
+    "cur": 0.0,
+    "delta": -4.0
+   },
+   {
+    "TL": "Mina Milad",
+    "prev": 30.0,
+    "cur": 22.0,
+    "delta": -8.0
+   },
+   {
+    "TL": "Shereen Kamal",
+    "prev": 74.0,
+    "cur": 61.0,
+    "delta": -13.0
+   }
+  ]
+ },
+ "last7_decomp": {
+  "seller_days_cur": 363,
+  "seller_days_prev": 255,
+  "units_per_seller_day_cur": 1.959,
+  "units_per_seller_day_prev": 1.745,
+  "distinct_sellers_cur": 176,
+  "distinct_sellers_prev": 118
+ },
+ "data_quality": {
+  "unmatched_rows": 410,
+  "unmatched_units": 482,
+  "unmatched_share_units": 0.1201,
+  "distinct_unmatched_ids": 100,
+  "valid_looking_ids": 56,
+  "valid_looking_units": 388,
+  "junk_id_units": 94,
+  "unmatched_last30_units": 131,
+  "unmatched_last30_share": 0.0617,
+  "unmatched_last7_units": 60,
+  "dup_rows": 212,
+  "dup_units": 233,
+  "dup_rows_by_tl": {
+   "Shereen Kamal": 95,
+   "Mina Milad": 33,
+   "Not in Roster": 33,
+   "Rahma Samir": 14,
+   "Omar Mansour": 13,
+   "Salma Ahmed": 10,
+   "Mohamed Ashour": 7,
+   "Ahmed Aboelgoud": 5,
+   "Anas Sami": 1,
+   "Mohamed Kelany": 1
+  },
+  "junk_order_rows": 525,
+  "junk_order_share": 0.1507,
+  "junk_order_units": 688,
+  "junk_order_by_tl": {
+   "Anas Sami": 0.455,
+   "Mostafa Mokhtar": 0.273,
+   "Omar Osama": 0.25,
+   "Shereen Kamal": 0.248,
+   "Mina Milad": 0.152,
+   "Islam Farouk": 0.13,
+   "Omar Mansour": 0.116,
+   "Not in Roster": 0.115,
+   "Essam Medhat": 0.106,
+   "Salma Ahmed": 0.092,
+   "Rahma Samir": 0.089,
+   "Mohamed Ashour": 0.064,
+   "Mohamed Kelany": 0.061,
+   "Ahmed Aboelgoud": 0.012,
+   "Taher Yehia": 0.0
+  },
+  "xmc_blank_on_xm": 258,
+  "esim_blank_on_xm": 320,
+  "xm_rows": 1010,
+  "big_tickets_ge5": [
+   {
+    "Date": "2026-08-27T00:00:00.000",
+    "hr_key": "100075057",
+    "TL": "Anas Sami",
+    "Type": "GSRs",
+    "units": 5
+   },
+   {
+    "Date": "2026-08-29T00:00:00.000",
+    "hr_key": "100074089",
+    "TL": "Rahma Samir",
+    "Type": "XM Lines",
+    "units": 5
+   },
+   {
+    "Date": "2026-09-03T00:00:00.000",
+    "hr_key": "100075901",
+    "TL": "Essam Medhat",
+    "Type": "GSRs",
+    "units": 6
+   },
+   {
+    "Date": "2026-09-08T00:00:00.000",
+    "hr_key": "UNMAPPED:999999",
+    "TL": "Not in Roster",
+    "Type": "XM Lines",
+    "units": 10
+   },
+   {
+    "Date": "2026-09-08T00:00:00.000",
+    "hr_key": "UNMAPPED:45646464",
+    "TL": "Not in Roster",
+    "Type": "XM Lines",
+    "units": 10
+   },
+   {
+    "Date": "2026-09-08T00:00:00.000",
+    "hr_key": "UNMAPPED:87877+7454",
+    "TL": "Not in Roster",
+    "Type": "XM Lines",
+    "units": 10
+   },
+   {
+    "Date": "2026-09-22T00:00:00.000",
+    "hr_key": "UNMAPPED:999",
+    "TL": "Not in Roster",
+    "Type": "XM Lines",
+    "units": 10
+   },
+   {
+    "Date": "2026-10-03T00:00:00.000",
+    "hr_key": "100070319",
+    "TL": "Salma Ahmed",
+    "Type": "XM Lines",
+    "units": 8
+   },
+   {
+    "Date": "2026-10-03T00:00:00.000",
+    "hr_key": "100070319",
+    "TL": "Salma Ahmed",
+    "Type": "GSRs",
+    "units": 10
+   }
+  ],
+  "top_unmatched": [
+   {
+    "hr_raw": "100071916",
+    "rows": 52,
+    "units": 57,
+    "first": "2026-07-23",
+    "last": "2026-09-13",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100071921",
+    "rows": 53,
+    "units": 56,
+    "first": "2026-08-01",
+    "last": "2026-09-27",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100064781",
+    "rows": 49,
+    "units": 50,
+    "first": "2026-07-23",
+    "last": "2026-09-03",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100065731",
+    "rows": 25,
+    "units": 28,
+    "first": "2026-07-24",
+    "last": "2026-08-15",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100071935",
+    "rows": 22,
+    "units": 23,
+    "first": "2026-07-22",
+    "last": "2026-08-06",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100070933",
+    "rows": 13,
+    "units": 16,
+    "first": "2026-08-08",
+    "last": "2026-09-06",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100070305",
+    "rows": 14,
+    "units": 14,
+    "first": "2026-07-27",
+    "last": "2026-08-07",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100070297",
+    "rows": 10,
+    "units": 13,
+    "first": "2026-07-31",
+    "last": "2026-08-20",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "87877+7454",
+    "rows": 1,
+    "units": 10,
+    "first": "2026-09-08",
+    "last": "2026-09-08",
+    "looks_valid": false
+   },
+   {
+    "hr_raw": "999",
+    "rows": 1,
+    "units": 10,
+    "first": "2026-09-22",
+    "last": "2026-09-22",
+    "looks_valid": false
+   },
+   {
+    "hr_raw": "999999",
+    "rows": 1,
+    "units": 10,
+    "first": "2026-09-08",
+    "last": "2026-09-08",
+    "looks_valid": false
+   },
+   {
+    "hr_raw": "45646464",
+    "rows": 1,
+    "units": 10,
+    "first": "2026-09-08",
+    "last": "2026-09-08",
+    "looks_valid": false
+   },
+   {
+    "hr_raw": "100049049",
+    "rows": 9,
+    "units": 9,
+    "first": "2026-07-22",
+    "last": "2026-08-21",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100072748",
+    "rows": 7,
+    "units": 8,
+    "first": "2026-08-28",
+    "last": "2026-08-31",
+    "looks_valid": true
+   },
+   {
+    "hr_raw": "100080071",
+    "rows": 7,
+    "units": 8,
+    "first": "2026-10-08",
+    "last": "2026-10-09",
+    "looks_valid": true
+   }
+  ],
+  "submissions_per_seller_day": 1.745,
+  "october_unmatched": {
+   "units": 61,
+   "distinct_ids": 31,
+   "units_from_10008xxxx_ids": 37,
+   "roster_ids_starting_10008": 1,
+   "top": {
+    "100080071": 8,
+    "100080064": 6,
+    "100080260": 6,
+    "100050828": 4,
+    "100080066": 3,
+    "100080262": 3,
+    "1000789": 2,
+    "100080483": 2,
+    "100080255": 2,
+    "100077692": 2
+   }
+  },
+  "dup_rows_by_agent_top": {
+   "Omar Sayed Mohammed Abdelhamid": 88,
+   "Not in Roster": 33,
+   "Ehab Elsawah": 18,
+   "Amr Abdallah": 10,
+   "Yassin Mohamed Fawzy Mostafa": 8,
+   "Momin Mohsen Ramadan Mohammad": 8
+  },
+  "fake_id_units": {
+   "ids": [
+    "999",
+    "999999",
+    "45646464",
+    "87877+7454"
+   ],
+   "units": 40,
+   "note": "each a single 10-line XM submission; 30 of the 40 fall on 2026-09-08"
+  }
+ },
+ "quality_weekly": [
+  {
+   "week_start": "2026-07-20",
+   "xmc_yes": 0,
+   "xmc_no": 0,
+   "esim_yes": 0,
+   "esim_no": 0,
+   "xmc_attach": null,
+   "esim_act": null
+  },
+  {
+   "week_start": "2026-07-27",
+   "xmc_yes": 0,
+   "xmc_no": 0,
+   "esim_yes": 0,
+   "esim_no": 0,
+   "xmc_attach": null,
+   "esim_act": null
+  },
+  {
+   "week_start": "2026-08-03",
+   "xmc_yes": 0,
+   "xmc_no": 0,
+   "esim_yes": 0,
+   "esim_no": 0,
+   "xmc_attach": null,
+   "esim_act": null
+  },
+  {
+   "week_start": "2026-08-10",
+   "xmc_yes": 0,
+   "xmc_no": 0,
+   "esim_yes": 0,
+   "esim_no": 0,
+   "xmc_attach": null,
+   "esim_act": null
+  },
+  {
+   "week_start": "2026-08-17",
+   "xmc_yes": 0,
+   "xmc_no": 0,
+   "esim_yes": 0,
+   "esim_no": 0,
+   "xmc_attach": null,
+   "esim_act": null
+  },
+  {
+   "week_start": "2026-08-24",
+   "xmc_yes": 10,
+   "xmc_no": 40,
+   "esim_yes": 44,
+   "esim_no": 5,
+   "xmc_attach": 0.2,
+   "esim_act": 0.898
+  },
+  {
+   "week_start": "2026-08-31",
+   "xmc_yes": 7,
+   "xmc_no": 106,
+   "esim_yes": 82,
+   "esim_no": 19,
+   "xmc_attach": 0.062,
+   "esim_act": 0.812
+  },
+  {
+   "week_start": "2026-09-07",
+   "xmc_yes": 17,
+   "xmc_no": 110,
+   "esim_yes": 104,
+   "esim_no": 14,
+   "xmc_attach": 0.134,
+   "esim_act": 0.881
+  },
+  {
+   "week_start": "2026-09-14",
+   "xmc_yes": 9,
+   "xmc_no": 76,
+   "esim_yes": 63,
+   "esim_no": 15,
+   "xmc_attach": 0.106,
+   "esim_act": 0.808
+  },
+  {
+   "week_start": "2026-09-21",
+   "xmc_yes": 19,
+   "xmc_no": 115,
+   "esim_yes": 91,
+   "esim_no": 32,
+   "xmc_attach": 0.142,
+   "esim_act": 0.74
+  },
+  {
+   "week_start": "2026-09-28",
+   "xmc_yes": 18,
+   "xmc_no": 89,
+   "esim_yes": 79,
+   "esim_no": 16,
+   "xmc_attach": 0.168,
+   "esim_act": 0.832
+  },
+  {
+   "week_start": "2026-10-05",
+   "xmc_yes": 35,
+   "xmc_no": 101,
+   "esim_yes": 80,
+   "esim_no": 46,
+   "xmc_attach": 0.257,
+   "esim_act": 0.635
+  }
+ ],
+ "last7_by_phase": {
+  "-": 60,
+  "Production": 476,
+  "Training": 175
+ },
+ "sellers_per_day_last7": [
+  33,
+  23,
+  40,
+  38,
+  69,
+  74,
+  86
+ ],
+ "concentration": {
+  "top_agent": "Omar Sayed Mohammed Abdelhamid (100071936)",
+  "top_agent_units": 239,
+  "top_agent_share_account": 0.0596,
+  "share_of_shereen_all": 0.353,
+  "share_of_shereen_30": 0.109
+ },
+ "weekday_last30_mean": {
+  "Fri": 84.2,
+  "Mon": 72.0,
+  "Sat": 73.2,
+  "Sun": 51.5,
+  "Thu": 72.4,
+  "Tue": 60.2,
+  "Wed": 77.8
+ }
+}
