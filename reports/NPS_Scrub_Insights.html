@@ -1,0 +1,659 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0}[hidden]{display:none!important}</style></head><body>
+<title>NPS Scrub Insights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Carlito:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: operations console — brand bar, sticky filter strip, tab rail, then summary-first panels on a cool neutral ground */
+:root{
+  --bg:#f3f5f8; --panel:#ffffff; --panel-2:#f8f9fb; --ink:#0e1a2b; --ink-2:#465365; --muted:#768194; --line:#e1e6ed; --line-2:#cdd4de;
+  --navy:#0b2545; --navy-ink:#ffffff; --accent:#d9661a; --accent-soft:#fdeee3; --accent-ink:#9a4209;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b; --good-ink:#0a7a0a; --crit-ink:#b42d2d; --warn-ink:#8a5b00;
+  --seq-0:#eef4fc; --seq-1:#cde2fb; --seq-2:#9ec5f4; --seq-3:#5598e7; --seq-4:#256abf; --seq-5:#104281;
+  --font-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"Carlito",Calibri,"Segoe UI",system-ui,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c121b; --panel:#141c28; --panel-2:#18212f; --ink:#e8edf4; --ink-2:#b4bfcd; --muted:#8692a3; --line:#243042; --line-2:#33425a;
+  --navy:#0f2a4d; --navy-ink:#f1f5fb; --accent:#f08a3e; --accent-soft:#3a2516; --accent-ink:#ffb27a;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+  --good-ink:#4fd34f; --crit-ink:#ff8a8a; --warn-ink:#ffcf5c;
+  --seq-0:#16243a; --seq-1:#184f95; --seq-2:#1c5cab; --seq-3:#2a78d6; --seq-4:#5598e7; --seq-5:#9ec5f4;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c121b; --panel:#141c28; --panel-2:#18212f; --ink:#e8edf4; --ink-2:#b4bfcd; --muted:#8692a3; --line:#243042; --line-2:#33425a;
+  --navy:#0f2a4d; --navy-ink:#f1f5fb; --accent:#f08a3e; --accent-soft:#3a2516; --accent-ink:#ffb27a;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+  --good-ink:#4fd34f; --crit-ink:#ff8a8a; --warn-ink:#ffcf5c;
+  --seq-0:#16243a; --seq-1:#184f95; --seq-2:#1c5cab; --seq-3:#2a78d6; --seq-4:#5598e7; --seq-5:#9ec5f4;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.45}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;letter-spacing:.01em}
+.num,td.n,th.n{font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* brand bar */
+.brand{background:var(--navy);color:var(--navy-ink)}
+.brand .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-block:14px}
+.brand h1{font-size:26px;font-weight:700}
+.brand .sub{font-size:13px;opacity:.82}
+.brand .grow{flex:1 1 240px;min-width:0}
+.upload{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--line-2);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:700}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.brand .btn{background:transparent;color:var(--navy-ink);border-color:rgba(255,255,255,.4)}
+.brand .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.filechip{font-size:13px;background:rgba(255,255,255,.12);padding:4px 10px;border-radius:999px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stripe{height:4px;background:var(--accent)}
+
+/* drop zone + banners */
+.drop{margin-top:16px;border:2px dashed var(--line-2);border-radius:var(--r);padding:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--panel)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop p{margin:0;color:var(--ink-2);min-width:0;flex:1 1 300px}
+.drop strong{color:var(--ink)}
+.banner{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.banner.sample{background:var(--accent-soft);color:var(--accent-ink)}
+.banner.err{background:color-mix(in srgb,var(--crit) 14%,var(--panel));color:var(--crit-ink)}
+.banner.ok{background:color-mix(in srgb,var(--good) 12%,var(--panel));color:var(--good-ink)}
+
+/* filters */
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:12px 8px;border-bottom:1px solid var(--line)}
+.frow{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.field label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.field select,.field input{background:var(--panel);border:1px solid var(--line-2);border-radius:8px;padding:6px 10px;min-width:0;max-width:100%}
+.field select:hover,.field input:hover{border-color:var(--accent)}
+.field.lead select{min-width:200px}
+.fsum{font-size:13px;color:var(--muted);margin-top:6px}
+.fsum b{color:var(--ink-2)}
+.reset{background:none;border:none;color:var(--accent-ink);cursor:pointer;font-weight:700;padding:6px 4px}
+
+/* tabs */
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-top:10px;border-bottom:2px solid var(--line);scrollbar-width:thin}
+.tab{border:none;background:none;padding:9px 14px;font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--ink-2);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--ink)}
+
+/* panels */
+.view{display:flex;flex-direction:column;gap:18px;margin-top:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.card h2{font-size:20px;font-weight:700;margin-bottom:2px}
+.card .hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:18px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:12px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.tile .val{font-family:var(--font-display);font-size:34px;font-weight:700;line-height:1.05}
+.tile .delta{font-size:13px;color:var(--ink-2)}
+.tile.flag{border-left:4px solid var(--crit)}
+.tile.goodflag{border-left:4px solid var(--good)}
+.up-bad,.down-bad{color:var(--crit-ink);font-weight:700}
+.up-good,.down-good{color:var(--good-ink);font-weight:700}
+.flat{color:var(--muted)}
+
+/* insights */
+.ins{display:flex;flex-direction:column;gap:0}
+.ins li{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+.ins li:first-child{border-top:none}
+.ins .k{font-family:var(--font-display);font-weight:700;font-size:15px;display:flex;gap:8px;align-items:center}
+.ins .dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--muted)}
+.ins .dot.bad{background:var(--crit)} .ins .dot.good{background:var(--good)} .ins .dot.warn{background:var(--warn)}
+.ins p{margin:0;max-width:95ch}
+ul.ins{list-style:none;margin:0;padding:0}
+@media (max-width:560px){.ins li{grid-template-columns:1fr;gap:2px}}
+
+/* tables */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{background:var(--panel-2);text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right;white-space:nowrap}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--accent-soft)}
+tr.total td{font-weight:700;background:var(--panel-2)}
+td.comment{min-width:280px;max-width:560px;color:var(--ink-2)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;border:1px solid var(--line-2);color:var(--ink-2)}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.crit{color:var(--crit-ink);border-color:color-mix(in srgb,var(--crit) 45%,transparent)}
+.chip.warn{color:var(--warn-ink);border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.chip.good{color:var(--good-ink);border-color:color-mix(in srgb,var(--good) 45%,transparent)}
+.chip.muted{color:var(--muted)}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:4px;background:var(--panel-2);border:1px solid var(--line);margin:1px 3px 1px 0;white-space:nowrap}
+.bar-in{display:flex;align-items:center;gap:6px}
+.bar-in i{display:block;height:8px;border-radius:0 4px 4px 0;background:var(--s1);min-width:1px}
+
+/* charts */
+.chart{position:relative;width:100%;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{fill:var(--muted);font-family:var(--font-body);font-size:12px}
+.chart .grid line{stroke:var(--line);stroke-width:1}
+.chart .axis line{stroke:var(--line-2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink-2);margin:0 0 8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.legend i.ln{height:3px;border-radius:2px}
+.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line-2);box-shadow:0 6px 18px rgba(0,0,0,.14);border-radius:8px;padding:8px 10px;font-size:13px;z-index:5;min-width:150px;max-width:260px}
+.tip b{display:block;font-family:var(--font-display);font-size:14px;margin-bottom:2px}
+.tip .r{display:flex;justify-content:space-between;gap:12px}
+.tip .r i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+
+/* heatmap */
+.heat td.h{text-align:center;font-variant-numeric:tabular-nums;min-width:52px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+.seg button{border:none;background:var(--panel);padding:6px 12px;cursor:pointer;font-weight:700;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--navy-ink)}
+.row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.foot{margin-top:28px;font-size:12px;color:var(--muted)}
+.kpi-mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px}
+.kpi-mini>div{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.kpi-mini .v{font-family:var(--font-display);font-size:24px;font-weight:700}
+.kpi-mini .l{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}
+.kpi-mini .c{font-size:12px;color:var(--ink-2)}
+@media (prefers-reduced-motion:no-preference){.tab,.btn,tr.click td{transition:background .15s,border-color .15s,color .15s}}
+</style>
+
+<header class="brand">
+  <div class="wrap">
+    <div class="grow">
+      <h1>NPS Scrub Insights</h1>
+      <div class="sub">VXI · Comcast · detractor scrubbing by team leader</div>
+    </div>
+    <div class="upload">
+      <span class="filechip" id="fileChip">Sample data</span>
+      <label class="btn primary" for="fileInput" tabindex="0" id="uploadBtn">Upload Excel</label>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm,.csv" hidden>
+      <button class="btn" id="sampleBtn" type="button">Load sample</button>
+    </div>
+  </div>
+  <div class="stripe"></div>
+</header>
+
+<main class="wrap">
+  <div class="drop" id="drop">
+    <p><strong>Drop your NPS Scrubbing export here</strong> (.xlsx or .csv, same columns as the Forms export: Start time, Name, BPID, Survey ID, Survey Date, Survey RCA, the four T2 columns, Comment). The file is read inside your browser and never leaves your computer.</p>
+    <label class="btn" for="fileInput">Choose file</label>
+  </div>
+  <div id="msg"></div>
+
+  <section class="filters" aria-label="Filters">
+    <div class="frow">
+      <div class="field lead"><label for="fLeader">Team leader</label><select id="fLeader"></select></div>
+      <div class="field"><label for="fPeriod">Period</label>
+        <select id="fPeriod">
+          <option>All time</option><option>Latest day</option><option>Last 7 days</option><option>Last 14 days</option><option>Last 30 days</option>
+          <option>This week</option><option>Month to date</option><option>Last month</option><option>Custom dates</option>
+        </select></div>
+      <div class="field"><label for="fBasis">Date basis</label>
+        <select id="fBasis"><option value="survey">Survey date</option><option value="scrub">Scrub date</option></select></div>
+      <div class="field" id="customFrom" hidden><label for="fFrom">From</label><input type="date" id="fFrom"></div>
+      <div class="field" id="customTo" hidden><label for="fTo">To</label><input type="date" id="fTo"></div>
+      <button class="reset" id="resetBtn" type="button">Reset filters</button>
+    </div>
+    <div class="fsum" id="fsum"></div>
+    <nav class="tabs" role="tablist" id="tabs">
+      <button class="tab" role="tab" data-tab="overview">Overview</button>
+      <button class="tab" role="tab" data-tab="leaders">Leaders</button>
+      <button class="tab" role="tab" data-tab="trends">Trends</button>
+      <button class="tab" role="tab" data-tab="drivers">Drivers</button>
+      <button class="tab" role="tab" data-tab="agents">Repeat agents</button>
+      <button class="tab" role="tab" data-tab="drill">Agent drill-down</button>
+      <button class="tab" role="tab" data-tab="quality">Data quality</button>
+    </nav>
+  </section>
+
+  <div id="views"></div>
+  <p class="foot">Agent Opp = Agent Opportunity (controllable). KPI buckets: QA (call handling, communication, tone, language) · Repeat/aiCR (knowledge gap, incorrect resolution, ownership, expectations, discovery) · Transfer (wrong/incorrect/missing ITG) · AHT/Hold (excessive hold/mute, tools navigation). Last 7 days and prior 7 days count back from the latest scrub date in the period.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------- constants ---------- */
+const RCA_MAP=[["agent","Agent Opportunity"],["customer","Customer"],["comcast","Comcast Process/Tools"],["vxi","VXI Process/Tools"],["audio","No Audio"]];
+const T2_MAP=[["call handling","Call Handling","QA"],["communication","Communication / Soft Skills","QA"],["tone","Tone - Pace","QA"],["language","Language Proficiency","QA"],
+ ["knowledge","Knowledge Gap","Repeat (aiCR)"],["resolution","Incorrect/Incomplete Resolution","Repeat (aiCR)"],["ownership","Ownership","Repeat (aiCR)"],
+ ["expectations","Customer Education - Setting Expectations","Repeat (aiCR)"],["discovery","Did not ask discovery questions","Repeat (aiCR)"],
+ ["wrong itg","Wrong ITG","Transfer"],["incomplete itg","Incorrect/Incomplete ITG","Transfer"],["missing itg","Missing ITG","Transfer"],
+ ["hold","Excessive Hold/Mute","AHT / Hold"],["tools navigation","Tools Navigation/Utilization","AHT / Hold"],
+ ["another agent","Another Agent's Opportunity",""],["positive feedback","Customer Provided Positive Feedback",""],["us rep","Customer Demanded a US Rep",""],
+ ["previous agent","Customer Preferred Previous Agent",""],["technician","Complaints about the technician",""],["dissatisfied","Dissatisfied with service",""],
+ ["outage","Outage",""],["tools outage","Comcast Tools Outage/Update",""],["restriction","Comcast Restriction",""],["ivr","IVR / Routing",""],
+ ["avaya","Avaya issue",""],["one cti","ONE CTI down",""],["headset","Headset Issue",""],["global protect","Global Protect / Connectivity",""],["connectivity","Global Protect / Connectivity",""]];
+const AO="Agent Opportunity";
+const RCAS=[AO,"Comcast Process/Tools","Customer","No Audio","VXI Process/Tools"];
+const RCA_SHORT={"Agent Opportunity":"Agent Opp","Comcast Process/Tools":"Comcast","Customer":"Customer","No Audio":"No Audio","VXI Process/Tools":"VXI"};
+const RCA_COLOR={"Agent Opportunity":"var(--s1)","Comcast Process/Tools":"var(--s2)","Customer":"var(--s3)","No Audio":"var(--s4)","VXI Process/Tools":"var(--s5)"};
+const BUCKETS=["QA","Repeat (aiCR)","Transfer","AHT / Hold"];
+const AGT=T2_MAP.slice(0,14).map(x=>x[1]);
+const BUCKET_OF=Object.fromEntries(T2_MAP.filter(x=>x[2]).map(x=>[x[1],x[2]]));
+const TH={calib:15,watch:8,minVol:20};
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+/* ---------- state ---------- */
+let ROWS=[], SOURCE="sample", FILE="Sample data";
+const S={leader:"All",period:"All time",basis:"survey",from:null,to:null,tab:"overview",trend:"day",drillLeader:null,drillAgent:null};
+try{const t=localStorage.getItem("nps-tab"); if(t) S.tab=t;}catch(e){}
+if(/^#[a-z]+$/.test(location.hash)) S.tab=location.hash.slice(1);
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+function h(tag,attrs,...kids){const e=document.createElement(tag);if(attrs)for(const[k,v]of Object.entries(attrs)){if(v==null||v===false)continue;if(k==="class")e.className=v;else if(k==="text")e.textContent=v;else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?"":v);}
+  for(const k of kids.flat()){if(k==null||k===false)continue;e.append(k.nodeType?k:document.createTextNode(String(k)));}return e;}
+const svgNS="http://www.w3.org/2000/svg";
+function s(tag,attrs,...kids){const e=document.createElementNS(svgNS,tag);if(attrs)for(const[k,v]of Object.entries(attrs))if(v!=null)e.setAttribute(k,v);for(const k of kids.flat())if(k!=null)e.append(k.nodeType?k:document.createTextNode(String(k)));return e;}
+const pct=(v,d=0)=>v==null||isNaN(v)?"—":(v*100).toFixed(d)+"%";
+const nf=v=>v==null||isNaN(v)?"—":Math.round(v).toLocaleString("en-US");
+const sg=(v,d=0)=>v==null||isNaN(v)?"—":(v>0?"+":v<0?"−":"±")+Math.abs(v).toFixed(d);
+const fd=(dn,f)=>{if(dn==null)return"—";const d=new Date(dn*864e5);const dd=String(d.getUTCDate()).padStart(2,"0"),m=MON[d.getUTCMonth()],y=String(d.getUTCFullYear()).slice(2);
+  if(f==="dm")return dd+"-"+m; if(f==="ddm")return DOW[d.getUTCDay()]+" "+dd+"-"+m; if(f==="my")return m+"-"+y; if(f==="iso")return d.toISOString().slice(0,10); return dd+"-"+m+"-"+y;};
+const dow=dn=>((dn%7)+11)%7; // 0=Sun (1970-01-01 = Thu)
+const weekStart=dn=>dn-((dow(dn)+6)%7);
+const ym=dn=>{const d=new Date(dn*864e5);return d.getUTCFullYear()*12+d.getUTCMonth();};
+const ymStart=k=>Date.UTC(Math.floor(k/12),k%12,1)/864e5;
+const norm=x=>String(x==null?"":x).toLowerCase().replace(/[^a-z0-9]/g,"");
+function toDay(v){if(v==null||v==="")return null;if(typeof v==="number"&&isFinite(v)){return Math.floor(v)-25569;}
+  if(v instanceof Date&&!isNaN(v))return Date.UTC(v.getFullYear(),v.getMonth(),v.getDate())/864e5;
+  const t=String(v).trim();let m=t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return Date.UTC(+m[1],m[2]-1,+m[3])/864e5;
+  m=t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);if(m){let y=+m[3];if(y<100)y+=2000;return Date.UTC(y,m[1]-1,+m[2])/864e5;}
+  const d=new Date(t);return isNaN(d)?null:Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5;}
+function toSerial(v){if(typeof v==="number")return v;if(v instanceof Date)return v.getTime()/864e5+25569-v.getTimezoneOffset()/1440;const d=new Date(String(v));return isNaN(d)?null:d.getTime()/864e5+25569-d.getTimezoneOffset()/1440;}
+function mapKw(text,map){const t=String(text||"").toLowerCase();let best=-1;for(let i=0;i<map.length;i++)if(t.includes(map[i][0]))best=i;return best;}
+const groupBy=(arr,fn)=>{const m=new Map();for(const r of arr){const k=fn(r);if(!m.has(k))m.set(k,[]);m.get(k).push(r);}return m;};
+const count=(arr,fn)=>arr.reduce((a,r)=>a+(fn(r)?1:0),0);
+const share=(a,b)=>b?a/b:null;
+function topKey(arr,fn){const m=new Map();for(const r of arr){const k=fn(r);if(!k)continue;m.set(k,(m.get(k)||0)+1);}let bk=null,bv=0;for(const[k,v]of m)if(v>bv){bk=k;bv=v;}return[bk,bv];}
+
+/* ---------- parsing ---------- */
+const COLS={start:["starttime"],end:["completiontime"],email:["email"],name:["name"],bpid:["bpid"],survey:["surveyid"],sdate:["surveydate"],rca:["surveyrca"],
+  t2a:["surveyrcat2agent"],t2cu:["surveyrcat2customer"],t2co:["surveyrcat2comcast"],t2v:["surveyrcat2vxi"],comment:["comment","comments"],id:["id"]};
+function buildRows(objs){
+  if(!objs.length)throw new Error("The sheet is empty.");
+  const keys=Object.keys(objs[0]);const km={};
+  for(const[c,alts]of Object.entries(COLS)){const k=keys.find(k=>alts.includes(norm(k)));if(k)km[c]=k;}
+  const miss=["start","name","bpid","rca"].filter(c=>!km[c]);
+  if(miss.length)throw new Error("Missing column(s): "+miss.map(c=>({start:"Start time",name:"Name",bpid:"BPID",rca:"Survey RCA"})[c]).join(", ")+". Upload the NPS Scrubbing export with its original headers.");
+  const out=[];
+  for(const o of objs){
+    const st=o[km.start];const scrub=toDay(st);if(scrub==null)continue;
+    const rcaRaw=String(o[km.rca]||"").trim();const ri=mapKw(rcaRaw,RCA_MAP);const rca=ri<0?(rcaRaw||"(blank)"):RCA_MAP[ri][1];
+    const t2Raw=[km.t2a,km.t2cu,km.t2co,km.t2v].map(k=>k?String(o[k]==null?"":o[k]).trim():"").find(x=>x)||"";
+    const ti=t2Raw?mapKw(t2Raw,T2_MAP):-1;const t2=t2Raw?(ti<0?t2Raw:T2_MAP[ti][1]):"";
+    const ss=toSerial(st),se=km.end?toSerial(o[km.end]):null;
+    out.push({id:km.id?o[km.id]:"",scrub,leader:String(o[km.name]||o[km.email]||"(no name)").trim(),email:km.email?String(o[km.email]||""):"",
+      bpid:String(o[km.bpid]==null?"":o[km.bpid]).trim().toLowerCase(),survey:km.survey?String(o[km.survey]==null?"":o[km.survey]).trim():"",
+      sdate:km.sdate?toDay(o[km.sdate]):null,rca,t2,bucket:rca===AO?(BUCKET_OF[t2]||""):"",comment:km.comment?String(o[km.comment]==null?"":o[km.comment]).trim():"",
+      handle:(ss!=null&&se!=null)?Math.round((se-ss)*1440*10)/10:null});
+  }
+  if(!out.length)throw new Error("No rows with a valid Start time were found.");
+  // flags over the whole file
+  const bySurvey=groupBy(out.filter(r=>r.survey),r=>r.survey);
+  for(const[,g]of bySurvey){if(g.length>1){const conflict=new Set(g.map(r=>r.rca)).size>1;for(const r of g){r.dup=true;r.conflict=conflict;}}}
+  for(const r of out){
+    const iss=[];if(r.dup)iss.push("Dup survey");if(r.conflict)iss.push("Conflicting RCA");
+    if(!/^bp-[a-z0-9]+$/.test(r.bpid)||r.bpid.length<7)iss.push("Invalid BPID");
+    if(r.rca!=="No Audio"&&!r.t2)iss.push("Missing T2");if(r.rca!=="No Audio"&&!r.comment)iss.push("No comment");
+    if(r.sdate==null)iss.push("Blank survey date");else if(r.sdate>r.scrub)iss.push("Survey date after scrub");
+    r.issues=iss;r.lag=r.sdate!=null?r.scrub-r.sdate:null;
+  }
+  return out;
+}
+function parseCSV(text){const rows=[];let row=[],f="",q=false;for(let i=0;i<text.length;i++){const c=text[i];
+  if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+  else if(c==='"')q=true;else if(c===","){row.push(f);f="";}else if(c==="\n"||c==="\r"){if(c==="\r"&&text[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f="";}else f+=c;}
+  if(f||row.length){row.push(f);rows.push(row);}const hd=rows.shift()||[];return rows.filter(r=>r.some(x=>x!=="")).map(r=>Object.fromEntries(hd.map((k,i)=>[k,r[i]===""?null:r[i]])));}
+function loadFile(file){
+  const isCSV=/\.csv$/i.test(file.name);const rd=new FileReader();
+  rd.onload=()=>{try{let objs;
+      if(isCSV){objs=parseCSV(String(rd.result));}
+      else{if(typeof XLSX==="undefined")throw new Error("The Excel reader did not load (no internet?). Save the file as CSV and upload that instead.");
+        const wb=XLSX.read(new Uint8Array(rd.result),{type:"array",cellDates:false});
+        let ws=null;for(const n of wb.SheetNames){const w=wb.Sheets[n];const hdr=(XLSX.utils.sheet_to_json(w,{header:1,range:0})[0]||[]).map(norm);if(hdr.includes("surveyrca")){ws=w;break;}}
+        if(!ws)ws=wb.Sheets[wb.SheetNames[0]];objs=XLSX.utils.sheet_to_json(ws,{defval:null,raw:true});}
+      ROWS=buildRows(objs);SOURCE="file";FILE=file.name;S.leader="All";S.drillAgent=null;S.drillLeader=null;
+      showMsg("ok","Loaded "+nf(ROWS.length)+" scrubs from "+file.name+".");render();
+    }catch(e){showMsg("err",e.message||String(e));}};
+  rd.onerror=()=>showMsg("err","The file could not be read. Try saving it again from Excel.");
+  if(isCSV)rd.readAsText(file);else rd.readAsArrayBuffer(file);
+}
+function showMsg(kind,text){const m=$("#msg");m.replaceChildren();if(kind)m.append(h("div",{class:"banner "+kind,role:kind==="err"?"alert":"status"},text));}
+
+/* ---------- sample data (clearly marked) ---------- */
+function sample(){
+  let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};const pick=a=>a[Math.floor(rnd()*a.length)];
+  const leaders=["Sample Leader A","Sample Leader B","Sample Leader C","Sample Leader D","Sample Leader E"];
+  const lean=[0.72,0.62,0.55,0.48,0.66];const end=Date.UTC(2026,9,7)/864e5;const objs=[];let id=1;
+  const agents=leaders.map((l,i)=>Array.from({length:10},(_,j)=>"bp-sample"+(i*10+j+1).toString().padStart(3,"0")));
+  const aoT2=["Communication / Soft Skills","Communication / Soft Skills","Call Handling","Knowledge Gap","Excessive Hold/Mute","Incorrect/ Incomplete Resolution","Ownership","Wrong ITG","Customer Education - Setting Expectations"];
+  const coT2=["Complaints about the technician","Dissatisfied with service","Outage","Comcast Restriction"];const cuT2=["Another Agent's Opportunity","Customer Provided the agent positive feedback"];
+  for(let d=end-69;d<=end;d++){if(dow(d)===5)continue;
+    for(let li=0;li<5;li++){const n=Math.floor(rnd()*5)+(d>end-10?3:0);
+      for(let k=0;k<n;k++){const ag=agents[li][Math.floor(Math.pow(rnd(),1.8)*10)];const x=rnd();let rca,t2a=null,t2c=null,t2m=null,cm="Sample comment for illustration.";
+        if(x<lean[li]){rca="Agent Opportunity";t2a=pick(aoT2);}else if(x<lean[li]+0.18){rca="Comcast Policy/Process or Tools";t2m=pick(coT2);}else if(x<lean[li]+0.27){rca="Customer";t2c=pick(cuT2);}else{rca="No Audio Found on I3";cm=null;}
+        const sd=d-1-Math.floor(rnd()*6);const serial=d+25569+0.4+rnd()*0.3;
+        objs.push({"ID":id++,"Start time":serial,"Completion time":serial+rnd()*0.01,"Email":"","Name":leaders[li],"BPID":ag,"Survey ID":String(2190000000+Math.floor(rnd()*9e6)),
+          "Survey Date":sd+25569,"Survey RCA":rca,"Survey RCA T2 (Agent)":t2a,"Survey RCA T2 (Customer)":t2c,"Survey RCA T2 (Comcast)":t2m,"Survey RCA T2 (VXI)":null,"Comment":cm});}}}
+  return objs;
+}
+
+/* ---------- filtering ---------- */
+function ctx(){
+  const all=ROWS;const maxScrub=Math.max(...all.map(r=>r.scrub));
+  const bd=r=>S.basis==="scrub"?r.scrub:r.sdate;
+  let anchor=maxScrub;if(S.basis==="survey"){const sd=all.map(r=>r.sdate).filter(v=>v!=null&&v<=maxScrub);anchor=sd.length?Math.max(...sd):maxScrub;}
+  let from=null,to=null;const p=S.period;
+  if(p==="Latest day"){from=to=anchor;}else if(p==="Last 7 days"){from=anchor-6;to=anchor;}else if(p==="Last 14 days"){from=anchor-13;to=anchor;}
+  else if(p==="Last 30 days"){from=anchor-29;to=anchor;}else if(p==="This week"){from=weekStart(anchor);to=anchor;}
+  else if(p==="Month to date"){from=ymStart(ym(anchor));to=anchor;}else if(p==="Last month"){from=ymStart(ym(anchor)-1);to=ymStart(ym(anchor))-1;}
+  else if(p==="Custom dates"){from=S.from;to=S.to;}
+  const ranged=from!=null||to!=null;
+  const D=ranged?all.filter(r=>{const v=bd(r);return v!=null&&(from==null||v>=from)&&(to==null||v<=to);}):all.slice();
+  const F=S.leader==="All"?D:D.filter(r=>r.leader===S.leader);
+  const asOf=D.length?Math.max(...D.map(r=>r.scrub)):maxScrub;
+  return{all,D,F,from,to,ranged,asOf,l7:asOf-6,p7:asOf-13,l30:asOf-29,anchor};
+}
+const inL7=(r,c)=>r.scrub>=c.l7;const inP7=(r,c)=>r.scrub>=c.p7&&r.scrub<c.l7;
+
+/* ---------- metrics ---------- */
+function rcaCounts(arr){const o={total:arr.length};for(const k of RCAS)o[k]=0;for(const r of arr)if(o[r.rca]!=null)o[r.rca]++;return o;}
+function leaderTable(c){
+  const floor=rcaCounts(c.D);const floorAO=share(floor[AO],floor.total);
+  return[...groupBy(c.D,r=>r.leader)].map(([ld,g])=>{const k=rcaCounts(g);const ao=k[AO];const aoP=share(ao,k.total);
+    const l7=count(g,r=>r.rca===AO&&inL7(r,c)),p7=count(g,r=>r.rca===AO&&inP7(r,c));
+    const agents=new Set(g.map(r=>r.bpid)).size;const gap=aoP!=null&&floorAO!=null?(aoP-floorAO)*100:null;
+    const flag=k.total<TH.minVol?"Low volume":Math.abs(gap)>TH.calib?"Calibrate":Math.abs(gap)>TH.watch?"Watch":"Aligned";
+    const b=Object.fromEntries(BUCKETS.map(x=>[x,count(g,r=>r.bucket===x)]));
+    return{leader:ld,agents,total:k.total,perAgent:share(k.total,agents),ao,aoP,gap,l7,p7,d7:l7-p7,comcastP:share(k["Comcast Process/Tools"],k.total),
+      noAudioP:share(k["No Audio"],k.total),customerP:share(k.Customer,k.total),b,top:topKey(g.filter(r=>r.rca===AO),r=>r.t2)[0]||"—",flag,
+      issueP:share(count(g,r=>r.issues.length),k.total),dup:count(g,r=>r.dup),conflict:count(g,r=>r.conflict),bad:count(g,r=>r.issues.includes("Invalid BPID")),
+      missT2:count(g,r=>r.issues.includes("Missing T2")),noCom:count(g,r=>r.issues.includes("No comment")),blankSd:count(g,r=>r.sdate==null),futSd:count(g,r=>r.issues.includes("Survey date after scrub")),
+      lag:avg(g.map(r=>r.lag))};}).sort((a,b)=>b.total-a.total);
+}
+const avg=a=>{const v=a.filter(x=>x!=null&&isFinite(x));return v.length?v.reduce((s,x)=>s+x,0)/v.length:null;};
+function agentTable(c,arr,limit){
+  const latestLeader=new Map();for(const r of c.D){const p=latestLeader.get(r.bpid);if(!p||r.scrub>=p.scrub)latestLeader.set(r.bpid,r);}
+  return[...groupBy(arr,r=>r.bpid)].map(([bp,g])=>{const ao=g.filter(r=>r.rca===AO);const[top,topN]=topKey(ao,r=>r.t2);
+    const l7=count(ao,r=>inL7(r,c)),l30=count(ao,r=>r.scrub>=c.l30);
+    const status=l30>=3?["Chronic — escalate","crit"]:l7>=1?["Active — coach now","warn"]:l30>=1?["Watch","muted"]:["Historic","muted"];
+    return{bpid:bp,ao:ao.length,total:g.length,aoP:share(ao.length,g.length),l7,l30,last:Math.max(...g.map(r=>r.scrub)),top:top||"—",topN,bucket:BUCKET_OF[top]||"",status,
+      leader:(latestLeader.get(bp)||g[g.length-1]).leader};}).filter(a=>a.ao>0||!limit).sort((a,b)=>b.ao-a.ao||b.total-a.total).slice(0,limit||1e9);
+}
+function series(c,arr,mode){
+  let keys,keyOf,label;
+  if(mode==="day"){const days=[...new Set(arr.map(r=>r.scrub))].sort((a,b)=>b-a).slice(0,45);keys=days;keyOf=r=>r.scrub;label=k=>fd(k,"ddm");}
+  else if(mode==="week"){const w0=weekStart(c.asOf);keys=Array.from({length:12},(_,i)=>w0-7*i);keyOf=r=>weekStart(r.scrub);label=k=>"Wk "+fd(k,"dm");}
+  else{const m0=ym(c.asOf);keys=Array.from({length:7},(_,i)=>m0-i);keyOf=r=>ym(r.scrub);label=k=>fd(ymStart(k),"my");}
+  const g=groupBy(arr,keyOf);
+  const rows=keys.map(k=>{const a=g.get(k)||[];const rc=rcaCounts(a);return{key:k,label:label(k),a,rc,total:a.length,aoP:share(rc[AO],a.length),comP:share(rc["Comcast Process/Tools"],a.length),
+    naP:share(rc["No Audio"],a.length),lag:avg(a.map(r=>r.lag)),issP:share(count(a,r=>r.issues.length),a.length)};});
+  rows.forEach((r,i)=>{const p=rows[i+1];r.dVol=p?r.total-p.total:null;r.dAO=p&&r.aoP!=null&&p.aoP!=null?(r.aoP-p.aoP)*100:null;
+    if(mode==="day"){const w=rows.slice(i,i+7);r.avg7=avg(w.map(x=>x.total));}});
+  return rows;
+}
+
+/* ---------- charts ---------- */
+function tipFor(box){let t=box.querySelector(".tip");if(!t){t=h("div",{class:"tip",hidden:true});box.append(t);}return t;}
+function showTip(box,x,y,title,rows){const t=tipFor(box);t.replaceChildren(h("b",{text:title}),...rows.map(([c,l,v])=>h("div",{class:"r"},h("span",null,c?h("i",{style:"background:"+c}):null,l),h("span",{class:"num",text:v}))));
+  t.hidden=false;const bw=box.clientWidth,tw=t.offsetWidth,th=t.offsetHeight;let left=x+14;if(left+tw>bw)left=Math.max(0,x-tw-14);let top=Math.max(0,y-th-8);t.style.left=left+"px";t.style.top=top+"px";}
+function hideTip(box){const t=box.querySelector(".tip");if(t)t.hidden=true;}
+function legend(items){return h("div",{class:"legend"},items.map(([c,l,line])=>h("span",null,h("i",{class:line?"ln":null,style:"background:"+c}),l)));}
+function niceStep(v){const p=Math.pow(10,Math.floor(Math.log10(v)));const n=v/p;return(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p;}
+function niceAxis(v){if(v<=0)v=1;let st=niceStep(v/4);if(st<1)st=1;return{max:Math.ceil(v/st)*st,step:st};}
+/* stacked/simple column chart; cats oldest→newest */
+function colChart(box,{cats,stacks,height=240,fmt=nf}){
+  box.replaceChildren();const W=Math.max(300,box.clientWidth||600),H=height,m={l:40,r:8,t:10,b:30};const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const tot=cats.map((_,i)=>stacks.reduce((a,st)=>a+(st.values[i]||0),0));const ax=niceAxis(Math.max(1,...tot));const ymax=ax.max;
+  const svg=s("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});const g=s("g",{class:"grid"});
+  const nt=Math.round(ax.max/ax.step);for(let i=0;i<=nt;i++){const y=m.t+ih-ih*i/nt;g.append(s("line",{x1:m.l,x2:W-m.r,y1:y,y2:y}));svg.append(s("text",{x:m.l-6,y:y+4,"text-anchor":"end"},fmt(ymax*i/nt)));}
+  svg.prepend(g);const bw=iw/cats.length;const barW=Math.max(2,Math.min(28,bw*0.62));
+  const every=Math.ceil(cats.length/Math.max(2,Math.floor(iw/64)));
+  cats.forEach((c,i)=>{const x=m.l+bw*i+(bw-barW)/2;let y0=m.t+ih;const nonzero=stacks.map((st,j)=>j).filter(j=>stacks[j].values[i]>0);const topJ=nonzero[nonzero.length-1];
+    stacks.forEach((st,j)=>{const v=st.values[i]||0;if(!v)return;let hgt=ih*v/ymax;const gap=j===nonzero[0]?0:2;const y=y0-hgt;
+      const hh=Math.max(0.5,hgt-gap);
+      if(j===topJ&&hh>4){const r=Math.min(4,barW/2);svg.append(s("path",{d:`M${x},${y0-gap} V${y+r} Q${x},${y} ${x+r},${y} H${x+barW-r} Q${x+barW},${y} ${x+barW},${y+r} V${y0-gap} Z`,fill:st.color}));}
+      else svg.append(s("rect",{x,y:y,width:barW,height:hh,fill:st.color}));y0=y;});
+    if((i%every===0&&cats.length-1-i>=Math.ceil(every/2))||i===cats.length-1)svg.append(s("text",{x:m.l+bw*i+bw/2,y:H-10,"text-anchor":"middle"},c));
+    const hit=s("rect",{x:m.l+bw*i,y:m.t,width:bw,height:ih,fill:"transparent"});
+    hit.addEventListener("mousemove",e=>{const b=box.getBoundingClientRect();showTip(box,e.clientX-b.left,e.clientY-b.top,c,[...stacks.filter(st=>st.values[i]).map(st=>[st.color,st.name,fmt(st.values[i])]).reverse(),[null,"Total",fmt(tot[i])]]);});
+    hit.addEventListener("mouseleave",()=>hideTip(box));svg.append(hit);});
+  svg.append(s("line",{x1:m.l,x2:W-m.r,y1:m.t+ih,y2:m.t+ih,stroke:"var(--line-2)"}));box.append(svg);
+}
+function lineChart(box,{cats,lines,height=220,fmt=v=>pct(v),ymin=0,ymaxFix=null,ref=null}){
+  box.replaceChildren();const W=Math.max(300,box.clientWidth||600),H=height,m={l:44,r:12,t:12,b:30};const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const vals=lines.flatMap(l=>l.values).filter(v=>v!=null);const ymax=ymaxFix??Math.min(1,Math.max(0.1,Math.ceil((Math.max(...vals,ref??0)+0.05)*10)/10));
+  const X=i=>m.l+(cats.length<2?iw/2:iw*i/(cats.length-1)),Y=v=>m.t+ih-ih*(v-ymin)/(ymax-ymin);
+  const svg=s("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});const g=s("g",{class:"grid"});
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*i/4,y=Y(v);g.append(s("line",{x1:m.l,x2:W-m.r,y1:y,y2:y}));svg.append(s("text",{x:m.l-6,y:y+4,"text-anchor":"end"},fmt(v)));}
+  svg.append(g);if(ref!=null){svg.append(s("line",{x1:m.l,x2:W-m.r,y1:Y(ref),y2:Y(ref),stroke:"var(--muted)","stroke-dasharray":"4 4"}));}
+  const every=Math.ceil(cats.length/Math.max(2,Math.floor(iw/70)));cats.forEach((c,i)=>{if((i%every===0&&cats.length-1-i>=Math.ceil(every/2))||i===cats.length-1)svg.append(s("text",{x:X(i),y:H-10,"text-anchor":"middle"},c));});
+  for(const l of lines){let d="";l.values.forEach((v,i)=>{if(v==null)return;d+=(d&&l.values[i-1]!=null?"L":"M")+X(i)+","+Y(v);});
+    if(lines.length===1){let a="";const pts=l.values.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);if(pts.length>1){a=`M${pts[0][0]},${m.t+ih} `+pts.map(p=>`L${p[0]},${p[1]}`).join(" ")+` L${pts[pts.length-1][0]},${m.t+ih} Z`;svg.append(s("path",{d:a,fill:l.color,opacity:.1}));}}
+    svg.append(s("path",{d,fill:"none",stroke:l.color,"stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"}));
+    const li=l.values.map((v,i)=>v==null?-1:i).filter(i=>i>=0).pop();if(li!=null&&li>=0)svg.append(s("circle",{cx:X(li),cy:Y(l.values[li]),r:4,fill:l.color,stroke:"var(--panel)","stroke-width":2}));}
+  const cross=s("line",{y1:m.t,y2:m.t+ih,stroke:"var(--line-2)",visibility:"hidden"});svg.append(cross);
+  const hit=s("rect",{x:m.l,y:m.t,width:iw,height:ih,fill:"transparent"});
+  hit.addEventListener("mousemove",e=>{const b=svg.getBoundingClientRect();const sx=(e.clientX-b.left)*W/b.width;const i=Math.max(0,Math.min(cats.length-1,Math.round((sx-m.l)/(iw/Math.max(1,cats.length-1)))));
+    cross.setAttribute("x1",X(i));cross.setAttribute("x2",X(i));cross.setAttribute("visibility","visible");const bb=box.getBoundingClientRect();
+    showTip(box,e.clientX-bb.left,e.clientY-bb.top,cats[i],lines.map(l=>[l.color,l.name,fmt(l.values[i])]));});
+  hit.addEventListener("mouseleave",()=>{cross.setAttribute("visibility","hidden");hideTip(box);});svg.append(hit);box.append(svg);
+}
+function hbar(box,{items,fmt=nf,ref=null,refLabel="",color="var(--s1)",max=null}){
+  box.replaceChildren();const W=Math.max(300,box.clientWidth||600),rowH=26,m={l:Math.min(220,W*0.42),r:56,t:ref!=null?18:4,b:4};const H=m.t+m.b+rowH*items.length;const iw=W-m.l-m.r;
+  const vmax=max??Math.max(...items.map(i=>i.value||0),ref||0,1e-9);const X=v=>m.l+iw*(v/vmax);
+  const svg=s("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  items.forEach((it,i)=>{const y=m.t+i*rowH;const lbl=it.label.length>32?it.label.slice(0,31)+"…":it.label;svg.append(s("text",{x:m.l-8,y:y+rowH/2+4,"text-anchor":"end",style:"fill:var(--ink-2)"},lbl));
+    const w=Math.max(1,X(it.value||0)-m.l);const bh=12,yy=y+(rowH-bh)/2;const r=Math.min(4,w);
+    svg.append(s("path",{d:`M${m.l},${yy} H${m.l+w-r} Q${m.l+w},${yy} ${m.l+w},${yy+r} V${yy+bh-r} Q${m.l+w},${yy+bh} ${m.l+w-r},${yy+bh} H${m.l} Z`,fill:it.color||color}));
+    svg.append(s("text",{x:m.l+w+6,y:y+rowH/2+4,style:"fill:var(--ink)"},fmt(it.value)));
+    const hit=s("rect",{x:0,y,width:W,height:rowH,fill:"transparent",style:it.onclick?"cursor:pointer":null});
+    hit.addEventListener("mousemove",e=>{const b=box.getBoundingClientRect();showTip(box,e.clientX-b.left,e.clientY-b.top,it.label,[[it.color||color,it.tipLabel||"Value",fmt(it.value)],...(it.extra||[])]);});
+    hit.addEventListener("mouseleave",()=>hideTip(box));if(it.onclick)hit.addEventListener("click",it.onclick);svg.append(hit);});
+  if(ref!=null){const x=X(ref);svg.append(s("line",{x1:x,x2:x,y1:m.t-4,y2:H,stroke:"var(--ink-2)","stroke-dasharray":"3 3"}));svg.append(s("text",{x,y:11,"text-anchor":"middle",style:"fill:var(--ink-2)"},refLabel+" "+fmt(ref)));}
+  box.append(svg);
+}
+const charts=[];function chart(height,fn){const box=h("div",{class:"chart"});charts.push(()=>fn(box));return box;}
+
+/* ---------- table helper ---------- */
+function table(cols,rows,{onRow,total,cls}={}){
+  const thead=h("thead",null,h("tr",null,cols.map(c=>h("th",{class:c.n?"n":null,text:c.t}))));
+  const tb=h("tbody");for(const r of rows){const tr=h("tr",{class:onRow?"click":null});if(onRow){tr.tabIndex=0;tr.addEventListener("click",()=>onRow(r));tr.addEventListener("keydown",e=>{if(e.key==="Enter")onRow(r);});}
+    for(const c of cols){const v=c.f(r);const td=h("td",{class:(c.n?"n ":"")+(c.cls||"")});if(v!=null&&v.nodeType)td.append(v);else td.textContent=v==null?"":v;if(c.style)td.setAttribute("style",c.style(r)||"");tr.append(td);}tb.append(tr);}
+  if(total){const tr=h("tr",{class:"total"});for(const c of cols){const v=total[c.k];const td=h("td",{class:c.n?"n":null});if(v!=null&&v.nodeType)td.append(v);else td.textContent=v==null?"":v;tr.append(td);}tb.append(tr);}
+  return h("div",{class:"tw"+(cls?" "+cls:"")},h("table",null,thead,tb));
+}
+const delta=(v,{d=0,bad="up",unit=""}={})=>{if(v==null||isNaN(v))return h("span",{class:"flat",text:"—"});const cls=Math.abs(v)<1e-9?"flat":(v>0)===(bad==="up")?"up-bad":"up-good";
+  return h("span",{class:cls,text:(v>0?"▲ ":v<0?"▼ ":"■ ")+sg(v,d)+unit});};
+const chip=([t,c])=>h("span",{class:"chip "+c,text:t});
+function card(title,hint,...body){return h("section",{class:"card"},h("h2",{text:title}),hint?h("p",{class:"hint",text:hint}):null,...body);}
+function setLeader(l){S.leader=l;$("#fLeader").value=l;render();}
+
+/* ---------- views ---------- */
+function vOverview(c){
+  const F=c.F,k=rcaCounts(F),aoP=share(k[AO],k.total);
+  const l7=F.filter(r=>inL7(r,c)),p7=F.filter(r=>inP7(r,c));const ao7=share(count(l7,r=>r.rca===AO),l7.length),aoPr=share(count(p7,r=>r.rca===AO),p7.length);
+  const days=series(c,F,"day");const d0=days[0]||{};const weeks=series(c,F,"week");const months=series(c,F,"month");
+  const issP=share(count(F,r=>r.issues.length),F.length);
+  const tiles=h("div",{class:"tiles"},
+    tile("Scrubs",nf(k.total),[nf(l7.length)+" in last 7 days ",delta(l7.length-p7.length,{bad:"none"})]),
+    tile("Agent Opp %",pct(aoP,1),["Last 7 days "+pct(ao7)+" ",delta(ao7!=null&&aoPr!=null?(ao7-aoPr)*100:null,{d:1,unit:" pts"})],ao7!=null&&aoPr!=null?(ao7>aoPr?"flag":"goodflag"):null),
+    tile("Comcast %",pct(share(k["Comcast Process/Tools"],k.total),1),["Customer "+pct(share(k.Customer,k.total))]),
+    tile("No Audio %",pct(share(k["No Audio"],k.total),1),[nf(k["No Audio"])+" scrubs with no recording"]),
+    tile("Latest day",nf(d0.total),[d0.label?d0.label+" ":"",delta(d0.dVol,{bad:"none"})," vs prior"]),
+    tile("Data-issue rate",pct(issP,1),[nf(count(F,r=>r.issues.length))+" rows flagged"],issP>0.1?"flag":null));
+  // insights
+  const lt=leaderTable(c);const named=lt.filter(x=>x.total>=TH.minVol);
+  const aoRows=F.filter(r=>r.rca===AO);const t2c=AGT.map(t=>({t,n:count(aoRows,r=>r.t2===t),l7:count(aoRows,r=>r.t2===t&&inL7(r,c)),p7:count(aoRows,r=>r.t2===t&&inP7(r,c))})).sort((a,b)=>b.n-a.n);
+  const top3=t2c.slice(0,3);const rise=[...t2c].sort((a,b)=>(b.l7-b.p7)-(a.l7-a.p7))[0];const fall=[...t2c].sort((a,b)=>(a.l7-a.p7)-(b.l7-b.p7))[0];
+  const bk=BUCKETS.map(b=>({b,l7:count(F,r=>r.bucket===b&&inL7(r,c)),p7:count(F,r=>r.bucket===b&&inP7(r,c))}));const bkTop=[...bk].sort((a,b)=>b.l7-a.l7)[0];
+  const ag=agentTable(c,F,25);const top10=ag.slice(0,10).reduce((a,x)=>a+x.ao,0);
+  const w0=weeks[0],w1=weeks[1],m0=months[0],m1=months[1];const na7=count(l7,r=>r.rca==="No Audio"),naP7=count(p7,r=>r.rca==="No Audio");
+  const lag7=avg(l7.map(r=>r.lag)),lagAll=avg(F.map(r=>r.lag));
+  const items=[];
+  if(d0.total!=null)items.push(["Day over day",d0.dAO>0?"bad":d0.dAO<0?"good":"",`Latest scrub day ${d0.label}: ${nf(d0.total)} scrubs (${sg(d0.dVol)} vs previous scrub day). Agent Opp ${pct(d0.aoP)} (${sg(d0.dAO,1)} pts), Comcast ${pct(d0.comP)}, No Audio ${pct(d0.naP)}.`]);
+  if(w0&&w0.total)items.push(["Week over week",w0.dAO>0?"bad":w0.dAO<0?"good":"",`${w0.label}: ${nf(w0.total)} scrubs, Agent Opp ${pct(w0.aoP)} vs ${pct(w1&&w1.aoP)} the week before (${sg(w0.dAO,1)} pts). The latest week may be partial.`]);
+  if(m0&&m0.total)items.push(["Month over month",m0.dAO>0?"bad":m0.dAO<0?"good":"",`${m0.label} so far: Agent Opp ${pct(m0.aoP)} vs ${pct(m1&&m1.aoP)} in ${m1?m1.label:"the prior month"} (${sg(m0.dAO,1)} pts) on ${nf(m0.total)} scrubs.`]);
+  if(top3.length&&top3[0].n)items.push(["Top driver","warn",`#1 Agent Opp driver: ${top3[0].t} = ${pct(share(top3[0].n,aoRows.length))} of Agent Opp. Top 3 (${top3.map(x=>x.t).join(", ")}) = ${pct(share(top3.reduce((a,x)=>a+x.n,0),aoRows.length))}.`]);
+  if(rise)items.push(["Moving drivers",rise.l7-rise.p7>0?"bad":"good",rise.l7-rise.p7>0?`Fastest-rising: ${rise.t} (${rise.l7} in last 7 days vs ${rise.p7} prior 7).`+(fall.l7-fall.p7<0?` Biggest drop: ${fall.t} (${sg(fall.l7-fall.p7)}).`:" No driver fell."):"No Agent Opp driver is rising: every driver is flat or down vs the prior 7 days."]);
+  if(bkTop)items.push(["KPI link",bkTop.l7>bkTop.p7?"bad":"",`Last 7 days Agent Opp by KPI: ${bk.map(x=>x.b+" "+x.l7).join(" · ")}. Largest: ${bkTop.b}${bkTop.l7>bkTop.p7?` (up from ${bkTop.p7})`:""}.`]);
+  if(named.length>1&&S.leader==="All"){const hi=[...named].sort((a,b)=>b.aoP-a.aoP)[0],lo=[...named].sort((a,b)=>a.aoP-b.aoP)[0];const most=[...lt].sort((a,b)=>b.l7-a.l7)[0];
+    items.push(["Leaders","",`Team Agent Opp % ranges from ${pct(lo.aoP)} (${lo.leader}) to ${pct(hi.aoP)} (${hi.leader}); floor ${pct(aoP)}. Most Agent Opp in the last 7 days: ${most.leader} (${most.l7}, ${sg(most.d7)} vs prior 7). ${count(lt,x=>x.flag==="Calibrate")} leader(s) flagged for calibration.`]);}
+  if(S.leader!=="All"){const me=lt.find(x=>x.leader===S.leader);const fl=share(rcaCounts(c.D)[AO],c.D.length);if(me)items.push(["This team",me.gap>0?"bad":"good",`${S.leader}: ${nf(me.agents)} agents, ${nf(me.total)} scrubs, Agent Opp ${pct(me.aoP)} vs floor ${pct(fl)} (${sg(me.gap,1)} pts). Top driver ${me.top}. Calibration: ${me.flag}.`]);}
+  if(ag.length)items.push(["Repeat agents",ag[0].status[1]==="crit"?"bad":"warn",`Top repeat agent: ${ag[0].bpid} (${ag[0].ao} Agent Opp, ${ag[0].l30} in last 30 days, mainly ${ag[0].top}; leader ${ag[0].leader}). Top 10 agents = ${pct(share(top10,aoRows.length))} of Agent Opp. ${count(ag,a=>a.status[1]==="crit")} chronic, ${count(ag,a=>a.status[0].startsWith("Active"))} active.`]);
+  items.push(["Data quality",issP>0.1?"bad":"good",`${nf(count(F,r=>r.dup))} rows share a Survey ID, ${nf(count(F,r=>r.conflict))} have conflicting RCAs, ${nf(count(F,r=>r.issues.includes("Invalid BPID")))} invalid BPIDs, ${nf(count(F,r=>r.issues.includes("Missing T2")))} missing T2, ${nf(count(F,r=>r.sdate==null))} blank survey dates. Issue rate ${pct(issP,1)}.`]);
+  items.push(["No Audio & lag",na7>naP7?"bad":"",`No Audio ${pct(share(k["No Audio"],k.total),1)} of scrubs (${na7} in last 7 days vs ${naP7} prior 7). Survey→scrub lag ${lag7==null?"—":lag7.toFixed(1)} days in the last 7 days vs ${lagAll==null?"—":lagAll.toFixed(1)} overall.`]);
+  const ins=h("ul",{class:"ins"},items.map(([k2,st,t])=>h("li",null,h("div",{class:"k"},h("span",{class:"dot "+st}),k2),h("p",{text:t}))));
+  // charts
+  const dAsc=[...days].slice(0,30).reverse();const wAsc=[...weeks].reverse();
+  const volChart=chart(240,box=>colChart(box,{cats:dAsc.map(d=>fd(d.key,"dm")),stacks:RCAS.map(r=>({name:RCA_SHORT[r],color:RCA_COLOR[r],values:dAsc.map(d=>d.rc[r])}))}));
+  const aoChart=chart(220,box=>lineChart(box,{cats:wAsc.map(w=>fd(w.key,"dm")),lines:[{name:"Agent Opp %",color:"var(--s1)",values:wAsc.map(w=>w.aoP)}],ref:aoP}));
+  const bkTable=table([{t:"KPI bucket",f:r=>r.b},{t:"All in period",n:1,f:r=>nf(count(F,x=>x.bucket===r.b))},{t:"Last 7 days",n:1,f:r=>nf(r.l7)},{t:"Prior 7 days",n:1,f:r=>nf(r.p7)},{t:"Change",n:1,f:r=>delta(r.l7-r.p7)},{t:"Share (7d)",n:1,f:r=>pct(share(r.l7,bk.reduce((a,x)=>a+x.l7,0)))}],bk);
+  return[tiles,card("What the data says","Written from the current filters; rewrites itself when you change a filter or upload a new file.",ins),
+    h("div",{class:"grid2"},card("Daily scrubs by RCA","Last 30 scrub days in the period",legend(RCAS.map(r=>[RCA_COLOR[r],RCA_SHORT[r]])),volChart),
+      card("Agent Opp % by week","Dashed line = average for the period",aoChart)),
+    card("Agent Opp by KPI bucket","Maps each Agent Opp reason to your floor KPIs",bkTable)];
+}
+function tile(lbl,val,deltaKids,cls){return h("div",{class:"tile"+(cls?" "+cls:"")},h("span",{class:"lbl",text:lbl}),h("span",{class:"val num",text:val}),h("span",{class:"delta"},deltaKids));}
+function vLeaders(c){
+  const lt=leaderTable(c);const fl=rcaCounts(c.D);const flAO=share(fl[AO],fl.total);
+  const bars=chart(0,box=>hbar(box,{items:lt.map(x=>({label:x.leader,value:x.aoP||0,color:x.leader===S.leader?"var(--s2)":"var(--s1)",tipLabel:"Agent Opp %",extra:[[null,"Scrubs",nf(x.total)],[null,"Agents",nf(x.agents)]],onclick:()=>setLeader(x.leader)})),fmt:v=>pct(v),ref:flAO,refLabel:"Floor",max:1}));
+  const tbl=table([
+    {t:"Team leader",f:r=>r.leader},{t:"Agents",n:1,f:r=>nf(r.agents)},{t:"Scrubs",n:1,f:r=>nf(r.total)},{t:"Per agent",n:1,f:r=>r.perAgent==null?"—":r.perAgent.toFixed(1)},
+    {t:"Agent Opp %",n:1,f:r=>pct(r.aoP)},{t:"Gap vs floor",n:1,f:r=>delta(r.gap,{d:1,unit:" pts"})},{t:"AO last 7d",n:1,f:r=>nf(r.l7)},{t:"Prior 7d",n:1,f:r=>nf(r.p7)},{t:"Δ 7d",n:1,f:r=>delta(r.d7)},
+    {t:"Comcast %",n:1,f:r=>pct(r.comcastP)},...BUCKETS.map(b=>({t:b,n:1,f:r=>nf(r.b[b])})),{t:"Top driver",f:r=>r.top},
+    {t:"Calibration",f:r=>chip([r.flag,r.flag==="Calibrate"?"crit":r.flag==="Watch"?"warn":r.flag==="Aligned"?"good":"muted"])}],lt,
+    {onRow:r=>setLeader(r.leader),total:{leader:"Floor",total:nf(fl.total),aoP:pct(flAO)}});
+  return[card("Agent Opp % by team leader","Each leader scrubs their own team. Click a bar or row to filter the whole page to that leader. Follows the period filter; ignores the leader filter.",bars),
+    card("Leader scorecard","Gap = team Agent Opp % minus floor. Calibrate > 15 pts, Watch > 8 pts (minimum 20 scrubs). A big gap can be real team performance or tagging bias, so cross-calibrate.",tbl)];
+}
+function vTrends(c){
+  const seg=h("div",{class:"seg",role:"group","aria-label":"Granularity"},[["day","Daily"],["week","Weekly"],["month","Monthly"]].map(([k,l])=>h("button",{type:"button","aria-pressed":String(S.trend===k),onclick:()=>{S.trend=k;render();}},l)));
+  const rows=series(c,c.F,S.trend);const asc=[...rows].reverse().slice(-(S.trend==="day"?30:rows.length));
+  const vol=chart(0,box=>colChart(box,{cats:asc.map(r=>S.trend==="month"?r.label:fd(r.key,"dm")),stacks:RCAS.map(x=>({name:RCA_SHORT[x],color:RCA_COLOR[x],values:asc.map(r=>r.rc[x])}))}));
+  const lines=chart(0,box=>lineChart(box,{cats:asc.map(r=>S.trend==="month"?r.label:fd(r.key,"dm")),lines:[{name:"Agent Opp %",color:"var(--s1)",values:asc.map(r=>r.aoP)},{name:"Comcast %",color:"var(--s2)",values:asc.map(r=>r.comP)},{name:"No Audio %",color:"var(--s4)",values:asc.map(r=>r.naP)}]}));
+  const cols=[{t:S.trend==="day"?"Scrub date":S.trend==="week"?"Week":"Month",f:r=>r.label},{t:"Total",n:1,f:r=>nf(r.total)},...RCAS.map(x=>({t:RCA_SHORT[x],n:1,f:r=>nf(r.rc[x])})),
+    {t:"Agent Opp %",n:1,f:r=>pct(r.aoP,1),style:r=>r.aoP==null?"":"background:"+heat(r.aoP,0.4,0.9)},{t:"Comcast %",n:1,f:r=>pct(r.comP)},{t:"Δ volume",n:1,f:r=>delta(r.dVol,{bad:"none"})},{t:"Δ AO pts",n:1,f:r=>delta(r.dAO,{d:1})}];
+  if(S.trend==="day")cols.push({t:"7-day avg",n:1,f:r=>r.avg7==null?"—":r.avg7.toFixed(1)});
+  cols.push({t:"Avg lag (days)",n:1,f:r=>r.lag==null?"—":r.lag.toFixed(1)},{t:"Issue rows",n:1,f:r=>pct(r.issP)});
+  // heatmap of agent drivers by week
+  const w0=weekStart(c.asOf);const wks=Array.from({length:8},(_,i)=>w0-7*(7-i));const ao=c.F.filter(r=>r.rca===AO);
+  const hm=AGT.map(t=>({t,b:BUCKET_OF[t],v:wks.map(w=>count(ao,r=>r.t2===t&&weekStart(r.scrub)===w))})).filter(x=>x.v.some(v=>v));const hmax=Math.max(1,...hm.flatMap(x=>x.v));
+  const htbl=h("div",{class:"tw heat"},h("table",null,h("thead",null,h("tr",null,h("th",{text:"Agent Opp driver"}),h("th",{text:"KPI"}),wks.map((w,i)=>h("th",{class:"n",text:i===7?"This wk":fd(w,"dm")})),h("th",{class:"n",text:"Δ vs last wk"}))),
+    h("tbody",null,hm.map(x=>h("tr",null,h("td",{text:x.t}),h("td",{text:x.b}),x.v.map(v=>{const lv=v?Math.min(5,1+Math.floor(4*v/hmax)):0;return h("td",{class:"h",style:`background:var(--seq-${lv});color:${lv>=3?"#fff":"var(--ink)"}`,text:v||""});}),
+      h("td",{class:"n"},delta(x.v[7]-x.v[6])))))));
+  return[card("Volume and mix over time",null,h("div",{class:"row"},legend(RCAS.map(r=>[RCA_COLOR[r],RCA_SHORT[r]])),seg),vol),
+    card("Rates over time","Share of scrubs in each period",legend([["var(--s1)","Agent Opp %",1],["var(--s2)","Comcast %",1],["var(--s4)","No Audio %",1]]),lines),
+    card(S.trend==="day"?"Day over day":S.trend==="week"?"Week over week":"Month over month","Newest first. Δ compares with the previous row.",table(cols,rows)),
+    card("Agent Opp drivers by week","Darker = more detractors. Last 8 weeks, oldest to newest.",hm.length?htbl:h("div",{class:"empty",text:"No Agent Opp in the last 8 weeks for this filter."}))];
+}
+function heat(v,lo,hi){const t=Math.max(0,Math.min(1,(v-lo)/(hi-lo)));return`color-mix(in srgb, var(--crit) ${Math.round(t*28)}%, transparent)`;}
+function vDrivers(c){
+  const F=c.F,tot=F.length;
+  const t1=table([{t:"RCA",f:r=>h("span",{class:"bar-in"},h("i",{style:`width:${Math.round(60*share(r.n,tot))}px;background:${RCA_COLOR[r.r]}`}),r.r)},{t:"Count",n:1,f:r=>nf(r.n)},{t:"% of total",n:1,f:r=>pct(share(r.n,tot),1)},
+    {t:"Last 7 days",n:1,f:r=>nf(r.l7)},{t:"Prior 7 days",n:1,f:r=>nf(r.p7)},{t:"Change",n:1,f:r=>delta(r.l7-r.p7,{bad:r.r==="Customer"?"none":"up"})}],
+    RCAS.map(r=>({r,n:count(F,x=>x.rca===r),l7:count(F,x=>x.rca===r&&inL7(x,c)),p7:count(F,x=>x.rca===r&&inP7(x,c))})));
+  const ao=F.filter(r=>r.rca===AO);const pareto=AGT.map(t=>({t,n:count(ao,r=>r.t2===t)})).filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  const pc=chart(0,box=>hbar(box,{items:pareto.slice(0,10).map(x=>({label:x.t,value:x.n,tipLabel:"Agent Opp",extra:[[null,"Share",pct(share(x.n,ao.length))],[null,"KPI",BUCKET_OF[x.t]]]}))}));
+  const t2tab=(cat,labels)=>{const g=F.filter(r=>r.rca===cat);const known=new Set(labels);const list=[...labels,...[...new Set(g.map(r=>r.t2||"(blank)"))].filter(x=>!known.has(x))];
+    const rows=list.map(t=>({t,n:count(g,r=>(r.t2||"(blank)")===t),l7:count(g,r=>(r.t2||"(blank)")===t&&inL7(r,c)),p7:count(g,r=>(r.t2||"(blank)")===t&&inP7(r,c))})).filter(x=>x.n||x.l7||x.p7).sort((a,b)=>b.n-a.n);
+    if(!rows.length)return h("div",{class:"empty",text:"None in this filter."});let cum=0;
+    return table([{t:"Driver",f:r=>r.t},{t:"Count",n:1,f:r=>nf(r.n)},{t:"Share",n:1,f:r=>pct(share(r.n,g.length),1)},{t:"Cumulative",n:1,f:r=>{cum+=r.n;return pct(share(cum,g.length));}},
+      ...(cat===AO?[{t:"KPI bucket",f:r=>BUCKET_OF[r.t]||""}]:[]),{t:"Last 7d",n:1,f:r=>nf(r.l7)},{t:"Prior 7d",n:1,f:r=>nf(r.p7)},{t:"Change",n:1,f:r=>delta(r.l7-r.p7,{bad:cat==="Customer"?"none":"up"})}],rows);};
+  return[card("Tier 1 RCA","Last 7 days vs prior 7 days, counted back from the latest scrub date",t1),
+    h("div",{class:"grid2"},card("Agent Opp — top 10 drivers","What to coach first",pc),card("Agent Opp drivers","Tier 2 reasons with their KPI bucket",t2tab(AO,AGT))),
+    h("div",{class:"grid2"},card("Comcast drivers","Non-controllable; share with the client as voice of the customer",t2tab("Comcast Process/Tools",["Complaints about the technician","Dissatisfied with service","Outage","Comcast Restriction","IVR / Routing","Comcast Tools Outage/Update"])),
+      card("Customer and VXI drivers",null,t2tab("Customer",["Another Agent's Opportunity","Customer Provided Positive Feedback","Customer Demanded a US Rep","Customer Preferred Previous Agent"]),h("div",{style:"height:12px"}),t2tab("VXI Process/Tools",["Avaya issue","ONE CTI down","Headset Issue","Global Protect / Connectivity"])))];
+}
+function vAgents(c){
+  const ag=agentTable(c,c.F,25);const aoTot=count(c.F,r=>r.rca===AO);
+  if(!ag.length)return[card("Repeat agents",null,h("div",{class:"empty",text:"No Agent Opp in this filter."}))];
+  const tbl=table([{t:"#",n:1,f:r=>ag.indexOf(r)+1},{t:"BPID",f:r=>r.bpid},{t:"Team leader",f:r=>r.leader},{t:"Agent Opp",n:1,f:r=>h("span",{class:"bar-in",style:"justify-content:flex-end"},nf(r.ao),h("i",{style:`width:${Math.round(50*r.ao/ag[0].ao)}px`}))},
+    {t:"Scrubs",n:1,f:r=>nf(r.total)},{t:"AO %",n:1,f:r=>pct(r.aoP)},{t:"AO 7d",n:1,f:r=>nf(r.l7)},{t:"AO 30d",n:1,f:r=>nf(r.l30)},{t:"Last scrub",f:r=>fd(r.last)},
+    {t:"Top driver",f:r=>r.top},{t:"KPI",f:r=>r.bucket},{t:"Status",f:r=>chip(r.status)}],ag,{onRow:r=>{S.drillAgent=r.bpid;S.drillLeader="All";S.tab="drill";render();}});
+  return[card("Repeat detractor agents — top 25",`Top 10 = ${pct(share(ag.slice(0,10).reduce((a,x)=>a+x.ao,0),aoTot))} of all Agent Opp. Chronic = 3+ Agent Opp in 30 days · Active = 1+ in 7 days. Click a row to open the agent.`,tbl)];
+}
+function vDrill(c){
+  if(S.drillLeader==null)S.drillLeader=S.leader;
+  const leaders=["All",...leaderTable(c).map(x=>x.leader)];if(!leaders.includes(S.drillLeader))S.drillLeader="All";
+  const pool=S.drillLeader==="All"?c.D:c.D.filter(r=>r.leader===S.drillLeader);const list=agentTable(c,pool,0);
+  if(!S.drillAgent||!list.some(a=>a.bpid===S.drillAgent))S.drillAgent=list[0]?list[0].bpid:null;
+  const ls=h("select",{id:"dLeader"},leaders.map(l=>h("option",{value:l,selected:l===S.drillLeader?true:null},l==="All"?"All leaders":l)));ls.addEventListener("change",()=>{S.drillLeader=ls.value;S.drillAgent=null;render();});
+  const as=h("select",{id:"dAgent"},list.map(a=>h("option",{value:a.bpid,selected:a.bpid===S.drillAgent?true:null},`${a.bpid} — ${a.ao} AO / ${a.total}`)));as.addEventListener("change",()=>{S.drillAgent=as.value;render();});
+  const controls=h("div",{class:"frow"},h("div",{class:"field lead"},h("label",{for:"dLeader",text:"Team leader"}),ls),h("div",{class:"field lead"},h("label",{for:"dAgent",text:`Agent (${list.length}, most Agent Opp first)`}),as));
+  if(!S.drillAgent)return[card("Agent drill-down",null,controls,h("div",{class:"empty",text:"No agents in this filter."}))];
+  const g=pool.filter(r=>r.bpid===S.drillAgent).sort((a,b)=>b.scrub-a.scrub);const ao=g.filter(r=>r.rca===AO);const team=rcaCounts(pool);
+  const leadNow=(c.D.filter(r=>r.bpid===S.drillAgent).sort((a,b)=>b.scrub-a.scrub)[0]||{}).leader||"—";
+  const mini=h("div",{class:"kpi-mini"},
+    mk("Scrubs",nf(g.length),"Team "+nf(team.total)),mk("Agent Opp %",pct(share(ao.length,g.length)),(S.drillLeader==="All"?"Floor ":"Team ")+pct(share(team[AO],team.total))),
+    mk("Agent Opp",nf(ao.length),nf(count(ao,r=>inL7(r,c)))+" in 7d · "+nf(count(ao,r=>r.scrub>=c.l30))+" in 30d"),
+    mk("First / last scrub",fd(Math.min(...g.map(r=>r.scrub)),"dm")+" → "+fd(Math.max(...g.map(r=>r.scrub)),"dm"),"Leader: "+leadNow));
+  const drv=AGT.map(t=>({t,n:count(ao,r=>r.t2===t)})).filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  const dc=chart(0,box=>drv.length?hbar(box,{items:drv.map(x=>({label:x.t,value:x.n,tipLabel:"Agent Opp",extra:[[null,"KPI",BUCKET_OF[x.t]]]}))}):box.replaceChildren(h("div",{class:"empty",text:"No Agent Opp for this agent."})));
+  const w0=weekStart(c.asOf);const wks=Array.from({length:12},(_,i)=>w0-7*(11-i));
+  const wc=chart(0,box=>colChart(box,{cats:wks.map(w=>fd(w,"dm")),height:200,stacks:[{name:"Agent Opp",color:"var(--s1)",values:wks.map(w=>count(ao,r=>weekStart(r.scrub)===w))},{name:"Other RCA",color:"var(--s3)",values:wks.map(w=>count(g,r=>r.rca!==AO&&weekStart(r.scrub)===w))}]}));
+  const tbl=table([{t:"Scrub",f:r=>fd(r.scrub)},{t:"Survey",f:r=>fd(r.sdate)},{t:"Survey ID",f:r=>r.survey},{t:"RCA",f:r=>RCA_SHORT[r.rca]||r.rca},{t:"T2",f:r=>r.t2},{t:"Comment",cls:"comment",f:r=>r.comment},{t:"Leader",f:r=>r.leader},
+    {t:"Issues",f:r=>h("span",null,r.issues.map(i=>h("span",{class:"tag",text:i})))}],g.slice(0,25));
+  return[card("Agent drill-down","Pick a leader, then an agent. Follows the period filter; uses its own leader box.",controls),
+    card(S.drillAgent,null,mini),h("div",{class:"grid2"},card("Agent Opp drivers",null,dc),card("Weekly scrubs — last 12 weeks",null,legend([["var(--s1)","Agent Opp"],["var(--s3)","Other RCA"]]),wc)),
+    card("Latest 25 scrubs","Newest first — use the comments as evidence in the 1:1",tbl)];
+}
+function mk(l,v,cpt){return h("div",null,h("div",{class:"l",text:l}),h("div",{class:"v num",text:v}),h("div",{class:"c",text:cpt}));}
+function vQuality(c){
+  const F=c.F;const kinds=["Dup survey","Conflicting RCA","Invalid BPID","Missing T2","No comment","Blank survey date","Survey date after scrub"];
+  const tiles=h("div",{class:"tiles"},kinds.map(k=>{const n=count(F,r=>r.issues.includes(k));return tile(k,nf(n),[pct(share(n,F.length),1)+" of rows"],n?"flag":null);}));
+  const lt=leaderTable(c).filter(x=>S.leader==="All"||x.leader===S.leader);
+  const t=table([{t:"Team leader",f:r=>r.leader},{t:"Scrubs",n:1,f:r=>nf(r.total)},{t:"Dup",n:1,f:r=>nf(r.dup)},{t:"Conflict",n:1,f:r=>nf(r.conflict)},{t:"Bad BPID",n:1,f:r=>nf(r.bad)},
+    {t:"Missing T2",n:1,f:r=>nf(r.missT2)},{t:"No comment",n:1,f:r=>nf(r.noCom)},{t:"Blank survey date",n:1,f:r=>nf(r.blankSd)},{t:"Future survey date",n:1,f:r=>nf(r.futSd)},
+    {t:"Issue rate",n:1,f:r=>pct(r.issueP),style:r=>r.issueP>0.1?"color:var(--crit-ink);font-weight:700":""},{t:"Avg lag (days)",n:1,f:r=>r.lag==null?"—":r.lag.toFixed(1)}],lt,{onRow:r=>setLeader(r.leader)});
+  const fl=F.filter(r=>r.issues.length).sort((a,b)=>b.scrub-a.scrub);
+  const ft=table([{t:"Scrub",f:r=>fd(r.scrub)},{t:"Leader",f:r=>r.leader},{t:"Raw ID",f:r=>r.id},{t:"BPID",f:r=>r.bpid},{t:"Survey ID",f:r=>r.survey},{t:"RCA",f:r=>RCA_SHORT[r.rca]||r.rca},{t:"T2",f:r=>r.t2},
+    {t:"Issues",f:r=>h("span",null,r.issues.map(i=>h("span",{class:"tag",text:i})))}],fl.slice(0,300));
+  return[tiles,card("Data hygiene by leader","Click a row to filter to that leader",t),card("Flagged rows",`${nf(fl.length)} rows need a look${fl.length>300?" (showing the newest 300)":""}. Judgement errors (for example a Comcast tag where the agent gave wrong information) still need a manual listen.`,fl.length?ft:h("div",{class:"empty",text:"No flagged rows."}))];
+}
+
+/* ---------- render ---------- */
+const VIEWS={overview:vOverview,leaders:vLeaders,trends:vTrends,drivers:vDrivers,agents:vAgents,drill:vDrill,quality:vQuality};
+function render(){
+  $("#fileChip").textContent=SOURCE==="sample"?"Sample data":FILE;
+  const ls=leaderTable({D:ROWS,all:ROWS,l7:0,p7:0,asOf:0});const sel=$("#fLeader");sel.replaceChildren(h("option",{value:"All"},"All leaders"),...ls.map(l=>h("option",{value:l.leader},l.leader+" ("+l.total+")")));
+  if(S.leader!=="All"&&!ls.some(l=>l.leader===S.leader))S.leader="All";sel.value=S.leader;
+  $("#fPeriod").value=S.period;$("#fBasis").value=S.basis;$("#customFrom").hidden=$("#customTo").hidden=S.period!=="Custom dates";
+  const c=ctx();
+  const bt=S.basis==="scrub"?"scrub date":"survey date";
+  $("#fsum").replaceChildren("Showing ",h("b",{text:nf(c.F.length)+" scrubs"})," · ",h("b",{text:S.leader==="All"?"all leaders":S.leader})," · ",
+    h("b",{text:c.ranged?`${bt} ${c.from==null?"start":fd(c.from)} → ${c.to==null?"end":fd(c.to)}`:"all dates"}),` · latest scrub ${fd(c.asOf)}`);
+  const banner=SOURCE==="sample"?h("div",{class:"banner sample"},"You are looking at made-up sample data (Sample Leader A–E). Upload your NPS Scrubbing export to see your floor."):null;
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.tab===S.tab)));
+  try{localStorage.setItem("nps-tab",S.tab);}catch(e){}
+  charts.length=0;const v=$("#views");v.replaceChildren(h("div",{class:"view"},banner,c.F.length?VIEWS[S.tab](c):[card("No scrubs match these filters",null,h("div",{class:"empty",text:"Widen the period or pick another leader."}))]));
+  requestAnimationFrame(()=>charts.forEach(f=>f()));
+}
+let rt;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>charts.forEach(f=>f()),150);});
+
+/* ---------- wiring ---------- */
+$("#fileInput").addEventListener("change",e=>{const f=e.target.files[0];if(f)loadFile(f);e.target.value="";});
+$("#uploadBtn").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#fileInput").click();}});
+$("#sampleBtn").addEventListener("click",()=>{ROWS=buildRows(sample());SOURCE="sample";FILE="Sample data";S.leader="All";S.drillAgent=null;S.drillLeader=null;showMsg();render();});
+const drop=$("#drop");["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)loadFile(f);});
+document.addEventListener("dragover",e=>e.preventDefault());document.addEventListener("drop",e=>{e.preventDefault();const f=e.dataTransfer&&e.dataTransfer.files[0];if(f)loadFile(f);});
+$("#fLeader").addEventListener("change",e=>{S.leader=e.target.value;S.drillLeader=null;render();});
+$("#fPeriod").addEventListener("change",e=>{S.period=e.target.value;render();});
+$("#fBasis").addEventListener("change",e=>{S.basis=e.target.value;render();});
+const dIn=v=>v?Date.UTC(+v.slice(0,4),+v.slice(5,7)-1,+v.slice(8,10))/864e5:null;
+$("#fFrom").addEventListener("change",e=>{S.from=dIn(e.target.value);render();});$("#fTo").addEventListener("change",e=>{S.to=dIn(e.target.value);render();});
+$("#resetBtn").addEventListener("click",()=>{Object.assign(S,{leader:"All",period:"All time",basis:"survey",from:null,to:null,drillLeader:null});$("#fFrom").value="";$("#fTo").value="";render();});
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{S.tab=t.dataset.tab;render();}));
+if(!VIEWS[S.tab])S.tab="overview";
+ROWS=buildRows(sample());render();
+if(typeof XLSX==="undefined"){const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";document.head.append(sc);}
+})();
+</script>
+</body></html>
