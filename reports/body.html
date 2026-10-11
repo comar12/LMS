@@ -13,7 +13,7 @@
 
   <section class="panel hero">
     <div class="hero-top">
-      <div><span class="eyebrow">VXI | TSX · Cairo Repair · Sales performance</span><h1>Sales Performance</h1><p id="heroSub">Units sold per business day (15:00 Cairo → 07:00 next morning) · attributed to ops managers, team leaders and agents through the roster</p></div>
+      <div><span class="eyebrow">VXI | TSX · Cairo Repair · Sales performance</span><h1>Sales Performance</h1><p id="heroSub">XM lines and GSR units per business day (15:00 Cairo → 07:00 next morning) · attributed to ops managers, team leaders and agents through the roster</p></div>
       <div class="hero-period"><span class="period-label">Summary period</span><div class="segmented" id="presets"></div><span class="period-label" id="periodLabel"></span></div>
     </div>
     <div class="daystrip">
@@ -45,17 +45,22 @@
   <section class="view" id="v-exec">
     <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Executive summary</span><h2 id="execTitle">What a VP needs to know</h2><p id="execSub"></p></div><span class="count-chip" id="attnCount">0 items</span></div><div class="callouts" id="execSummary"></div></div>
     <div class="kpis" id="kpis"></div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Day-over-day replay</span><h2>Watch the period unfold, product by product</h2><p>Press play to step through every business day in the selected period · XM lines and each GSR type · thin marker = the previous day · chip = change vs the previous day</p></div></div><div id="replayX"></div></div>
     <div class="chart-grid">
-      <div class="panel"><div class="panel-head"><div><h2>Daily units vs target</h2><p>Selected period · current filters · dashed line = target for this scope · rings green at/above target</p></div><button class="text-button" data-tv="c1">Table view</button></div><div class="panel-body"><div class="headline" id="dailyHead"></div><figure id="c1"></figure><div class="legend"><span><i class="k"></i>Daily units</span><span><i class="k" style="border-color:var(--s2)"></i>7-day average</span><span><i class="k dash"></i>Target</span><span><i class="k vol"></i>Submissions</span></div></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Daily sales by product vs target</h2><p>Selected period · current filters · stacked = XM lines + each GSR type · dashed line = target for this scope</p></div><button class="text-button" data-tv="c1">Table view</button></div><div class="panel-body"><div class="headline" id="dailyHead"></div><figure id="c1"></figure><div class="legend" id="mixLegend1"></div></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Fiscal month pacing</h2><p id="cumSub">Cumulative units vs cumulative target · dotted = projection at the current 7-day pace</p></div><button class="text-button" data-tv="c2">Table view</button></div><div class="panel-body"><figure id="c2"></figure><div class="legend"><span><i class="k"></i>Actual</span><span><i class="k dash"></i>Target</span><span><i class="k" style="border-color:var(--muted);border-top-style:dotted"></i>Projection</span></div><div class="chart-foot" id="cumFoot"></div></div></div>
     </div>
     <div class="grid-two">
       <div class="panel"><div class="panel-head"><div><h2>Operations managers vs target</h2><p>Units per agent per business day · bar = actual, tick = target</p></div><button class="text-button" data-tv="c3">Table view</button></div><div class="panel-body"><figure id="c3"></figure></div></div>
       <div class="panel"><div class="panel-head"><div><h2>What drove the change</h2><p id="wfSub">Change in units vs the prior period, by team</p></div><button class="text-button" data-tv="c4">Table view</button></div><div class="panel-body"><figure id="c4"></figure></div></div>
     </div>
-    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><h2>Every business day at a glance</h2><p>Units per day over the whole tracker history · current filters</p></div><button class="text-button" data-tv="c5">Table view</button></div><div class="panel-body"><figure id="c5"></figure></div></div>
     <div class="grid-two">
-      <div class="panel"><div class="panel-head"><div><h2>Weekly mix</h2><p>Units per week by product · last 8 weeks</p></div><button class="text-button" data-tv="c6">Table view</button></div><div class="panel-body"><figure id="c6"></figure><div class="legend" id="mixLegend"></div></div></div>
+      <div class="panel"><div class="panel-head"><div><span class="eyebrow">XM lines</span><h2>What kind of XM lines</h2><p>Selected period · SIM type, promotion and device on every XM-line entry · XMC added and e-SIM activation</p></div></div><div class="panel-body" id="xmMix"></div></div>
+      <div class="panel"><div class="panel-head"><div><span class="eyebrow">GSR</span><h2>What kind of GSR</h2><p>Selected period · Speed Upgrade, X-PRO, Adding LOB, Mobile Plus Plan and XMC · change vs the prior period</p></div></div><div class="panel-body" id="gsrMix"></div></div>
+    </div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><h2>Every business day at a glance</h2><p>Sales (XM + GSR) per day over the whole tracker history · current filters</p></div><button class="text-button" data-tv="c5">Table view</button></div><div class="panel-body"><figure id="c5"></figure></div></div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Weekly mix</h2><p>Sales per week by product · last 8 weeks</p></div><button class="text-button" data-tv="c6">Table view</button></div><div class="panel-body"><figure id="c6"></figure><div class="legend" id="mixLegend"></div></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Attach &amp; activation</h2><p>XMC attach % and e-SIM activation % on answered XM-line entries</p></div><button class="text-button" data-tv="c7">Table view</button></div><div class="panel-body"><figure id="c7"></figure><div class="legend"><span><i class="k"></i>XMC attach %</span><span><i class="k" style="border-color:var(--s2)"></i>E-SIM activation %</span><span><i class="k dash"></i>XMC target (if set)</span></div></div></div>
     </div>
     <div class="panel"><div class="panel-head"><div><h2>Attention</h2><p id="attnSub"></p></div></div><ul class="attn" id="attn"></ul></div>
@@ -81,9 +86,10 @@
   <!-- ================= TEAM LEADERS -->
   <section class="view" id="v-leader">
     <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Team leader view</span><h2 id="leaderName">Team</h2><p id="leaderInfo"></p></div><div style="display:flex;gap:8px;align-items:center"><div class="picker" id="pk-leader" style="min-width:240px"></div></div></div>
-      <div class="panel-body"><div class="headline four" id="leaderHead"></div><div class="grid-two" style="margin-bottom:0"><div><figure id="c13"></figure><div class="legend"><span><i class="k"></i>Team units</span><span><i class="k" style="border-color:var(--s2)"></i>7-day average</span><span><i class="k dash"></i>Team target</span></div></div><div><figure id="c14"></figure><div class="legend"><span><i class="k" style="border-color:var(--s3)"></i>Participation % (agents who sold ÷ HC)</span></div></div></div></div></div>
+      <div class="panel-body"><div class="headline four" id="leaderHead"></div><div class="grid-two" style="margin-bottom:0"><div><figure id="c13"></figure><div class="legend" id="mixLegendL"></div></div><div><figure id="c14"></figure><div class="legend"><span><i class="k" style="border-color:var(--s3)"></i>Participation % (agents who sold ÷ HC)</span></div></div></div></div></div>
     <div class="grid-two">
-      <div class="panel"><div class="panel-head"><div><h2>Agents vs target</h2><p>Units per business day per agent · tick = target</p></div><button class="text-button" data-tv="c15">Table view</button></div><div class="panel-body"><figure id="c15"></figure></div></div>
+      <div class="panel" style="grid-column:1 / -1"><div class="panel-head"><div><span class="eyebrow">Day-over-day replay</span><h2>This team, day by day</h2><p>Press play to step through the period · XM lines and each GSR type for the selected team</p></div></div><div id="replayL"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Agents vs target</h2><p>Sales (XM + GSR) per business day per agent · tick = target</p></div><button class="text-button" data-tv="c15">Table view</button></div><div class="panel-body"><figure id="c15"></figure></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Coaching priorities</h2><p>Score blends gap to target, days since last sale and position vs team median · Production agents first, Training agents scaled down</p></div></div><div class="table-wrap" id="coachTable"></div></div>
     </div>
     <div class="grid-two">
@@ -97,7 +103,7 @@
   <section class="view" id="v-agents">
     <div class="grid-three" id="agentCards" style="grid-template-columns:repeat(4,1fr)"></div>
     <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Agent review</span><h2 id="agentName">Agent</h2><p id="agentInfo"></p></div><div style="display:flex;gap:8px;align-items:center"><input class="search" id="agentSel" list="agentList" placeholder="Type an agent name or HRID"><datalist id="agentList"></datalist><button class="text-button" data-tv="c18">Table view</button></div></div>
-      <div class="panel-body"><div class="headline four" id="agentHead"></div><div class="grid-two" style="margin-bottom:0"><div><figure id="c18"></figure><div class="legend"><span><i class="k"></i>Agent units</span><span><i class="k" style="border-color:var(--s2)"></i>Team average per agent</span><span><i class="k dash"></i>Target</span></div></div><div><figure id="c19"></figure><div class="chart-foot" id="agentMixFoot"></div></div></div></div></div>
+      <div class="panel-body"><div class="headline four" id="agentHead"></div><div class="grid-two" style="margin-bottom:0"><div><figure id="c18"></figure><div class="legend"><span><i class="k"></i>Agent sales (XM + GSR)</span><span><i class="k" style="border-color:var(--s2)"></i>Team average per agent</span><span><i class="k dash"></i>Target</span></div></div><div><figure id="c19"></figure><div class="chart-foot" id="agentMixFoot"></div></div></div></div></div>
     <div class="grid-two">
       <div class="panel"><div class="panel-head"><div><h2>Top 10 agents</h2><p>Selected period &amp; scope</p></div></div><div class="table-wrap" id="top10"></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Needs a closer look</h2><p>Production agents with the fewest units · coaching list</p></div></div><div class="table-wrap" id="bottom10"></div></div>

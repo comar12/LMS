@@ -231,7 +231,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const chip = (v, f=n0) => `<span class="score-chip ${dcls(v)}">${arrow(v)}${sgn(v,f)}</span>`;
 const pchip = v => v==null ? '<span class="score-chip neutral">—</span>' : chip(v, x=>(x*100).toFixed(1)+'%');
 function applyData(D){
-  rows = D.rows.map(a => ({d:a[0], hr:a[1], tl:a[2], om:a[3], xm:a[4], gsr:a[5], u:a[4]+a[5], xmc:a[6], esim:a[7], dev:a[8], promo:a[9], dup:a[10], inr:a[11], ov:a[12], ty:a[13], id:a[14], h:(a[15]==null?-1:a[15])}));
+  rows = D.rows.map(a => ({d:a[0], hr:a[1], tl:a[2], om:a[3], xm:a[4], gsr:a[5], u:a[4]+a[5], xmc:a[6], esim:a[7], dev:a[8], promo:a[9], dup:a[10], inr:a[11], ov:a[12], ty:a[13], id:a[14], h:(a[15]==null?-1:a[15]), sim:(a[16]||'')}));
   roster = D.roster.map(a => ({hr:a[0], name:a[1], tl:a[2], om:a[3], phase:a[4], tenure:a[5], wave:a[6]}));
   rosterBy = Object.fromEntries(roster.map(a => [a.hr, a]));
   for (const r of rows){ const a=rosterBy[r.hr]; r.phase = a? a.phase : '-'; r.tenure = a? a.tenure : '-'; }
@@ -243,8 +243,8 @@ function applyData(D){
 const state = { from:null, to:null, om:'All', tl:'All', phase:'All', tenure:'All', exdup:true, tab:'overview', leader:null, agent:null, preset:'7', perAgent:2, xmcTarget:null, targetProd:false };
 
 /* ---------------------------------------------------------------- compute */
-function daily(rs){ const n=DATES.length, z=()=>new Array(n).fill(0); const o={u:z(),xm:z(),gsr:z(),subs:z(),xy:z(),xn:z(),ey:z(),en:z(),act:z(),nr:z()}; const sets=DATES.map(()=>new Set());
-  for (const r of rs){ const i=DI[r.d]; if(i==null) continue; o.u[i]+=r.u; o.xm[i]+=r.xm; o.gsr[i]+=r.gsr; o.subs[i]++; if(r.xmc==='Y')o.xy[i]++; else if(r.xmc==='N')o.xn[i]++; if(r.esim==='Y')o.ey[i]++; else if(r.esim==='N')o.en[i]++; if(r.inr) sets[i].add(r.hr); else o.nr[i]++; }
+function daily(rs){ const n=DATES.length, z=()=>new Array(n).fill(0); const o={u:z(),xm:z(),gsr:z(),subs:z(),xy:z(),xn:z(),ey:z(),en:z(),act:z(),nr:z(),speed:z(),xpro:z(),lob:z(),mplus:z(),xmcG:z(),otherG:z(),esimL:z(),physL:z()}; const sets=DATES.map(()=>new Set());
+  for (const r of rs){ const i=DI[r.d]; if(i==null) continue; o.u[i]+=r.u; o.xm[i]+=r.xm; o.gsr[i]+=r.gsr; o.subs[i]++; if(r.xm){ if(r.sim==='E') o.esimL[i]+=r.xm; else if(r.sim==='P') o.physL[i]+=r.xm; } if(r.gsr){ const nt=r.ty.length; for(const t of (nt?r.ty:['Other'])){ const u=nt===1?r.gsr:1; if(t==='Speed Upgrade') o.speed[i]+=u; else if(t==='X-PRO') o.xpro[i]+=u; else if(t.startsWith('Adding LOB')) o.lob[i]+=u; else if(t.startsWith('Adding Mobile')) o.mplus[i]+=u; else if(t==='XMC') o.xmcG[i]+=u; else o.otherG[i]+=u; } } if(r.xmc==='Y')o.xy[i]++; else if(r.xmc==='N')o.xn[i]++; if(r.esim==='Y')o.ey[i]++; else if(r.esim==='N')o.en[i]++; if(r.inr) sets[i].add(r.hr); else o.nr[i]++; }
   o.act=sets.map(s=>s.size); o.avg7=o.u.map((_,i)=>{ const a=o.u.slice(Math.max(0,i-6),i+1); return a.reduce((x,y)=>x+y,0)/a.length; }); return o; }
 function sum(a,i0,i1){ let s=0; for(let i=i0;i<=i1;i++) s+=a[i]||0; return s; }
 const agg = rs => { const o={u:0,xm:0,gsr:0,subs:0,xy:0,xn:0,ey:0,en:0,set:new Set()}; for(const r of rs){o.u+=r.u;o.xm+=r.xm;o.gsr+=r.gsr;o.subs++; if(r.xmc==='Y')o.xy++; else if(r.xmc==='N')o.xn++; if(r.esim==='Y')o.ey++; else if(r.esim==='N')o.en++; if(r.inr)o.set.add(r.hr);} o.active=o.set.size; o.xmcRate=(o.xy+o.xn)?o.xy/(o.xy+o.xn):null; o.esRate=(o.ey+o.en)?o.ey/(o.ey+o.en):null; return o; };
@@ -271,7 +271,7 @@ function compute(){
     return {om:o, hc, teams, subs:c.subs, xm:c.xm, gsr:c.gsr, u:c.u, uph:hc?c.u/hc:0, active:c.active, part:hc?c.active/hc:0, prior:p.u, delta:c.u-p.u, dpct:p.u?(c.u-p.u)/p.u:null}; });
   const os=[...omsR].sort((a,b)=>b.u-a.u); omsR.forEach(l=>{ l.rank = l.u? os.filter(x=>x.u>l.u).length+1 : null; });
   const nrCur = agg((state.phase==='All'&&state.tenure==='All') ? base.filter(r=>!r.inr && per(r)) : []);
-  return {base, scoped, i0, i1, len, p0, p1, cur, prev, dy, agents, leaders, omsR, nrCur, hcScope, hcAll, hcTarget, target, byHr, byTl, perRows: scoped.filter(per)};
+  return {base, scoped, i0, i1, len, p0, p1, cur, prev, dy, agents, leaders, omsR, nrCur, hcScope, hcAll, hcTarget, target, byHr, byTl, perRows: scoped.filter(per), priorRows: scoped.filter(pri)};
 }
 
 /* ---------------------------------------------------------------- tooltip + charts */
@@ -498,7 +498,7 @@ function cleanTracker(sheet, rosterList){ const h=header(sheet); const need=['ID
     const tyRaw=String(r[h['Type of GSR']]??'').trim().replace(/^;+|;+$/g,''); const types=tyRaw? tyRaw.split(';').map(s=>s.trim()).filter(Boolean):[]; const cg=num(r[h['Count of GSR']]); const gsr = type==='GSRs' ? Math.trunc(cg==null? Math.max(types.length,1) : cg) : 0;
     const yn = v => { const s=String(v??'').trim(); return s==='Yes'?'Y':s==='No'?'N':''; }; const bd=new Date(ct.getTime()-12*3600000).toISOString().slice(0,10);
     const acct=isNA(r[h['Account Number:']])?'':String(r[h['Account Number:']]).trim(); const order=isNA(r[h['Order Number']])?'':String(r[h['Order Number']]).trim(); const ov=/^\d{6,20}$/.test(order)?1:0;
-    recs.push({ct:ct.getTime(), row:[bd, key, a?a[2]:'Not in Roster', a?a[3]:'Not in Roster', xm, gsr, yn(r[h['Did you add XMC?']]), yn(r[h['Did you Activate the E-SIM?']]), cleanDevice(r[h['Sold Device Type']]), cleanPromo(r[h['What was the promotion type']]), 0, hr?1:0, ov, types, Math.trunc(Number(r[h['ID']])||0), ct.getUTCHours()], k: key+'|'+acct+'|'+order+'|'+type, ov}); }
+    recs.push({ct:ct.getTime(), row:[bd, key, a?a[2]:'Not in Roster', a?a[3]:'Not in Roster', xm, gsr, yn(r[h['Did you add XMC?']]), yn(r[h['Did you Activate the E-SIM?']]), cleanDevice(r[h['Sold Device Type']]), cleanPromo(r[h['What was the promotion type']]), 0, hr?1:0, ov, types, Math.trunc(Number(r[h['ID']])||0), ct.getUTCHours(), (()=>{ const s=String(r[h['What is the type of the SIM']]??'').trim(); return s==='E-sim'?'E':s==='Physical SIM'?'P':''; })()], k: key+'|'+acct+'|'+order+'|'+type, ov}); }
   recs.sort((a,b)=>a.ct-b.ct); const seen=new Set(); for (const x of recs){ if (x.ov){ if (seen.has(x.k)) x.row[10]=1; else seen.add(x.k); } }
   return recs.map(x=>x.row); }
 
@@ -507,7 +507,7 @@ function buildData(trackerRows, rosterList, name){ if(!trackerRows.length) throw
   return {meta:{minDate:minD, maxDate:maxD, defFrom:addDays(maxD,-6), built:EMBEDDED.meta.built, source:'uploaded Sales Tracker export', uploaded:{name, when:new Date().toLocaleString()}}, rows:trackerRows, roster:rosterList, tls, oms}; }
 let pendingRoster=null, pendingRosterName=null;
 function toast(msg, err){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast'+(err?' error':''); t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>{t.style.display='none';},err?7000:4000); }
-function persist(){ try{ localStorage.setItem('tsxDashData', JSON.stringify({meta:{...META, rowsRaw:undefined}, rows:rows.map(r=>[r.d,r.hr,r.tl,r.om,r.xm,r.gsr,r.xmc,r.esim,r.dev,r.promo,r.dup,r.inr,r.ov,r.ty,r.id,r.h]), roster:roster.map(a=>[a.hr,a.name,a.tl,a.om,a.phase,a.tenure,a.wave]), tls:TLS, oms:OMS})); }catch(e){ console.warn('Could not save to this browser',e); } }
+function persist(){ try{ localStorage.setItem('tsxDashData', JSON.stringify({meta:{...META, rowsRaw:undefined}, rows:rows.map(r=>[r.d,r.hr,r.tl,r.om,r.xm,r.gsr,r.xmc,r.esim,r.dev,r.promo,r.dup,r.inr,r.ov,r.ty,r.id,r.h,r.sim]), roster:roster.map(a=>[a.hr,a.name,a.tl,a.om,a.phase,a.tenure,a.wave]), tls:TLS, oms:OMS})); }catch(e){ console.warn('Could not save to this browser',e); } }
 async function handleFiles(fileList){ const msg=document.getElementById('uploadMsg'); for (const f of fileList){ try{ msg.textContent=`Reading ${f.name}…`; const sheets=await readXlsx(await f.arrayBuffer()); const names=Object.keys(sheets); const isRoster=n=>sheets[n][0]&&sheets[n][0].some(v=>String(v??'').trim()==='Agent Name');
       if (sheets['Roster']||names.some(isRoster)){ const sh=sheets['Roster']||sheets[names.find(isRoster)]; pendingRoster=cleanRoster(sh); pendingRosterName=f.name; const tr=META.rowsRaw; if(tr){ const data=buildData(cleanTracker(tr,pendingRoster),pendingRoster,META.uploaded?META.uploaded.name:'tracker'); data.meta.rowsRaw=tr; data.meta.rosterName=f.name; applyData(data); } else { msg.textContent=`Roster loaded (${pendingRoster.length} agents). Now load the tracker export to apply it.`; toast(`Roster loaded: ${pendingRoster.length} agents. Load the tracker export next.`); continue; } }
       else { const sh=sheets[names[0]]; const rl=pendingRoster||EMBEDDED.roster; const data=buildData(cleanTracker(sh,rl),rl,f.name); data.meta.rowsRaw=sh; data.meta.rosterName=pendingRosterName||null; applyData(data); }
@@ -560,7 +560,7 @@ function init(){ const pr=document.getElementById('presets'); for(const [p,l] of
   const applyTheme=c=>{ const r=document.documentElement; if(c==='auto'){ r.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; } else r.dataset.theme=c; document.querySelectorAll('[data-theme-choice]').forEach(b=>b.classList.toggle('active',b.dataset.themeChoice===c)); try{ localStorage.setItem('tsxTheme',c); }catch(e){} }; document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>applyTheme(b.dataset.themeChoice))); let th='light'; try{ th=localStorage.getItem('tsxTheme')||'light'; }catch(e){} applyTheme(th);
   document.getElementById('targetInput').addEventListener('change',e=>{ const v=+e.target.value; if(v>0){ state.perAgent=v; try{ localStorage.setItem('tsxTargets',JSON.stringify({perAgent:v,xmc:state.xmcTarget,prod:state.targetProd})); }catch(e){} renderAll(); } }); document.getElementById('targetProd').addEventListener('change',e=>{ state.targetProd=e.target.checked; try{ localStorage.setItem('tsxTargets',JSON.stringify({perAgent:state.perAgent,xmc:state.xmcTarget,prod:state.targetProd})); }catch(e){} renderAll(); }); document.getElementById('xmcTarget').addEventListener('change',e=>{ const s=e.target.value.trim(); const v=s===''?null:+s; if(v==null||v>=0){ state.xmcTarget=v; try{ localStorage.setItem('tsxTargets',JSON.stringify({perAgent:state.perAgent,xmc:v,prod:state.targetProd})); }catch(e){} renderAll(); } });
   let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(renderAll,150); }); wireUpload();
-  let D=EMBEDDED; try{ const saved=JSON.parse(localStorage.getItem('tsxDashData')||'null'); if(saved&&saved.meta&&saved.rows&&saved.rows[0]&&saved.rows[0].length>=16) D=saved; }catch(e){}
+  let D=EMBEDDED; try{ const saved=JSON.parse(localStorage.getItem('tsxDashData')||'null'); if(saved&&saved.meta&&saved.rows&&saved.rows[0]&&saved.rows[0].length>=17) D=saved; }catch(e){}
   applyData(D); document.querySelector('#tabs button').classList.add('active'); document.getElementById('v-overview').classList.add('active'); rebuildForData(); document.getElementById('footerMid').textContent=`Built ${META.built} · uploads processed on this computer`; }
 init();
 </script>
