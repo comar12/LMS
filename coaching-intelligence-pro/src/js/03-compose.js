@@ -81,6 +81,14 @@ function groupByTheme(opps) {
 }
 const themeOf = (key) => THEMES[key] || FALLBACK_THEME;
 
+/* Attendance, adherence, and engagement entries are measured by shifts and check-ins, not calls. */
+const isPeopleOpp = (o) => o.cat === 'people';
+function builderMode(opps) {
+  const p = opps.filter(isPeopleOpp).length;
+  return p === 0 ? 'call' : p === opps.length ? 'people' : 'mixed';
+}
+const unitPhrase = (mode) => (mode === 'people' ? 'every scheduled shift' : mode === 'mixed' ? 'every applicable call and scheduled shift' : 'every applicable call');
+
 function quantity(n) {
   if (n === 1) return 'one';
   if (n === 2) return 'two';
@@ -88,14 +96,20 @@ function quantity(n) {
   return 'several';
 }
 
-function challengeOpener(tone, scope, n) {
-  const where = scope === 'multiple' ? 'Across the interactions reviewed' : 'During the interaction';
+function challengeOpener(tone, scope, n, mode) {
+  if (mode === 'people') {
+    const q = quantity(n);
+    if (tone === 'supportive') return n === 1 ? 'There is one area from the recent review period that we will work on together.' : `There are ${q} areas from the recent review period that we will work on together.`;
+    if (tone === 'direct') return n === 1 ? 'Over the recent review period, one behavior did not meet the expected standard.' : `Over the recent review period, ${q} behaviors did not meet the expected standard.`;
+    return n === 1 ? 'Looking at the recent review period, there is one area to focus on.' : `Looking at the recent review period, there are ${q} areas to focus on.`;
+  }
+  const where = mode === 'mixed' ? (scope === 'multiple' ? 'Across the interactions and the schedule period reviewed' : 'During the interaction and the recent schedule period') : scope === 'multiple' ? 'Across the interactions reviewed' : 'During the interaction';
   const q = quantity(n);
   if (tone === 'supportive') {
     const area = n === 1 ? 'is one area' : `are ${q} areas`;
     return scope === 'multiple'
       ? `Across the interactions reviewed, there ${area} we will work on together.`
-      : `There ${area} from this interaction that we will work on together.`;
+      : `There ${area} from this ${mode === 'mixed' ? 'review' : 'interaction'} that we will work on together.`;
   }
   if (tone === 'direct') {
     return n === 1
@@ -107,7 +121,7 @@ function challengeOpener(tone, scope, n) {
     : `${where}, ${q} behaviors affected the overall customer experience.`;
 }
 
-function challengeCloser(tone, n) {
+function challengeCloser(tone, n, mode) {
   if (tone === 'supportive') {
     return n === 1
       ? 'This can be strengthened with focused practice, and the action plan breaks that practice into specific, measurable steps.'
@@ -115,8 +129,8 @@ function challengeCloser(tone, n) {
   }
   if (tone === 'direct') {
     return n === 1
-      ? 'Meeting the expected standard in this area is required on every applicable call, and the action plan defines how progress will be measured.'
-      : 'Meeting the expected standard in these areas is required on every applicable call, and the action plan defines how progress will be measured.';
+      ? `Meeting the expected standard in this area is required on ${unitPhrase(mode)}, and the action plan defines how progress will be measured.`
+      : `Meeting the expected standard in these areas is required on ${unitPhrase(mode)}, and the action plan defines how progress will be measured.`;
   }
   return n === 1
     ? 'The action plan outlines the specific steps and measures for improving in this area.'
@@ -160,7 +174,8 @@ function composeProgress(b) {
 function composeChallenges(b, opps) {
   if (!opps.length) return '';
   const n = opps.length;
-  const sentences = [challengeOpener(b.tone, b.scope, n)];
+  const mode = builderMode(opps);
+  const sentences = [challengeOpener(b.tone, b.scope, n, mode)];
   const groups = groupByTheme(opps);
   for (const g of groups) {
     const theme = themeOf(g.theme);
@@ -172,7 +187,7 @@ function composeChallenges(b, opps) {
   }
   const impacts = dedupe(groups.map((g) => themeOf(g.theme).impact)).slice(0, 4);
   sentences.push(n === 1 ? `This can ${impacts[0]}.` : `Together, these behaviors can ${joinList(impacts)}.`);
-  sentences.push(challengeCloser(b.tone, n));
+  sentences.push(challengeCloser(b.tone, n, mode));
   let text = sentences.map(tidySentence).join(' ');
   const evidence = b.notes.evidence.trim();
   if (evidence && b.notes.includeEvidence) text += '\n\n' + evidence;
@@ -182,13 +197,14 @@ function composeChallenges(b, opps) {
 function composePlan(b, opps, s) {
   if (!opps.length) return '';
   const direct = b.tone === 'direct';
+  const mode = builderMode(opps);
   const will = direct ? 'you are expected to' : 'you will';
   const alsoWill = direct ? 'You are also expected to' : 'You will also';
   const focus = dedupe(opps.map((o) => (o.b && o.b.focus) || lowerTitle(o.title)));
   const dur = durationPhrase(s.duration);
   const intro = [];
   if (b.tone === 'supportive') intro.push(`Over the next ${dur}, we will work together on ${joinList(focus)}.`);
-  else if (direct) intro.push(`Over the next ${dur}, you are expected to meet the standard for ${joinList(focus)} on every applicable call.`);
+  else if (direct) intro.push(`Over the next ${dur}, you are expected to meet the standard for ${joinList(focus)} on ${unitPhrase(mode)}.`);
   else intro.push(`Over the next ${dur}, you will focus on ${joinList(focus)}.`);
 
   for (const g of groupByTheme(opps)) {
@@ -198,16 +214,18 @@ function composePlan(b, opps, s) {
     intro.push(...clauseSentences(theme.plan.replace('you will', will), commits, follow));
     g.items
       .filter((o) => !(o.b && o.b.commit))
-      .forEach((o) => intro.push(`${alsoWill} apply the expected behavior for ${lowerTitle(o.title)} on every applicable call.`));
+      .forEach((o) => intro.push(`${alsoWill} apply the expected behavior for ${lowerTitle(o.title)} on ${unitPhrase(isPeopleOpp(o) ? 'people' : 'call')}.`));
   }
 
   const calls = numWord(s.calls);
-  const measure = [`We will review ${calls} applicable calls within the next ${followupPhrase(s.followup)} to measure progress.`];
-  const std = dedupe(opps.map((o) => o.b && o.b.m).filter(Boolean));
+  const measure = [];
+  if (mode === 'people') measure.push(`We will check in together within the next ${followupPhrase(s.followup)} to review how the plan is going.`);
+  else measure.push(`We will review ${calls} applicable calls within the next ${followupPhrase(s.followup)} to measure progress.`);
+  const std = dedupe(opps.filter((o) => !isPeopleOpp(o)).map((o) => o.b && o.b.m).filter(Boolean));
   if (std.length && std.length <= 2) measure.push(`The target is for all ${calls} reviewed calls to show ${joinList(std)}.`);
   else if (std.length) measure.push(`The targets for all ${calls} reviewed calls are: ${std.slice(0, -1).join('; ')}; and ${std[std.length - 1]}.`);
   dedupe(opps.map((o) => o.b && o.b.mx).filter(Boolean)).forEach((mx) => measure.push(fillTokens(mx, s)));
-  if (!std.length && !opps.some((o) => o.b && o.b.mx)) {
+  if (mode !== 'people' && !std.length && !opps.some((o) => !isPeopleOpp(o) && o.b && o.b.mx)) {
     measure.push(`The target is for all ${calls} reviewed calls to show the expected behaviors in this plan.`);
   }
   return intro.map(tidySentence).join(' ') + '\n\n' + measure.map(tidySentence).join(' ');
@@ -215,15 +233,25 @@ function composePlan(b, opps, s) {
 
 function composeFollowup(b, opps, s) {
   if (!opps.length) return '';
+  const mode = builderMode(opps);
+  const people = opps.filter(isPeopleOpp);
+  const hasSchedule = people.some((o) => o.theme === 'attend' || o.theme === 'adhere');
+  const hasEngage = people.some((o) => o.theme === 'engage');
   const allCoach = dedupe(opps.map((o) => o.b && o.b.coach).filter(Boolean));
   const coach = allCoach.slice(0, 2);
   const parts = [];
-  if (!coach.length) parts.push('During this coaching session, we will walk through the expected behaviors together using examples from the call.');
+  if (!coach.length) parts.push(mode === 'people' ? 'During this coaching session, we will talk through the expectations together and agree on the support you need.' : 'During this coaching session, we will walk through the expected behaviors together using examples from the call.');
   else if (coach.length === 1) parts.push(`During this coaching session, we will complete ${coach[0]}.`);
   else parts.push(`During this coaching session, we will complete ${coach[0]}.`, `We will also complete ${coach[1]}.`);
-  if (opps.length > coach.length && coach.length) parts.push('We will cover the remaining focus areas with short examples from the call.');
+  if (opps.length > coach.length && coach.length) parts.push(mode === 'people' ? 'We will cover the remaining focus areas in our check-ins.' : 'We will cover the remaining focus areas with short examples from the call.');
   const checkin = s.followup >= 5 ? 'a brief midweek check-in' : 'a brief check-in';
-  parts.push(`I will review ${numWord(s.calls)} of your applicable calls within the next ${followupPhrase(s.followup)} and share what I find, and we will have ${checkin} to discuss what is working and any recurring gaps.`);
+  const peopleTopics = [hasSchedule ? 'review your schedule adherence and attendance together' : null, hasEngage ? 'talk about what is going well and where you would like more support' : null].filter(Boolean);
+  if (mode === 'people') {
+    parts.push(`We will have a short check-in within the next ${followupPhrase(s.followup)} to ${joinList(peopleTopics)}, and we will keep checking in regularly until the end of the plan.`);
+  } else {
+    parts.push(`I will review ${numWord(s.calls)} of your applicable calls within the next ${followupPhrase(s.followup)} and share what I find, and we will have ${checkin} to discuss what is working and any recurring gaps.`);
+    if (mode === 'mixed') parts.push(`During the same period, we will also ${joinList(peopleTopics)}.`);
+  }
   parts.push(`At the end of the ${durationAdj(s.duration)} coaching period, we will review the results together and decide whether the plan is complete or needs to be extended or adjusted.`);
   if (b.tone === 'supportive') parts.push('If anything in this plan feels unclear, or you would like more practice before then, let me know and we will set up time.');
   if (b.tone === 'direct') parts.push('If the targets are not met by the end of the plan, we will discuss next steps, which may include an extended plan.');

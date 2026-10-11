@@ -34,12 +34,15 @@ function renderSidebar() {
     h(
       'nav',
       { class: 'nav', 'aria-label': 'Coaching library' },
+      navItem({ view: 'home', label: 'Home', iconName: 'home' }),
       navItem({ view: 'all', label: 'All Opportunities', iconName: 'layers', count: content.opps.length }),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Categories'),
       CATS.map((c) => navItem({ view: 'cat', cat: c.id, label: c.nav, iconName: CAT_ICON[c.id], count: counts[c.id] || 0 })),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Coaching'),
+      navItem({ view: 'call-review', label: 'Call Review', iconName: 'checklist' }),
       navItem({ view: 'strengths', label: 'Things Went Well', iconName: 'thumb', count: content.strengths.length }),
       navItem({ view: 'sales-toolkit', label: 'Sales Toolkit', iconName: 'tag' }),
+      navItem({ view: 'people-toolkit', label: 'ABS & Attrition Toolkit', iconName: 'users' }),
       navItem({ view: 'favorites', label: 'Favorites', iconName: 'star', count: state.favorites.size }),
       navItem({ view: 'builder', label: 'Coaching Builder', iconName: 'clipboard', badge: bc || null, count: bc ? null : 0 }),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Personal'),
@@ -183,6 +186,17 @@ function cardGrid(items, tokens) {
 }
 
 /* ---------- Reference cards ---------- */
+/** Banner at the top of the ABS & Attrition category, pointing to the conversation toolkit. */
+function peoplePromo() {
+  return h(
+    'div',
+    { class: 'promo cat-people' },
+    h('span', { class: 'promo__icon', 'aria-hidden': 'true' }, icon('users')),
+    h('div', { class: 'promo__text' }, h('p', { class: 'promo__title' }, 'Planning an attendance or stay conversation?'), h('p', { class: 'promo__sub' }, 'The toolkit has a step-by-step attendance conversation, return-to-work lines, stay questions, early warning signs, and recognition ideas.')),
+    h('a', { class: 'btn btn--primary btn--sm', href: '#/people-toolkit', 'data-fk': 'promo-people' }, 'Open the toolkit', icon('arrow-right'))
+  );
+}
+
 function refCard(kind) {
   const g = GUIDES[kind];
   if (!g) return null;
@@ -321,6 +335,7 @@ function renderLibrary(main) {
   main.append(pageHead({ eyebrow, title, sub }), libraryToolbar());
 
   if (cat && (cat.id === 'hold' || cat.id === 'sales')) main.append(refCard(cat.id));
+  if (cat && cat.id === 'people') main.append(peoplePromo());
 
   if (q) {
     const meta = h('p', { class: 'result-meta', role: 'status' });
@@ -381,11 +396,21 @@ function renderMain() {
   const main = els.main;
   main.replaceChildren();
   const v = state.ui.view;
+  // Entrance animations run only when a page is opened, not when it re-renders after a click.
+  main.classList.remove('anim-enter');
+  if (state.ui.enterAnim) {
+    void main.offsetWidth;
+    main.classList.add('anim-enter');
+    state.ui.enterAnim = false;
+  }
   if (!store.ok && (v === 'builder' || v === 'templates' || v === 'settings')) {
     main.append(h('p', { class: 'banner', role: 'note' }, icon('alert'), h('span', null, 'Browser storage is unavailable (for example in some private windows or locked-down browsers). Everything works, but changes are lost when this tab closes. Use Export in Settings & Data to keep a copy.')));
   }
-  if (v === 'strengths') renderStrengthsView(main);
+  if (v === 'home') renderHome(main);
+  else if (v === 'strengths') renderStrengthsView(main);
   else if (v === 'sales-toolkit') renderSalesToolkit(main);
+  else if (v === 'call-review') renderCallReview(main);
+  else if (v === 'people-toolkit') renderPeopleToolkit(main);
   else if (v === 'links') renderLinks(main);
   else if (v === 'builder') renderBuilder(main);
   else if (v === 'templates') renderTemplates(main);
@@ -397,7 +422,7 @@ function renderMain() {
 function titleForView() {
   const v = state.ui.view;
   if (v === 'cat') return (CAT_MAP[state.ui.cat] || {}).nav || 'Category';
-  return { all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
+  return { home: 'Home', all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', 'call-review': 'Call Review', 'people-toolkit': 'ABS & Attrition Toolkit', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
 }
 
 /** Re-render everything that depends on state, keeping focus and scroll where they were. */

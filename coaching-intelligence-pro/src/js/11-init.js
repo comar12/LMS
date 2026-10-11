@@ -2,14 +2,15 @@
    11-init: hash routing, global events, startup
    ========================================================================== */
 
-const VIEWS = ['all', 'strengths', 'sales-toolkit', 'favorites', 'builder', 'links', 'templates', 'settings'];
+const VIEWS = ['home', 'all', 'call-review', 'strengths', 'sales-toolkit', 'people-toolkit', 'favorites', 'builder', 'links', 'templates', 'settings'];
 
 function parseHash() {
   const raw = (window.location.hash || '').replace(/^#/, '');
   const [path, qs] = raw.split('?');
   const parts = path.split('/').filter(Boolean);
   const params = new URLSearchParams(qs || '');
-  let view = 'all';
+  // With no hash the app opens on the Home dashboard.
+  let view = parts.length ? 'all' : 'home';
   let cat = null;
   if (parts[0] === 'cat' && CAT_MAP[parts[1]]) {
     view = 'cat';
@@ -43,6 +44,7 @@ function route() {
   state.ui.view = r.view;
   state.ui.cat = r.cat;
   if (viewChanged) {
+    state.ui.enterAnim = true;
     renderSidebar();
     updateTopbar();
     renderMain();
@@ -242,7 +244,8 @@ function init() {
   rebuildContent();
   bindEvents();
   const r = parseHash();
-  state.ui.view = r.view === 'all' && !window.location.hash ? 'all' : r.view;
+  state.ui.view = r.view;
+  state.ui.enterAnim = true;
   state.ui.cat = r.cat;
   renderSidebar();
   updateTopbar();

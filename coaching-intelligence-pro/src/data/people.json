@@ -1,0 +1,929 @@
+[
+  {
+    "id": "people-unplanned-absence",
+    "cat": "people",
+    "title": "Unplanned Absences",
+    "desc": "Missing scheduled shifts on short notice, which reduces planned coverage and moves extra work onto the rest of the team.",
+    "kw": [
+      "unplanned absence",
+      "unscheduled absence",
+      "absent",
+      "absences",
+      "missed shift",
+      "missed shifts",
+      "called out",
+      "call out",
+      "out of work",
+      "missing work",
+      "attendance",
+      "abs",
+      "abs rate",
+      "shrinkage",
+      "coverage",
+      "reliability"
+    ],
+    "tags": [
+      "Attendance",
+      "Reliability",
+      "Team Coverage"
+    ],
+    "kpi": [
+      "ABS"
+    ],
+    "theme": "attend",
+    "feedback": "Over the past few weeks, you had several unplanned absences from scheduled shifts. I am not asking you to explain the reasons in this conversation, and if anything is affecting your attendance that you would like me to know about, you are welcome to share it so we can talk through the support options available under site policy. When a shift is missed on short notice, the schedule has already been built around you being there, so the queue has fewer people and your teammates absorb the extra work. Moving forward, the expectation is to work your scheduled shifts and, when an absence cannot be avoided, to give notice as early as possible through the call-out process.",
+    "impact": "Unplanned absences often build up when small obstacles to working a shift go unspoken until the day itself. Each unexpected gap can leave the team short-staffed, which may mean customers wait longer to reach someone and teammates take on a heavier load. Over time, frequent missed shifts can also make it harder to reach your own performance goals and can affect the confidence the team has in planned coverage.",
+    "plan": "For the next {duration}, you will work each scheduled shift as planned. If you see anything coming that could affect your attendance, you will raise it with me or WFM as early as possible so we can look at options together before it turns into a missed shift. If an absence cannot be avoided, you will report it through the site's absence reporting process before your shift starts. We will hold our first check-in within {followup}, and the goal for this period is every scheduled shift worked or, where an absence is unavoidable, reported in advance.",
+    "followup": "In this session, we will review your recent schedule together and agree on who you will contact, and how, if an attendance concern comes up. I will check in with you within {followup} to see how your shifts are going and whether anything is getting in the way. We will also meet briefly each week, and at the end of the {durationAdj} plan we will review your attendance together and decide on next steps.",
+    "example": [
+      {
+        "label": "Raising a concern early",
+        "say": "Hi, I wanted to give you a heads-up about something that might make it hard for me to work my shift later this week. Could we talk about what options I have, so I do not end up missing it unexpectedly?"
+      },
+      {
+        "label": "When an absence cannot be avoided",
+        "say": "I am not able to work my scheduled shift today. I am reporting it now through the call-out process, before my start time, and I will let you know as soon as I am back on schedule."
+      }
+    ],
+    "questions": [
+      "What would help you feel comfortable raising a possible attendance concern with me before the day of the shift?",
+      "How do you think an unexpected gap in the schedule affects the teammates working that shift?",
+      "What support or scheduling tools would make it easier for you to work every scheduled shift?"
+    ],
+    "strengths": [
+      "s-callout",
+      "s-punctuality",
+      "s-team-support",
+      "s-resolution"
+    ],
+    "b": {
+      "obs": "missed several scheduled shifts on short notice, which left the team with less coverage than planned",
+      "focus": "reliable attendance",
+      "commit": "work each scheduled shift as planned and raise any attendance concern with me or WFM before it becomes a missed shift",
+      "mx": "Every scheduled shift during the next {duration} is worked as planned or, when an absence cannot be avoided, reported before the shift starts.",
+      "coach": "a review of your recent schedule and a plan for who to contact when an attendance concern comes up"
+    },
+    "note": "Confirm the site attendance policy and any leave or support options with WFM or HR before the session. Do not ask about medical or personal reasons, and keep anything the agent chooses to share private."
+  },
+  {
+    "id": "people-late-login",
+    "cat": "people",
+    "title": "Late Log-Ins",
+    "desc": "Logging in after the scheduled start time or returning late from breaks and lunch, so availability does not match the schedule.",
+    "kw": [
+      "late",
+      "late login",
+      "late log in",
+      "logged in late",
+      "tardy",
+      "tardiness",
+      "late start",
+      "late back",
+      "late from lunch",
+      "late from break",
+      "not ready",
+      "punctuality",
+      "start time",
+      "running late",
+      "clocked in late",
+      "abs"
+    ],
+    "tags": [
+      "Punctuality",
+      "Schedule Adherence"
+    ],
+    "kpi": [
+      "ABS"
+    ],
+    "theme": "attend",
+    "feedback": "Looking at your recent schedule, there were several times when you were not logged in and ready at your scheduled start time or when a break or lunch ended. A few minutes can seem small, but the queue is staffed minute by minute, so a late start leaves fewer people available exactly when customers are expected to be waiting. If something is making on-time starts difficult, you are welcome to tell me, and we can explore what is possible under site policy. On your upcoming shifts, plan to be logged in, with your tools open, and ready to help customers at the scheduled time, and let me know before your start time if you are running late.",
+    "impact": "Late log-ins usually come from a start routine that leaves little room for signing in, opening tools, and settling in before the scheduled time. When several minutes are lost at the start of a shift or after a break, wait times can rise for customers in the queue and teammates may carry more of the volume. Repeated late starts can also lower your adherence results and make the rest of the shift feel rushed.",
+    "plan": "Starting with your next shift and continuing for {duration}, you will be logged in, with your tools open, and in an available state at each scheduled start time and at the end of every break and lunch. You will plan your arrival and startup routine according to site guidance so that technical startup does not cut into your scheduled time. If you can see that you are going to be late, you will message me before the start time rather than after. We will look at your adherence together within {followup}, with the goal of every start and every return happening on time.",
+    "followup": "During this session, we will walk through your start-of-shift routine step by step and find where time is being lost. I will go over your log-in times with you within {followup}, and we will have a short conversation at the start of one of your shifts midway through the plan. At the end of the {durationAdj} period, we will review the adherence report together and agree whether the plan is complete.",
+    "example": [
+      {
+        "label": "Running behind",
+        "say": "Hi, I wanted to let you know before my start time that I am running about ten minutes behind. I will be logged in and ready as soon as I get set up, and I am planning extra time for tomorrow."
+      },
+      {
+        "label": "Asking for help",
+        "say": "My systems have been slow to open at the start of my shift. Could someone help me look at that so it is not cutting into my start time?"
+      }
+    ],
+    "questions": [
+      "What usually happens in the few minutes before your scheduled start time?",
+      "What would make it easier to be logged in and ready right when a break or lunch ends?",
+      "How could you let me know earlier on a day when you can see you are going to be late?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-callout",
+      "s-tone",
+      "s-resolution"
+    ],
+    "b": {
+      "obs": "were not logged in and ready at several scheduled start times and returns from breaks or lunch",
+      "focus": "on-time starts",
+      "commit": "be logged in and available at every scheduled start time and end of break, and message me before the start time if you are running late",
+      "mx": "Every shift start and every return from a break or lunch during the next {duration} happens on time, logged in and ready.",
+      "coach": "a step-by-step walkthrough of your start-of-shift routine to find where time is lost"
+    },
+    "note": "Confirm the site's guidance on arrival, clock-in, and system startup time with WFM before the session so the plan matches policy. Check for system outages or log-in issues before documenting late starts."
+  },
+  {
+    "id": "people-callout-process",
+    "cat": "people",
+    "title": "Call-Out Process Not Followed",
+    "desc": "Reporting absences late, through an unofficial channel, or without the details the call-out process requires, which makes coverage harder to plan.",
+    "kw": [
+      "call out",
+      "callout",
+      "call-out process",
+      "late call out",
+      "texted absence",
+      "texted supervisor",
+      "short notice",
+      "late notice",
+      "wrong channel",
+      "absence notice",
+      "reporting absence",
+      "notify supervisor",
+      "wfm",
+      "attendance line",
+      "missing details",
+      "abs"
+    ],
+    "tags": [
+      "Attendance",
+      "Process",
+      "Communication"
+    ],
+    "kpi": [
+      "ABS"
+    ],
+    "theme": "attend",
+    "feedback": "During the last schedule period, some of your absences were reported later than the call-out process expects, through a channel other than the one the site uses, or without all of the required details. I appreciate that you let us know, and the process exists so that WFM and the supervisor team can adjust coverage right away. When notice arrives late or in the wrong place, it may not reach the people planning the schedule in time. From here, report any absence through the official call-out process, as early as you can, and include each detail the process asks for so no one has to follow up for missing information.",
+    "impact": "Call-out issues often happen when the process steps are unclear or when a quick text to a teammate or supervisor feels easier in the moment. Notice that arrives late, incomplete, or in an unmonitored channel may not be seen in time to adjust staffing, which can leave the queue short and customers waiting longer. It can also create confusion about whether your absence was properly recorded under your site's attendance policy.",
+    "plan": "Over the next {duration}, you will use only the official absence reporting process whenever you cannot work a scheduled shift. You will report as early as you are able, before the scheduled start time, and you will include every detail the process requires. Keep the reporting contact information saved somewhere you can reach it quickly, such as in your phone. Within {followup}, we will confirm together that you have the correct contact details, and the goal is that every absence in this period is reported correctly and before the shift begins.",
+    "followup": "Today, we will walk through the absence reporting process together, including who to contact, how to reach them, and what information to give. I will confirm within {followup} that you have the reporting details saved and that your questions are answered. If an absence happens during the plan, we will talk afterward about how it was reported, and at the end of the {durationAdj} period we will confirm the process is working for you.",
+    "example": [
+      {
+        "label": "A complete notice",
+        "say": "Hi, I am not able to work my scheduled shift today. I am reporting it through the call-out process before my start time and have included the details it asks for. I will let you know as soon as I am able to return."
+      },
+      {
+        "label": "Checking the steps",
+        "say": "Can you show me the right way to report an absence and what I need to include, so I get it right the first time?"
+      }
+    ],
+    "questions": [
+      "How clear are the call-out steps to you right now, and which part feels confusing?",
+      "What would make it easier to use the official process instead of a text or direct message?",
+      "Where could you keep the reporting contact details so they are easy to find on short notice?"
+    ],
+    "strengths": [
+      "s-punctuality",
+      "s-adherence",
+      "s-tone",
+      "s-resolution"
+    ],
+    "b": {
+      "obs": "reported absences late, outside the official channel, or without all of the details the call-out process requires",
+      "focus": "absence reporting",
+      "commit": "report any absence through the official call-out process before your scheduled start time and include every detail the process asks for",
+      "mx": "Any absence during the next {duration} is reported through the official process before the shift starts, with all required details.",
+      "coach": "a walkthrough of the call-out process, including who to contact and what to include"
+    },
+    "note": "Confirm the current call-out channel, contact details, and required information with WFM before the session. Do not ask about the reason for any absence."
+  },
+  {
+    "id": "people-no-call-no-show",
+    "cat": "people",
+    "title": "No-Call, No-Show",
+    "desc": "Missing a scheduled shift without any notice, leaving the team unaware of the absence and unable to adjust coverage.",
+    "kw": [
+      "no call no show",
+      "ncns",
+      "no show",
+      "no-show",
+      "did not show",
+      "did not call",
+      "no notice",
+      "missed shift",
+      "unreported absence",
+      "absent without notice",
+      "awol",
+      "wellbeing check",
+      "attendance",
+      "abs",
+      "attrition risk"
+    ],
+    "tags": [
+      "Attendance",
+      "Wellbeing",
+      "Communication"
+    ],
+    "kpi": [
+      "ABS",
+      "Attrition"
+    ],
+    "theme": "attend",
+    "feedback": "Before anything else, I want to check that you are okay, because you missed a recent scheduled shift and we did not receive any notice. Your wellbeing comes first, and you do not need to share any details you are not comfortable sharing. If there is something you would like support with, I will walk you through the options available under site policy. Not hearing from you left the team unsure whether you were safe and unable to adjust coverage for the shift. Next time you cannot work a shift, please let us know through the call-out process, even if the notice is late or brief, so we know where things stand.",
+    "impact": "A missed shift without notice often happens when something unexpected comes up and reaching out feels difficult or slips away in the moment. Without any word, the team may spend time trying to reach you and cannot plan for the gap, which can leave customers waiting longer and teammates covering more. It can also raise real concern for your wellbeing and make it harder for us to offer support when you need it.",
+    "plan": "During the next {duration}, you will contact me or use the absence reporting process any time you are unable to work a scheduled shift, even when the notice is short. Together we will make sure you have the reporting contact details saved and a backup way to reach the team if your usual method is not available. If something comes up that could affect your shifts, you will let me know as early as you are able so we can look at support options. We will meet within {followup}, and the goal for this period is zero shifts missed without notice.",
+    "followup": "In today's conversation, we will start with a wellbeing check and then confirm your contact and reporting details together. I will meet with you again within {followup} to see how you are doing and whether you need anything from me. We will keep a short weekly check-in through the end of the {durationAdj} plan and look back together at how attendance and communication have gone.",
+    "example": [
+      {
+        "label": "Letting the team know",
+        "say": "Hi, I am not going to be able to make my shift today. I know this is short notice, but I wanted to tell you right away instead of not saying anything. I will follow the call-out process and update you when I know more."
+      },
+      {
+        "label": "Asking for support",
+        "say": "Something has come up that may affect my shifts for a while. Can we find a time to talk about what options might be available?"
+      }
+    ],
+    "questions": [
+      "How are you doing, and is there anything you need from me right now?",
+      "What would make it easier to reach out on a day when something unexpected comes up?",
+      "Who would you feel most comfortable contacting if you could not reach me or the usual reporting line?"
+    ],
+    "strengths": [
+      "s-punctuality",
+      "s-adherence",
+      "s-tone",
+      "s-team-support"
+    ],
+    "b": {
+      "obs": "missed a scheduled shift without giving any notice, which left the team unsure of your wellbeing and unable to adjust coverage",
+      "focus": "communication about absences",
+      "commit": "contact me or use the absence reporting process whenever you cannot work a scheduled shift, even when the notice is short",
+      "mx": "No scheduled shift during the next {duration} is missed without notice to your supervisor or through the reporting process.",
+      "coach": "a wellbeing check followed by confirming your reporting contacts and a backup way to reach the team"
+    },
+    "note": "Lead with a wellbeing check. Confirm the site attendance policy and any support or leave options with WFM or HR before the session. Do not ask about medical or personal details, and follow site guidance if you have concerns about the agent's safety."
+  },
+  {
+    "id": "people-absence-pattern",
+    "cat": "people",
+    "title": "Absences Around Days Off",
+    "desc": "Unplanned absences that tend to fall next to scheduled days off or weekends, creating a predictable gap in coverage on those shifts.",
+    "kw": [
+      "absence pattern",
+      "attendance pattern",
+      "attendance trend",
+      "pattern",
+      "around days off",
+      "before days off",
+      "after days off",
+      "weekend absences",
+      "monday",
+      "friday",
+      "extended weekend",
+      "absences cluster",
+      "repeated absences",
+      "days off",
+      "time off",
+      "abs"
+    ],
+    "tags": [
+      "Attendance",
+      "Attendance Trends"
+    ],
+    "kpi": [
+      "ABS"
+    ],
+    "theme": "attend",
+    "feedback": "In reviewing your attendance, I noticed that several of your recent unplanned absences fell on shifts right before or right after your scheduled days off. I am sharing this as a pattern in the schedule data, not as a conclusion about why it happened, and you are welcome to tell me anything you think would help me understand it. Absences that cluster around the same days can leave those shifts short in a predictable way, which is hard for the team to plan around. The expectation is to work the shifts next to your days off as scheduled and, if you need extra time around them, to request it in advance through the time-off process.",
+    "impact": "Patterns like this often develop when planned time off feels harder to arrange than an unplanned absence, or when schedule options have not been fully explored. When absences regularly fall on the same days, those shifts can become harder to staff, which may lead to longer waits for customers and heavier days for the teammates scheduled with you. Requesting time in advance lets the schedule absorb it instead.",
+    "plan": "Each week for the next {duration}, you will work the shifts that fall next to your scheduled days off as planned. If you need extra time around a day off, you will request it in advance through the time-off process instead of taking it as an unplanned absence. If your current schedule is not working for you, you will bring it to me so we can look at what options exist with WFM. We will look at the schedule together within {followup}, and the target is no unplanned absences on the shifts next to your days off.",
+    "followup": "We will start by looking at the schedule data side by side so you can see the same pattern I see and share your view of it. I will check in within {followup} to talk through any time-off requests or schedule questions, and I can connect you with WFM about available options. At the close of the {durationAdj} period, we will review the shifts around your days off together.",
+    "example": [
+      {
+        "label": "Planning ahead",
+        "say": "I would like to request a day off next to my upcoming weekend. Can you walk me through how to submit it, so it is planned in advance?"
+      },
+      {
+        "label": "Raising a schedule concern",
+        "say": "My current days off have been getting harder to work around. Could we talk about whether there are any schedule options I could look into?"
+      }
+    ],
+    "questions": [
+      "When you look at the schedule data with me, what stands out to you?",
+      "How comfortable do you feel using the time-off process to plan extra time around your days off?",
+      "What would help the shifts next to your days off feel easier to work as scheduled?"
+    ],
+    "strengths": [
+      "s-punctuality",
+      "s-adherence",
+      "s-callout",
+      "s-tone"
+    ],
+    "b": {
+      "obs": "had several unplanned absences that fell on the shifts right before or after your scheduled days off",
+      "focus": "planned time off",
+      "commit": "work the shifts next to your days off as scheduled and request any extra time in advance through the time-off process",
+      "mx": "No unplanned absences fall on the shifts next to your scheduled days off during the next {duration}.",
+      "coach": "a side-by-side look at your schedule data and the options for requesting planned time off"
+    },
+    "note": "Describe the pattern from the attendance data only; do not suggest dishonesty, ask for proof, or ask about reasons. Confirm the time-off request process and site attendance policy with WFM before the session."
+  },
+  {
+    "id": "people-early-logout",
+    "cat": "people",
+    "title": "Early Log-Outs",
+    "desc": "Logging out or going unavailable before the scheduled end of shift, which reduces coverage during the final part of the day.",
+    "kw": [
+      "early logout",
+      "early log out",
+      "logged out early",
+      "leaving early",
+      "left early",
+      "end of shift",
+      "ending shift early",
+      "early departure",
+      "clocked out early",
+      "adherence",
+      "schedule adherence",
+      "out of adherence",
+      "conformance",
+      "last hour",
+      "abs"
+    ],
+    "tags": [
+      "Schedule Adherence",
+      "Team Coverage"
+    ],
+    "kpi": [
+      "ABS"
+    ],
+    "theme": "adhere",
+    "feedback": "On several recent shifts, you logged out before your scheduled end time. The last part of a shift is still planned coverage, and when someone leaves early the queue has fewer people available while customers continue to come in. If you need to leave early on a given day, the expectation is to ask me first so we can plan around it, and if something regular is affecting your end time, you are welcome to raise it so we can review options within site policy. Going forward, stay logged in and available until your scheduled end time unless an early departure has been approved in advance.",
+    "impact": "Early log-outs often happen when the end of the shift is planned around the day winding down rather than the scheduled time. Because the schedule counts on you until the end, leaving early can reduce coverage during a busy stretch, lengthen waits for customers, and leave teammates helping more customers before their own shifts end. It can also lower your adherence results without anyone having had a chance to plan for it.",
+    "plan": "Each shift for the next {duration}, you will stay logged in and available until your scheduled end time. If you need to leave early for any reason, you will ask me or the supervisor on duty for approval before logging out and leave only once it is approved. If something about your end time is regularly difficult, you will bring it to me so we can look at schedule options. We will review your log-out times together within {followup}, aiming for every shift to end at the scheduled time or with an approved early departure.",
+    "followup": "We will open the adherence report together today and look at your recent end-of-shift times, so we are working from the same information. I will review your log-out times again within {followup}, and we will have a short check-in midway through the plan. At the end of the {durationAdj} plan, we will confirm whether your end times match the schedule and decide on next steps.",
+    "example": [
+      {
+        "label": "Asking before leaving",
+        "say": "Hi, I need to leave about thirty minutes before the end of my shift today. Is that something you can approve, and is there anything I should finish before I log out?"
+      },
+      {
+        "label": "A recurring conflict",
+        "say": "My end time has been hard to manage on a few days each week. Could we look at whether a different schedule might be an option?"
+      }
+    ],
+    "questions": [
+      "What would help you stay logged in and available through the last part of your shift?",
+      "How do you think an early log-out affects the teammates still working the queue?",
+      "What would make it easier to ask for approval when you need to leave before your end time?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-punctuality",
+      "s-tone",
+      "s-ownership"
+    ],
+    "b": {
+      "obs": "logged out before your scheduled end time on several shifts without an approved early departure",
+      "focus": "full-shift availability",
+      "commit": "stay logged in and available until your scheduled end time and get approval before logging out early for any reason",
+      "mx": "Every shift during the next {duration} ends at the scheduled time or with an early departure approved in advance.",
+      "coach": "a review of your recent end-of-shift times in the adherence report"
+    },
+    "note": "Confirm the site's early departure approval process and adherence standard with WFM before the session. Check whether any early log-outs were already approved or caused by system issues before documenting them."
+  },
+  {
+    "id": "people-break-overrun",
+    "cat": "people",
+    "title": "Extended Breaks and Lunches",
+    "desc": "Taking breaks or lunches that run past their scheduled length or start outside the scheduled times, reducing planned coverage.",
+    "kw": [
+      "long break",
+      "long lunch",
+      "extended break",
+      "extended lunch",
+      "break overrun",
+      "over break",
+      "over lunch",
+      "break time",
+      "lunch time",
+      "break adherence",
+      "breaks",
+      "lunch",
+      "off schedule break",
+      "out of adherence",
+      "adherence",
+      "abs"
+    ],
+    "tags": [
+      "Schedule Adherence",
+      "Breaks and Lunches"
+    ],
+    "kpi": [
+      "ABS"
+    ],
+    "theme": "adhere",
+    "feedback": "Across your recent shifts, several of your breaks and lunches ran longer than scheduled or started at times other than those on your schedule. Breaks are staggered so that only a certain number of people are away from the queue at once, and when one runs over, the team has less coverage than WFM planned for that stretch. If something is making it hard to take breaks as scheduled, tell me so we can review what support the site offers. To keep coverage steady, start each break and lunch at its scheduled time and be back, logged in and available, when it is scheduled to end.",
+    "impact": "Break overruns often start with a few extra minutes that are easy to lose track of, especially when nothing is reminding you of the return time. Because breaks are staggered across the team, a late return can leave fewer people available than planned, which may mean longer waits for customers and teammates taking on extra volume. Repeated overruns can also lower your adherence and make your own day feel less predictable.",
+    "plan": "Over the next {duration}, you will start every break and lunch at the scheduled time and return logged in and available by the scheduled end time. You will use a timer or reminder so the return time is not left to memory. If you are held up and cannot start or end a break on schedule, you will let me know right away so we can adjust. Within {followup}, we will look at your break and lunch adherence together, and the measure for this period is every break and lunch taken within its scheduled times.",
+    "followup": "During the session, we will compare your scheduled break times with your actual ones in the adherence report and agree on a simple reminder method that works for you. I will review your break times with you within {followup} and share what I see, so there are no surprises. We will complete a final review at the end of the {durationAdj} plan and agree whether any further support is needed.",
+    "example": [
+      {
+        "label": "When something holds you up",
+        "say": "Hi, I am still finishing something and my break is scheduled to start now. Is it okay if I start a few minutes late, or would you like me to adjust anything?"
+      },
+      {
+        "label": "Planning the return",
+        "say": "I set a reminder a couple of minutes before my lunch ends, so I am back at my desk and logged in right on time."
+      }
+    ],
+    "questions": [
+      "What usually makes it easy to lose track of the time during a break or lunch?",
+      "Which reminder or routine would help you be back and available right when a break ends?",
+      "How might a late return from lunch affect the teammates who are scheduled to break after you?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-callout",
+      "s-tone",
+      "s-team-support"
+    ],
+    "b": {
+      "obs": "took breaks and lunches that ran past their scheduled length or started outside the scheduled times",
+      "focus": "break and lunch adherence",
+      "commit": "start every break and lunch at the scheduled time and be logged in and available again when it is scheduled to end",
+      "mx": "Every break and lunch during the next {duration} starts and ends within its scheduled times.",
+      "coach": "a comparison of your scheduled and actual break times with a reminder plan that fits your day"
+    },
+    "note": "Confirm the scheduled break and lunch lengths and the site adherence standard with WFM before the session. Check for approved exceptions, such as system issues or supervisor requests, before documenting overruns."
+  },
+  {
+    "id": "people-aux-misuse",
+    "cat": "people",
+    "title": "Excessive Not Ready or Aux Time",
+    "desc": "Not ready or aux states used more often or for longer than the related activity needs, reducing the time available to help customers.",
+    "kw": [
+      "aux",
+      "aux time",
+      "not ready",
+      "excessive aux",
+      "aux codes",
+      "wrong aux code",
+      "unavailable",
+      "idle",
+      "off queue",
+      "away from queue",
+      "adherence",
+      "out of adherence",
+      "after call work",
+      "acw",
+      "wrap time",
+      "personal time",
+      "aux misuse"
+    ],
+    "tags": [
+      "Schedule Adherence",
+      "Aux Codes",
+      "Availability"
+    ],
+    "kpi": [
+      "ABS"
+    ],
+    "theme": "adhere",
+    "feedback": "Your recent adherence reports show time in not ready and aux states that ran longer, and came up more often, than the related activities usually require. The approved aux codes are there so that necessary work away from the queue is recorded accurately and planned for. When those states stretch past what the task needs, fewer agents are available, and customers in the queue may wait longer to reach someone. From here, use each approved aux code only for its intended purpose, return to available as soon as the activity is complete, and tell me right away when a task or a system issue is taking more time than expected.",
+    "impact": "Extra aux time often comes from uncertainty about which code fits which activity, or from finishing small tasks while still unavailable. Each extended not ready period can reduce the number of agents ready for the next customer, which may lengthen wait times and put more pressure on teammates who are still in the queue. It can also pull your results away from the adherence standard even on days when you are working the whole shift.",
+    "plan": "For the next {duration}, you will use only the approved aux codes, each for the activity it is meant to cover, and return to available as soon as that activity is finished. If a task or system issue needs more time than expected, you will let me or the team lead on duty know before staying in an aux state longer. We will review your adherence report together within {followup}. The target is that your aux and not ready time stays within the adherence standard on every scheduled shift during the plan.",
+    "followup": "During our session, we will walk through the approved aux codes together and match each one to the activities it covers, so the right choice is clear in the moment. I will review your adherence report within {followup} and share what I see, and we will hold a short midweek conversation about any situation where a code felt unclear. At the end of the {durationAdj} plan, we will review the results together and agree on next steps.",
+    "example": [
+      {
+        "label": "Telling the team lead",
+        "say": "I need to finish a follow-up task the customer asked for, so I'm going into the approved aux code for that. It should only take a few minutes, and I'll let you know if it runs longer."
+      },
+      {
+        "label": "When the system is slow",
+        "say": "My tools stopped loading, so I'm not ready right now. Which aux code should I use while I report the issue?"
+      }
+    ],
+    "questions": [
+      "Which activities during your shift are hardest to match with the right aux code?",
+      "What usually keeps you in a not ready state longer than you planned?",
+      "What would help you get back to available as soon as a task is finished?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-punctuality",
+      "s-tone",
+      "s-ownership",
+      "s-resolution"
+    ],
+    "b": {
+      "obs": "stayed in not ready and aux states longer, and more often, than the related activities required",
+      "focus": "aux code use",
+      "commit": "use the approved aux codes only for their intended activities and return to available as soon as each activity is finished",
+      "mx": "Your not ready and aux time on every scheduled shift during the next {duration} stays within the adherence standard.",
+      "coach": "a walkthrough matching each approved aux code to the activities it covers"
+    },
+    "note": "Confirm the approved aux codes, their intended uses, and the adherence standard with WFM before the session. Review the adherence report together rather than relying on memory, and check whether system issues contributed to the aux time."
+  },
+  {
+    "id": "people-missed-sessions",
+    "cat": "people",
+    "title": "Missed Huddles, Training, or Coaching",
+    "desc": "Scheduled huddles, training sessions, or coaching conversations missed or joined late, leaving gaps in updates, skill practice, and feedback.",
+    "kw": [
+      "missed huddle",
+      "missed training",
+      "missed coaching",
+      "skipped huddle",
+      "late to huddle",
+      "no show training",
+      "offline time",
+      "team meeting",
+      "training session",
+      "coaching session",
+      "one on one",
+      "huddle attendance",
+      "scheduled meeting",
+      "missed updates",
+      "nesting"
+    ],
+    "tags": [
+      "Schedule Adherence",
+      "Development",
+      "Team Updates"
+    ],
+    "kpi": [
+      "ABS",
+      "Attrition"
+    ],
+    "theme": "adhere",
+    "feedback": "Several recent huddles, training sessions, or coaching conversations on your schedule were missed or joined after they had started. These sessions are where process updates, new information for your line of business, and one-on-one feedback are shared, and they are built into the schedule so you are not left to catch up on your own. Missing them can leave you working from older information, which may affect how confident you feel and how accurately customers are helped. Moving forward, treat every scheduled session like the start of a shift, join on time, and message me as soon as you can if a customer interaction is keeping you from leaving the queue.",
+    "impact": "Missed sessions often happen when offline time feels less urgent than the queue, or when a session is easy to lose track of during a busy shift. Without those updates, you may handle a process from memory after it has changed, which can lead to errors, repeat contacts, and less confidence. Trainers and teammates may also need to repeat the material, and your own development goals can slow down.",
+    "plan": "Starting with your next shift and continuing for {duration}, you will check your schedule at the start of each shift for huddles, training, and coaching, and set a reminder a few minutes before each one. You will join every scheduled session on time and ready to take part. If you are still helping a customer when a session begins, you will message me and join as soon as you are free. We will look at session attendance together within {followup}, with the goal of full attendance at every scheduled session for the rest of the plan.",
+    "followup": "I will share the session schedule for the coming weeks during our conversation, and we will set up reminders together so nothing slips by. Within {followup}, I will check session attendance with you and recap any update you may have missed. When the {durationAdj} plan ends, we will confirm that you are current on every update and decide whether any training needs to be repeated.",
+    "example": [
+      {
+        "label": "Before a huddle",
+        "say": "I'm still helping a customer and the huddle is starting now. I'll join as soon as I finish. Could you share anything I miss at the start?"
+      },
+      {
+        "label": "Catching up",
+        "say": "I missed part of the training update earlier this week. Could we go over the main changes so I'm working from the current process?"
+      }
+    ],
+    "questions": [
+      "What makes it hardest to leave the queue on time for a scheduled huddle or training?",
+      "Which kind of reminder would help you join each session on time?",
+      "What do you find most useful from huddles and coaching, and what would make them more useful?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-punctuality",
+      "s-team-support",
+      "s-tone"
+    ],
+    "b": {
+      "obs": "missed several huddles, training sessions, or coaching conversations on your schedule, or joined them after they had started",
+      "focus": "session attendance",
+      "commit": "check your schedule for huddles, training, and coaching at the start of each shift and join every session on time",
+      "mx": "Every huddle, training session, and coaching conversation on your schedule during the next {duration} is attended from the start.",
+      "coach": "a review of the upcoming session schedule with reminders set up together"
+    },
+    "note": "Confirm upcoming huddle, training, and coaching times with WFM and make sure they appear on the schedule. If queue conditions are keeping the agent from leaving on time, raise it with WFM or the operations manager rather than treating it as an adherence gap."
+  },
+  {
+    "id": "people-disengagement",
+    "cat": "people",
+    "title": "Signs of Disengagement",
+    "desc": "Fewer contributions in huddles, fewer questions, and less response to feedback, which can signal that a supportive conversation is needed.",
+    "kw": [
+      "disengaged",
+      "disengagement",
+      "quiet",
+      "withdrawn",
+      "not participating",
+      "huddle participation",
+      "no questions",
+      "low interest",
+      "checked out",
+      "low energy",
+      "motivation",
+      "not motivated",
+      "less involved",
+      "stay conversation",
+      "retention",
+      "attrition risk",
+      "flight risk"
+    ],
+    "tags": [
+      "Engagement",
+      "Retention",
+      "Wellbeing"
+    ],
+    "kpi": [
+      "Attrition"
+    ],
+    "theme": "engage",
+    "feedback": "During recent huddles and one-on-ones, you have been speaking up less, asking fewer questions, and responding less to the feedback we discuss. I am not assuming anything about why, and I would like to understand how work is feeling for you right now. Your ideas and questions help the team spot problems early, and staying involved keeps you connected to the updates and support that make your work with customers easier. From here, let's set aside time to talk about what is going well and what is getting in the way, and you can share as much or as little as you like. In huddles, bring a question or an idea whenever something comes up.",
+    "impact": "Pulling back like this often happens when work feels repetitive, when goals are unclear, or when something is weighing on a person and there has not been a good moment to raise it. Without a conversation, you may feel less connected and less supported, and it can become harder to enjoy the work or see a future here. Teammates may also miss the questions and ideas you bring.",
+    "plan": "Over the next {duration}, you and I will hold a short weekly stay conversation about what you enjoy, what frustrates you, and what would make the work more satisfying. Before each one, you will think of one thing that is working and one thing you would change. In huddles, you will share a question or an idea whenever something relevant comes up. Our first conversation will take place within {followup}, and together we will agree on one change, from either side, that would improve how work feels for you.",
+    "followup": "I will open our first conversation with a few stay questions and listen more than I talk, so the plan reflects what matters to you. Within {followup}, I will follow up on the change we agreed to and share what I have done on my side. We will keep the weekly conversations going for the full {duration} and then decide together whether to continue them.",
+    "example": [
+      {
+        "label": "Raising it early",
+        "say": "Can we find a few minutes this week to talk? Work has felt a bit flat for me lately, and I'd like to figure out what would help."
+      },
+      {
+        "label": "In a huddle",
+        "say": "I have a question about the update we just covered. How does it change what we tell customers about their next steps?"
+      }
+    ],
+    "questions": [
+      "What parts of your work do you enjoy most right now, and which parts feel harder?",
+      "What would make huddles and feedback conversations more useful for you?",
+      "If you could change one thing about your work week, what would it be?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-punctuality",
+      "s-adherence",
+      "s-tone",
+      "s-resolution"
+    ],
+    "b": {
+      "obs": "spoke up less in huddles, asked fewer questions, and responded less to the feedback we discussed together",
+      "focus": "open conversation",
+      "commit": "share in a weekly stay conversation what is working, what is getting in the way, and what would make the work more satisfying",
+      "mx": "Each week for the next {duration}, we hold a short stay conversation and agree on at least one change that would make your work more satisfying.",
+      "coach": "a stay conversation about what you enjoy and what would make work more satisfying"
+    },
+    "note": "Approach this as a stay conversation, not a performance warning. Listen first, do not ask about personal or medical details, and offer the site's support resources if the agent raises something outside work. Write down any change you commit to and follow through on it."
+  },
+  {
+    "id": "people-stress-fatigue",
+    "cat": "people",
+    "title": "Stress and Fatigue",
+    "desc": "Visible strain or tiredness after difficult interactions, with few resets between contacts and breaks not taken as scheduled.",
+    "kw": [
+      "stress",
+      "stressed",
+      "fatigue",
+      "tired",
+      "burnout",
+      "worn out",
+      "overwhelmed",
+      "drained",
+      "tough calls",
+      "difficult customers",
+      "reset",
+      "skipped breaks",
+      "working through breaks",
+      "wellbeing",
+      "support resources",
+      "heavy shift"
+    ],
+    "tags": [
+      "Wellbeing",
+      "Engagement",
+      "Breaks"
+    ],
+    "kpi": [
+      "Attrition",
+      "ABS"
+    ],
+    "theme": "engage",
+    "feedback": "After some of your more difficult interactions recently, you have looked visibly tired or tense, and you have moved straight into the next contact without a moment to reset. Breaks have also been worked through or taken later than scheduled. Difficult conversations take energy, and carrying that strain into the rest of the shift can make each new customer feel heavier than the last and wear down your patience and focus. I want you to feel supported here. Going forward, take a few seconds to reset before the next customer when you need it, use your breaks as scheduled, and tell me early when a shift is starting to feel like too much.",
+    "impact": "Strain like this usually builds when tough interactions stack up without a pause, or when breaks get pushed aside to keep up with the queue. Over time, it can lower your energy and patience, make difficult customers feel harder to handle, and make a full shift feel overwhelming. Customers may notice the change in tone, and stretched energy can also lead to more unplanned time away from work.",
+    "plan": "During the next {duration}, you will take a short reset after a difficult interaction before taking the next customer, such as a slow breath, a sip of water, and a quick note of what went well. You will take every break and lunch at the scheduled time rather than working through them. When a shift starts to feel heavy, you will let me or the team lead on duty know early so we can talk through options together. We will check in within {followup} to see what is helping and what support you would like from me.",
+    "followup": "We will start with a short wellbeing check-in about which moments of a shift feel heaviest and what helps you feel steady again. I will share the support resources available through the site so you know where to turn, and I will check in with you within {followup}. We will keep a brief weekly conversation going for the full {duration}, and you can ask for one sooner at any time.",
+    "example": [
+      {
+        "label": "Raising stress early",
+        "say": "The last few customers were really tough, and I'm feeling worn down. Could I talk with you for a minute before my next break about how to handle the rest of the shift?"
+      },
+      {
+        "label": "Protecting a break",
+        "say": "My break is coming up, and I'm going to take it on time today. I think I need the reset."
+      }
+    ],
+    "questions": [
+      "What part of a difficult interaction stays with you the longest afterward?",
+      "What helps you reset before the next customer, even for a few seconds?",
+      "How can I support you when a shift starts to feel like too much?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-empathy",
+      "s-deescalation",
+      "s-ownership"
+    ],
+    "b": {
+      "obs": "looked visibly tired after difficult interactions, moved straight into the next contact without a reset, and worked through or delayed scheduled breaks",
+      "focus": "resets and breaks",
+      "commit": "take a short reset after difficult interactions, use every break as scheduled, and tell me early when a shift feels heavy",
+      "mx": "Every break and lunch during the next {duration} is taken at the scheduled time, and we hold a short wellbeing check-in each week.",
+      "coach": "a short wellbeing check-in and a walkthrough of the support resources available through the site"
+    },
+    "note": "Do not diagnose or ask about medical or personal details. Offer the support resources the site provides, such as an employee assistance program where available, and involve HR if the agent asks for more support. Confirm break and lunch times with WFM before the session."
+  },
+  {
+    "id": "people-low-confidence",
+    "cat": "people",
+    "title": "Low Confidence on the Floor",
+    "desc": "Hesitation on newer call types, reluctance to ask the team lead for help, and reliance on teammates instead of building confidence through practice.",
+    "kw": [
+      "low confidence",
+      "confidence",
+      "hesitant",
+      "unsure",
+      "nervous",
+      "new hire",
+      "new call types",
+      "afraid to ask",
+      "not asking for help",
+      "relies on others",
+      "leaning on peers",
+      "second guessing",
+      "buddy",
+      "practice",
+      "nesting",
+      "side by side"
+    ],
+    "tags": [
+      "Confidence",
+      "Development",
+      "Engagement"
+    ],
+    "kpi": [
+      "Attrition"
+    ],
+    "theme": "engage",
+    "feedback": "When newer call types come into your queue, you have hesitated before moving forward, held back from asking me or the team lead for help, and relied on teammates to give you the answer. Wanting to get it right is a good instinct, and confidence on newer work comes from practice and support, not from knowing everything on day one. Without that support, uncertainty can stretch out conversations and leave customers waiting while you look for an answer. Next time a newer situation comes up, check the approved resources, ask me or the team lead directly when you are unsure, and talk through what you learned afterward so the next one feels easier.",
+    "impact": "Low confidence on newer work usually comes from limited practice with those situations and worry about asking a question that seems basic. If it continues, you may avoid the very situations you most need to practice, lean on others longer than needed, and feel less sure of yourself overall. Customers may experience longer pauses or holds, and teammates who step in can lose time with their own customers.",
+    "plan": "Each week for the next {duration}, you will practice one newer contact type with a peer buddy, using the approved resources to walk through the steps together. When you are unsure while helping a customer, you will check the approved resources first and then ask me or the team lead directly, instead of waiting or handing the question to a teammate. At the end of each week, you will name one situation that felt easier and one that still feels uncertain. We will review those notes together within {followup}.",
+    "followup": "I will pair you with a peer buddy who handles these situations well, and we will run a short practice scenario together during our session. Within {followup}, I will sit with you for part of a shift to support you on a newer contact type as it happens. We will meet weekly to talk about what is getting easier, and at the end of the {durationAdj} plan we will choose the next area to build.",
+    "example": [
+      {
+        "label": "Asking for help directly",
+        "say": "I haven't handled this type of request much yet. Could you walk me through the first steps so I can do the next one on my own?"
+      },
+      {
+        "label": "After practice",
+        "say": "I went through the steps in the approved resources with my buddy, and I'd like to take the next one myself. Can you stay nearby in case I get stuck?"
+      }
+    ],
+    "questions": [
+      "Which types of customer requests feel least comfortable for you right now?",
+      "What makes it harder to ask me or the team lead a question when you are unsure?",
+      "What kind of practice would help a newer situation feel familiar faster?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-punctuality",
+      "s-tone",
+      "s-empathy",
+      "s-listening"
+    ],
+    "b": {
+      "obs": "hesitated on newer call types, held back from asking me or the team lead for help, and relied on teammates for the answers",
+      "focus": "confidence on newer work",
+      "commit": "practice one newer contact type each week with a peer buddy and ask me or the team lead directly when you are unsure",
+      "mx": "Each week for the next {duration}, you complete one practice session with your peer buddy and bring one question to our weekly check-in.",
+      "coach": "a practice scenario on a newer contact type with a peer buddy"
+    },
+    "note": "Choose a peer buddy who is patient and accurate, and confirm that the approved resources for newer contact types are current. Keep the tone encouraging; the goal is to make asking for help feel normal."
+  },
+  {
+    "id": "people-growth-goals",
+    "cat": "people",
+    "title": "Unclear Growth Goals",
+    "desc": "No clear development goal or next step, which can leave work feeling directionless and make it harder to see a future on the team.",
+    "kw": [
+      "growth",
+      "career",
+      "career path",
+      "development goal",
+      "development plan",
+      "idp",
+      "next step",
+      "promotion",
+      "advancement",
+      "no goals",
+      "stagnant",
+      "bored",
+      "skills",
+      "learning",
+      "mentor",
+      "upskill"
+    ],
+    "tags": [
+      "Development",
+      "Career Growth",
+      "Retention"
+    ],
+    "kpi": [
+      "Attrition"
+    ],
+    "theme": "engage",
+    "feedback": "Right now, you do not have a clear development goal or an agreed next step for your growth here. Without one, it is easy for each shift to feel the same and hard to see how the skills you are building connect to where you would like to go. That can make the work feel less rewarding and make busy weeks harder to get through. I would like us to change that together. The expectation is to sit down with me, talk about what interests you, whether that is a skill, a specialty, or a future role, and agree on one simple goal with a first step you can start right away.",
+    "impact": "Unclear growth goals often come from not having a dedicated conversation about development, or from not knowing which paths and skills are open at the site. When people cannot see a next step, they may feel stuck, put less energy into learning, and start looking elsewhere for growth. A clear goal gives your effort a direction and helps me support you with the right practice and opportunities.",
+    "plan": "Within the next {followup}, you and I will hold a development conversation and agree on one goal that matters to you, such as strengthening a skill, learning a new area, or preparing for a future role. Together we will write down the goal, the first step, and how you will know it is working. For the rest of the {duration}, you will take one small action toward the goal each week and bring a short update to our check-in. If the goal needs training or time with a mentor, we will discuss what is available according to site policy.",
+    "followup": "Before our development conversation, I will gather information about the skills, training, and paths available at the site so we can look at real options together. Within {followup}, we will agree on the goal and the first step. I will check in each week, help clear anything in the way, and at the end of the {durationAdj} plan we will review the goal and set the next step.",
+    "example": [
+      {
+        "label": "Asking for a development conversation",
+        "say": "I'd like to grow here, but I'm not sure what my next step should be. Could we set up some time to talk about my development and the options I have?"
+      },
+      {
+        "label": "Sharing an interest",
+        "say": "I've really enjoyed the technical side of the work. What would it take for me to build toward a role that uses more of that?"
+      }
+    ],
+    "questions": [
+      "What part of your work would you like to get even better at over the next few months?",
+      "Where would you like to be in a year, and what would help you get there?",
+      "What kind of support from me would make a development goal feel achievable?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-adherence",
+      "s-tone",
+      "s-resolution",
+      "s-team-support"
+    ],
+    "b": {
+      "obs": "worked without a clear development goal or an agreed next step for your growth on the team",
+      "focus": "development goals",
+      "commit": "agree on one development goal with me and take one small action toward it each week",
+      "mx": "Within {followup}, we agree on one written development goal, and you share a short weekly update on it for the rest of the {duration}.",
+      "coach": "a development conversation to agree on one goal and a first step"
+    },
+    "note": "Before the session, confirm the development paths, training options, and internal posting process at the site with HR or the training team, so you do not promise roles or timelines that are not available."
+  },
+  {
+    "id": "people-team-connection",
+    "cat": "people",
+    "title": "Limited Team Connection",
+    "desc": "Working in isolation, with little contact with peers or the team lead, which can limit support, shared knowledge, and a sense of belonging.",
+    "kw": [
+      "isolated",
+      "isolation",
+      "works alone",
+      "team connection",
+      "belonging",
+      "not reaching out",
+      "peer support",
+      "loner",
+      "remote",
+      "work from home",
+      "new to team",
+      "team chat",
+      "quiet on the team",
+      "doesn't ask peers",
+      "connection",
+      "teamwork"
+    ],
+    "tags": [
+      "Teamwork",
+      "Engagement",
+      "Retention"
+    ],
+    "kpi": [
+      "Attrition"
+    ],
+    "theme": "engage",
+    "feedback": "On the floor and in team chat, you have mostly worked on your own, with little contact with your peers or with me and the team lead. Working independently is a real strength, and you also deserve the support and shared knowledge that come from being connected to the team. When questions or tough moments stay with you alone, they can feel heavier, and you may miss quick tips that would make your work with customers easier. Instead, reach out to a teammate when you have a question or something to share, join in during huddles, and come to me or the team lead whenever you need support.",
+    "impact": "Limited connection often happens when someone is newer to the team, works mostly remotely, or has not had a natural way to get to know teammates. Without it, you may carry questions and difficult moments on your own, feel less like part of the team, and have fewer reasons to stay when work gets hard. The team also misses the perspective and knowledge you bring.",
+    "plan": "Throughout the next {duration}, you will reach out to at least one teammate each shift, whether to ask a question, share something useful, or check how their day is going. You will also meet with your peer buddy for a short conversation each week and share one tip or question in a huddle or in team chat. Within {followup}, we will talk about which connections feel natural and where you would like more support from me or the team lead.",
+    "followup": "I will introduce you to a peer buddy whose strengths match what you are working on, and I will make a point of checking in with you during shifts, not only when something needs fixing. Within {followup}, we will talk about how those connections are going. At the end of the {durationAdj} plan, we will decide together how to keep you connected to the team.",
+    "example": [
+      {
+        "label": "Reaching out to a peer",
+        "say": "You handle these billing questions really well. Do you have a minute later to show me how you explain the charges?"
+      },
+      {
+        "label": "Asking the team lead",
+        "say": "I'd like to feel more connected to the team. Is there a huddle topic or a team project I could help with?"
+      }
+    ],
+    "questions": [
+      "Who on the team do you feel most comfortable going to with a question?",
+      "What makes it harder to reach out to teammates or to me during a shift?",
+      "What would help you feel more a part of this team?"
+    ],
+    "strengths": [
+      "s-attendance",
+      "s-adherence",
+      "s-punctuality",
+      "s-resolution",
+      "s-tone"
+    ],
+    "b": {
+      "obs": "worked mostly on your own and rarely reached out to peers, the team lead, or me for questions or support",
+      "focus": "team connection",
+      "commit": "reach out to a teammate each shift and come to me or the team lead whenever you need support",
+      "mx": "During the next {duration}, you meet with your peer buddy each week and share at least one question or tip with the team.",
+      "coach": "an introduction to a peer buddy and a plan for staying connected during shifts"
+    },
+    "note": "Pair the agent with a welcoming peer buddy and check in during shifts, not only during formal coaching. If the agent works remotely, confirm which team channels are available before suggesting them."
+  }
+]

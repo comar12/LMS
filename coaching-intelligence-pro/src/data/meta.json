@@ -1,271 +1,1304 @@
 {
   "categories": [
-    { "id": "com",   "nav": "Communication",     "label": "Communication & Soft Skills",           "file": "communication.json" },
-    { "id": "dis",   "nav": "Discovery",         "label": "Probing & Discovery",                   "file": "discovery.json" },
-    { "id": "hold",  "nav": "Hold & Mute",       "label": "Hold, Mute & Call Control",             "file": "hold.json" },
-    { "id": "own",   "nav": "Ownership",         "label": "Ownership & Resolution",                "file": "ownership.json" },
-    { "id": "tech",  "nav": "Technical Support", "label": "Technical Support & Process Knowledge", "file": "technical.json" },
-    { "id": "bill",  "nav": "Billing",           "label": "Billing & Customer Education",          "file": "billing.json" },
-    { "id": "sales", "nav": "Sales",             "label": "Sales & Retention",                     "file": "sales.json" }
+    {
+      "id": "com",
+      "nav": "Communication",
+      "label": "Communication & Soft Skills",
+      "file": "communication.json"
+    },
+    {
+      "id": "dis",
+      "nav": "Discovery",
+      "label": "Probing & Discovery",
+      "file": "discovery.json"
+    },
+    {
+      "id": "hold",
+      "nav": "Hold & Mute",
+      "label": "Hold, Mute & Call Control",
+      "file": "hold.json"
+    },
+    {
+      "id": "own",
+      "nav": "Ownership",
+      "label": "Ownership & Resolution",
+      "file": "ownership.json"
+    },
+    {
+      "id": "tech",
+      "nav": "Technical Support",
+      "label": "Technical Support & Process Knowledge",
+      "file": "technical.json"
+    },
+    {
+      "id": "bill",
+      "nav": "Billing",
+      "label": "Billing & Customer Education",
+      "file": "billing.json"
+    },
+    {
+      "id": "sales",
+      "nav": "Sales",
+      "label": "Sales & Retention",
+      "file": "sales.json"
+    },
+    {
+      "id": "people",
+      "nav": "ABS & Attrition",
+      "label": "Attendance, Adherence & Retention",
+      "file": "people.json"
+    }
   ],
-
   "kpis": [
-    { "id": "QA",       "label": "QA",            "hint": "Behaviors typically scored on the quality evaluation form" },
-    { "id": "aiCR",     "label": "Repeat (aiCR)", "hint": "Behaviors that can drive repeat contacts" },
-    { "id": "Transfer", "label": "Transfer",      "hint": "Behaviors that can drive avoidable or incorrect transfers" }
+    {
+      "id": "QA",
+      "label": "QA",
+      "hint": "Behaviors typically scored on the quality evaluation form"
+    },
+    {
+      "id": "aiCR",
+      "label": "Repeat (aiCR)",
+      "hint": "Behaviors that can drive repeat contacts"
+    },
+    {
+      "id": "Transfer",
+      "label": "Transfer",
+      "hint": "Behaviors that can drive avoidable or incorrect transfers"
+    },
+    {
+      "id": "ABS",
+      "label": "ABS",
+      "hint": "Attendance and schedule behaviors that affect absenteeism and coverage"
+    },
+    {
+      "id": "Attrition",
+      "label": "Attrition",
+      "hint": "Engagement and wellbeing signals that affect whether agents stay"
+    }
   ],
-
   "themes": {
-    "connect":   { "label": "Empathy & Connection",        "lead": "When the customer shared the concern, you {list}.",           "plan": "To build a stronger connection with the customer, you will {list}.",                "impact": "leave the customer feeling unheard or unsupported" },
-    "delivery":  { "label": "Tone & Clarity",              "lead": "Throughout the call, you {list}.",                            "plan": "To keep your delivery engaged and easy to follow, you will {list}.",                 "impact": "make the conversation feel disengaged or harder to follow" },
-    "listen":    { "label": "Listening & Customer Effort", "lead": "While the customer was speaking, you {list}.",                "plan": "To reduce customer effort and show that you are listening, you will {list}.",       "impact": "increase the effort the customer has to put into the call" },
-    "structure": { "label": "Call Structure",              "lead": "In the structure of the call, you {list}.",                   "plan": "To keep each call organized from opening to close, you will {list}.",                "impact": "cause confusion about what was done and what happens next" },
-    "discover":  { "label": "Probing & Discovery",         "lead": "During discovery, you {list}.",                               "plan": "To strengthen discovery before acting on the concern, you will {list}.",            "impact": "lead to solutions that do not fully address the actual concern" },
-    "control":   { "label": "Hold & Call Control",         "lead": "In managing the flow of the call, you {list}.",               "plan": "To stay in control of the call during research and holds, you will {list}.",        "impact": "create uncertainty about whether the concern is still being handled" },
-    "own":       { "label": "Ownership & Resolution",      "lead": "When it came to ownership and resolution, you {list}.",       "plan": "To take full ownership of each concern through resolution, you will {list}.",       "impact": "raise the likelihood of a repeat contact" },
-    "tech":      { "label": "Technical Accuracy",          "lead": "From a technical and process standpoint, you {list}.",       "plan": "To keep your troubleshooting accurate and complete, you will {list}.",              "impact": "result in unresolved issues and avoidable repeat contacts" },
-    "billing":   { "label": "Billing Accuracy",            "lead": "As you reviewed the account and billing details, you {list}.", "plan": "To make billing conversations accurate and clear, you will {list}.",                "impact": "undermine the customer's trust in the charges and commitments on the account" },
-    "sales":     { "label": "Sales & Retention",           "lead": "In the sales conversation, you {list}.",                      "plan": "To keep sales conversations relevant to the customer, you will {list}.",            "impact": "weaken the customer's trust in the offers you recommend" }
+    "connect": {
+      "label": "Empathy & Connection",
+      "lead": "When the customer shared the concern, you {list}.",
+      "plan": "To build a stronger connection with the customer, you will {list}.",
+      "impact": "leave the customer feeling unheard or unsupported"
+    },
+    "delivery": {
+      "label": "Tone & Clarity",
+      "lead": "Throughout the call, you {list}.",
+      "plan": "To keep your delivery engaged and easy to follow, you will {list}.",
+      "impact": "make the conversation feel disengaged or harder to follow"
+    },
+    "listen": {
+      "label": "Listening & Customer Effort",
+      "lead": "While the customer was speaking, you {list}.",
+      "plan": "To reduce customer effort and show that you are listening, you will {list}.",
+      "impact": "increase the effort the customer has to put into the call"
+    },
+    "structure": {
+      "label": "Call Structure",
+      "lead": "In the structure of the call, you {list}.",
+      "plan": "To keep each call organized from opening to close, you will {list}.",
+      "impact": "cause confusion about what was done and what happens next"
+    },
+    "discover": {
+      "label": "Probing & Discovery",
+      "lead": "During discovery, you {list}.",
+      "plan": "To strengthen discovery before acting on the concern, you will {list}.",
+      "impact": "lead to solutions that do not fully address the actual concern"
+    },
+    "control": {
+      "label": "Hold & Call Control",
+      "lead": "In managing the flow of the call, you {list}.",
+      "plan": "To stay in control of the call during research and holds, you will {list}.",
+      "impact": "create uncertainty about whether the concern is still being handled"
+    },
+    "own": {
+      "label": "Ownership & Resolution",
+      "lead": "When it came to ownership and resolution, you {list}.",
+      "plan": "To take full ownership of each concern through resolution, you will {list}.",
+      "impact": "raise the likelihood of a repeat contact"
+    },
+    "tech": {
+      "label": "Technical Accuracy",
+      "lead": "From a technical and process standpoint, you {list}.",
+      "plan": "To keep your troubleshooting accurate and complete, you will {list}.",
+      "impact": "result in unresolved issues and avoidable repeat contacts"
+    },
+    "billing": {
+      "label": "Billing Accuracy",
+      "lead": "As you reviewed the account and billing details, you {list}.",
+      "plan": "To make billing conversations accurate and clear, you will {list}.",
+      "impact": "undermine the customer's trust in the charges and commitments on the account"
+    },
+    "sales": {
+      "label": "Sales & Retention",
+      "lead": "In the sales conversation, you {list}.",
+      "plan": "To keep sales conversations relevant to the customer, you will {list}.",
+      "impact": "weaken the customer's trust in the offers you recommend"
+    },
+    "attend": {
+      "label": "Attendance & Punctuality",
+      "lead": "Over the recent schedule period, you {list}.",
+      "plan": "To strengthen your attendance and reliability, you will {list}.",
+      "impact": "put extra pressure on your teammates and stretch coverage when customers are waiting"
+    },
+    "adhere": {
+      "label": "Schedule Adherence",
+      "lead": "During your scheduled shifts, you {list}.",
+      "plan": "To stay aligned with your schedule, you will {list}.",
+      "impact": "reduce the number of agents available to customers and lengthen wait times"
+    },
+    "engage": {
+      "label": "Engagement & Wellbeing",
+      "lead": "In recent weeks, you {list}.",
+      "plan": "To support your confidence and growth on the team, you will {list}.",
+      "impact": "affect your confidence and the support the team is able to give you"
+    }
   },
-
   "strengthGroups": [
-    { "id": "com",   "label": "Communication" },
-    { "id": "dis",   "label": "Discovery" },
-    { "id": "hold",  "label": "Hold & Control" },
-    { "id": "own",   "label": "Ownership" },
-    { "id": "tech",  "label": "Technical" },
-    { "id": "bill",  "label": "Billing" },
-    { "id": "sales", "label": "Sales & Retention" }
+    {
+      "id": "com",
+      "label": "Communication"
+    },
+    {
+      "id": "dis",
+      "label": "Discovery"
+    },
+    {
+      "id": "hold",
+      "label": "Hold & Control"
+    },
+    {
+      "id": "own",
+      "label": "Ownership"
+    },
+    {
+      "id": "tech",
+      "label": "Technical"
+    },
+    {
+      "id": "bill",
+      "label": "Billing"
+    },
+    {
+      "id": "sales",
+      "label": "Sales & Retention"
+    },
+    {
+      "id": "people",
+      "label": "Attendance & Engagement"
+    }
   ],
-
   "strengthCatalog": [
-    { "id": "s-acknowledgement",  "group": "com",   "title": "Strong Acknowledgement",          "desc": "Recognizes and restates the customer's concern early, so the customer knows they were heard." },
-    { "id": "s-empathy",          "group": "com",   "title": "Personalized Empathy",            "desc": "Responds to the customer's specific situation with sincere, tailored empathy." },
-    { "id": "s-assurance",        "group": "com",   "title": "Effective Assurance",             "desc": "Gives clear, confident assurance of ownership early in the call." },
-    { "id": "s-rapport",          "group": "com",   "title": "Excellent Rapport",               "desc": "Builds a genuine, professional connection that makes the conversation comfortable." },
-    { "id": "s-tone",             "group": "com",   "title": "Professional Tone",               "desc": "Keeps an engaged, confident tone and a pace that fits the customer and the situation." },
-    { "id": "s-listening",        "group": "com",   "title": "Strong Active Listening",         "desc": "Captures details the first time and responds to what the customer actually said." },
-    { "id": "s-deescalation",     "group": "com",   "title": "Successful De-escalation",        "desc": "Calms a frustrated customer and moves the conversation toward a solution." },
-    { "id": "s-clarity",          "group": "com",   "title": "Clear, Simple Explanations",      "desc": "Explains information in plain language the customer can easily follow." },
-    { "id": "s-opening",          "group": "com",   "title": "Strong Call Opening",             "desc": "Opens professionally and quickly sets a clear direction for the call." },
-    { "id": "s-closing",          "group": "com",   "title": "Strong Call Closing",             "desc": "Recaps what was done, confirms next steps, and closes professionally." },
-    { "id": "s-loyalty",          "group": "com",   "title": "Recognizing Customer Loyalty",    "desc": "Sincerely acknowledges the customer's tenure and relationship with the company." },
-    { "id": "s-probing",          "group": "dis",   "title": "Effective Probing",               "desc": "Asks focused, relevant questions to understand the full concern before acting." },
-    { "id": "s-understanding",    "group": "dis",   "title": "Confirming Customer Understanding", "desc": "Checks that the customer understands the information and the next steps." },
-    { "id": "s-hold",             "group": "hold",  "title": "Proper Hold Management",          "desc": "Asks permission, gives a timeframe, and returns on time with an update." },
-    { "id": "s-research-updates", "group": "hold",  "title": "Keeping the Customer Informed",   "desc": "Narrates research and gives updates, so silence never goes unexplained." },
-    { "id": "s-call-control",     "group": "hold",  "title": "Confident Call Control",          "desc": "Guides the conversation with purpose while staying respectful and flexible." },
-    { "id": "s-ownership",        "group": "own",   "title": "Effective Ownership",             "desc": "Takes personal responsibility for the concern from start to finish." },
-    { "id": "s-expectations",     "group": "own",   "title": "Strong Expectation Setting",      "desc": "Sets accurate expectations about timeframes, next steps, and outcomes." },
-    { "id": "s-escalation",       "group": "own",   "title": "Correct Escalation",              "desc": "Uses the correct escalation path at the right time and explains it clearly." },
-    { "id": "s-transfer",         "group": "own",   "title": "Proper Transfer Handling",        "desc": "Transfers only when needed, explains why, and follows the correct handoff process." },
-    { "id": "s-education",        "group": "own",   "title": "Effective Customer Education",    "desc": "Teaches the customer what they need to know to manage or prevent the issue." },
-    { "id": "s-resolution",       "group": "own",   "title": "Accurate Resolution",             "desc": "Resolves the actual concern correctly and confirms the outcome with the customer." },
-    { "id": "s-followup",         "group": "own",   "title": "Appropriate Customer Follow-Up",  "desc": "Makes clear follow-up commitments when needed and explains how they will happen." },
-    { "id": "s-itg",              "group": "tech",  "title": "Correct ITG Utilization",         "desc": "Follows the applicable ITG flow accurately and completely." },
-    { "id": "s-troubleshooting",  "group": "tech",  "title": "Good Technical Troubleshooting",  "desc": "Works through troubleshooting in a logical, thorough sequence." },
-    { "id": "s-diagnosis",        "group": "tech",  "title": "Correct Technical Diagnosis",     "desc": "Identifies the correct root cause before recommending a solution." },
-    { "id": "s-tools",            "group": "tech",  "title": "Efficient Tools Navigation",      "desc": "Moves through systems and tools efficiently while staying engaged with the customer." },
-    { "id": "s-verification",     "group": "tech",  "title": "Accurate Account Verification",   "desc": "Completes verification correctly before accessing or changing the account." },
-    { "id": "s-billing",          "group": "bill",  "title": "Accurate Billing Explanation",    "desc": "Explains charges, changes, and timelines accurately and in plain language." },
-    { "id": "s-pricing",          "group": "bill",  "title": "Clear Pricing Explanation",       "desc": "Explains pricing, promotional terms, and what changes afterward, with no surprises." },
-    { "id": "s-payment-options",  "group": "bill",  "title": "Helpful Payment Options Guidance", "desc": "Explains the payment options that fit the customer's situation clearly and accurately." },
-    { "id": "s-sales-discovery",  "group": "sales", "title": "Effective Sales Discovery",       "desc": "Asks about needs and usage before recommending a product or service." },
-    { "id": "s-plant-seed",       "group": "sales", "title": "Effective Plant the Seed",        "desc": "Introduces a relevant idea naturally after the concern is resolved, without pressure." },
-    { "id": "s-relevant-offer",   "group": "sales", "title": "Relevant Offer",                  "desc": "Recommends an offer that clearly connects to what the customer shared." },
-    { "id": "s-value",            "group": "sales", "title": "Clear Offer Value",               "desc": "Explains the offer in terms of the benefits that matter to the customer." },
-    { "id": "s-objection",        "group": "sales", "title": "Effective Objection Handling",    "desc": "Acknowledges objections, clarifies the concern, and responds with relevant value." },
-    { "id": "s-retention",        "group": "sales", "title": "Effective Retention Handling",    "desc": "Recognizes cancellation risk and works to understand and address the reason." },
-    { "id": "s-sales-close",      "group": "sales", "title": "Confident Sales Close",           "desc": "Asks for the decision confidently and confirms exactly what the customer agreed to." }
+    {
+      "id": "s-acknowledgement",
+      "group": "com",
+      "title": "Strong Acknowledgement",
+      "desc": "Recognizes and restates the customer's concern early, so the customer knows they were heard."
+    },
+    {
+      "id": "s-empathy",
+      "group": "com",
+      "title": "Personalized Empathy",
+      "desc": "Responds to the customer's specific situation with sincere, tailored empathy."
+    },
+    {
+      "id": "s-assurance",
+      "group": "com",
+      "title": "Effective Assurance",
+      "desc": "Gives clear, confident assurance of ownership early in the call."
+    },
+    {
+      "id": "s-rapport",
+      "group": "com",
+      "title": "Excellent Rapport",
+      "desc": "Builds a genuine, professional connection that makes the conversation comfortable."
+    },
+    {
+      "id": "s-tone",
+      "group": "com",
+      "title": "Professional Tone",
+      "desc": "Keeps an engaged, confident tone and a pace that fits the customer and the situation."
+    },
+    {
+      "id": "s-listening",
+      "group": "com",
+      "title": "Strong Active Listening",
+      "desc": "Captures details the first time and responds to what the customer actually said."
+    },
+    {
+      "id": "s-deescalation",
+      "group": "com",
+      "title": "Successful De-escalation",
+      "desc": "Calms a frustrated customer and moves the conversation toward a solution."
+    },
+    {
+      "id": "s-clarity",
+      "group": "com",
+      "title": "Clear, Simple Explanations",
+      "desc": "Explains information in plain language the customer can easily follow."
+    },
+    {
+      "id": "s-opening",
+      "group": "com",
+      "title": "Strong Call Opening",
+      "desc": "Opens professionally and quickly sets a clear direction for the call."
+    },
+    {
+      "id": "s-closing",
+      "group": "com",
+      "title": "Strong Call Closing",
+      "desc": "Recaps what was done, confirms next steps, and closes professionally."
+    },
+    {
+      "id": "s-loyalty",
+      "group": "com",
+      "title": "Recognizing Customer Loyalty",
+      "desc": "Sincerely acknowledges the customer's tenure and relationship with the company."
+    },
+    {
+      "id": "s-probing",
+      "group": "dis",
+      "title": "Effective Probing",
+      "desc": "Asks focused, relevant questions to understand the full concern before acting."
+    },
+    {
+      "id": "s-understanding",
+      "group": "dis",
+      "title": "Confirming Customer Understanding",
+      "desc": "Checks that the customer understands the information and the next steps."
+    },
+    {
+      "id": "s-hold",
+      "group": "hold",
+      "title": "Proper Hold Management",
+      "desc": "Asks permission, gives a timeframe, and returns on time with an update."
+    },
+    {
+      "id": "s-research-updates",
+      "group": "hold",
+      "title": "Keeping the Customer Informed",
+      "desc": "Narrates research and gives updates, so silence never goes unexplained."
+    },
+    {
+      "id": "s-call-control",
+      "group": "hold",
+      "title": "Confident Call Control",
+      "desc": "Guides the conversation with purpose while staying respectful and flexible."
+    },
+    {
+      "id": "s-ownership",
+      "group": "own",
+      "title": "Effective Ownership",
+      "desc": "Takes personal responsibility for the concern from start to finish."
+    },
+    {
+      "id": "s-expectations",
+      "group": "own",
+      "title": "Strong Expectation Setting",
+      "desc": "Sets accurate expectations about timeframes, next steps, and outcomes."
+    },
+    {
+      "id": "s-escalation",
+      "group": "own",
+      "title": "Correct Escalation",
+      "desc": "Uses the correct escalation path at the right time and explains it clearly."
+    },
+    {
+      "id": "s-transfer",
+      "group": "own",
+      "title": "Proper Transfer Handling",
+      "desc": "Transfers only when needed, explains why, and follows the correct handoff process."
+    },
+    {
+      "id": "s-education",
+      "group": "own",
+      "title": "Effective Customer Education",
+      "desc": "Teaches the customer what they need to know to manage or prevent the issue."
+    },
+    {
+      "id": "s-resolution",
+      "group": "own",
+      "title": "Accurate Resolution",
+      "desc": "Resolves the actual concern correctly and confirms the outcome with the customer."
+    },
+    {
+      "id": "s-followup",
+      "group": "own",
+      "title": "Appropriate Customer Follow-Up",
+      "desc": "Makes clear follow-up commitments when needed and explains how they will happen."
+    },
+    {
+      "id": "s-itg",
+      "group": "tech",
+      "title": "Correct ITG Utilization",
+      "desc": "Follows the applicable ITG flow accurately and completely."
+    },
+    {
+      "id": "s-troubleshooting",
+      "group": "tech",
+      "title": "Good Technical Troubleshooting",
+      "desc": "Works through troubleshooting in a logical, thorough sequence."
+    },
+    {
+      "id": "s-diagnosis",
+      "group": "tech",
+      "title": "Correct Technical Diagnosis",
+      "desc": "Identifies the correct root cause before recommending a solution."
+    },
+    {
+      "id": "s-tools",
+      "group": "tech",
+      "title": "Efficient Tools Navigation",
+      "desc": "Moves through systems and tools efficiently while staying engaged with the customer."
+    },
+    {
+      "id": "s-verification",
+      "group": "tech",
+      "title": "Accurate Account Verification",
+      "desc": "Completes verification correctly before accessing or changing the account."
+    },
+    {
+      "id": "s-billing",
+      "group": "bill",
+      "title": "Accurate Billing Explanation",
+      "desc": "Explains charges, changes, and timelines accurately and in plain language."
+    },
+    {
+      "id": "s-pricing",
+      "group": "bill",
+      "title": "Clear Pricing Explanation",
+      "desc": "Explains pricing, promotional terms, and what changes afterward, with no surprises."
+    },
+    {
+      "id": "s-payment-options",
+      "group": "bill",
+      "title": "Helpful Payment Options Guidance",
+      "desc": "Explains the payment options that fit the customer's situation clearly and accurately."
+    },
+    {
+      "id": "s-sales-discovery",
+      "group": "sales",
+      "title": "Effective Sales Discovery",
+      "desc": "Asks about needs and usage before recommending a product or service."
+    },
+    {
+      "id": "s-plant-seed",
+      "group": "sales",
+      "title": "Effective Plant the Seed",
+      "desc": "Introduces a relevant idea naturally after the concern is resolved, without pressure."
+    },
+    {
+      "id": "s-relevant-offer",
+      "group": "sales",
+      "title": "Relevant Offer",
+      "desc": "Recommends an offer that clearly connects to what the customer shared."
+    },
+    {
+      "id": "s-value",
+      "group": "sales",
+      "title": "Clear Offer Value",
+      "desc": "Explains the offer in terms of the benefits that matter to the customer."
+    },
+    {
+      "id": "s-objection",
+      "group": "sales",
+      "title": "Effective Objection Handling",
+      "desc": "Acknowledges objections, clarifies the concern, and responds with relevant value."
+    },
+    {
+      "id": "s-retention",
+      "group": "sales",
+      "title": "Effective Retention Handling",
+      "desc": "Recognizes cancellation risk and works to understand and address the reason."
+    },
+    {
+      "id": "s-sales-close",
+      "group": "sales",
+      "title": "Confident Sales Close",
+      "desc": "Asks for the decision confidently and confirms exactly what the customer agreed to."
+    },
+    {
+      "id": "s-attendance",
+      "group": "people",
+      "title": "Reliable Attendance",
+      "desc": "Works the scheduled shifts in the period reviewed, so the team can count on full coverage."
+    },
+    {
+      "id": "s-punctuality",
+      "group": "people",
+      "title": "On-Time Starts",
+      "desc": "Is logged in and ready at the start of shifts and when returning from breaks and lunch."
+    },
+    {
+      "id": "s-adherence",
+      "group": "people",
+      "title": "Strong Schedule Adherence",
+      "desc": "Follows scheduled breaks, lunches, and log-out times, which keeps the queue covered."
+    },
+    {
+      "id": "s-callout",
+      "group": "people",
+      "title": "Responsible Absence Notice",
+      "desc": "When unable to work, gives notice early and through the correct call-out process."
+    },
+    {
+      "id": "s-engagement",
+      "group": "people",
+      "title": "Positive Team Engagement",
+      "desc": "Takes part in huddles and team activities and brings a constructive attitude."
+    },
+    {
+      "id": "s-team-support",
+      "group": "people",
+      "title": "Supports Teammates",
+      "desc": "Shares knowledge and helps peers, which strengthens the whole team."
+    },
+    {
+      "id": "s-development",
+      "group": "people",
+      "title": "Owns Development",
+      "desc": "Asks for feedback, practices new skills, and follows through on development goals."
+    },
+    {
+      "id": "s-resilience",
+      "group": "people",
+      "title": "Resilience After Tough Calls",
+      "desc": "Resets after a difficult interaction and brings a steady, professional tone to the next call."
+    }
   ],
-
   "required": {
     "com": [
-      ["com-missing-empathy",        "Missing Empathy",                                  "connect"],
-      ["com-generic-empathy",        "Generic / Non-Personalized Empathy",               "connect"],
-      ["com-missing-acknowledgement","Missing Acknowledgement",                          "connect"],
-      ["com-weak-assurance",         "Weak or Missing Assurance",                        "connect"],
-      ["com-lack-rapport",           "Lack of Rapport",                                  "connect"],
-      ["com-flat-tone",              "Flat / Sleepy / Low-Energy Tone",                  "delivery"],
-      ["com-tone-pace",              "Inappropriate Tone or Pace",                       "delivery"],
-      ["com-active-listening",       "Poor Active Listening",                            "listen"],
-      ["com-interrupting",           "Interrupting the Customer",                        "listen"],
-      ["com-repeating-questions",    "Repeating Questions / Increasing Customer Effort", "listen"],
-      ["com-deescalation",           "Poor De-escalation",                               "connect"],
-      ["com-emotional-ownership",    "Lack of Emotional Ownership",                      "connect"],
-      ["com-clarity",                "Confusing Explanations / Communication Clarity",   "delivery"],
-      ["com-opening",                "Weak Call Opening",                                "structure"],
-      ["com-call-flow",              "Poor Call Flow",                                   "structure"],
-      ["com-closing",                "Weak Call Closing / No Recap",                     "structure"]
+      [
+        "com-missing-empathy",
+        "Missing Empathy",
+        "connect"
+      ],
+      [
+        "com-generic-empathy",
+        "Generic / Non-Personalized Empathy",
+        "connect"
+      ],
+      [
+        "com-missing-acknowledgement",
+        "Missing Acknowledgement",
+        "connect"
+      ],
+      [
+        "com-weak-assurance",
+        "Weak or Missing Assurance",
+        "connect"
+      ],
+      [
+        "com-lack-rapport",
+        "Lack of Rapport",
+        "connect"
+      ],
+      [
+        "com-flat-tone",
+        "Flat / Sleepy / Low-Energy Tone",
+        "delivery"
+      ],
+      [
+        "com-tone-pace",
+        "Inappropriate Tone or Pace",
+        "delivery"
+      ],
+      [
+        "com-active-listening",
+        "Poor Active Listening",
+        "listen"
+      ],
+      [
+        "com-interrupting",
+        "Interrupting the Customer",
+        "listen"
+      ],
+      [
+        "com-repeating-questions",
+        "Repeating Questions / Increasing Customer Effort",
+        "listen"
+      ],
+      [
+        "com-deescalation",
+        "Poor De-escalation",
+        "connect"
+      ],
+      [
+        "com-emotional-ownership",
+        "Lack of Emotional Ownership",
+        "connect"
+      ],
+      [
+        "com-clarity",
+        "Confusing Explanations / Communication Clarity",
+        "delivery"
+      ],
+      [
+        "com-opening",
+        "Weak Call Opening",
+        "structure"
+      ],
+      [
+        "com-call-flow",
+        "Poor Call Flow",
+        "structure"
+      ],
+      [
+        "com-closing",
+        "Weak Call Closing / No Recap",
+        "structure"
+      ]
     ],
     "dis": [
-      ["dis-missing-probing",        "Missing Probing Questions",                        "discover"],
-      ["dis-insufficient-probing",   "Insufficient Probing",                             "discover"],
-      ["dis-early-troubleshooting",  "Starting Troubleshooting Too Early",               "discover"],
-      ["dis-main-concern",           "Not Identifying the Main Concern",                 "discover"],
-      ["dis-customer-needs",         "Not Understanding Customer Needs",                 "discover"],
-      ["dis-contact-history",        "Missing Previous Contact History",                 "discover"],
-      ["dis-prior-troubleshooting",  "Not Confirming Troubleshooting Already Completed", "discover"],
-      ["dis-issue-scope",            "Not Isolating the Scope of an Issue",              "discover"],
-      ["dis-irrelevant-questions",   "Asking Irrelevant Questions",                      "discover"],
-      ["dis-confirm-understanding",  "Failing to Confirm Customer Understanding",        "delivery"]
+      [
+        "dis-missing-probing",
+        "Missing Probing Questions",
+        "discover"
+      ],
+      [
+        "dis-insufficient-probing",
+        "Insufficient Probing",
+        "discover"
+      ],
+      [
+        "dis-early-troubleshooting",
+        "Starting Troubleshooting Too Early",
+        "discover"
+      ],
+      [
+        "dis-main-concern",
+        "Not Identifying the Main Concern",
+        "discover"
+      ],
+      [
+        "dis-customer-needs",
+        "Not Understanding Customer Needs",
+        "discover"
+      ],
+      [
+        "dis-contact-history",
+        "Missing Previous Contact History",
+        "discover"
+      ],
+      [
+        "dis-prior-troubleshooting",
+        "Not Confirming Troubleshooting Already Completed",
+        "discover"
+      ],
+      [
+        "dis-issue-scope",
+        "Not Isolating the Scope of an Issue",
+        "discover"
+      ],
+      [
+        "dis-irrelevant-questions",
+        "Asking Irrelevant Questions",
+        "discover"
+      ],
+      [
+        "dis-confirm-understanding",
+        "Failing to Confirm Customer Understanding",
+        "delivery"
+      ]
     ],
     "hold": [
-      ["hold-dead-air",              "Excessive Dead Air",                               "control"],
-      ["hold-mute-usage",            "Incorrect Mute Usage",                             "control"],
-      ["hold-excessive-hold",        "Excessive Hold Time",                              "control"],
-      ["hold-no-permission",         "No Permission Before Hold",                        "control"],
-      ["hold-no-estimate",           "No Estimated Hold Time",                           "control"],
-      ["hold-no-updates",            "Failure to Return With Updates",                   "control"],
-      ["hold-delayed-responses",     "Delayed Responses to the Customer",                "control"],
-      ["hold-research-communication","Poor Research Communication",                      "control"],
-      ["hold-time-constraints",      "Not Acknowledging Customer Time Constraints",      "control"],
-      ["hold-call-control",          "Poor Call Control",                                "control"],
-      ["hold-dropped-call",          "Dropped Call / Callback Ownership",                "control"],
-      ["hold-unexplained-silence",   "Avoidable or Unexplained Silence",                 "control"]
+      [
+        "hold-dead-air",
+        "Excessive Dead Air",
+        "control"
+      ],
+      [
+        "hold-mute-usage",
+        "Incorrect Mute Usage",
+        "control"
+      ],
+      [
+        "hold-excessive-hold",
+        "Excessive Hold Time",
+        "control"
+      ],
+      [
+        "hold-no-permission",
+        "No Permission Before Hold",
+        "control"
+      ],
+      [
+        "hold-no-estimate",
+        "No Estimated Hold Time",
+        "control"
+      ],
+      [
+        "hold-no-updates",
+        "Failure to Return With Updates",
+        "control"
+      ],
+      [
+        "hold-delayed-responses",
+        "Delayed Responses to the Customer",
+        "control"
+      ],
+      [
+        "hold-research-communication",
+        "Poor Research Communication",
+        "control"
+      ],
+      [
+        "hold-time-constraints",
+        "Not Acknowledging Customer Time Constraints",
+        "control"
+      ],
+      [
+        "hold-call-control",
+        "Poor Call Control",
+        "control"
+      ],
+      [
+        "hold-dropped-call",
+        "Dropped Call / Callback Ownership",
+        "control"
+      ],
+      [
+        "hold-unexplained-silence",
+        "Avoidable or Unexplained Silence",
+        "control"
+      ]
     ],
     "own": [
-      ["own-lack-ownership",         "Lack of Ownership",                                "own"],
-      ["own-incomplete-resolution",  "Incorrect / Incomplete Resolution",                "own"],
-      ["own-premature-resolution",   "Prematurely Claiming Resolution",                  "own"],
-      ["own-unnecessary-transfer",   "Unnecessary Transfer",                             "own"],
-      ["own-transfer-process",       "Failure to Follow Correct Transfer Process",       "own"],
-      ["own-primary-concern",        "Not Resolving the Primary Concern",                "own"],
-      ["own-missing-followup",       "Missing Follow-Up / Callback Commitment",          "own"],
-      ["own-repeat-contacts",        "Failure to Take Ownership of Repeat Contacts",     "own"],
-      ["own-incomplete-education",   "Incomplete Customer Education",                    "own"],
-      ["own-unsupported-guarantees", "Unsupported Guarantees",                           "own"],
-      ["own-expectation-setting",    "Weak Expectation Setting",                         "own"],
-      ["own-escalation-path",        "Incorrect Escalation Path",                        "own"],
-      ["own-objections",             "Not Addressing Customer Objections or Concerns",   "own"],
-      ["own-confirm-resolution",     "Not Confirming Resolution Before Closing",         "own"]
+      [
+        "own-lack-ownership",
+        "Lack of Ownership",
+        "own"
+      ],
+      [
+        "own-incomplete-resolution",
+        "Incorrect / Incomplete Resolution",
+        "own"
+      ],
+      [
+        "own-premature-resolution",
+        "Prematurely Claiming Resolution",
+        "own"
+      ],
+      [
+        "own-unnecessary-transfer",
+        "Unnecessary Transfer",
+        "own"
+      ],
+      [
+        "own-transfer-process",
+        "Failure to Follow Correct Transfer Process",
+        "own"
+      ],
+      [
+        "own-primary-concern",
+        "Not Resolving the Primary Concern",
+        "own"
+      ],
+      [
+        "own-missing-followup",
+        "Missing Follow-Up / Callback Commitment",
+        "own"
+      ],
+      [
+        "own-repeat-contacts",
+        "Failure to Take Ownership of Repeat Contacts",
+        "own"
+      ],
+      [
+        "own-incomplete-education",
+        "Incomplete Customer Education",
+        "own"
+      ],
+      [
+        "own-unsupported-guarantees",
+        "Unsupported Guarantees",
+        "own"
+      ],
+      [
+        "own-expectation-setting",
+        "Weak Expectation Setting",
+        "own"
+      ],
+      [
+        "own-escalation-path",
+        "Incorrect Escalation Path",
+        "own"
+      ],
+      [
+        "own-objections",
+        "Not Addressing Customer Objections or Concerns",
+        "own"
+      ],
+      [
+        "own-confirm-resolution",
+        "Not Confirming Resolution Before Closing",
+        "own"
+      ]
     ],
     "tech": [
-      ["tech-knowledge-gap",            "Technical Knowledge Gap",                                    "tech"],
-      ["tech-itg-incorrect",            "Incorrect / Incomplete ITG Usage",                           "tech"],
-      ["tech-itg-missing",              "Missing ITG",                                                "tech"],
-      ["tech-tools-navigation",         "Poor Tools Navigation",                                      "tech"],
-      ["tech-root-cause",               "Incorrect Root Cause Identification",                        "tech"],
-      ["tech-diagnostics",              "Insufficient Technical Diagnostics",                         "tech"],
-      ["tech-equipment-replacement",    "Inappropriate Equipment Replacement",                        "tech"],
-      ["tech-scheduling",               "Incorrect Technician Scheduling",                            "tech"],
-      ["tech-appointment-expectations", "Incorrect Appointment Expectations",                         "tech"],
-      ["tech-outage-expectations",      "Incorrect Outage Expectations",                              "tech"],
-      ["tech-verification",             "Missing Account Verification",                               "tech"],
-      ["tech-account-access",           "Incorrect Account-Linking / Account-Access Troubleshooting", "tech"],
-      ["tech-porting",                  "Incorrect Mobile Porting Process",                           "tech"],
-      ["tech-explanations",             "Unclear Technical Explanations",                             "tech"],
-      ["tech-repeat-issues",            "Failure to Identify Repeat Technical Issues",                "tech"]
+      [
+        "tech-knowledge-gap",
+        "Technical Knowledge Gap",
+        "tech"
+      ],
+      [
+        "tech-itg-incorrect",
+        "Incorrect / Incomplete ITG Usage",
+        "tech"
+      ],
+      [
+        "tech-itg-missing",
+        "Missing ITG",
+        "tech"
+      ],
+      [
+        "tech-tools-navigation",
+        "Poor Tools Navigation",
+        "tech"
+      ],
+      [
+        "tech-root-cause",
+        "Incorrect Root Cause Identification",
+        "tech"
+      ],
+      [
+        "tech-diagnostics",
+        "Insufficient Technical Diagnostics",
+        "tech"
+      ],
+      [
+        "tech-equipment-replacement",
+        "Inappropriate Equipment Replacement",
+        "tech"
+      ],
+      [
+        "tech-scheduling",
+        "Incorrect Technician Scheduling",
+        "tech"
+      ],
+      [
+        "tech-appointment-expectations",
+        "Incorrect Appointment Expectations",
+        "tech"
+      ],
+      [
+        "tech-outage-expectations",
+        "Incorrect Outage Expectations",
+        "tech"
+      ],
+      [
+        "tech-verification",
+        "Missing Account Verification",
+        "tech"
+      ],
+      [
+        "tech-account-access",
+        "Incorrect Account-Linking / Account-Access Troubleshooting",
+        "tech"
+      ],
+      [
+        "tech-porting",
+        "Incorrect Mobile Porting Process",
+        "tech"
+      ],
+      [
+        "tech-explanations",
+        "Unclear Technical Explanations",
+        "tech"
+      ],
+      [
+        "tech-repeat-issues",
+        "Failure to Identify Repeat Technical Issues",
+        "tech"
+      ]
     ],
     "bill": [
-      ["bill-incomplete-explanation",   "Incomplete Billing Explanation",                  "billing"],
-      ["bill-payment-options",          "Failure to Explain Payment Options",              "billing"],
-      ["bill-credit-expectations",      "Incorrect Credit Expectations",                   "billing"],
-      ["bill-refund-expectations",      "Incorrect Refund Expectations",                   "billing"],
-      ["bill-previous-commitments",     "Not Reviewing Previous Billing Commitments",      "billing"],
-      ["bill-promotion-eligibility",    "Promotion Eligibility Miscommunication",          "billing"],
-      ["bill-pricing-disclosure",       "Incomplete Pricing Disclosure",                   "billing"],
-      ["bill-customer-education",       "Weak Customer Education",                         "billing"],
-      ["bill-subscription",             "Incorrect Subscription Explanation",              "billing"],
-      ["bill-frustration",              "Failure to Address Billing Frustration",          "billing"],
-      ["bill-cancellation-risk",        "Failure to Recognize Cancellation Risk",          "billing"],
-      ["bill-restoration-expectations", "Misleading Payment or Restoration Expectations",  "billing"]
+      [
+        "bill-incomplete-explanation",
+        "Incomplete Billing Explanation",
+        "billing"
+      ],
+      [
+        "bill-payment-options",
+        "Failure to Explain Payment Options",
+        "billing"
+      ],
+      [
+        "bill-credit-expectations",
+        "Incorrect Credit Expectations",
+        "billing"
+      ],
+      [
+        "bill-refund-expectations",
+        "Incorrect Refund Expectations",
+        "billing"
+      ],
+      [
+        "bill-previous-commitments",
+        "Not Reviewing Previous Billing Commitments",
+        "billing"
+      ],
+      [
+        "bill-promotion-eligibility",
+        "Promotion Eligibility Miscommunication",
+        "billing"
+      ],
+      [
+        "bill-pricing-disclosure",
+        "Incomplete Pricing Disclosure",
+        "billing"
+      ],
+      [
+        "bill-customer-education",
+        "Weak Customer Education",
+        "billing"
+      ],
+      [
+        "bill-subscription",
+        "Incorrect Subscription Explanation",
+        "billing"
+      ],
+      [
+        "bill-frustration",
+        "Failure to Address Billing Frustration",
+        "billing"
+      ],
+      [
+        "bill-cancellation-risk",
+        "Failure to Recognize Cancellation Risk",
+        "billing"
+      ],
+      [
+        "bill-restoration-expectations",
+        "Misleading Payment or Restoration Expectations",
+        "billing"
+      ]
     ],
     "sales": [
-      ["sales-plant-seed",            "Missing Plant the Seed",                          "sales"],
-      ["sales-pitch-before-resolve",  "Pitching Before Resolving the Concern",           "sales"],
-      ["sales-irrelevant-pitch",      "Irrelevant Sales Pitch",                          "sales"],
-      ["sales-missing-discovery",     "Missing Sales Discovery",                         "sales"],
-      ["sales-weak-transition",       "Weak Sales Transition",                           "sales"],
-      ["sales-missing-offer",         "Missing Relevant Offer",                          "sales"],
-      ["sales-weak-objection",        "Weak Objection Handling",                         "sales"],
-      ["sales-pitch-after-rejection", "Continuing to Pitch After Rejection",             "sales"],
-      ["sales-buying-signals",        "Failure to Identify Customer Buying Signals",     "sales"],
-      ["sales-offer-value",           "Failure to Explain Offer Value",                  "sales"],
-      ["sales-pricing-disclosure",    "Incorrect Sales Pricing / Disclosure",            "sales"],
-      ["sales-retention",             "Not Recognizing Retention Opportunities",         "sales"],
-      ["sales-features-benefits",     "Pitching Features Rather Than Customer Benefits", "sales"],
-      ["sales-closing",               "Poor Closing / No Confirmation",                  "sales"]
+      [
+        "sales-plant-seed",
+        "Missing Plant the Seed",
+        "sales"
+      ],
+      [
+        "sales-pitch-before-resolve",
+        "Pitching Before Resolving the Concern",
+        "sales"
+      ],
+      [
+        "sales-irrelevant-pitch",
+        "Irrelevant Sales Pitch",
+        "sales"
+      ],
+      [
+        "sales-missing-discovery",
+        "Missing Sales Discovery",
+        "sales"
+      ],
+      [
+        "sales-weak-transition",
+        "Weak Sales Transition",
+        "sales"
+      ],
+      [
+        "sales-missing-offer",
+        "Missing Relevant Offer",
+        "sales"
+      ],
+      [
+        "sales-weak-objection",
+        "Weak Objection Handling",
+        "sales"
+      ],
+      [
+        "sales-pitch-after-rejection",
+        "Continuing to Pitch After Rejection",
+        "sales"
+      ],
+      [
+        "sales-buying-signals",
+        "Failure to Identify Customer Buying Signals",
+        "sales"
+      ],
+      [
+        "sales-offer-value",
+        "Failure to Explain Offer Value",
+        "sales"
+      ],
+      [
+        "sales-pricing-disclosure",
+        "Incorrect Sales Pricing / Disclosure",
+        "sales"
+      ],
+      [
+        "sales-retention",
+        "Not Recognizing Retention Opportunities",
+        "sales"
+      ],
+      [
+        "sales-features-benefits",
+        "Pitching Features Rather Than Customer Benefits",
+        "sales"
+      ],
+      [
+        "sales-closing",
+        "Poor Closing / No Confirmation",
+        "sales"
+      ]
+    ],
+    "people": [
+      [
+        "people-unplanned-absence",
+        "Unplanned Absences",
+        "attend"
+      ],
+      [
+        "people-late-login",
+        "Late Log-Ins",
+        "attend"
+      ],
+      [
+        "people-callout-process",
+        "Call-Out Process Not Followed",
+        "attend"
+      ],
+      [
+        "people-no-call-no-show",
+        "No-Call, No-Show",
+        "attend"
+      ],
+      [
+        "people-absence-pattern",
+        "Absences Around Days Off",
+        "attend"
+      ],
+      [
+        "people-early-logout",
+        "Early Log-Outs",
+        "adhere"
+      ],
+      [
+        "people-break-overrun",
+        "Extended Breaks and Lunches",
+        "adhere"
+      ],
+      [
+        "people-aux-misuse",
+        "Excessive Not Ready or Aux Time",
+        "adhere"
+      ],
+      [
+        "people-missed-sessions",
+        "Missed Huddles, Training, or Coaching",
+        "adhere"
+      ],
+      [
+        "people-disengagement",
+        "Signs of Disengagement",
+        "engage"
+      ],
+      [
+        "people-stress-fatigue",
+        "Stress and Fatigue",
+        "engage"
+      ],
+      [
+        "people-low-confidence",
+        "Low Confidence on the Floor",
+        "engage"
+      ],
+      [
+        "people-growth-goals",
+        "Unclear Growth Goals",
+        "engage"
+      ],
+      [
+        "people-team-connection",
+        "Limited Team Connection",
+        "engage"
+      ]
     ]
   },
-
   "opposites": {
-    "com-missing-empathy": ["s-empathy"],
-    "com-generic-empathy": ["s-empathy"],
-    "com-missing-acknowledgement": ["s-acknowledgement"],
-    "com-weak-assurance": ["s-assurance"],
-    "com-lack-rapport": ["s-rapport"],
-    "com-flat-tone": ["s-tone"],
-    "com-tone-pace": ["s-tone"],
-    "com-active-listening": ["s-listening"],
-    "com-interrupting": ["s-listening"],
-    "com-repeating-questions": ["s-listening"],
-    "com-deescalation": ["s-deescalation"],
-    "com-emotional-ownership": ["s-ownership"],
-    "com-clarity": ["s-clarity"],
-    "com-opening": ["s-opening"],
-    "com-call-flow": ["s-call-control"],
-    "com-closing": ["s-closing"],
-    "dis-missing-probing": ["s-probing"],
-    "dis-insufficient-probing": ["s-probing"],
-    "dis-early-troubleshooting": ["s-probing"],
-    "dis-main-concern": ["s-probing"],
-    "dis-customer-needs": ["s-probing"],
-    "dis-irrelevant-questions": ["s-probing"],
-    "dis-confirm-understanding": ["s-understanding"],
-    "hold-dead-air": ["s-research-updates"],
-    "hold-mute-usage": ["s-hold"],
-    "hold-excessive-hold": ["s-hold"],
-    "hold-no-permission": ["s-hold"],
-    "hold-no-estimate": ["s-hold"],
-    "hold-no-updates": ["s-hold", "s-research-updates"],
-    "hold-research-communication": ["s-research-updates"],
-    "hold-call-control": ["s-call-control"],
-    "hold-dropped-call": ["s-followup"],
-    "hold-unexplained-silence": ["s-research-updates"],
-    "own-lack-ownership": ["s-ownership"],
-    "own-incomplete-resolution": ["s-resolution"],
-    "own-premature-resolution": ["s-resolution"],
-    "own-unnecessary-transfer": ["s-transfer"],
-    "own-transfer-process": ["s-transfer"],
-    "own-primary-concern": ["s-resolution"],
-    "own-missing-followup": ["s-followup"],
-    "own-repeat-contacts": ["s-ownership"],
-    "own-incomplete-education": ["s-education"],
-    "own-unsupported-guarantees": ["s-expectations"],
-    "own-expectation-setting": ["s-expectations"],
-    "own-escalation-path": ["s-escalation"],
-    "own-confirm-resolution": ["s-resolution"],
-    "tech-itg-incorrect": ["s-itg"],
-    "tech-itg-missing": ["s-itg"],
-    "tech-tools-navigation": ["s-tools"],
-    "tech-root-cause": ["s-diagnosis"],
-    "tech-diagnostics": ["s-troubleshooting", "s-diagnosis"],
-    "tech-equipment-replacement": ["s-diagnosis"],
-    "tech-appointment-expectations": ["s-expectations"],
-    "tech-outage-expectations": ["s-expectations"],
-    "tech-verification": ["s-verification"],
-    "tech-explanations": ["s-clarity"],
-    "bill-incomplete-explanation": ["s-billing"],
-    "bill-payment-options": ["s-payment-options"],
-    "bill-credit-expectations": ["s-expectations"],
-    "bill-refund-expectations": ["s-expectations"],
-    "bill-promotion-eligibility": ["s-pricing"],
-    "bill-pricing-disclosure": ["s-pricing"],
-    "bill-customer-education": ["s-education"],
-    "bill-subscription": ["s-billing"],
-    "bill-frustration": ["s-empathy", "s-deescalation"],
-    "bill-cancellation-risk": ["s-retention"],
-    "bill-restoration-expectations": ["s-expectations"],
-    "sales-plant-seed": ["s-plant-seed"],
-    "sales-irrelevant-pitch": ["s-relevant-offer"],
-    "sales-missing-discovery": ["s-sales-discovery"],
-    "sales-missing-offer": ["s-relevant-offer"],
-    "sales-weak-objection": ["s-objection"],
-    "sales-offer-value": ["s-value"],
-    "sales-pricing-disclosure": ["s-pricing"],
-    "sales-retention": ["s-retention"],
-    "sales-features-benefits": ["s-value"],
-    "sales-closing": ["s-sales-close"]
+    "com-missing-empathy": [
+      "s-empathy"
+    ],
+    "com-generic-empathy": [
+      "s-empathy"
+    ],
+    "com-missing-acknowledgement": [
+      "s-acknowledgement"
+    ],
+    "com-weak-assurance": [
+      "s-assurance"
+    ],
+    "com-lack-rapport": [
+      "s-rapport"
+    ],
+    "com-flat-tone": [
+      "s-tone"
+    ],
+    "com-tone-pace": [
+      "s-tone"
+    ],
+    "com-active-listening": [
+      "s-listening"
+    ],
+    "com-interrupting": [
+      "s-listening"
+    ],
+    "com-repeating-questions": [
+      "s-listening"
+    ],
+    "com-deescalation": [
+      "s-deescalation"
+    ],
+    "com-emotional-ownership": [
+      "s-ownership"
+    ],
+    "com-clarity": [
+      "s-clarity"
+    ],
+    "com-opening": [
+      "s-opening"
+    ],
+    "com-call-flow": [
+      "s-call-control"
+    ],
+    "com-closing": [
+      "s-closing"
+    ],
+    "dis-missing-probing": [
+      "s-probing"
+    ],
+    "dis-insufficient-probing": [
+      "s-probing"
+    ],
+    "dis-early-troubleshooting": [
+      "s-probing"
+    ],
+    "dis-main-concern": [
+      "s-probing"
+    ],
+    "dis-customer-needs": [
+      "s-probing"
+    ],
+    "dis-irrelevant-questions": [
+      "s-probing"
+    ],
+    "dis-confirm-understanding": [
+      "s-understanding"
+    ],
+    "hold-dead-air": [
+      "s-research-updates"
+    ],
+    "hold-mute-usage": [
+      "s-hold"
+    ],
+    "hold-excessive-hold": [
+      "s-hold"
+    ],
+    "hold-no-permission": [
+      "s-hold"
+    ],
+    "hold-no-estimate": [
+      "s-hold"
+    ],
+    "hold-no-updates": [
+      "s-hold",
+      "s-research-updates"
+    ],
+    "hold-research-communication": [
+      "s-research-updates"
+    ],
+    "hold-call-control": [
+      "s-call-control"
+    ],
+    "hold-dropped-call": [
+      "s-followup"
+    ],
+    "hold-unexplained-silence": [
+      "s-research-updates"
+    ],
+    "own-lack-ownership": [
+      "s-ownership"
+    ],
+    "own-incomplete-resolution": [
+      "s-resolution"
+    ],
+    "own-premature-resolution": [
+      "s-resolution"
+    ],
+    "own-unnecessary-transfer": [
+      "s-transfer"
+    ],
+    "own-transfer-process": [
+      "s-transfer"
+    ],
+    "own-primary-concern": [
+      "s-resolution"
+    ],
+    "own-missing-followup": [
+      "s-followup"
+    ],
+    "own-repeat-contacts": [
+      "s-ownership"
+    ],
+    "own-incomplete-education": [
+      "s-education"
+    ],
+    "own-unsupported-guarantees": [
+      "s-expectations"
+    ],
+    "own-expectation-setting": [
+      "s-expectations"
+    ],
+    "own-escalation-path": [
+      "s-escalation"
+    ],
+    "own-confirm-resolution": [
+      "s-resolution"
+    ],
+    "tech-itg-incorrect": [
+      "s-itg"
+    ],
+    "tech-itg-missing": [
+      "s-itg"
+    ],
+    "tech-tools-navigation": [
+      "s-tools"
+    ],
+    "tech-root-cause": [
+      "s-diagnosis"
+    ],
+    "tech-diagnostics": [
+      "s-troubleshooting",
+      "s-diagnosis"
+    ],
+    "tech-equipment-replacement": [
+      "s-diagnosis"
+    ],
+    "tech-appointment-expectations": [
+      "s-expectations"
+    ],
+    "tech-outage-expectations": [
+      "s-expectations"
+    ],
+    "tech-verification": [
+      "s-verification"
+    ],
+    "tech-explanations": [
+      "s-clarity"
+    ],
+    "bill-incomplete-explanation": [
+      "s-billing"
+    ],
+    "bill-payment-options": [
+      "s-payment-options"
+    ],
+    "bill-credit-expectations": [
+      "s-expectations"
+    ],
+    "bill-refund-expectations": [
+      "s-expectations"
+    ],
+    "bill-promotion-eligibility": [
+      "s-pricing"
+    ],
+    "bill-pricing-disclosure": [
+      "s-pricing"
+    ],
+    "bill-customer-education": [
+      "s-education"
+    ],
+    "bill-subscription": [
+      "s-billing"
+    ],
+    "bill-frustration": [
+      "s-empathy",
+      "s-deescalation"
+    ],
+    "bill-cancellation-risk": [
+      "s-retention"
+    ],
+    "bill-restoration-expectations": [
+      "s-expectations"
+    ],
+    "sales-plant-seed": [
+      "s-plant-seed"
+    ],
+    "sales-irrelevant-pitch": [
+      "s-relevant-offer"
+    ],
+    "sales-missing-discovery": [
+      "s-sales-discovery"
+    ],
+    "sales-missing-offer": [
+      "s-relevant-offer"
+    ],
+    "sales-weak-objection": [
+      "s-objection"
+    ],
+    "sales-offer-value": [
+      "s-value"
+    ],
+    "sales-pricing-disclosure": [
+      "s-pricing"
+    ],
+    "sales-retention": [
+      "s-retention"
+    ],
+    "sales-features-benefits": [
+      "s-value"
+    ],
+    "sales-closing": [
+      "s-sales-close"
+    ],
+    "people-unplanned-absence": [
+      "s-attendance"
+    ],
+    "people-late-login": [
+      "s-punctuality"
+    ],
+    "people-callout-process": [
+      "s-callout"
+    ],
+    "people-no-call-no-show": [
+      "s-callout",
+      "s-attendance"
+    ],
+    "people-absence-pattern": [
+      "s-attendance"
+    ],
+    "people-early-logout": [
+      "s-adherence"
+    ],
+    "people-break-overrun": [
+      "s-adherence",
+      "s-punctuality"
+    ],
+    "people-aux-misuse": [
+      "s-adherence"
+    ],
+    "people-missed-sessions": [
+      "s-engagement",
+      "s-development"
+    ],
+    "people-disengagement": [
+      "s-engagement"
+    ],
+    "people-stress-fatigue": [
+      "s-resilience"
+    ],
+    "people-low-confidence": [],
+    "people-growth-goals": [
+      "s-development"
+    ],
+    "people-team-connection": [
+      "s-team-support",
+      "s-engagement"
+    ]
   }
 }

@@ -20,6 +20,9 @@ DATA = os.path.join(ROOT, "src", "data")
 TOKENS = {"{duration}", "{durationAdj}", "{calls}", "{followup}"}
 RENDER = {"{duration}": "two weeks", "{durationAdj}": "two-week", "{calls}": "five", "{followup}": "seven days"}
 KPIS = {"QA", "aiCR", "Transfer"}
+PEOPLE_KPIS = {"ABS", "Attrition"}
+# Attendance, adherence, and retention entries are about schedules and engagement, not calls.
+PEOPLE_CATS = {"people"}
 OPP_KEYS = {"id", "cat", "title", "desc", "kw", "tags", "kpi", "theme", "feedback", "impact", "plan",
             "followup", "example", "questions", "strengths", "b", "note"}
 B_KEYS = {"obs", "focus", "commit", "m", "mx", "coach"}
@@ -171,6 +174,7 @@ def validate_opps(path, meta, rep, all_sentences, all_fragments):
         rep.err(fname, "top level must be a JSON array")
         return []
 
+    people = cat in PEOPLE_CATS
     required = meta["required"][cat]
     req_ids = [r[0] for r in required]
     req_map = {r[0]: r for r in required}
@@ -243,8 +247,9 @@ def validate_opps(path, meta, rep, all_sentences, all_fragments):
 
         # kpi
         kpi = e["kpi"]
-        if not isinstance(kpi, list) or not kpi or not set(kpi) <= KPIS or len(set(kpi)) != len(kpi):
-            rep.err(where, f"'kpi' must be a non-empty subset of {sorted(KPIS)}")
+        allowed = PEOPLE_KPIS if people else KPIS
+        if not isinstance(kpi, list) or not kpi or not set(kpi) <= allowed or len(set(kpi)) != len(kpi):
+            rep.err(where, f"'kpi' must be a non-empty subset of {sorted(allowed)}")
 
         # main text fields
         check_text(rep, where, e["feedback"], eid, "feedback")
@@ -265,15 +270,21 @@ def validate_opps(path, meta, rep, all_sentences, all_fragments):
             need_range(rep, where, "impact", e["impact"], 40, 100)
         if isinstance(e["plan"], str):
             need_range(rep, where, "plan", e["plan"], 65, 140)
-            for tok in ("{duration}", "{calls}", "{followup}"):
+            for tok in ("{duration}", "{followup}") if people else ("{duration}", "{calls}", "{followup}"):
                 if tok not in e["plan"]:
                     rep.err(where, f"'plan' must include the token {tok}")
             plan_openers[" ".join(e["plan"].split()[:3]).lower()] += 1
         if isinstance(e["followup"], str):
             need_range(rep, where, "followup", e["followup"], 35, 110)
-            for tok in ("{calls}", "{followup}"):
+            for tok in ("{followup}",) if people else ("{calls}", "{followup}"):
                 if tok not in e["followup"]:
                     rep.err(where, f"'followup' must include the token {tok}")
+        if people:
+            for fld in ("plan", "followup"):
+                if isinstance(e[fld], str) and "{calls}" in e[fld]:
+                    rep.err(where, f"'{fld}' must not use {{calls}}; attendance and engagement plans are measured by shifts and check-ins")
+                if isinstance(e[fld], str) and re.search(r"\bcalls?\b", e[fld]) and "{calls}" not in e[fld]:
+                    rep.warn(where, f"'{fld}' mentions calls; check that the measure fits attendance or engagement")
             if "{duration}" not in e["followup"] and "{durationAdj}" not in e["followup"]:
                 rep.err(where, "'followup' must reference the end of the plan with {duration} or {durationAdj}")
         for fld in ("feedback", "impact", "plan", "followup"):
@@ -343,6 +354,10 @@ def validate_opps(path, meta, rep, all_sentences, all_fragments):
                     rep.err(where, f"'b.{k}' is required")
             if ("m" in b) == ("mx" in b):
                 rep.err(where, "'b' must contain exactly one of 'm' or 'mx'")
+            if people and "mx" not in b:
+                rep.err(where, "attendance and engagement entries must use 'b.mx' (a complete measure sentence), not 'b.m'")
+            if people and isinstance(b.get("mx"), str) and "{calls}" in b["mx"]:
+                rep.err(where, "'b.mx' must not use {calls} in attendance and engagement entries")
             if isinstance(b.get("obs"), str):
                 s = b["obs"]
                 check_text(rep, where, s, eid, "b.obs")
@@ -573,6 +588,139 @@ def validate_sales_toolkit(path, meta, rep, opp_ids):
             text(where, sg.get(key), key)
 
 
+def validate_people_toolkit(path, meta, rep, opp_ids):
+    """ABS & Attrition toolkit: conversation guides, stay questions, early warning signs, recognition."""
+    fname = os.path.basename(path)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except Exception as exc:  # noqa: BLE001
+        rep.err(fname, f"invalid JSON: {exc}")
+        return
+
+    def text(where, value, field, lo=None, hi=None):
+        check_text(rep, where, value, "people-toolkit", field)
+        if isinstance(value, str):
+            if lo is not None:
+                need_range(rep, where, field, value, lo, hi)
+            if "!" in value:
+                rep.err(where, f"'{field}' must not contain exclamation marks")
+            if re.search(r"\b(medical|diagnos|illness|sick note|doctor)", value, re.I):
+                rep.err(where, f"'{field}' must not mention medical details")
+
+    for key in ("intro", "privacy"):
+        text(fname, d.get(key), key, 12, 70)
+    steps = (d.get("attendance") or {}).get("steps") or []
+    if not (6 <= len(steps) <= 9):
+        rep.err(fname, "attendance.steps needs 6-9 steps")
+    ids = set()
+    for st in steps:
+        where = f"{fname}:attendance.{st.get('id')}"
+        if not isinstance(st.get("id"), str) or st["id"] in ids:
+            rep.err(where, "each step needs a unique id")
+        ids.add(st.get("id"))
+        text(where, st.get("title"), "title", 1, 5)
+        text(where, st.get("good"), "good", 8, 40)
+        text(where, st.get("say"), "say", 8, 50)
+    rtw = d.get("returnToWork") or {}
+    text(f"{fname}:returnToWork", rtw.get("intro"), "intro", 10, 60)
+    lines = rtw.get("lines") or []
+    if not (3 <= len(lines) <= 6):
+        rep.err(fname, "returnToWork.lines needs 3-6 lines")
+    for i, ln in enumerate(lines):
+        text(f"{fname}:returnToWork[{i}]", ln.get("label"), "label", 1, 5)
+        text(f"{fname}:returnToWork[{i}]", ln.get("say"), "say", 8, 50)
+    stay = d.get("stay") or {}
+    text(f"{fname}:stay", stay.get("intro"), "intro", 10, 60)
+    groups = stay.get("groups") or []
+    if not (4 <= len(groups) <= 6):
+        rep.err(fname, "stay.groups needs 4-6 groups")
+    for g in groups:
+        where = f"{fname}:stay.{g.get('id')}"
+        text(where, g.get("title"), "title", 1, 5)
+        qs = g.get("questions") or []
+        if not (3 <= len(qs) <= 5):
+            rep.err(where, "needs 3-5 questions")
+        for i, q in enumerate(qs):
+            text(where, q, f"questions[{i}]", 6, 30)
+            if isinstance(q, str) and not q.endswith("?"):
+                rep.err(where, f"questions[{i}] must end with '?'")
+    signs = d.get("signs") or []
+    if not (7 <= len(signs) <= 12):
+        rep.err(fname, "signs needs 7-12 early warning signs")
+    for sg in signs:
+        where = f"{fname}:signs.{sg.get('id')}"
+        text(where, sg.get("sign"), "sign", 2, 10)
+        text(where, sg.get("detail"), "detail", 8, 40)
+        text(where, sg.get("action"), "action", 8, 45)
+        opps = sg.get("opps") or []
+        if not opps:
+            rep.err(where, "needs at least one related opportunity")
+        for o in opps:
+            if o not in opp_ids:
+                rep.err(where, f"unknown opportunity id '{o}'")
+    rec = d.get("recognition") or {}
+    text(f"{fname}:recognition", rec.get("intro"), "intro", 10, 60)
+    ideas = rec.get("ideas") or []
+    if not (6 <= len(ideas) <= 12):
+        rep.err(fname, "recognition.ideas needs 6-12 ideas")
+    for i, idea in enumerate(ideas):
+        text(f"{fname}:recognition.ideas[{i}]", idea.get("title"), "title", 1, 6)
+        text(f"{fname}:recognition.ideas[{i}]", idea.get("detail"), "detail", 8, 40)
+    shout = rec.get("shoutouts") or []
+    if not (3 <= len(shout) <= 6):
+        rep.err(fname, "recognition.shoutouts needs 3-6 templates")
+    for i, t in enumerate(shout):
+        text(f"{fname}:recognition.shoutouts[{i}]", t, f"shoutouts[{i}]", 10, 50)
+
+
+def validate_call_reviews(path, meta, rep, opp_ids):
+    """Call review checklists for Technical Support, Billing, and Customer Service calls."""
+    fname = os.path.basename(path)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except Exception as exc:  # noqa: BLE001
+        rep.err(fname, f"invalid JSON: {exc}")
+        return
+    strength_ids = {s["id"] for s in meta["strengthCatalog"]}
+    kpis = {k["id"] for k in meta["kpis"]}
+    types = d.get("types") or []
+    if [t.get("id") for t in types] != ["tech", "billing", "service"]:
+        rep.err(fname, "types must be tech, billing, service in that order")
+    for t in types:
+        tw = f"{fname}:{t.get('id')}"
+        check_text(rep, tw, t.get("label"), "call-reviews", "label")
+        check_text(rep, tw, t.get("intro"), "call-reviews", "intro")
+        seen = set()
+        steps, skills = t.get("steps") or [], t.get("skills") or []
+        if not (6 <= len(steps) <= 12) or not (3 <= len(skills) <= 6):
+            rep.err(tw, "needs 6-12 steps and 3-6 skills")
+        for group, items in (("steps", steps), ("skills", skills)):
+            for it in items:
+                where = f"{tw}.{group}.{it.get('id')}"
+                if not isinstance(it.get("id"), str) or it["id"] in seen:
+                    rep.err(where, "ids must be unique within a call type")
+                seen.add(it.get("id"))
+                check_text(rep, where, it.get("title"), "call-reviews", "title")
+                check_text(rep, where, it.get("good"), "call-reviews", "good")
+                if isinstance(it.get("good"), str):
+                    need_range(rep, where, "good", it["good"], 8, 40)
+                if "say" in it:
+                    check_text(rep, where, it["say"], "call-reviews", "say")
+                gaps = it.get("gaps") or []
+                if not gaps:
+                    rep.err(where, "needs at least one related opportunity")
+                for g in gaps:
+                    if g not in opp_ids:
+                        rep.err(where, f"unknown opportunity id '{g}'")
+                if it.get("strength") is not None and it.get("strength") not in strength_ids:
+                    rep.err(where, f"unknown strength id '{it.get('strength')}'")
+                for k in it.get("kpi") or []:
+                    if k not in kpis:
+                        rep.err(where, f"unknown KPI '{k}'")
+
+
 def main(argv):
     strict = "--strict" in argv
     files = [a for a in argv if not a.startswith("--")]
@@ -582,6 +730,8 @@ def main(argv):
         files = [os.path.join(DATA, c["file"]) for c in meta["categories"]]
         files.append(os.path.join(DATA, "strengths.json"))
         files.append(os.path.join(DATA, "sales_toolkit.json"))
+        files.append(os.path.join(DATA, "people_toolkit.json"))
+        files.append(os.path.join(DATA, "call_reviews.json"))
         files = [f for f in files if os.path.exists(f)]
     rep = Report()
     all_sentences = defaultdict(list)
@@ -596,11 +746,17 @@ def main(argv):
                     opp_ids.update(e.get("id") for e in json.load(fh) if isinstance(e, dict))
             except Exception:  # noqa: BLE001
                 pass
+    # Entries that meta.json requires count as known, so toolkits can be written before their category file.
+    opp_ids.update(r[0] for reqs in meta["required"].values() for r in reqs)
     for f in files:
         if os.path.basename(f) == "strengths.json":
             validate_strengths(f, meta, rep)
         elif os.path.basename(f) == "sales_toolkit.json":
             validate_sales_toolkit(f, meta, rep, opp_ids)
+        elif os.path.basename(f) == "people_toolkit.json":
+            validate_people_toolkit(f, meta, rep, opp_ids)
+        elif os.path.basename(f) == "call_reviews.json":
+            validate_call_reviews(f, meta, rep, opp_ids)
         else:
             count += len(validate_opps(f, meta, rep, all_sentences, all_fragments))
     for s, where in all_sentences.items():

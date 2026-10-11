@@ -6,15 +6,18 @@ A self-contained, offline coaching reference library and coaching builder for co
 Download it and double-click it. It opens in any modern browser (Chrome, Edge, Firefox, Safari). It needs no
 internet connection, sign-in, server, or installation.
 
-To see it working first, watch the 55-second walkthrough: [`docs-walkthrough.mp4`](docs-walkthrough.mp4).
+To see it working first, watch the one-minute walkthrough: [`docs-walkthrough.mp4`](docs-walkthrough.mp4).
 
 ## What it does
 
-- **93 coaching opportunities** across 7 categories (Communication, Discovery, Hold & Mute, Ownership,
-  Technical Support, Billing, Sales). Each one has seven sections: Things Went Well (optional strengths),
+- **Home dashboard** with a quick start, coach-by-KPI tiles (QA, Repeat (aiCR), Transfer, ABS, Attrition), quick
+  actions, and pinned links. Pages and cards animate in smoothly; animation turns off automatically when the
+  computer asks for reduced motion.
+- **107 coaching opportunities** across 8 categories (Communication, Discovery, Hold & Mute, Ownership,
+  Technical Support, Billing, Sales, and ABS & Attrition). Each one has seven sections: Things Went Well (optional strengths),
   Things Can Be Better, Root Cause & Customer Impact, a SMART Action Plan, a Supervisor Follow-Up Plan, an
   example statement, and three coaching questions.
-- **38 "Things Went Well" strengths**, each with two or three wordings. A strength only appears in copied text
+- **46 "Things Went Well" strengths**, each with two or three wordings. A strength only appears in copied text
   when you mark it as observed.
 - **Copy buttons on every section** plus **Copy Full Coaching**. Copied text is plain text with no formatting
   marks, ready to paste into a coaching form.
@@ -23,7 +26,16 @@ To see it working first, watch the 55-second walkthrough: [`docs-walkthrough.mp4
   length, number of calls to review, first review date, and tone (Supportive, Balanced, Direct). Every
   section can be edited before copying, and edits are kept.
 - **Search** by behavior names, synonyms, and shorthand ("dead air", "silent", "sleepy tone", "customer angry").
-- **KPI links** on each opportunity: QA, Repeat (aiCR), and Transfer, with a filter.
+- **KPI links** on each opportunity: QA, Repeat (aiCR), Transfer, ABS, and Attrition, with a filter.
+- **Call Review** for Technical Support, Billing, Customer Service, and Sales & Retention calls. Mark each step as
+  Met, Opportunity, or N/A while you listen; a progress ring and a KPI risk summary show where repeat-contact
+  (aiCR) and transfer risk came from. Opportunities go to the Coaching Builder and met steps become observed
+  strengths. Each call type keeps its own review.
+- **ABS & Attrition**: 14 coaching entries on attendance, punctuality, schedule adherence, engagement, stress,
+  confidence, growth, and team connection, plus a toolkit for new team leaders: a step-by-step attendance
+  conversation, return-to-work lines, stay conversation questions, early warning signs, and recognition ideas
+  with ready-to-send shout-outs. These entries never ask for the reason behind an absence or for private
+  details, and the Builder measures them by shifts and check-ins instead of calls.
 - **Favorites, custom entries, customized wording, saved combinations, and drafts**, stored in the browser.
 - **Export / Import** of everything as a JSON backup.
 - **Sales Toolkit** for sales and retention calls:
@@ -77,13 +89,16 @@ src/
   data/*.json          coaching content (one file per category) and strengths.json
   data/guides.json     reference cards and quick guide
   data/sales_toolkit.json  Sales Toolkit: review steps and skills, offer guides, objections, buying signals
+  data/call_reviews.json   Call Review checklists for Technical Support, Billing, and Customer Service
+  data/people_toolkit.json ABS & Attrition Toolkit: conversations, stay questions, warning signs, recognition
 tools/
   CONTENT_GUIDE.md     writing standard for coaching content
   validate_content.py  content validator (schema, word counts, tone, privacy rules)
   build.py             builds VXI_Coaching_Intelligence_Pro.html
 tests/
   e2e.cjs              browser tests (Playwright + Chromium): the ten QA scenarios plus copy, storage,
-                       import, Builder, Sales Toolkit, and brand color checks
+                       import, Builder, Home, Call Review, ABS & Attrition, Sales Toolkit, Quick Links,
+                       and brand color checks
 ```
 
 ```

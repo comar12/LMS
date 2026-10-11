@@ -48,12 +48,12 @@ python3 tools/validate_content.py src/data/<file>.json
 | Field | Content | Length |
 |---|---|---|
 | `id` | Exact id from `meta.json` `required` | |
-| `cat` | Category id (`com`, `dis`, `hold`, `own`, `tech`, `bill`, `sales`) | |
+| `cat` | Category id (`com`, `dis`, `hold`, `own`, `tech`, `bill`, `sales`, `people`) | |
 | `title` | Exact title from `meta.json` | |
 | `desc` | One-sentence library description of the behavior gap, written neutrally (no "you"). Ends with a period. | 10-32 words, max 200 chars |
 | `kw` | Search keywords: synonyms, supervisor shorthand, symptoms, related phrases. Lowercase, 1-4 words each. Include the words a supervisor would actually type (e.g., "silent", "mute", "no response", "sleepy", "monotone", "customer angry"). | 8-22 items |
 | `tags` | 2-4 short Title Case labels (e.g., "Soft Skills", "Call Control", "Process") | max 24 chars each |
-| `kpi` | Subset of `["QA", "aiCR", "Transfer"]`. QA = scored on the quality form. aiCR = can drive repeat contacts. Transfer = can drive avoidable or incorrect transfers. | at least 1 |
+| `kpi` | Subset of `["QA", "aiCR", "Transfer"]` (for `people` entries: subset of `["ABS", "Attrition"]`). QA = scored on the quality form. aiCR = can drive repeat contacts. Transfer = can drive avoidable or incorrect transfers. | at least 1 |
 | `theme` | Exact theme from `meta.json` `required` | |
 | `feedback` | **Things Can Be Better.** Ready-to-copy coaching paragraph. | **70-120 words** (aim 85-110) |
 | `impact` | **Root Cause & Customer Impact.** 1-2 sentences on the common root cause (phrased as "usually happens when", "often comes from", never as an accusation), then the cause-and-effect impact on the customer and the business, using conditional language. | 40-100 words |
@@ -206,6 +206,42 @@ Confirm -> Plant the Seed -> Relevant Offer -> Explain Pricing -> Confirm Unders
   internet speed or equipment), TV package changes, and retention offers for customers considering cancellation.
 - Offers must connect to needs discovered in the conversation; respect a clear "no"; explain value as customer
   benefits; disclose pricing completely and accurately; confirm understanding and agreement.
+
+**ABS & Attrition (`people`: Attendance, Adherence & Retention).** These entries coach attendance, schedule
+adherence, and engagement. They are written to the agent like every other entry, but they are about shifts,
+schedules, and the working relationship, not about a call. Rules that differ from call entries:
+- **Never assume or ask about the reason** for an absence, and never mention or guess at health, medical,
+  family, or personal details. Invite the agent to share anything that is affecting attendance if they choose,
+  and say that support options will be discussed according to site policy. Never threaten discipline; the
+  supervisor can explain consequences separately if policy requires it.
+- **No invented policy.** Do not state attendance points, occurrence counts, grace periods, call-out deadlines,
+  adherence percentages, or disciplinary steps. Use "the call-out process", "your site's attendance policy",
+  "the scheduled start time", "the scheduled break and lunch times", "the adherence standard". Put reminders in
+  `note` (for example: "Confirm the site attendance policy and any leave or support options with WFM or HR before
+  the session. Do not ask about medical details.").
+- **Impact** is on teammates, coverage, customers waiting longer, and the agent's own goals and confidence,
+  always conditional ("can", "may").
+- **Feedback openings** suit schedules: "Over the past few weeks,", "Looking at your recent schedule,", "During
+  the last schedule period,", "In our recent conversations,", "Recently,". Do not mention a call.
+- **Plan tokens:** use `{duration}` and `{followup}`, and **never `{calls}`**. Measures are shift-based or
+  conversation-based, for example "every scheduled shift starts logged in and ready at the scheduled time",
+  "any absence is reported through the call-out process before the shift starts", "a weekly ten-minute check-in
+  for the next {duration}".
+- **Follow-up** uses `{followup}` and `{duration}` or `{durationAdj}`: weekly check-ins, reviewing the
+  schedule adherence report together, agreeing a development goal, pairing with a peer buddy, a short
+  wellbeing check-in. No `{calls}`.
+- **`b` fragments:** `obs` follows the theme lead-in ("Over the recent schedule period, you {list}.", "During your
+  scheduled shifts, you {list}.", "In recent weeks, you {list}."). Use **`mx`, never `m`** (the generic call
+  measure does not fit). `mx` is a complete sentence, for example "Every scheduled shift during the next
+  {duration} starts with you logged in and ready at the scheduled time."
+- **Example statement** is what the agent would say in the right behavior: giving notice through the call-out
+  process, asking a supervisor for help, raising a concern early, asking for a development conversation. Natural
+  speech, no names, no times like "seven o'clock" tied to a specific person.
+- **Questions** are respectful and open, focused on what would help, never on proving fault ("What would make it
+  easier to be logged in and ready at the start of your shift?").
+- **Engagement entries (`engage`) are supportive in every tone.** They open a conversation about wellbeing,
+  confidence, growth, and belonging; they do not accuse the agent of a bad attitude. Describe neutral observable
+  behavior ("you have spoken up less in huddles", "you have not asked for help on the new call types").
 
 ---
 

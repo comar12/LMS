@@ -38,8 +38,8 @@ function wordsOf(text) {
 }
 
 // Category names a supervisor might type; matching one boosts every entry in that category.
-const CAT_BOOST_WORDS = { com: ['communication'], dis: ['probing', 'discovery'], hold: ['hold', 'mute'], own: ['ownership', 'resolution'], tech: ['technical'], bill: ['billing'], sales: ['sales', 'retention'] };
-const GROUP_BOOST_WORDS = { com: ['communication'], dis: ['discovery', 'probing'], hold: ['hold', 'control'], own: ['ownership'], tech: ['technical'], bill: ['billing'], sales: ['sales', 'retention'] };
+const CAT_BOOST_WORDS = { com: ['communication'], dis: ['probing', 'discovery'], hold: ['hold', 'mute'], own: ['ownership', 'resolution'], tech: ['technical'], bill: ['billing'], sales: ['sales', 'retention'], people: ['attendance', 'absence', 'abs', 'attrition', 'adherence', 'engagement'] };
+const GROUP_BOOST_WORDS = { com: ['communication'], dis: ['discovery', 'probing'], hold: ['hold', 'control'], own: ['ownership'], tech: ['technical'], bill: ['billing'], sales: ['sales', 'retention'], people: ['attendance', 'absence', 'abs', 'attrition', 'adherence', 'engagement'] };
 
 function indexOpp(o) {
   const kw = (o.kw || []).map(normalizeText).filter(Boolean);
@@ -125,6 +125,29 @@ const SYNONYMS = {
   fixed: ['resolution', 'resolve'],
   bill: ['billing'],
   money: ['billing', 'payment'],
+  absent: ['absence', 'attendance', 'call-out'],
+  absences: ['absence', 'attendance'],
+  absenteeism: ['absence', 'attendance'],
+  sick: ['absence', 'call-out'],
+  late: ['log-in', 'tardy', 'punctual'],
+  tardy: ['late', 'log-in'],
+  tardiness: ['late', 'log-in'],
+  aux: ['not ready', 'adherence'],
+  break: ['breaks', 'adherence'],
+  lunch: ['breaks', 'adherence'],
+  schedule: ['adherence', 'shift'],
+  shift: ['schedule', 'attendance'],
+  burnout: ['stress', 'fatigue'],
+  stressed: ['stress', 'fatigue'],
+  quit: ['attrition', 'disengage', 'leaving'],
+  quitting: ['attrition', 'disengage'],
+  resign: ['attrition', 'leaving'],
+  leaving: ['attrition', 'disengage'],
+  motivation: ['engage', 'disengage'],
+  unmotivated: ['disengage', 'engage'],
+  confidence: ['confident', 'nesting'],
+  career: ['growth', 'development'],
+  promotion: ['growth', 'development', 'promo'],
 };
 
 function queryParts(q) {

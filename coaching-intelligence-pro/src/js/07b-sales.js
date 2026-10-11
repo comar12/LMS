@@ -11,12 +11,11 @@ const SALES_TABS = [
   { id: 'objections', label: 'Objections', icon: 'chat' },
   { id: 'signals', label: 'Buying signals', icon: 'sparkle' },
 ];
-const REVIEW_ITEMS = SALES.steps.map((s, i) => ({ ...s, group: 'flow', n: i + 1 })).concat(SALES.skills.map((s) => ({ ...s, group: 'skill' })));
-const MARK_LABEL = { met: 'Met', gap: 'Opportunity', na: 'Not applicable' };
 
 function setSalesTab(id) {
   state.prefs.salesTab = id;
   persist('prefs');
+  state.ui.tabAnim = true;
   refresh({ panel: false });
 }
 
@@ -90,166 +89,6 @@ function oppChips(ids, fkPrefix) {
           o.title
         )
       )
-  );
-}
-
-/* ---------- Call review ---------- */
-function setReviewMark(id, mark) {
-  const marks = state.review.marks;
-  if (marks[id] === mark) delete marks[id];
-  else marks[id] = mark;
-  persist('review');
-  refresh({ panel: false });
-}
-
-function toggleReviewPick(item, oppId, on) {
-  const picks = (state.review.picks[item.id] || [item.gaps[0]]).slice();
-  const i = picks.indexOf(oppId);
-  if (on && i < 0) picks.push(oppId);
-  if (!on && i >= 0) picks.splice(i, 1);
-  state.review.picks[item.id] = picks;
-  persist('review');
-}
-
-function reviewGapOpps() {
-  const out = [];
-  for (const it of REVIEW_ITEMS) {
-    if (state.review.marks[it.id] !== 'gap') continue;
-    for (const id of state.review.picks[it.id] || [it.gaps[0]]) if (getOpp(id) && !out.includes(id)) out.push(id);
-  }
-  return out;
-}
-
-function reviewMetStrengths() {
-  const out = [];
-  for (const it of REVIEW_ITEMS) if (state.review.marks[it.id] === 'met' && it.strength && getStrength(it.strength) && !out.includes(it.strength)) out.push(it.strength);
-  return out;
-}
-
-function reviewSummaryText() {
-  const lines = ['Sales Call Review'];
-  const add = (it) => {
-    const m = state.review.marks[it.id];
-    if (m) lines.push(`${it.title}: ${MARK_LABEL[m]}`);
-  };
-  REVIEW_ITEMS.filter((i) => i.group === 'flow').forEach(add);
-  const skills = REVIEW_ITEMS.filter((i) => i.group === 'skill' && state.review.marks[i.id]);
-  if (skills.length) {
-    lines.push('');
-    skills.forEach(add);
-  }
-  return lines.length > 1 ? lines.join('\n') : '';
-}
-
-function addReviewGaps() {
-  const ids = reviewGapOpps();
-  if (!ids.length) {
-    toast('Mark at least one step as an opportunity first.', { type: 'warn' });
-    return;
-  }
-  const added = ids.filter((id) => !state.builder.opps.includes(id));
-  state.builder.opps.push(...added);
-  persist('builder');
-  refresh({ panel: false });
-  toast(added.length ? `Added ${plural(added.length, 'opportunity', 'opportunities')} to the Coaching Builder` : 'Those opportunities are already in the Coaching Builder', {
-    action: { label: 'Open Builder', fn: () => navigate('builder') },
-  });
-}
-
-function addReviewStrengths() {
-  const ids = reviewMetStrengths();
-  if (!ids.length) {
-    toast('Mark at least one step as met first.', { type: 'warn' });
-    return;
-  }
-  const have = new Set(state.builder.strengths.map((s) => s.id));
-  const added = ids.filter((id) => !have.has(id));
-  added.forEach((id) => state.builder.strengths.push({ id, v: 0 }));
-  persist('builder');
-  refresh({ panel: false });
-  toast(added.length ? `Marked ${plural(added.length, 'strength')} as observed` : 'Those strengths are already marked as observed', {
-    action: { label: 'Open Builder', fn: () => navigate('builder') },
-  });
-}
-
-async function clearReview() {
-  if (!Object.keys(state.review.marks).length) return;
-  if (!(await confirmDialog({ title: 'Clear this call review?', message: 'All marks on this review will be cleared. Anything already added to the Coaching Builder stays there.', confirmLabel: 'Clear review' }))) return;
-  state.review = defaultReview();
-  persist('review');
-  refresh({ panel: false });
-}
-
-function reviewRow(it) {
-  const mark = state.review.marks[it.id] || '';
-  const picks = state.review.picks[it.id] || [it.gaps[0]];
-  const titleId = `rv-${it.id}`;
-  const btn = (value, label) =>
-    h(
-      'button',
-      {
-        type: 'button',
-        class: `rv-btn rv-btn--${value}`,
-        'aria-pressed': String(mark === value),
-        'data-fk': `rv:${it.id}:${value}`,
-        onclick: () => setReviewMark(it.id, value),
-      },
-      label
-    );
-  return h(
-    'li',
-    { class: `rv-row${mark ? ' is-' + mark : ''}` },
-    h('div', { class: 'rv-row__num', 'aria-hidden': 'true' }, it.n ? String(it.n) : '•'),
-    h('div', { class: 'rv-row__main' }, h('h3', { class: 'rv-row__title', id: titleId }, it.title), h('p', { class: 'rv-row__good' }, it.good)),
-    h('div', { class: 'rv-row__marks', role: 'group', 'aria-labelledby': titleId }, btn('met', 'Met'), btn('gap', 'Opportunity'), btn('na', 'N/A')),
-    mark === 'gap'
-      ? h(
-          'fieldset',
-          { class: 'rv-row__picks' },
-          h('legend', null, 'Coach with:'),
-          it.gaps
-            .map(getOpp)
-            .filter(Boolean)
-            .map((o) =>
-              h(
-                'label',
-                { class: 'check' },
-                h('input', { type: 'checkbox', checked: picks.includes(o.id), 'data-fk': `rvp:${it.id}:${o.id}`, onchange: (e) => toggleReviewPick(it, o.id, e.target.checked) }),
-                o.title
-              )
-            )
-        )
-      : null
-  );
-}
-
-function renderReviewTab(panel) {
-  const counts = { met: 0, gap: 0, na: 0 };
-  Object.values(state.review.marks).forEach((m) => counts[m]++);
-  const reviewed = counts.met + counts.gap + counts.na;
-  panel.append(
-    h('p', { class: 'hint', style: 'margin-bottom:14px' }, icon('info'), 'Mark each step as you listen to a sales or retention call. Opportunities can be sent to the Coaching Builder, and steps you mark as met can be added as observed strengths. Nothing is added until you choose.'),
-    h(
-      'section',
-      { class: 'card', 'aria-labelledby': 'rvFlowTitle' },
-      h('div', { class: 'card__head' }, h('h2', { class: 'card__title', id: 'rvFlowTitle' }, icon('trend'), 'Sales flow')),
-      h('div', { class: 'card__body' }, h('ol', { class: 'rv-list' }, REVIEW_ITEMS.filter((i) => i.group === 'flow').map(reviewRow)))
-    ),
-    h(
-      'section',
-      { class: 'card', style: 'margin-top:16px', 'aria-labelledby': 'rvSkillTitle' },
-      h('div', { class: 'card__head' }, h('h2', { class: 'card__title', id: 'rvSkillTitle' }, icon('target'), 'Sales skills'), h('span', { class: 'sec__sub' }, 'mark N/A when it did not come up')),
-      h('div', { class: 'card__body' }, h('ul', { class: 'rv-list' }, REVIEW_ITEMS.filter((i) => i.group === 'skill').map(reviewRow)))
-    ),
-    h(
-      'div',
-      { class: `selection-bar selection-bar--review${reviewed ? '' : ' is-empty'}`, role: 'region', 'aria-label': 'Call review summary' },
-      h('span', { class: 'selection-bar__text' }, reviewed ? `${counts.met} met · ${counts.gap} ${counts.gap === 1 ? 'opportunity' : 'opportunities'} · ${counts.na} N/A` : 'No steps marked yet'),
-      h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'rv-add-gaps', disabled: !counts.gap, onclick: addReviewGaps }, icon('plus'), h('span', { class: 'lbl-long' }, 'Add opportunities to Builder'), h('span', { class: 'lbl-short' }, 'Add to Builder')),
-      h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'rv-add-strengths', disabled: !counts.met, onclick: addReviewStrengths }, icon('thumb'), h('span', { class: 'lbl-long' }, 'Add met steps as strengths'), h('span', { class: 'lbl-short' }, 'Add strengths')),
-      copyButton(() => reviewSummaryText(), { label: 'Copy review', srLabel: 'Copy review summary', fk: 'rv-copy', emptyMessage: 'Mark at least one step first.' }),
-      h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'rv-clear', disabled: !reviewed, onclick: clearReview }, 'Clear')
-    )
   );
 }
 
@@ -412,11 +251,11 @@ function renderSalesToolkit(main) {
     h('p', { class: 'notice', role: 'note', style: 'margin-bottom:16px' }, icon('alert'), h('span', { class: 'notice__body' }, SALES.notOffer)),
     salesTabs()
   );
-  const panel = h('div', { class: 'tk-panel', role: 'tabpanel', id: 'tk-panel', 'aria-labelledby': `tk-tab-${tab}`, tabindex: '-1' });
+  const panel = h('div', { class: `tk-panel${takeTabAnim()}`, role: 'tabpanel', id: 'tk-panel', 'aria-labelledby': `tk-tab-${tab}`, tabindex: '-1' });
   if (tab === 'flow') renderFlowTab(panel);
   else if (tab === 'offers') renderOffersTab(panel);
   else if (tab === 'objections') renderObjectionsTab(panel);
   else if (tab === 'signals') renderSignalsTab(panel);
-  else renderReviewTab(panel);
+  else renderReviewTab(panel, 'sales');
   main.append(panel);
 }

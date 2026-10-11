@@ -20,6 +20,9 @@ const opps = meta.categories.flatMap((c) => JSON.parse(fs.readFileSync(path.join
 const strengths = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'strengths.json'), 'utf8'));
 const oppById = Object.fromEntries(opps.map((o) => [o.id, o]));
 const toolkit = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'sales_toolkit.json'), 'utf8'));
+const callReviews = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'call_reviews.json'), 'utf8'));
+const peopleToolkit = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'people_toolkit.json'), 'utf8'));
+const OPP_COUNT = opps.length;
 const strengthById = Object.fromEntries(strengths.map((s) => [s.id, s]));
 
 const results = [];
@@ -43,6 +46,8 @@ function assert(cond, msg) {
 }
 
 const NAME_RE = /\b(John|Mary|Sarah|Michael|David|Jennifer|Maria|Karen|Mike|Omar|Ahmed|Jessica|Ashley)\b|\bthe agent\b|\b(BPID|HRID|Avaya)\b|\d{6,}/;
+const location = (page) => page.url();
+
 function assertClean(text, label) {
   assert(text && text.trim().length > 0, `${label}: empty`);
   assert(!/[{}]/.test(text), `${label}: contains unrendered token braces`);
@@ -78,7 +83,8 @@ async function newPage(opts = {}) {
     await d.dismiss();
   });
   if (opts.init) await page.addInitScript(opts.init);
-  await page.goto(URL + (opts.hash || ''));
+  // Most tests start in the library; the Home dashboard has its own test.
+  await page.goto(URL + (opts.hash === undefined ? '#/all' : opts.hash));
   await page.waitForSelector('.opp-card, .s-card, .builder, .page-title');
   return { page, context };
 }
@@ -343,7 +349,7 @@ async function test(name, fn) {
     assert(/Content-Security-Policy/.test(html) && /connect-src 'none'/.test(html), 'CSP meta missing');
     const { page, context } = await newPage();
     const n = await page.locator('.opp-card').count();
-    assert(n === 93, `Expected 93 cards on All Opportunities, found ${n}`);
+    assert(n === OPP_COUNT, `Expected ${OPP_COUNT} cards on All Opportunities, found ${n}`);
     await openFromSearch(page, 'transfer');
     await page.goto(URL + '#/builder');
     await page.goto(URL + '#/strengths');
@@ -410,6 +416,21 @@ async function test(name, fn) {
         await page.waitForTimeout(120);
         await overflow('sales toolkit: ' + tab);
       }
+      for (const t of ['Technical Support', 'Billing', 'Customer Service', 'Sales & Retention']) {
+        await page.goto(URL + '#/call-review');
+        await page.getByRole('tab', { name: new RegExp(t) }).click();
+        await page.waitForTimeout(120);
+        await overflow('call review: ' + t);
+      }
+      for (const tab of ['Attendance talk', 'Return to work', 'Stay conversation', 'Early warning signs', 'Recognition']) {
+        await page.goto(URL + '#/people-toolkit');
+        await page.getByRole('tab', { name: tab }).click();
+        await page.waitForTimeout(120);
+        await overflow('ABS & Attrition toolkit: ' + tab);
+      }
+      await page.goto(URL + '#/home');
+      await page.waitForSelector('.hero');
+      await overflow('home');
       await page.goto(URL + '#/settings');
       await overflow('settings');
       if (vp.width < 1024) {
@@ -557,7 +578,7 @@ async function test(name, fn) {
       }
       return out;
     });
-    assert(docs.length === 93 && docs.every((d) => d.ok), 'Not every entry opened with a Copy Full Coaching button');
+    assert(docs.length === OPP_COUNT && docs.every((d) => d.ok), 'Not every entry opened with a Copy Full Coaching button');
     await page.goto(URL + '#/all?open=tech-porting');
     await page.waitForSelector('#panelTitle');
     const full = await clickCopy(page, 'Copy full coaching document');
@@ -570,7 +591,7 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
-  await test('Every entry renders clean copy text (all 93 x 7 sections)', async () => {
+  await test(`Every entry renders clean copy text (all ${OPP_COUNT} x 7 sections)`, async () => {
     for (const o of opps) {
       assertClean(o.feedback, `${o.id} feedback`);
       assertClean(o.impact, `${o.id} impact`);
@@ -689,7 +710,7 @@ async function test(name, fn) {
       Object.defineProperty(window, 'localStorage', { get() { throw new Error('storage blocked'); }, configurable: true });
     };
     const { page, context } = await newPage({ init: block });
-    assert((await page.locator('.opp-card').count()) === 93, 'Library did not render with storage blocked');
+    assert((await page.locator('.opp-card').count()) === OPP_COUNT, 'Library did not render with storage blocked');
     assert((await page.locator('.sidebar__status').innerText()).includes('storage unavailable'), 'Storage warning not shown in the sidebar');
     await page.getByRole('button', { name: 'Add Lack of Rapport to favorites' }).click();
     await page.goto(URL + '#/favorites');
@@ -943,6 +964,124 @@ async function test(name, fn) {
     const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Export backup/ }).click()]);
     const json = JSON.parse(fs.readFileSync(await download.path(), 'utf8'));
     assert(json.data.links && json.data.links.items.length === 6, 'Export backup does not include quick links');
+    await finish(page, context);
+  });
+
+  await test('Home dashboard: opens by default, KPI tiles filter the library, quick actions navigate', async () => {
+    const { page, context } = await newPage({ hash: '' });
+    await page.waitForSelector('.hero');
+    assert(/Ready to coach\?$/.test(await page.locator('#pageTitle').innerText()), 'Home did not open by default');
+    const kpiTiles = await page.locator('.kpi-tile .kpi-tile__label').allInnerTexts();
+    assert(kpiTiles.join('|') === meta.kpis.map((k) => k.label).join('|'), 'KPI tiles do not match the KPI list: ' + kpiTiles.join('|'));
+    await page.waitForTimeout(1200);
+    const absCount = opps.filter((o) => o.kpi.includes('ABS')).length;
+    assert((await page.locator('.kpi-tile--abs .kpi-tile__num').innerText()).startsWith(String(absCount)), 'ABS tile count is wrong');
+    await page.locator('.kpi-tile--abs').click();
+    await page.waitForSelector('.opp-card');
+    assert(location(page).endsWith('#/all'), 'KPI tile did not open the library');
+    const cards = await page.locator('.opp-card').count();
+    assert(cards === absCount, `ABS filter should show ${absCount} entries, showed ${cards}`);
+    await page.evaluate(() => { const p = JSON.parse(localStorage.getItem('cip.v1.prefs')); p.kpi = ''; localStorage.setItem('cip.v1.prefs', JSON.stringify(p)); });
+    await page.goto(URL + '#/home');
+    await page.getByRole('link', { name: /Start a call review/ }).click();
+    await page.waitForSelector('.type-picker');
+    assert((await page.locator('#pageTitle').innerText()) === 'Call Review', 'Hero button did not open Call Review');
+    await finish(page, context);
+  });
+
+  await test('Call Review: every call type reviews, feeds the Builder, and keeps its own marks', async () => {
+    const { page, context } = await newPage({ hash: '#/call-review', init: () => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('cip.v1.review', JSON.stringify({ marks: { understand: 'met' }, picks: {} })); } } });
+    assert((await page.getByRole('tab').count()) === 4, 'Expected four call types');
+    const row = (title) => page.locator('.rv-row', { has: page.locator('.rv-row__title', { hasText: new RegExp('^' + title + '$') }) });
+    // Older saved Sales reviews still load.
+    await page.getByRole('tab', { name: /Sales & Retention/ }).click();
+    assert((await row('Understand').getByRole('button', { name: 'Met' }).getAttribute('aria-pressed')) === 'true', 'A Sales review saved in the old format was lost');
+    for (const t of callReviews.types) {
+      await page.getByRole('tab', { name: new RegExp(t.label) }).click();
+      await page.waitForTimeout(100);
+      assert((await page.locator('.rv-row').count()) === t.steps.length + t.skills.length, `${t.label}: wrong number of review rows`);
+      for (const it of t.steps.concat(t.skills)) for (const g of it.gaps) assert(oppById[g], `${t.label}/${it.id}: unknown entry ${g}`);
+    }
+    await page.getByRole('tab', { name: /Technical Support/ }).click();
+    const tech = callReviews.types.find((t) => t.id === 'tech');
+    await row('Open and acknowledge').getByRole('button', { name: 'Met' }).click();
+    await row('Follow the ITG').getByRole('button', { name: 'Opportunity' }).click();
+    await row('Own it before you route it').getByRole('button', { name: 'Opportunity' }).click();
+    await row('Own it before you route it').getByLabel('Failure to Follow Correct Transfer Process').check();
+    const risk = await page.locator('.scorecard__risk').innerText();
+    assert(/Repeat \(aiCR\): 2 steps/.test(risk) && /Transfer: 1 step/.test(risk), 'KPI risk summary is wrong: ' + risk);
+    assert((await page.locator('.ring__value').innerText()).replace(/\s/g, '') === '3/' + (tech.steps.length + tech.skills.length), 'Progress ring count is wrong');
+    const say = tech.steps.find((x) => x.id === 'open').say;
+    assert((await clickCopy(page, 'Copy model line for Open and acknowledge')) === say, 'Model line copy mismatch');
+    const summary = await clickCopy(page, 'Copy review summary');
+    assert(summary.startsWith('Technical Support Call Review') && summary.includes('Follow the ITG: Opportunity'), 'Technical review summary is wrong');
+    await page.getByRole('button', { name: 'Add opportunities to Builder' }).click();
+    await page.getByRole('button', { name: 'Add met steps as strengths' }).click();
+    const b = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.builder')));
+    assert(JSON.stringify(b.opps) === JSON.stringify(['tech-itg-missing', 'own-unnecessary-transfer', 'own-transfer-process']), 'Builder got the wrong opportunities: ' + b.opps.join(','));
+    assert(b.strengths.map((x) => x.id).join() === 's-acknowledgement', 'Met step did not become its strength');
+    // Each type keeps its own marks across reloads.
+    await page.reload();
+    await page.waitForSelector('.rv-row');
+    assert((await page.getByRole('tab', { name: /Technical Support/ }).getAttribute('aria-selected')) === 'true', 'Selected call type was not remembered');
+    assert((await row('Follow the ITG').getByRole('button', { name: 'Opportunity' }).getAttribute('aria-pressed')) === 'true', 'Technical marks did not persist');
+    await page.getByRole('tab', { name: /Billing/ }).click();
+    assert((await page.locator('.rv-btn[aria-pressed="true"]').count()) === 0, 'Billing review should start empty');
+    // Keyboard switching between call types
+    await page.getByRole('tab', { name: /Billing/ }).focus();
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(120);
+    assert((await page.getByRole('tab', { name: /Customer Service/ }).getAttribute('aria-selected')) === 'true', 'Arrow key did not switch call type');
+    await finish(page, context);
+  });
+
+  await test('ABS & Attrition: entries, schedule-based Builder wording, and the toolkit', async () => {
+    const { page, context } = await newPage({ hash: '#/cat/people' });
+    const people = opps.filter((o) => o.cat === 'people');
+    assert((await page.locator('.opp-card').count()) === people.length, 'ABS & Attrition category is incomplete');
+    assert((await page.locator('.promo a', { hasText: 'Open the toolkit' }).count()) === 1, 'Category is missing the toolkit link');
+    await search(page, 'late');
+    assert((await page.locator('.opp-card__title').first().innerText()) === 'Late Log-Ins', 'Search "late" should find Late Log-Ins first');
+    await search(page, 'burnout');
+    assert((await page.locator('.opp-card__title').first().innerText()) === 'Stress and Fatigue', 'Search "burnout" should find Stress and Fatigue first');
+    await search(page, '');
+    // Builder with attendance and engagement entries only: no call language in the plan or follow-up.
+    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['people-late-login', 'people-break-overrun', 'people-disengagement'], strengths: [{ id: 's-team-support', v: 0 }] })));
+    await page.goto(URL + '#/builder');
+    await page.reload();
+    await page.waitForSelector('.out-sec__text');
+    const out = await page.locator('.out-sec__text').evaluateAll((els) => els.map((e) => e.value));
+    for (const t of out) assertClean(t, 'people builder');
+    assert(!/\bcalls?\b/i.test(out[2]) && !/\bcalls?\b/i.test(out[3]), 'Attendance-only plan or follow-up mentions calls');
+    assert(out[2].includes('We will check in together within the next seven days'), 'Attendance plan is missing its check-in measure');
+    assert(out[2].includes(fill(oppById['people-late-login'].b.mx)), 'Attendance plan is missing the entry measure');
+    assert(out[3].includes('review your schedule adherence and attendance together'), 'Follow-up does not mention the schedule review');
+    // Mixed call and attendance coaching keeps both measures.
+    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['hold-dead-air', 'people-late-login'], strengths: [] })));
+    await page.reload();
+    await page.waitForSelector('.out-sec__text');
+    const mixed = await page.locator('.out-sec__text').evaluateAll((els) => els.map((e) => e.value));
+    assert(mixed[2].includes('We will review five applicable calls') && mixed[2].includes(fill(oppById['people-late-login'].b.mx)), 'Mixed plan lost a measure');
+    // Toolkit
+    await page.goto(URL + '#/people-toolkit');
+    await page.waitForSelector('.timeline');
+    assert((await page.getByRole('tab').count()) === 5, 'Expected five toolkit tabs');
+    const steps = peopleToolkit.attendance.steps;
+    assert((await page.locator('.timeline__item').count()) === steps.length, 'Attendance conversation steps missing');
+    assert((await clickCopy(page, 'Copy what to say for ' + steps[1].title)) === steps[1].say, 'Attendance line copy mismatch');
+    const all = await clickCopy(page, 'Copy the whole attendance conversation');
+    assert(all.startsWith('1. ' + steps[0].title) && all.includes(steps[steps.length - 1].say), 'Whole conversation copy is wrong');
+    await page.getByRole('tab', { name: 'Stay conversation' }).click();
+    const g = peopleToolkit.stay.groups[0];
+    assert((await clickCopy(page, 'Copy questions: ' + g.title)) === g.questions.join('\n'), 'Stay questions copy mismatch');
+    await page.getByRole('tab', { name: 'Early warning signs' }).click();
+    assert((await page.locator('.pk-sign').count()) === peopleToolkit.signs.length, 'Warning signs missing');
+    await page.locator('.pk-sign').first().getByRole('button', { name: oppById[peopleToolkit.signs[0].opps[0]].title }).click();
+    await page.waitForSelector('#panelTitle');
+    assert((await page.locator('#panelTitle').innerText()) === oppById[peopleToolkit.signs[0].opps[0]].title, 'Warning sign chip opened the wrong entry');
+    await page.keyboard.press('Escape');
+    await page.getByRole('tab', { name: 'Recognition' }).click();
+    assert((await clickCopy(page, 'Copy shout-out 1')) === peopleToolkit.recognition.shoutouts[0], 'Shout-out copy mismatch');
     await finish(page, context);
   });
 

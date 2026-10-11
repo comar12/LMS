@@ -7,7 +7,7 @@ const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
 const CAT_MAP = Object.fromEntries(CATS.map((c) => [c.id, c]));
-const CAT_ICON = { com: 'chat', dis: 'compass', hold: 'pause', own: 'shield', tech: 'router', bill: 'receipt', sales: 'trend' };
+const CAT_ICON = { com: 'chat', dis: 'compass', hold: 'pause', own: 'shield', tech: 'router', bill: 'receipt', sales: 'trend', people: 'users' };
 const CAT_DESC = {
   com: 'Empathy, acknowledgement, tone, listening, and call structure.',
   dis: 'Asking the right questions before acting on the concern.',
@@ -16,8 +16,9 @@ const CAT_DESC = {
   tech: 'Troubleshooting accuracy, ITG use, tools, scheduling, and process knowledge.',
   bill: 'Accurate billing explanations, credits, payments, and customer education.',
   sales: 'Needs-based offers, transitions, objections, pricing disclosure, and retention.',
+  people: 'Attendance, punctuality, schedule adherence, engagement, and the conversations that keep people on the team.',
 };
-const CAT_DEFAULT_THEME = { com: 'connect', dis: 'discover', hold: 'control', own: 'own', tech: 'tech', bill: 'billing', sales: 'sales' };
+const CAT_DEFAULT_THEME = { com: 'connect', dis: 'discover', hold: 'control', own: 'own', tech: 'tech', bill: 'billing', sales: 'sales', people: 'attend' };
 const THEMES = META.themes;
 const FALLBACK_THEME = {
   label: 'Additional Focus',

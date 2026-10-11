@@ -76,6 +76,7 @@ const DEFAULT_FULLCOPY = Object.freeze({ strengths: true, feedback: true, impact
 
 const SALES_TAB_IDS = ['review', 'flow', 'offers', 'objections', 'signals'];
 const SALES_OFFER_IDS = ['xm', 'upgrade', 'tv', 'retention'];
+const PEOPLE_TAB_IDS = ['attendance', 'return', 'stay', 'signs', 'recognition'];
 
 function defaultPrefs() {
   return {
@@ -85,14 +86,16 @@ function defaultPrefs() {
     kpi: '',
     sGroup: '',
     fullCopy: { ...DEFAULT_FULLCOPY },
-    refOpen: { hold: true, sales: true },
+    refOpen: { hold: true, sales: true, people: true },
     salesTab: 'review',
     salesOffer: 'xm',
+    peopleTab: 'attendance',
     brand: null,
   };
 }
+/** Call reviews are kept per call type, so a Technical review and a Sales review can be in progress together. */
 function defaultReview() {
-  return { marks: {}, picks: {} };
+  return { type: 'tech', byType: {} };
 }
 /** Quick Links start from the preset built into this copy of the app (empty in the shared copy). */
 function initialLinks() {
@@ -165,10 +168,11 @@ function sanitizePrefs(o) {
     for (const k of Object.keys(DEFAULT_FULLCOPY)) if (typeof src.fullCopy[k] === 'boolean') p.fullCopy[k] = src.fullCopy[k];
   }
   if (src.refOpen && typeof src.refOpen === 'object') {
-    for (const k of ['hold', 'sales']) if (typeof src.refOpen[k] === 'boolean') p.refOpen[k] = src.refOpen[k];
+    for (const k of ['hold', 'sales', 'people']) if (typeof src.refOpen[k] === 'boolean') p.refOpen[k] = src.refOpen[k];
   }
   if (SALES_TAB_IDS.includes(src.salesTab)) p.salesTab = src.salesTab;
   if (SALES_OFFER_IDS.includes(src.salesOffer)) p.salesOffer = src.salesOffer;
+  if (PEOPLE_TAB_IDS.includes(src.peopleTab)) p.peopleTab = src.peopleTab;
   if (src.brand && typeof src.brand === 'object') {
     const hex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
     const primary = hex(src.brand.primary);
@@ -178,17 +182,24 @@ function sanitizePrefs(o) {
   return p;
 }
 
-/** Call review marks: only known steps, only met/gap/na, and coaching picks limited to that step's related entries. */
+/** Call review marks: only known call types and steps, only met/gap/na, and coaching picks limited to that step's related entries. */
 function sanitizeReview(o) {
   const src = o && typeof o === 'object' ? o : {};
   const out = defaultReview();
-  const items = (DATA.salesToolkit.steps || []).concat(DATA.salesToolkit.skills || []);
-  const marks = src.marks && typeof src.marks === 'object' ? src.marks : {};
-  const picks = src.picks && typeof src.picks === 'object' ? src.picks : {};
-  for (const it of items) {
-    if (['met', 'gap', 'na'].includes(marks[it.id])) out.marks[it.id] = marks[it.id];
-    if (Array.isArray(picks[it.id])) out.picks[it.id] = picks[it.id].filter((id) => it.gaps.includes(id));
+  // Reviews saved before call types existed were Sales reviews.
+  const byType = src.byType && typeof src.byType === 'object' ? src.byType : src.marks ? { sales: { marks: src.marks, picks: src.picks } } : {};
+  for (const t of REVIEW_TYPES) {
+    const slot = byType[t.id] && typeof byType[t.id] === 'object' ? byType[t.id] : {};
+    const marks = slot.marks && typeof slot.marks === 'object' ? slot.marks : {};
+    const picks = slot.picks && typeof slot.picks === 'object' ? slot.picks : {};
+    const clean = { marks: {}, picks: {} };
+    for (const it of t.steps.concat(t.skills)) {
+      if (['met', 'gap', 'na'].includes(marks[it.id])) clean.marks[it.id] = marks[it.id];
+      if (Array.isArray(picks[it.id])) clean.picks[it.id] = picks[it.id].filter((id) => it.gaps.includes(id));
+    }
+    if (Object.keys(clean.marks).length) out.byType[t.id] = clean;
   }
+  if (REVIEW_TYPE_IDS.includes(src.type)) out.type = src.type;
   return out;
 }
 

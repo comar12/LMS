@@ -1,0 +1,622 @@
+{
+  "types": [
+    {
+      "id": "tech",
+      "label": "Technical Support",
+      "short": "Technical",
+      "intro": "Follow a repair call from the opening to a confirmed fix. The steps that drive repeat contacts and transfers are marked, so you can see where aiCR and transfer risk came from.",
+      "steps": [
+        {
+          "id": "open",
+          "title": "Open and acknowledge",
+          "good": "Greet the customer, restate the reason for the call, and acknowledge how the issue is affecting them before anything else.",
+          "say": "I'm sorry the internet keeps dropping while you're working from home. Let's find out what's causing it.",
+          "gaps": [
+            "com-missing-acknowledgement",
+            "com-opening",
+            "com-missing-empathy"
+          ],
+          "strength": "s-acknowledgement",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "verify",
+          "title": "Verify the account",
+          "good": "Complete account verification following the applicable process before discussing or changing anything on the account.",
+          "gaps": [
+            "tech-verification"
+          ],
+          "strength": "s-verification",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "discover",
+          "title": "Discover and scope",
+          "good": "Ask when the issue started, which devices and services are affected, and what the customer has already tried.",
+          "say": "When did you first notice the drops, and is it happening on every device or just one?",
+          "gaps": [
+            "dis-insufficient-probing",
+            "dis-issue-scope",
+            "dis-prior-troubleshooting",
+            "dis-early-troubleshooting"
+          ],
+          "strength": "s-probing",
+          "kpi": [
+            "QA",
+            "aiCR"
+          ]
+        },
+        {
+          "id": "history",
+          "title": "Check history and outages",
+          "good": "Review previous contacts and check for known outages before starting troubleshooting, so a repeat issue is treated as one.",
+          "gaps": [
+            "dis-contact-history",
+            "tech-repeat-issues",
+            "tech-outage-expectations"
+          ],
+          "strength": "s-troubleshooting",
+          "kpi": [
+            "aiCR"
+          ]
+        },
+        {
+          "id": "itg",
+          "title": "Follow the ITG",
+          "good": "Work through the applicable ITG flow step by step, without skipping steps or improvising a different path.",
+          "gaps": [
+            "tech-itg-missing",
+            "tech-itg-incorrect",
+            "tech-diagnostics"
+          ],
+          "strength": "s-itg",
+          "kpi": [
+            "QA",
+            "aiCR"
+          ]
+        },
+        {
+          "id": "inform",
+          "title": "Keep the customer informed",
+          "good": "Explain what you are checking and how long it will take, and use the hold process correctly for longer research.",
+          "say": "I'm going to check the signal history on your equipment. That will take about two minutes. Is it okay if I place you on a brief hold?",
+          "gaps": [
+            "hold-dead-air",
+            "hold-research-communication",
+            "hold-no-permission",
+            "hold-excessive-hold"
+          ],
+          "strength": "s-research-updates",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "fix",
+          "title": "Fix the root cause",
+          "good": "Identify the actual cause and resolve it, rather than treating a symptom or replacing equipment by default.",
+          "gaps": [
+            "tech-root-cause",
+            "own-incomplete-resolution",
+            "tech-equipment-replacement"
+          ],
+          "strength": "s-diagnosis",
+          "kpi": [
+            "aiCR"
+          ]
+        },
+        {
+          "id": "own",
+          "title": "Own it before you route it",
+          "good": "Resolve what you can yourself. When a transfer or technician visit is truly needed, follow the correct path and process.",
+          "gaps": [
+            "own-unnecessary-transfer",
+            "own-transfer-process",
+            "own-escalation-path",
+            "tech-scheduling"
+          ],
+          "strength": "s-ownership",
+          "kpi": [
+            "Transfer",
+            "aiCR"
+          ]
+        },
+        {
+          "id": "expect",
+          "title": "Set clear expectations",
+          "good": "Explain what happens next, including appointment or outage details, without guaranteeing an outcome you cannot confirm.",
+          "gaps": [
+            "own-expectation-setting",
+            "tech-appointment-expectations",
+            "own-unsupported-guarantees"
+          ],
+          "strength": "s-expectations",
+          "kpi": [
+            "aiCR"
+          ]
+        },
+        {
+          "id": "confirm",
+          "title": "Confirm the fix and close",
+          "good": "Have the customer confirm the service works on their side, recap what was done, and close the call warmly.",
+          "say": "Could you open a page on your laptop and tell me if it loads normally now?",
+          "gaps": [
+            "own-confirm-resolution",
+            "own-premature-resolution",
+            "com-closing"
+          ],
+          "strength": "s-resolution",
+          "kpi": [
+            "aiCR",
+            "QA"
+          ]
+        }
+      ],
+      "skills": [
+        {
+          "id": "explain",
+          "title": "Clear technical explanations",
+          "good": "Explain each technical step in plain language and check that the customer can follow along.",
+          "gaps": [
+            "tech-explanations",
+            "com-clarity"
+          ],
+          "strength": "s-clarity"
+        },
+        {
+          "id": "tools",
+          "title": "Tools navigation",
+          "good": "Move through the tools efficiently, so research time stays short and the customer is not left waiting.",
+          "gaps": [
+            "tech-tools-navigation"
+          ],
+          "strength": "s-tools"
+        },
+        {
+          "id": "control",
+          "title": "Call control",
+          "good": "Guide the conversation with purpose and keep the call moving toward the fix.",
+          "gaps": [
+            "hold-call-control",
+            "com-call-flow"
+          ],
+          "strength": "s-call-control"
+        },
+        {
+          "id": "tone",
+          "title": "Tone and energy",
+          "good": "Keep a warm, confident, engaged tone from the opening to the close, even during long troubleshooting.",
+          "gaps": [
+            "com-flat-tone",
+            "com-tone-pace"
+          ],
+          "strength": "s-tone"
+        },
+        {
+          "id": "educate",
+          "title": "Customer education",
+          "good": "Show the customer what to do if the issue returns, so they are not left needing to call again.",
+          "gaps": [
+            "own-incomplete-education"
+          ],
+          "strength": "s-education",
+          "kpi": [
+            "aiCR"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "billing",
+      "label": "Billing",
+      "short": "Billing",
+      "intro": "Review a billing call from the first acknowledgement to a customer who understands the next bill. Accurate expectations here are what prevent repeat contacts.",
+      "steps": [
+        {
+          "id": "open",
+          "title": "Open and acknowledge",
+          "good": "Greet the customer and restate the billing concern in your own words, so they know you understood it.",
+          "gaps": [
+            "com-missing-acknowledgement",
+            "com-opening"
+          ],
+          "strength": "s-acknowledgement",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "empathize",
+          "title": "Acknowledge the frustration",
+          "good": "Recognize how an unexpected bill feels for the customer before explaining any charges.",
+          "say": "I can see why a higher bill than you expected is frustrating. Let's go through it together so it makes sense.",
+          "gaps": [
+            "bill-frustration",
+            "com-missing-empathy",
+            "com-generic-empathy"
+          ],
+          "strength": "s-empathy",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "verify",
+          "title": "Verify the account",
+          "good": "Complete account verification following the applicable process before discussing account details.",
+          "gaps": [
+            "tech-verification"
+          ],
+          "strength": "s-verification",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "review",
+          "title": "Review the account and history",
+          "good": "Review the statement, recent changes, and any previous billing commitments before answering the question.",
+          "gaps": [
+            "bill-previous-commitments",
+            "dis-contact-history",
+            "dis-main-concern"
+          ],
+          "strength": "s-probing",
+          "kpi": [
+            "aiCR"
+          ]
+        },
+        {
+          "id": "explain",
+          "title": "Explain the bill",
+          "good": "Walk through each charge that changed and why, in plain language and in a logical order.",
+          "say": "There are two changes on this bill. Let's start with the first one, and I'll explain what changed and why.",
+          "gaps": [
+            "bill-incomplete-explanation",
+            "bill-subscription",
+            "bill-promotion-eligibility"
+          ],
+          "strength": "s-billing",
+          "kpi": [
+            "QA",
+            "aiCR"
+          ]
+        },
+        {
+          "id": "options",
+          "title": "Offer the right options",
+          "good": "Explain the payment or plan options that fit the customer's situation, using approved resources.",
+          "gaps": [
+            "bill-payment-options"
+          ],
+          "strength": "s-payment-options",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "accurate",
+          "title": "Set accurate expectations",
+          "good": "Be accurate about any credit, refund, payment, or service restoration, and never promise what you cannot confirm.",
+          "gaps": [
+            "bill-credit-expectations",
+            "bill-refund-expectations",
+            "bill-restoration-expectations",
+            "own-unsupported-guarantees"
+          ],
+          "strength": "s-expectations",
+          "kpi": [
+            "aiCR"
+          ]
+        },
+        {
+          "id": "pricing",
+          "title": "Disclose pricing fully",
+          "good": "Disclose pricing completely, including when a promotional rate ends and what the standard rate will be afterward.",
+          "gaps": [
+            "bill-pricing-disclosure"
+          ],
+          "strength": "s-pricing",
+          "kpi": [
+            "aiCR",
+            "QA"
+          ]
+        },
+        {
+          "id": "retain",
+          "title": "Recognize cancellation risk",
+          "good": "Notice when the customer mentions cancelling or switching, and address the concern behind it before routing anywhere.",
+          "gaps": [
+            "bill-cancellation-risk",
+            "sales-retention"
+          ],
+          "strength": "s-retention",
+          "kpi": [
+            "Transfer",
+            "aiCR"
+          ]
+        },
+        {
+          "id": "confirm",
+          "title": "Educate and confirm",
+          "good": "Check that the customer understands what the next bill will look like, then recap the call.",
+          "say": "Before we finish, can you tell me what you expect to see on next month's bill, so I know I explained it clearly?",
+          "gaps": [
+            "bill-customer-education",
+            "dis-confirm-understanding",
+            "com-closing"
+          ],
+          "strength": "s-understanding",
+          "kpi": [
+            "aiCR"
+          ]
+        }
+      ],
+      "skills": [
+        {
+          "id": "clarity",
+          "title": "Clear explanations",
+          "good": "Use plain language and short steps, and avoid billing jargon the customer may not know.",
+          "gaps": [
+            "com-clarity"
+          ],
+          "strength": "s-clarity"
+        },
+        {
+          "id": "deescalate",
+          "title": "De-escalation",
+          "good": "Stay calm and steady when the customer is upset, and move the conversation toward a solution.",
+          "gaps": [
+            "com-deescalation",
+            "com-emotional-ownership"
+          ],
+          "strength": "s-deescalation",
+          "kpi": [
+            "Transfer"
+          ]
+        },
+        {
+          "id": "own",
+          "title": "Ownership",
+          "good": "Handle the billing concern yourself whenever you can, instead of passing it to another team.",
+          "gaps": [
+            "own-lack-ownership",
+            "own-unnecessary-transfer"
+          ],
+          "strength": "s-ownership",
+          "kpi": [
+            "Transfer"
+          ]
+        },
+        {
+          "id": "research",
+          "title": "Research with updates",
+          "good": "Tell the customer what you are reviewing and how long it will take while you look at the account.",
+          "gaps": [
+            "hold-dead-air",
+            "hold-research-communication"
+          ],
+          "strength": "s-research-updates"
+        },
+        {
+          "id": "tone",
+          "title": "Tone and pace",
+          "good": "Keep a patient, professional tone and a pace the customer can follow.",
+          "gaps": [
+            "com-tone-pace",
+            "com-flat-tone"
+          ],
+          "strength": "s-tone"
+        }
+      ]
+    },
+    {
+      "id": "service",
+      "label": "Customer Service",
+      "short": "Service",
+      "intro": "A general customer service review for any call type. It follows the conversation from the opening to a confirmed resolution, with ownership and transfers marked.",
+      "steps": [
+        {
+          "id": "open",
+          "title": "Strong opening",
+          "good": "Open with energy, introduce yourself, and move quickly to the reason for the call.",
+          "gaps": [
+            "com-opening",
+            "com-missing-acknowledgement"
+          ],
+          "strength": "s-opening",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "empathize",
+          "title": "Empathize",
+          "good": "Respond to how the situation is affecting the customer, using details they actually shared.",
+          "say": "Having your service go down right before an important meeting is stressful. I'm glad you called, and I'll help you with it now.",
+          "gaps": [
+            "com-missing-empathy",
+            "com-generic-empathy"
+          ],
+          "strength": "s-empathy",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "assure",
+          "title": "Assure",
+          "good": "Tell the customer clearly that you will take care of the concern, and preview the first step.",
+          "gaps": [
+            "com-weak-assurance"
+          ],
+          "strength": "s-assurance",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "listen",
+          "title": "Listen and discover",
+          "good": "Let the customer finish, ask open questions, and confirm what they need before acting.",
+          "gaps": [
+            "com-active-listening",
+            "dis-missing-probing",
+            "dis-customer-needs",
+            "com-interrupting"
+          ],
+          "strength": "s-listening",
+          "kpi": [
+            "QA",
+            "aiCR"
+          ]
+        },
+        {
+          "id": "main",
+          "title": "Find the main concern",
+          "good": "Identify the main reason for the call and check previous contacts, so the real issue gets solved.",
+          "gaps": [
+            "dis-main-concern",
+            "dis-contact-history"
+          ],
+          "strength": "s-probing",
+          "kpi": [
+            "aiCR",
+            "Transfer"
+          ]
+        },
+        {
+          "id": "research",
+          "title": "Research with updates",
+          "good": "Give an estimate before research, use hold correctly, and check back with updates when it takes longer.",
+          "gaps": [
+            "hold-dead-air",
+            "hold-no-estimate",
+            "hold-no-updates",
+            "hold-unexplained-silence"
+          ],
+          "strength": "s-hold",
+          "kpi": [
+            "QA"
+          ]
+        },
+        {
+          "id": "resolve",
+          "title": "Resolve it fully",
+          "good": "Resolve the primary concern completely, and take ownership instead of handing off what you can handle.",
+          "gaps": [
+            "own-primary-concern",
+            "own-incomplete-resolution",
+            "own-lack-ownership"
+          ],
+          "strength": "s-resolution",
+          "kpi": [
+            "aiCR"
+          ]
+        },
+        {
+          "id": "route",
+          "title": "Route only when needed",
+          "good": "Transfer or escalate only when the issue truly needs another team, and follow the warm transfer steps when you do.",
+          "gaps": [
+            "own-unnecessary-transfer",
+            "own-transfer-process",
+            "own-escalation-path"
+          ],
+          "strength": "s-transfer",
+          "kpi": [
+            "Transfer"
+          ]
+        },
+        {
+          "id": "next",
+          "title": "Set expectations and follow up",
+          "good": "Explain what happens next and keep any callback or follow-up commitment through the applicable process.",
+          "gaps": [
+            "own-expectation-setting",
+            "own-missing-followup",
+            "hold-dropped-call"
+          ],
+          "strength": "s-followup",
+          "kpi": [
+            "aiCR"
+          ]
+        },
+        {
+          "id": "close",
+          "title": "Confirm and close",
+          "good": "Confirm the issue is resolved from the customer's side, recap the call, and close warmly.",
+          "say": "Just to recap, we updated your plan and the change shows on your account now. Is there anything else I can help with today?",
+          "gaps": [
+            "own-confirm-resolution",
+            "com-closing",
+            "dis-confirm-understanding"
+          ],
+          "strength": "s-closing",
+          "kpi": [
+            "aiCR",
+            "QA"
+          ]
+        }
+      ],
+      "skills": [
+        {
+          "id": "rapport",
+          "title": "Rapport",
+          "good": "Make a genuine connection using what the customer shares, while keeping the call on track.",
+          "gaps": [
+            "com-lack-rapport"
+          ],
+          "strength": "s-rapport"
+        },
+        {
+          "id": "tone",
+          "title": "Tone and energy",
+          "good": "Sound warm, engaged, and confident from the opening to the close.",
+          "gaps": [
+            "com-flat-tone",
+            "com-tone-pace"
+          ],
+          "strength": "s-tone"
+        },
+        {
+          "id": "explain",
+          "title": "Clear explanations",
+          "good": "Explain steps and outcomes simply, and check that the customer is following.",
+          "gaps": [
+            "com-clarity"
+          ],
+          "strength": "s-clarity"
+        },
+        {
+          "id": "deescalate",
+          "title": "De-escalation",
+          "good": "Stay calm with an upset customer, own the experience, and move the conversation toward a solution.",
+          "gaps": [
+            "com-deescalation",
+            "com-emotional-ownership"
+          ],
+          "strength": "s-deescalation",
+          "kpi": [
+            "Transfer"
+          ]
+        },
+        {
+          "id": "control",
+          "title": "Call control",
+          "good": "Keep the call organized, avoid asking for the same information twice, and lead it toward resolution.",
+          "gaps": [
+            "hold-call-control",
+            "com-call-flow",
+            "com-repeating-questions"
+          ],
+          "strength": "s-call-control"
+        }
+      ]
+    }
+  ]
+}

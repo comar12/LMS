@@ -3,3 +3,4 @@ tests/last-run.json
 *links*.json
 *_MyLinks.html
 My_Copy.html
+__pycache__/

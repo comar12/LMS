@@ -1,0 +1,269 @@
+{
+  "intro": "This toolkit covers the people side of the role: attendance, schedule adherence, and retention conversations. It is built for new team leaders and gives you a step-by-step attendance conversation, a short return-to-work check-in, stay conversation questions, early warning signs to watch for, and low-cost ways to recognize your team.",
+  "privacy": "Hold these conversations in private and treat each person with respect. Never ask for the reason behind an absence, and never ask for or write down private or personal details. Follow your site's attendance policy as written, and bring in WFM or HR for any policy, leave, or support question.",
+  "attendance": {
+    "steps": [
+      {
+        "id": "prepare",
+        "title": "Prepare the Facts",
+        "good": "Check the schedule and attendance records, confirm the dates and times, and reread your site's attendance policy. Write down any questions for WFM or HR before you meet.",
+        "say": "Do you have ten minutes after your lunch today? I'd like to sit down privately and talk through your schedule."
+      },
+      {
+        "id": "open-with-care",
+        "title": "Open With Care",
+        "good": "Meet somewhere private, explain why you asked to talk, and make it clear the goal is to help them succeed, not to catch them out.",
+        "say": "Thanks for making time. I wanted to talk about attendance because you matter to this team, and I'd like to understand how I can help."
+      },
+      {
+        "id": "share-observed",
+        "title": "Share What You Observed",
+        "good": "State the specific dates, times, or patterns from the records in neutral language. Describe what happened, not what you think it means.",
+        "say": "Looking at the schedule for this period, here are the missed shifts and late log-ins I can see. I want to make sure we're looking at the same information."
+      },
+      {
+        "id": "listen",
+        "title": "Listen First",
+        "good": "Ask one open question about what is getting in the way, then let them talk. Do not ask for the reason or private details; they share only what they choose.",
+        "say": "What's been making it harder to be here and ready on time? You don't have to tell me anything personal. I'm asking so I know what would help."
+      },
+      {
+        "id": "agree-actions",
+        "title": "Agree on Actions",
+        "good": "Agree on one or two specific, realistic actions, such as setting a log-in reminder or using the call-out process before the shift if they cannot make it.",
+        "say": "So for the next couple of weeks, you'll be logged in and ready at your start time, and if something comes up, you'll use the call-out process before your shift. Does that feel doable?"
+      },
+      {
+        "id": "offer-support",
+        "title": "Offer Support",
+        "good": "Share the support resources your site offers and explain how schedule change requests work. Send policy, leave, or schedule questions to WFM or HR instead of promising an outcome yourself.",
+        "say": "If your current schedule is part of the problem, I can show you how to request a change through WFM. I can't promise the result, but I'll help you put the request in."
+      },
+      {
+        "id": "confirm-follow-up",
+        "title": "Confirm and Follow Up",
+        "good": "Summarize what you agreed, set a specific check-in date, and document the conversation factually according to your site's process. Recognize them when they meet the commitment.",
+        "say": "Let's meet again next Thursday to see how the week went. If anything gets in the way before then, come and find me. I'd rather hear about it early."
+      }
+    ]
+  },
+  "returnToWork": {
+    "intro": "A short, private welcome-back conversation after any absence, long or short. The goal is to help the person settle back in and catch up on what changed, never to question them about why they were out or to assign blame.",
+    "lines": [
+      {
+        "label": "Welcome Back",
+        "say": "Good to have you back. How is the start of your shift going so far?"
+      },
+      {
+        "label": "Catch Up on Changes",
+        "say": "A couple of things changed while you were out. Let me walk you through the process update and the team notes so nothing catches you off guard on a call."
+      },
+      {
+        "label": "Offer Support",
+        "say": "Is there anything you need from me to get back into the rhythm, like a quick refresher or a few calls side by side?"
+      },
+      {
+        "label": "Keep the Door Open",
+        "say": "If something comes up that might affect your schedule, let me know early. You don't need to give me details. I only want to help plan around it."
+      },
+      {
+        "label": "Set a Quick Check-In",
+        "say": "Let's check in for a few minutes at the end of the week to see how things are going and whether you need anything else."
+      }
+    ]
+  },
+  "stay": {
+    "intro": "Stay conversations ask what keeps someone on the team before they start thinking about leaving. Hold them one on one, separate from performance coaching, and listen more than you talk. Pick two or three questions, note anything you can act on, and follow up on it.",
+    "groups": [
+      {
+        "id": "keeps-you-here",
+        "title": "What Keeps You Here",
+        "questions": [
+          "What do you look forward to most when you come in for a shift?",
+          "What would you miss most about this team if you moved on?",
+          "Which parts of your work feel most worthwhile to you right now?",
+          "What first made you want to work here, and is that still true for you?"
+        ]
+      },
+      {
+        "id": "gets-in-the-way",
+        "title": "What Gets in the Way",
+        "questions": [
+          "What is the most frustrating part of your week right now?",
+          "If you could change one thing about your schedule or workload, what would it be?",
+          "Which tools or processes slow you down the most on calls?",
+          "What makes a tough day on the phones harder than it needs to be?"
+        ]
+      },
+      {
+        "id": "growth-goals",
+        "title": "Growth and Goals",
+        "questions": [
+          "Where would you like to be a year from now, here or in another role?",
+          "What skill would you like to build next, and how can I help you practice it?",
+          "Which call types or projects would you like more experience with?",
+          "What would make you feel you are moving forward in this job?"
+        ]
+      },
+      {
+        "id": "support-from-me",
+        "title": "Support From Me",
+        "questions": [
+          "What do I do that helps you most, and what should I do more of?",
+          "What is one thing I could do differently to make your job easier?",
+          "How do you prefer to get feedback from me, in the moment or in a set conversation?",
+          "How easy is it to come to me when something goes wrong on a shift?"
+        ]
+      },
+      {
+        "id": "recognition-feedback",
+        "title": "Recognition and Feedback",
+        "questions": [
+          "How do you like to be recognized when you do good work, publicly or privately?",
+          "When was the last time you felt your work was really noticed here?",
+          "What kind of feedback helps you most when you are learning something new?",
+          "Is there something you have done recently that you feel went unnoticed?"
+        ]
+      }
+    ]
+  },
+  "signs": [
+    {
+      "id": "attendance-change",
+      "sign": "A change in attendance or punctuality",
+      "detail": "More unplanned absences, late log-ins, or absences around days off from someone who is usually on time. On its own it proves nothing, but a shift from their usual pattern is worth noticing.",
+      "action": "Hold a private, caring check-in this week. Share what you saw on the schedule, ask what would help, and remind them of the call-out process without asking for reasons.",
+      "opps": [
+        "people-unplanned-absence",
+        "people-late-login",
+        "people-absence-pattern"
+      ]
+    },
+    {
+      "id": "quieter-huddles",
+      "sign": "Quieter in huddles",
+      "detail": "Someone who used to speak up now stays silent, keeps their camera off, or leaves right as the huddle ends. It can mean many things, including a busy or tiring day.",
+      "action": "Invite their view in a low-pressure way, such as one question in the next huddle, then follow up one on one and ask how things are going for them.",
+      "opps": [
+        "people-disengagement",
+        "people-team-connection"
+      ]
+    },
+    {
+      "id": "less-interest-feedback",
+      "sign": "Fewer questions or less interest in feedback",
+      "detail": "Questions stop coming, coaching sessions feel short and one-sided, or feedback is met with quick agreement and no discussion.",
+      "action": "Make the next coaching session a two-way conversation. Ask what they find useful, what is not helping, and what they would like support with right now.",
+      "opps": [
+        "people-disengagement",
+        "people-low-confidence",
+        "people-missed-sessions"
+      ]
+    },
+    {
+      "id": "more-aux-time",
+      "sign": "More time in aux or not ready",
+      "detail": "Longer stretches in aux or not ready, breaks running over, or early log-outs. This can point to a hard stretch, frustration, or uncertainty about a process, not only a schedule issue.",
+      "action": "Review the adherence report together in a neutral way. Ask what is happening during those times and whether a process, tool, or call type is causing the delays.",
+      "opps": [
+        "people-aux-misuse",
+        "people-break-overrun",
+        "people-early-logout"
+      ]
+    },
+    {
+      "id": "frustration-after-calls",
+      "sign": "Frustration after difficult calls",
+      "detail": "Visible frustration, sharp comments, or a tense tone that carries into the next call after a tough interaction.",
+      "action": "Check in soon after a hard call. Acknowledge that it was difficult, offer a short reset within what your site allows, and ask what would help with similar calls.",
+      "opps": [
+        "people-stress-fatigue",
+        "people-low-confidence"
+      ]
+    },
+    {
+      "id": "asking-about-moves",
+      "sign": "Asking about schedule changes or other roles",
+      "detail": "Questions about different shifts, other teams, or open positions. This is often normal curiosity, and it can also be an early sign someone is weighing other options.",
+      "action": "Thank them for asking and hold a stay conversation this week. Learn what they are looking for, and explain the proper process for schedule or role requests.",
+      "opps": [
+        "people-growth-goals",
+        "people-disengagement"
+      ]
+    },
+    {
+      "id": "stalled-development",
+      "sign": "Stalled development or repeated missed goals",
+      "detail": "Development goals sit untouched, the same coaching goal is missed more than once, or interest in training starts to fade.",
+      "action": "Reset the goal together this week. Make it smaller and more specific, agree on one practice step, and set a date to look at it again.",
+      "opps": [
+        "people-growth-goals",
+        "people-low-confidence"
+      ]
+    },
+    {
+      "id": "working-in-isolation",
+      "sign": "Working in isolation",
+      "detail": "Rarely asks peers or the team leader for help, stays out of team chat, or takes breaks alone after usually joining others. It may be personal preference, so look for a change.",
+      "action": "Pair them with a peer buddy on a call type or project, and invite them into one team activity where their knowledge is useful to others.",
+      "opps": [
+        "people-team-connection",
+        "people-disengagement"
+      ]
+    },
+    {
+      "id": "drop-in-quality-energy",
+      "sign": "A sudden drop in quality or energy",
+      "detail": "Quality slips on calls that used to go well, tone sounds flat, or effort seems lower across a shift than it was a short while ago.",
+      "action": "Start with curiosity, not correction. Ask privately how things are going, listen, and offer support before coaching on the calls themselves.",
+      "opps": [
+        "people-stress-fatigue",
+        "people-disengagement",
+        "people-low-confidence"
+      ]
+    }
+  ],
+  "recognition": {
+    "intro": "Recognition does not need a budget. It works best when it is specific, timely, and matched to how the person likes to be recognized. Name the exact behavior and why it mattered, and do it close to when it happened.",
+    "ideas": [
+      {
+        "title": "Specific in-the-moment praise",
+        "detail": "Right after a strong call or a helpful act, tell the person exactly what they did well and what difference it made for the customer or the team."
+      },
+      {
+        "title": "Huddle shout-out",
+        "detail": "Open a huddle by naming one behavior from the past few days that helped customers or the team, such as covering a busy stretch."
+      },
+      {
+        "title": "Short written thank-you",
+        "detail": "Leave a short handwritten or chat note that names the behavior. It takes two minutes, and people often keep these."
+      },
+      {
+        "title": "Tell your manager",
+        "detail": "Share the person's contribution with your operations manager, and let them know you did. Being visible to leadership matters for their growth."
+      },
+      {
+        "title": "Ask them to teach",
+        "detail": "Invite someone to share a tip or walk through a call type in a huddle. Being asked to teach shows you trust their skill."
+      },
+      {
+        "title": "Offer a stretch task",
+        "detail": "When the work allows, let a team member take on a task they are interested in, such as helping a new hire through their first weeks."
+      },
+      {
+        "title": "Recognize reliability",
+        "detail": "Thank people who show up, start on time, and follow their schedule. Reliable attendance is easy to overlook because nothing goes wrong."
+      },
+      {
+        "title": "Peer recognition thread",
+        "detail": "Keep a shared chat thread where anyone can recognize a teammate. Peer recognition catches good work that one team leader cannot see."
+      }
+    ],
+    "shoutouts": [
+      "Shout-out to the team for keeping the queue covered during this afternoon's busy stretch. You stayed on schedule, came back from breaks on time, and helped each other with tricky calls. That made a real difference for the customers waiting in queue.",
+      "Shout-out to everyone who jumped in to help a teammate this week. Sharing a quick tip or walking someone through a process is how we get stronger as a team. Thank you.",
+      "Thank you for being here and ready at the start of your shifts this week. That reliability makes a real difference to the team and to the customers waiting in queue.",
+      "I noticed how you handled that difficult call earlier, staying calm and then resetting for the next customer. That takes skill, and I appreciate the professionalism you brought to it."
+    ]
+  }
+}

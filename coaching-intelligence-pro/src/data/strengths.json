@@ -338,5 +338,77 @@
       "Your close was confident without being pushy. You summarized the offer, asked directly whether the customer wanted to move forward, and recapped the details they agreed to before completing the order. A clear, confirmed close reduces misunderstandings and leaves the customer certain about what they chose.",
       "Once the customer had the information they needed, you moved the conversation to a decision instead of leaving it open-ended, and you confirmed their agreement in clear terms. A confident close saves time and ensures that you and the customer leave with the same understanding of what was agreed."
     ]
+  },
+  {
+    "id": "s-attendance",
+    "kw": ["attendance", "reliable attendance", "dependable", "present", "no absences", "shows up", "full coverage", "worked scheduled shifts", "reliability"],
+    "v": [
+      "During the schedule period we reviewed, you worked each of the shifts you were scheduled for. When you are here as planned, the team has the coverage the schedule was built around, customers spend less time waiting in queue, and your teammates are not stretched to cover an empty seat.",
+      "Your attendance in this schedule period gave the team something it could plan around. Being present for your scheduled shifts helps keep wait times manageable for customers, and it means the people working beside you can take their own breaks without the queue backing up.",
+      "One strength I want to point out is how dependable you were on the schedule. Showing up for your shifts as planned during the period we reviewed tells your teammates they can count on you, and it builds the kind of trust that matters when you ask about development opportunities."
+    ]
+  },
+  {
+    "id": "s-punctuality",
+    "kw": ["punctual", "punctuality", "on time", "on-time start", "logged in on time", "ready at start", "back from break", "back from lunch", "no late log-ins"],
+    "v": [
+      "On the shifts we looked at, you were logged in and ready at your scheduled start time, and you came back from breaks and lunch on schedule. Being ready right at the start means calls get answered as soon as the shift begins, instead of waiting in queue while the team catches up.",
+      "Being on time is a quiet strength, and you showed it during this schedule period. You started your shifts ready to take calls, with your tools open and your status set, which helps the team meet the staffing plan and lets customers reach someone without an extra wait.",
+      "I appreciated how you handled returns from breaks and lunch in the period we reviewed: you were back and available at the scheduled time. Those few minutes add up across a team, so your timing helps keep the queue steady and shows respect for the teammates covering while you were away."
+    ]
+  },
+  {
+    "id": "s-adherence",
+    "kw": ["adherence", "schedule adherence", "on schedule", "breaks on time", "lunch on time", "aux time", "not ready", "status accuracy", "log-out time", "wfm"],
+    "v": [
+      "Your schedule adherence stood out in this schedule period. You took breaks and lunches at the times WFM planned and stayed available until your scheduled log-out. Following the schedule as written keeps enough people on the phones through each part of the day, which helps keep customer wait times under control.",
+      "Looking at the period we reviewed, your time in each status lined up closely with your schedule, with breaks, lunch, and log-out where they were planned. That matters because the staffing plan depends on everyone following it, so your adherence helps your teammates get their own breaks on time.",
+      "You used aux and not ready time for its intended purpose during the shifts we looked at, and you returned to available promptly. Keeping your status accurate gives the team a true picture of who can take the next call, and it helps customers reach someone sooner during busy stretches."
+    ]
+  },
+  {
+    "id": "s-callout",
+    "kw": ["call-out", "callout", "call out process", "absence notice", "gave notice", "early notice", "reported absence", "followed process", "notified wfm"],
+    "v": [
+      "When you were unable to work a shift in this schedule period, you gave notice early and used the call-out process. That early notice gives WFM and your team leader time to adjust coverage, so customers are less likely to face long waits and your teammates are not caught off guard.",
+      "I appreciated how you handled your absence: you reported it through the correct call-out process and gave as much notice as you could. Following the process keeps your attendance record accurate and lets the team plan around the open shift instead of scrambling to react to it.",
+      "Your notice about missing a shift came early and through the right channel. Communication like that makes it easier for the team to rebalance the schedule and keep the queue covered, and it shows you take your commitment to your teammates seriously, even on a day you cannot be here."
+    ]
+  },
+  {
+    "id": "s-engagement",
+    "kw": ["engagement", "engaged", "huddle participation", "participates", "team player", "positive attitude", "constructive", "shares ideas", "team activities"],
+    "v": [
+      "In the huddles during the period we reviewed, you shared ideas, asked useful questions, and responded to what others said. Participation like that keeps team meetings worth having, helps new information land for everyone, and shows your teammates that their input is welcome too.",
+      "You brought a constructive attitude to team activities in this schedule period. When a change was discussed, you asked how it would work in practice instead of dismissing it, which helps the whole team adjust faster and makes it easier for quieter teammates to raise their own questions.",
+      "A clear strength I noticed was the energy you brought to team conversations. You took part in the huddle discussion, offered a practical tip from your own calls, and stayed open to other approaches. Engagement like that builds a team where people learn from each other and want to stay."
+    ]
+  },
+  {
+    "id": "s-team-support",
+    "kw": ["team support", "helps peers", "helping teammates", "peer support", "knowledge sharing", "shares tips", "mentoring", "buddy", "team chat help", "supportive"],
+    "v": [
+      "You took time to help a teammate who was stuck on a process, walking them through the steps so they could follow along. Sharing knowledge this way helps your teammate handle the next customer with the same issue on their own, and it makes the whole team stronger.",
+      "Your willingness to support your peers stood out in the period we reviewed. You answered questions in the team chat, pointed people to the right resources, and did it with patience. When knowledge moves freely across a team, customers get accurate answers faster and new teammates settle in sooner.",
+      "I appreciated that you offered help before being asked when a newer teammate was having a tough shift. A quick check-in or a shared tip from a peer can make a difficult day manageable, and it builds the kind of team where people look out for each other."
+    ]
+  },
+  {
+    "id": "s-development",
+    "kw": ["development", "owns development", "asks for feedback", "practices skills", "growth", "learning", "development goals", "follow through", "career goals", "upskilling"],
+    "v": [
+      "You asked for specific feedback on a skill you want to build and then put it into practice on your next calls. Owning your development like this makes coaching time more useful, and it moves you toward your own goals, whether that is mastering a new call type or preparing for a different role.",
+      "Your approach to your development goal in this period showed real ownership. You came to our conversation with questions, tried the approach we discussed, and told me what worked and what did not. Follow-through like that turns coaching into skill and puts you in control of where you go next.",
+      "When a new process came up, you looked for the training material, asked questions, and practiced until you were comfortable with it. Investing in your own learning builds confidence on the floor and prepares you for the opportunities you have said you are interested in."
+    ]
+  },
+  {
+    "id": "s-resilience",
+    "kw": ["resilience", "resilient", "tough call", "difficult call", "bounced back", "reset", "composure", "stayed calm", "steady tone", "professional after escalation"],
+    "v": [
+      "After a difficult interaction on the shift we reviewed, you took a moment to regroup and greeted the next customer with a calm, professional tone. Not carrying one tough call into the next is a real skill, and it means each customer gets a fresh start with you.",
+      "Your composure after a challenging call stood out. Instead of letting the frustration show, you finished the interaction professionally and came back ready to help the next customer. That steadiness protects the experience of the customers who follow, and it also protects your own energy across a demanding shift.",
+      "Tough calls happen, and how you respond afterward matters. On the shift we looked at, you closed a hard interaction professionally, asked for a second opinion when you wanted one, and moved on to the next caller with a steady tone. That balance helps you stay effective and keeps the strain of one call from reaching the next customer."
+    ]
   }
 ]
