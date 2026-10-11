@@ -212,10 +212,59 @@ table.heat tr.click td:first-child{font-weight:650}
   html{scroll-behavior:smooth}
   .btn,.dd>button,.tabs button,tr.click td,.kpi{transition:background .18s,border-color .18s,color .18s,box-shadow .18s,transform .18s}
   .seg .thumb{transition:transform .3s cubic-bezier(.3,.7,.2,1),width .3s cubic-bezier(.3,.7,.2,1)}
-  .reveal>*{animation:rise .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*55ms)}
-  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .reveal>*:not(.g12):not(.brief){animation:rise .6s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*55ms)}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
   .card:hover{box-shadow:var(--shadow-lg)}
+  /* cards reveal as they scroll into view; their rows and briefing items cascade after */
+  .sr{opacity:0;transform:translateY(22px) scale(.985)}
+  .sr.in{opacity:1;transform:none;transition:opacity .65s ease,transform .8s cubic-bezier(.16,.84,.24,1),box-shadow .2s;transition-delay:var(--sd,0ms)}
+  .sr.in tbody tr{animation:rowIn .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(min(var(--r,0),14)*32ms + var(--sd,0ms) + 200ms)}
+  .sr.in .st{animation:rowIn .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--k,0)*70ms + var(--sd,0ms) + 180ms)}
+  @keyframes rowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* chart hover focus, gliding guides, tooltip motion */
+  .chart svg .mk{transition:opacity .22s ease,transform .24s cubic-bezier(.2,.7,.2,1)}
+  .chart svg.hov .mk:not(.on){opacity:.28}
+  .chart svg .glide{transition:transform .22s cubic-bezier(.2,.7,.2,1),opacity .18s ease}
+  .tip{transition:opacity .16s ease,transform .2s cubic-bezier(.2,.7,.2,1)} .tip.snap{transition:none}
+  /* latest-point pulse */
+  .chart svg .halo{animation:halo 2.8s cubic-bezier(.2,.6,.3,1) infinite}
+  @keyframes halo{0%{opacity:.5;transform:scale(1)}75%,100%{opacity:0;transform:scale(3.8)}}
+  /* heatmap and calendar cells ripple in when their chart reaches the viewport */
+  .chart:not(.play) table.heat.cascade td.v{opacity:0}
+  .chart.play table.heat.cascade td.v{animation:cellIn .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0ms)}
+  .chart:not(.play) svg .pop{opacity:0}
+  .chart.play svg .pop{animation:cellIn .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0ms);transform-box:fill-box;transform-origin:center}
+  @keyframes cellIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+  /* hero aurora + cursor spotlight */
+  .hero::before{animation:aurora 24s ease-in-out infinite alternate}
+  @keyframes aurora{0%{transform:translate3d(0,0,0) rotate(0deg)}50%{transform:translate3d(5%,-4%,0) rotate(9deg)}100%{transform:translate3d(-4%,4%,0) rotate(-7deg)}}
+  .kpi:hover{transform:translateY(-2px)}
+  .tabs .tthumb{transition:transform .42s cubic-bezier(.3,.75,.2,1),width .42s cubic-bezier(.3,.75,.2,1)}
 }
+@media (prefers-reduced-motion:reduce){.chart svg .halo{display:none}}
+.chart svg .halo{pointer-events:none}
+.tip{background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4)}
+.tip b{font-size:13px}
+/* heatmap: rounded cells with a surface gap, row/column crosshair on hover */
+table.heat{border-collapse:separate;border-spacing:3px;width:auto;min-width:100%}
+table.heat td{border:0;border-radius:8px;font-weight:600;font-size:12.5px;padding:9px 10px;transition:box-shadow .15s ease}
+table.heat th{border:0}
+table.heat td.v:hover{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--text);position:relative;z-index:1}
+table.heat th.hc{color:var(--teal)}
+table.heat tbody tr.click:hover th{color:var(--teal)}
+/* hero aurora layer */
+.hero::before{content:"";position:absolute;inset:-35%;background:radial-gradient(34% 40% at 24% 32%,color-mix(in srgb,var(--hero-c) 90%,transparent),transparent 70%),radial-gradient(26% 30% at 80% 70%,#e8742a30,transparent 70%),radial-gradient(24% 28% at 62% 18%,#2a78d63a,transparent 70%);pointer-events:none;z-index:0}
+/* cursor spotlight on KPI tiles, glowing edge on cards */
+.kpi>*{position:relative;z-index:1}
+.kpi::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),#ffffff24,transparent 62%);opacity:0;transition:opacity .3s;pointer-events:none;z-index:0}
+.kpi:hover::before{opacity:1}
+.card{position:relative}
+.card::after{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--teal) 65%,transparent),transparent 70%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .35s;pointer-events:none}
+.card:hover::after{opacity:1}
+/* sliding tab indicator */
+.tabs{position:relative} .tabs button{position:relative;z-index:1}
+.tabs .tthumb{position:absolute;top:3px;left:0;height:calc(100% - 6px);border-radius:9px;background:var(--card);box-shadow:0 1px 4px #0b203218,0 0 0 1px var(--line);z-index:0;pointer-events:none}
+.tabs.thumbed button[aria-selected="true"]{background:transparent;box-shadow:none}
 .foot{font-size:12.5px;color:var(--muted)}
 @media (max-width:560px){.brand .pill{display:none}.rail .lbl{display:none}.rail .spacer{display:none}.dd>button{max-width:100%}.dd{flex:1 1 100%}.crumbs{font-size:12px}.hero{padding:22px 18px}.hero h1{font-size:24px}}
 </style>
@@ -251,14 +300,21 @@ table.heat tr.click td:first-child{font-weight:650}
  *
  * Every chart: (el, data, opts) => void. Clears `el`, renders an <svg viewBox> sized to
  * el.clientWidth (fallback 600), creates a <div class="tip"> tooltip inside `el`.
- * First render animates (~600ms ease-out via rAF); later renders on the same element do
- * not re-animate unless opts.animate === true. prefers-reduced-motion disables animation.
+ *
+ * Motion: the chart is built at once in its collapsed state, and its animation waits until
+ * the chart scrolls into view (IntersectionObserver), so every chart is seen animating.
+ * Marks animate individually with a stagger: bars rise from behind their baseline with the
+ * rounded cap intact, series sweep left→right with a gradient wash, markers pop, values
+ * count up. Hover focuses the hovered mark and dims the rest. Later renders on the same
+ * element do not re-animate unless opts.animate === true; prefers-reduced-motion disables it.
  */
 (function () {
   'use strict';
   var NS = 'http://www.w3.org/2000/svg';
-  var DUR = 600;
+  var DUR = 760;
   var rendered = typeof WeakMap === 'function' ? new WeakMap() : null;
+  var uidN = 0;
+  function uid(p) { return 'nc' + (p || '') + (++uidN); }
 
   /* ---------------------------------------------------------------- utils */
   function nn(v) { return v != null; }
@@ -293,7 +349,7 @@ table.heat tr.click td:first-child{font-weight:650}
     return ((v > ref) === !!upIsGood) ? 'var(--good)' : 'var(--bad)';
   }
 
-  /* ------------------------------------------------------------ animation */
+  /* ------------------------------------------------------------ motion */
   function reduced() {
     try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return false; }
   }
@@ -305,40 +361,99 @@ table.heat tr.click td:first-child{font-weight:650}
   }
   function mark(el) { if (rendered && el) rendered.set(el, true); }
   function raf(fn) { return window.requestAnimationFrame ? window.requestAnimationFrame(fn) : setTimeout(fn, 16); }
-  function ease(t) { return 1 - Math.pow(1 - t, 3); }
-  function animate(on, dur, step, done) {
-    if (!on) { step(1); if (done) done(); return; }
-    var t0 = Date.now();
-    (function tick() {
-      var t = Math.min(1, (Date.now() - t0) / dur);
-      step(ease(t));
-      if (t < 1) raf(tick); else if (done) done();
-    })();
+  function now() { return window.performance && performance.now ? performance.now() : Date.now(); }
+  var E = {
+    out: function (t) { return 1 - Math.pow(1 - t, 3); },
+    quart: function (t) { return 1 - Math.pow(1 - t, 4); },
+    inOut: function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; },
+    back: function (t) { var c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
+  };
+
+  /* Visibility gate. Animations created while a chart renders into CUR are queued on that
+   * element and start when it scrolls into view; the element also gets class "play" so
+   * CSS-driven cell animations (heatmap, calendar) can key off it. */
+  var CUR = null, queues = typeof Map === 'function' ? new Map() : null, io = null;
+  function flush(el, now_) {
+    var q = queues ? queues.get(el) : null;
+    if (queues) queues['delete'](el);
+    if (io) io.unobserve(el);
+    var go = function () { if (el.classList) el.classList.add('play'); if (q) q.forEach(function (f) { f(); }); };
+    if (now_) { go(); return; }
+    /* wait for the enclosing card's reveal stagger (--sd, set by the app's own observer this frame) */
+    setTimeout(function () {
+      var c = el.closest ? el.closest('.sr') : null, sd = 0;
+      try { sd = c ? parseFloat(getComputedStyle(c).getPropertyValue('--sd')) || 0 : 0; } catch (e) { sd = 0; }
+      if (sd) setTimeout(go, sd); else go();
+    }, 0);
   }
-  function drawIn(path, on, fallbackLen) {
+  if (typeof IntersectionObserver === 'function' && queues) {
+    io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) flush(e.target); }); },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0 });
+  }
+  function whenVisible(el, fn) {
+    if (!el || !io) { if (el && el.classList) el.classList.add('play'); fn(); return; }
+    var q = queues.get(el);
+    if (!q) { q = []; queues.set(el, q); io.observe(el); }
+    q.push(fn);
+  }
+  function flushAll() { if (queues) Array.from(queues.keys()).forEach(function (el) { flush(el, true); }); }
+  if (window.addEventListener) window.addEventListener('beforeprint', flushAll);
+
+  /* animate(on, dur, step(t), done, delay, easing) — step(0) runs now (collapsed state); the
+   * tween starts when the host chart is visible. Off → step(1) immediately. */
+  function animate(on, dur, step, done, delay, ez) {
+    if (!on) { step(1); if (done) done(); return; }
+    step(0);
+    var host = CUR;
+    ez = ez || E.out;
+    var run = function () {
+      var t0 = now() + 120 + (delay || 0);
+      (function tick() {
+        var t = Math.max(0, Math.min(1, (now() - t0) / dur));
+        step(ez(t));
+        if (t < 1) raf(tick); else if (done) done();
+      })();
+    };
+    if (host) whenVisible(host, run); else run();
+  }
+  /* stagger delay for mark i of n, spread over at most `total` ms */
+  function stagger(i, n, total) { total = total || 480; return Math.min(i * Math.min(60, total / Math.max(1, n)), total); }
+  function drawIn(path, on, fallbackLen, delay, dur) {
     if (!on) return;
     var L = fallbackLen || 2000;
     try { if (path.getTotalLength) L = path.getTotalLength() || L; } catch (e) { /* not rendered */ }
-    path.setAttribute('stroke-dasharray', L + ' ' + L);
-    path.setAttribute('stroke-dashoffset', L);
-    animate(true, DUR, function (t) { path.setAttribute('stroke-dashoffset', R(L * (1 - t))); },
-      function () { path.removeAttribute('stroke-dasharray'); path.removeAttribute('stroke-dashoffset'); });
+    path.setAttribute('stroke-dasharray', R(L) + ' ' + R(L));
+    animate(true, dur || DUR * 1.3, function (t) { path.setAttribute('stroke-dashoffset', R(L * (1 - t))); },
+      function () { path.removeAttribute('stroke-dasharray'); path.removeAttribute('stroke-dashoffset'); }, delay, E.inOut);
   }
-  function fadeIn(node, on, to) {
+  function fadeIn(node, on, to, delay, dur) {
     to = to == null ? 1 : to;
     if (!on) { node.setAttribute('opacity', to); return; }
-    node.setAttribute('opacity', 0);
-    animate(true, DUR, function (t) { node.setAttribute('opacity', R(to * t)); });
+    animate(true, dur || DUR * 0.7, function (t) { node.setAttribute('opacity', R(to * t)); }, null, delay);
   }
-  function growY(g, baseY, on) {
+  /* translate a node from (dx,dy) to rest — used inside a clip group so bars rise from behind their baseline */
+  function rise(node, dx, dy, on, delay, dur) {
+    if (!on) return;
+    animate(true, dur || DUR, function (t) { node.setAttribute('transform', 'translate(' + R(dx * (1 - t)) + ' ' + R(dy * (1 - t)) + ')'); },
+      function () { node.removeAttribute('transform'); }, delay, E.quart);
+  }
+  function growY(g, baseY, on, delay) {
     if (!on) return;
     animate(true, DUR, function (t) { g.setAttribute('transform', 'translate(0 ' + R(baseY * (1 - t)) + ') scale(1 ' + Math.max(t, 0.001) + ')'); },
-      function () { g.removeAttribute('transform'); });
+      function () { g.removeAttribute('transform'); }, delay, E.quart);
   }
-  function growX(g, baseX, on) {
+  /* scale-pop from the node's own center (spring overshoot) */
+  function pop(node, on, delay, dur) {
     if (!on) return;
-    animate(true, DUR, function (t) { g.setAttribute('transform', 'translate(' + R(baseX * (1 - t)) + ' 0) scale(' + Math.max(t, 0.001) + ' 1)'); },
-      function () { g.removeAttribute('transform'); });
+    node.style.transformBox = 'fill-box'; node.style.transformOrigin = 'center';
+    animate(true, dur || 520, function (t) { node.style.transform = 'scale(' + R(Math.max(0, t)) + ')'; },
+      function () { node.style.transform = ''; }, delay, E.back);
+  }
+  /* text that counts up to v (fmt applied every frame) */
+  function countText(t, v, fmt, on, delay, dur) {
+    if (!on || !nn(num(v))) { t.textContent = fmt(v); return; }
+    animate(true, dur || DUR, function (k) { t.textContent = fmt(v * k); t.setAttribute('opacity', R(Math.min(1, k * 2.5))); },
+      function () { t.textContent = fmt(v); t.removeAttribute('opacity'); }, delay, E.out);
   }
 
   /* ------------------------------------------------------------------ DOM */
@@ -364,16 +479,53 @@ table.heat tr.click td:first-child{font-weight:650}
   function prep(el, opts, H) {
     clear(el);
     el.style.position = 'relative';
+    if (el.classList) el.classList.remove('play');
     var W = el.clientWidth || 600;
     var svg = mk('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'chart', role: 'img' });
     svg.style.cssText = 'width:100%;height:auto;display:block;overflow:visible;font-family:var(--font)';
     el.appendChild(svg);
+    CUR = el;
     return { svg: svg, W: W, H: H, anim: wantAnim(el, opts) };
   }
   function empty(el, opts, H, msg) {
     var f = prep(el, opts, H || 80);
     txt(f.svg, f.W / 2, f.H / 2, msg || 'No data', { anchor: 'middle', base: 'middle', fill: 'var(--faint)' });
     mark(el);
+  }
+  function defs(svg) { var d = svg.querySelector('defs'); if (!d) { d = mk('defs', null); svg.insertBefore(d, svg.firstChild); } return d; }
+  /* <g> clipped to a rectangle; g._clip is the rect so callers can animate a sweep */
+  function clipGroup(svg, x, y, w, h, parent) {
+    var id = uid('c'), cp = mk('clipPath', { id: id }, defs(svg));
+    var r = mk('rect', { x: R(x), y: R(y), width: R(Math.max(0, w)), height: R(Math.max(0, h)) }, cp);
+    var g = mk('g', { 'clip-path': 'url(#' + id + ')' }, parent || svg);
+    g._clip = r;
+    return g;
+  }
+  /* vertical gradient wash in `color`, from alpha a0 at the top to a1 at the bottom */
+  function vGrad(svg, color, a0, a1) {
+    var id = uid('g'), lg = mk('linearGradient', { id: id, x1: 0, y1: 0, x2: 0, y2: 1 }, defs(svg));
+    var s0 = mk('stop', { offset: '0%' }, lg); s0.style.stopColor = color; s0.style.stopOpacity = a0;
+    var s1 = mk('stop', { offset: '100%' }, lg); s1.style.stopColor = color; s1.style.stopOpacity = a1;
+    return 'url(#' + id + ')';
+  }
+  /* sweep a clip group's rect from width 0 to w */
+  function sweep(g, w, on, delay, dur) {
+    animate(on, dur || 1150, function (t) { g._clip.setAttribute('width', R(Math.max(0, w * t))); }, null, delay, E.inOut);
+  }
+  /* hover focus: the hovered marks keep full ink, every other .mk in the svg dims */
+  function focusOn(svg, nodes) { svg.classList.add('hov'); nodes.forEach(function (n) { if (n && n.classList) n.classList.add('on'); }); }
+  function focusOff(svg) { svg.classList.remove('hov'); Array.prototype.forEach.call(svg.querySelectorAll('.on'), function (n) { n.classList.remove('on'); }); }
+  /* move a .glide node with a CSS transform; snaps (no glide from the corner) when it was hidden */
+  function place(node, tx, ty) {
+    var tr = 'translate(' + R(tx) + 'px,' + R(ty) + 'px)';
+    if (node.getAttribute('opacity') === '0') { node.style.transition = 'none'; node.style.transform = tr; void node.getBoundingClientRect(); node.style.transition = ''; }
+    else node.style.transform = tr;
+    node.setAttribute('opacity', 1);
+  }
+  /* a soft rounded band that glides to the hovered column/row (sits under the marks created after it) */
+  function band(svg, w, h) {
+    var b = mk('rect', { x: 0, y: 0, width: R(Math.max(0, w)), height: R(Math.max(0, h)), rx: 8, fill: 'var(--soft)', class: 'glide', opacity: 0 }, svg);
+    return { to: function (bx, by) { place(b, bx, by); }, hide: function () { b.setAttribute('opacity', 0); } };
   }
 
   /* ------------------------------------------------------------- tooltip */
@@ -392,20 +544,23 @@ table.heat tr.click td:first-child{font-weight:650}
     });
     return frag;
   }
+  /* glides between positions while visible; snaps (no slide from the corner) when first shown */
   function makeTip(el) {
     var t = document.createElement('div'); t.className = 'tip';
-    t.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;opacity:0;z-index:5;transition:opacity .12s';
+    t.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;opacity:0;z-index:5';
     el.appendChild(t);
+    var vis = false;
     return {
       show: function (title, rows, px, py) {
         clear(t); t.appendChild(tipHTML(title, rows));
-        t.style.opacity = '1';
         var cw = el.clientWidth || 600, tw = t.offsetWidth || 160, th = t.offsetHeight || 60;
-        var x = px + 14; if (x + tw > cw - 4) x = px - 14 - tw; if (x < 4) x = 4;
-        var y = py - th - 12; if (y < 2) y = py + 18;
-        t.style.left = R(x) + 'px'; t.style.top = R(y) + 'px';
+        var x = px + 16; if (x + tw > cw - 4) x = px - 16 - tw; if (x < 4) x = 4;
+        var y = py - th - 14; if (y < 2) y = py + 20;
+        if (!vis) { t.classList.add('snap'); t.style.transform = 'translate(' + R(x) + 'px,' + R(y + 6) + 'px)'; void t.offsetWidth; t.classList.remove('snap'); }
+        t.style.transform = 'translate(' + R(x) + 'px,' + R(y) + 'px)';
+        t.style.opacity = '1'; vis = true;
       },
-      hide: function () { t.style.opacity = '0'; }
+      hide: function () { t.style.opacity = '0'; vis = false; }
     };
   }
   /* mouse position in viewBox units (x,y) and in container pixels (px,py) */
@@ -434,12 +589,15 @@ table.heat tr.click td:first-child{font-weight:650}
     for (var v = lo; v <= hi + s / 2; v += s) out.push(Math.round(v / s) * s);
     return out;
   }
-  function grid(svg, tk, y, x0, x1, fmt, labelX) {
+  function grid(svg, tk, y, x0, x1, fmt, labelX, on) {
+    var g = mk('g', null, svg);
     tk.forEach(function (v) {
       var yy = R(y(v));
-      mk('line', { x1: R(x0), x2: R(x1), y1: yy, y2: yy, stroke: 'var(--line)', 'stroke-width': 1, 'shape-rendering': 'crispEdges' }, svg);
-      if (fmt) txt(svg, labelX, yy, fmt(v), { anchor: 'end', base: 'middle' });
+      mk('line', { x1: R(x0), x2: R(x1), y1: yy, y2: yy, stroke: 'var(--line)', 'stroke-width': 1, 'shape-rendering': 'crispEdges' }, g);
+      if (fmt) txt(g, labelX, yy, fmt(v), { anchor: 'end', base: 'middle' });
     });
+    if (on) fadeIn(g, true, 1, 0, 420);
+    return g;
   }
   /* x category labels; skips so labels are >= 60px apart; truncates to the slot */
   function xLabels(svg, cats, x, y, slot, fromEnd) {
@@ -466,6 +624,31 @@ table.heat tr.click td:first-child{font-weight:650}
     pts.forEach(function (p) { if (!p) { pen = false; return; } d += (pen ? 'L' : 'M') + R(p[0]) + ' ' + R(p[1]); pen = true; });
     return d;
   }
+  /* smooth monotone-x curve through points (no overshoot between samples); gaps break the line */
+  function smoothPath(pts) {
+    var d = '', run = [];
+    function emit(seg) {
+      if (!seg.length) return;
+      if (seg.length < 3) { d += linePath(seg); return; }
+      var n = seg.length, dx = [], m = [], t = [];
+      for (var i = 0; i < n - 1; i++) { dx[i] = seg[i + 1][0] - seg[i][0]; m[i] = dx[i] ? (seg[i + 1][1] - seg[i][1]) / dx[i] : 0; }
+      t[0] = m[0]; t[n - 1] = m[n - 2];
+      for (i = 1; i < n - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
+      for (i = 0; i < n - 1; i++) {
+        if (m[i] === 0) { t[i] = 0; t[i + 1] = 0; continue; }
+        var a = t[i] / m[i], b = t[i + 1] / m[i], s = a * a + b * b;
+        if (s > 9) { var k = 3 / Math.sqrt(s); t[i] = k * a * m[i]; t[i + 1] = k * b * m[i]; }
+      }
+      d += 'M' + R(seg[0][0]) + ' ' + R(seg[0][1]);
+      for (i = 0; i < n - 1; i++) {
+        var h = dx[i] / 3;
+        d += 'C' + R(seg[i][0] + h) + ' ' + R(seg[i][1] + h * t[i]) + ' ' + R(seg[i + 1][0] - h) + ' ' + R(seg[i + 1][1] - h * t[i + 1]) + ' ' + R(seg[i + 1][0]) + ' ' + R(seg[i + 1][1]);
+      }
+    }
+    pts.forEach(function (p) { if (!p) { emit(run); run = []; } else run.push(p); });
+    emit(run);
+    return d;
+  }
   function arcPath(cx, cy, r0, r1, a0, a1) {
     if (!(a1 > a0)) return '';
     if (a1 - a0 >= Math.PI * 2 - 1e-4) a1 = a0 + Math.PI * 2 - 1e-4;
@@ -476,13 +659,19 @@ table.heat tr.click td:first-child{font-weight:650}
   function dot(svg, x, y, r, color) {
     return mk('circle', { cx: R(x), cy: R(y), r: r, fill: color, stroke: 'var(--card)', 'stroke-width': 2 }, svg);
   }
+  /* soft expanding ring behind the latest point (CSS-driven, off under reduced motion) */
+  function halo(svg, x, y, color) {
+    var c = mk('circle', { cx: R(x), cy: R(y), r: 4, fill: color, class: 'halo' }, svg);
+    c.style.transformBox = 'fill-box'; c.style.transformOrigin = 'center';
+    return c;
+  }
   function dashed(svg, x1, y1, x2, y2, color) {
     return mk('line', { x1: R(x1), y1: R(y1), x2: R(x2), y2: R(y2), stroke: color || 'var(--faint)', 'stroke-width': 1, 'stroke-dasharray': '4 3' }, svg);
   }
   /* small label on a card-colored pill so it stays legible over marks (ref lines, bands) */
   function pill(svg, x, y, s, o) {
     o = o || {}; var size = o.size || 10.5, w = textW(s, size) + 8, g = mk('g', null, svg), x0 = o.anchor === 'end' ? x - w : o.anchor === 'middle' ? x - w / 2 : x;
-    mk('rect', { x: R(x0), y: R(y - 8), width: R(w), height: 16, rx: 3, fill: 'var(--card)', opacity: 0.9 }, g);
+    mk('rect', { x: R(x0), y: R(y - 8), width: R(w), height: 16, rx: 4, fill: 'var(--card)', opacity: 0.92 }, g);
     txt(g, x0 + 4, y, s, { base: 'middle', size: size, fill: o.fill || 'var(--muted)' });
     return g;
   }
@@ -496,12 +685,13 @@ table.heat tr.click td:first-child{font-weight:650}
     if (v == null) { el.textContent = '–'; if (el.dataset) delete el.dataset.v; return; }
     var from = el.dataset ? num(parseFloat(el.dataset.v)) : null; if (from == null) from = 0;
     var on = opts.animate !== false && !reduced() && from !== v;
-    animate(on, opts.duration || DUR, function (t) { el.textContent = fmt(from + (v - from) * t); }, function () { el.textContent = fmt(v); });
+    CUR = el;
+    animate(on, opts.duration || 1100, function (t) { el.textContent = fmt(from + (v - from) * t); }, function () { el.textContent = fmt(v); }, opts.delay, E.out);
     if (el.dataset) el.dataset.v = String(v);
     mark(el);
   }
 
-  /** sparkline(el, values, {ref, color, height=32, upIsGood=false}) — tiny line, last dot colored good/bad vs ref. */
+  /** sparkline(el, values, {ref, color, height=32, upIsGood=false, halo}) — tiny line with a gradient wash, last dot colored good/bad vs ref. */
   function sparkline(el, values, opts) {
     opts = opts || {};
     var H = opts.height || 32, vals = arr(values).map(num), n = vals.length, valid = vals.filter(nn);
@@ -514,15 +704,19 @@ table.heat tr.click td:first-child{font-weight:650}
     var y = function (v) { return pad + (hi - v) / (hi - lo) * (H - 2 * pad); };
     var color = opts.color || 'var(--teal)';
     if (nn(ref)) mk('line', { x1: x(0), x2: x(n - 1), y1: R(y(ref)), y2: R(y(ref)), stroke: 'var(--faint)', 'stroke-width': 1, 'stroke-dasharray': '2 3' }, svg);
-    var pts = vals.map(function (v, i) { return nn(v) ? [x(i), y(v)] : null; });
-    var path = mk('path', { d: linePath(pts), fill: 'none', stroke: color, 'stroke-width': 1.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg);
+    var pts = vals.map(function (v, i) { return nn(v) ? [x(i), y(v)] : null; }), vp = pts.filter(Boolean);
+    var sg = clipGroup(svg, -2, -6, W + 4, H + 12);
+    if (vp.length > 1) mk('path', { d: smoothPath(vp) + 'L' + R(vp[vp.length - 1][0]) + ' ' + H + 'L' + R(vp[0][0]) + ' ' + H + 'Z', fill: vGrad(svg, color, 0.32, 0) }, sg);
+    mk('path', { d: smoothPath(pts), fill: 'none', stroke: color, 'stroke-width': 1.75, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, sg);
     var li = n - 1; while (li >= 0 && !nn(vals[li])) li--;
-    var d = mk('circle', { cx: R(x(li)), cy: R(y(vals[li])), r: 3, fill: judge(vals[li], ref, opts.upIsGood) || color, stroke: 'var(--card)', 'stroke-width': 1.5 }, svg);
-    drawIn(path, f.anim, W * 1.5); fadeIn(d, f.anim);
+    var dc = judge(vals[li], ref, opts.upIsGood) || color;
+    if (opts.halo) halo(svg, x(li), y(vals[li]), dc);
+    var d = mk('circle', { cx: R(x(li)), cy: R(y(vals[li])), r: 3, fill: dc, stroke: 'var(--card)', 'stroke-width': 1.5 }, svg);
+    sweep(sg, W + 4, f.anim, 0, 1000); pop(d, f.anim, 900);
     mark(el);
   }
 
-  /** trend(el, {cats, values, lower, upper, vol, ref, refLabel, yPct=true, height=280, label}) — line + CI band + area + volume + crosshair. */
+  /** trend(el, {cats, values, lower, upper, vol, ref, refLabel, yPct=true, height=280, label}) — line + CI band + gradient area + volume + crosshair. */
   function trend(el, data, opts) {
     data = data || {}; opts = opts || {};
     var f0 = F(), cats = arr(data.cats), vals = arr(data.values).map(num), lower = arr(data.lower).map(num), upper = arr(data.upper).map(num), vol = arr(data.vol).map(num);
@@ -537,41 +731,54 @@ table.heat tr.click td:first-child{font-weight:650}
     var slot = plotW / Math.max(1, n - 1);
     var x = function (i) { return n > 1 ? M.l + i * slot : M.l + plotW / 2; };
     var y = function (v) { return M.t + (y1 - v) / (y1 - y0) * plotH; };
-    grid(svg, tk, y, M.l, W - M.r, fy, M.l - 8);
+    grid(svg, tk, y, M.l, W - M.r, fy, M.l - 8, f.anim);
     xLabels(svg, cats, x, H - 8, slot, true);
+    var bnd = band(svg, Math.max(12, Math.min(40, slot * 0.8)), H - M.t - 22);
+    var volBars = [];
     if (hasVol) {
-      var vmax = maxOf(vol, 1) || 1, vBase = plotB + 12 + volH, bw = Math.max(2, Math.min(14, slot * 0.6)), vg = mk('g', null, svg);
-      vol.forEach(function (v, i) { if (!nn(v)) return; var h = v / vmax * volH; mk('rect', { x: R(x(i) - bw / 2), y: R(vBase - h), width: R(bw), height: R(h), rx: 1.5, fill: 'var(--seq1)' }, vg); });
+      var vmax = maxOf(vol, 1) || 1, vBase = plotB + 12 + volH, bw = Math.max(2, Math.min(14, slot * 0.6));
+      var vg = clipGroup(svg, M.l - slot, vBase - volH - 4, plotW + 2 * slot, volH + 4);
+      vol.forEach(function (v, i) {
+        if (!nn(v)) return;
+        var h = Math.max(1, v / vmax * volH), r_ = mk('path', { d: rrTop(x(i) - bw / 2, vBase - h, bw, h, 2), fill: 'var(--seq2)', class: 'mk' }, vg);
+        volBars[i] = r_; rise(r_, 0, h + 2, f.anim, stagger(i, n, 420), 620);
+      });
       txt(svg, M.l - 8, vBase, 'vol', { anchor: 'end', fill: 'var(--faint)', size: 10.5 });
-      growY(vg, vBase, f.anim);
     }
     var pts = vals.map(function (v, i) { return nn(v) ? [x(i), y(v)] : null; }), valid = pts.filter(Boolean);
+    var sg = clipGroup(svg, M.l - 8, 0, plotW + 16, H);
     if (lower.some(nn) && upper.some(nn)) {
       var up = [], lo = [];
       for (var i = 0; i < n; i++) if (nn(upper[i]) && nn(lower[i])) { up.push([x(i), y(upper[i])]); lo.unshift([x(i), y(lower[i])]); }
-      if (up.length > 1) fadeIn(mk('path', { d: linePath(up) + linePath(lo).replace(/^M/, 'L') + 'Z', fill: 'var(--teal)' }, svg), f.anim, 0.12);
+      if (up.length > 1) mk('path', { d: linePath(up) + linePath(lo).replace(/^M/, 'L') + 'Z', fill: 'var(--teal)', opacity: 0.12 }, sg);
     }
-    if (valid.length > 1) fadeIn(mk('path', { d: linePath(valid) + 'L' + R(valid[valid.length - 1][0]) + ' ' + R(y(y0)) + 'L' + R(valid[0][0]) + ' ' + R(y(y0)) + 'Z', fill: 'var(--teal)' }, svg), f.anim, lower.some(nn) ? 0.04 : 0.08);
+    if (valid.length > 1) mk('path', { d: smoothPath(valid) + 'L' + R(valid[valid.length - 1][0]) + ' ' + R(y(y0)) + 'L' + R(valid[0][0]) + ' ' + R(y(y0)) + 'Z', fill: vGrad(svg, 'var(--teal)', lower.some(nn) ? 0.14 : 0.24, 0) }, sg);
+    mk('path', { d: smoothPath(pts), fill: 'none', stroke: 'var(--teal)', 'stroke-width': 2.25, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, sg);
+    var refG = mk('g', null, svg);
     if (nn(ref)) {
-      dashed(svg, M.l, y(ref), W - M.r, y(ref), 'var(--faint)');
+      dashed(refG, M.l, y(ref), W - M.r, y(ref), 'var(--faint)');
+      if (data.refLabel) pill(refG, M.l + 4, y(ref), data.refLabel);
     }
-    var path = mk('path', { d: linePath(pts), fill: 'none', stroke: 'var(--teal)', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg);
-    if (nn(ref) && data.refLabel) pill(svg, M.l + 4, y(ref), data.refLabel);
     var li = n - 1; while (li >= 0 && !nn(vals[li])) li--;
     var endG = mk('g', null, svg);
-    dot(endG, x(li), y(vals[li]), 4, 'var(--teal)');
-    txt(endG, x(li) + 10, y(vals[li]), fy(vals[li]), { base: 'middle', fill: 'var(--text)', size: 12.5, weight: 600, cls: 'lbl' });
-    var cross = mk('line', { y1: M.t, y2: plotB, stroke: 'var(--faint)', 'stroke-width': 1, opacity: 0 }, svg);
-    var hd = mk('circle', { r: 4.5, fill: 'var(--teal)', stroke: 'var(--card)', 'stroke-width': 2, opacity: 0 }, svg);
+    halo(endG, x(li), y(vals[li]), 'var(--teal)');
+    var ed = dot(endG, x(li), y(vals[li]), 4.5, 'var(--teal)');
+    var el_ = txt(endG, x(li) + 11, y(vals[li]), fy(vals[li]), { base: 'middle', fill: 'var(--text)', size: 12.5, weight: 700, cls: 'lbl' });
+    var cross = mk('line', { x1: 0, x2: 0, y1: M.t, y2: plotB, stroke: 'var(--faint)', 'stroke-width': 1, class: 'glide', opacity: 0 }, svg);
+    var hd = mk('circle', { cx: 0, cy: 0, r: 5, fill: 'var(--teal)', stroke: 'var(--card)', 'stroke-width': 2.5, class: 'glide', opacity: 0 }, svg);
     hoverRect(svg, M.l - slot / 2, M.t, plotW + slot, H - M.t - 20, function (e) {
       var p = pointer(el, svg, W, H, e), i = Math.max(0, Math.min(n - 1, Math.round((p.x - M.l) / slot))), v = vals[i];
-      cross.setAttribute('x1', R(x(i))); cross.setAttribute('x2', R(x(i))); cross.setAttribute('opacity', 1);
-      if (nn(v)) { hd.setAttribute('cx', R(x(i))); hd.setAttribute('cy', R(y(v))); hd.setAttribute('opacity', 1); } else hd.setAttribute('opacity', 0);
+      place(cross, x(i), 0);
+      bnd.to(x(i) - Math.max(12, Math.min(40, slot * 0.8)) / 2, M.t);
+      if (nn(v)) place(hd, x(i), y(v)); else hd.setAttribute('opacity', 0);
+      focusOff(svg); if (volBars[i]) focusOn(svg, [volBars[i]]);
       tip.show(cats[i], [['var(--teal)', data.label || 'Rate', fy(v)],
         nn(lower[i]) && nn(upper[i]) ? [null, '95% CI', fy(lower[i]) + ' – ' + fy(upper[i])] : null,
         nn(vol[i]) ? [null, 'Scrubs', f0.nf(vol[i])] : null], p.px, p.py);
-    }, function () { cross.setAttribute('opacity', 0); hd.setAttribute('opacity', 0); tip.hide(); });
-    drawIn(path, f.anim, plotW * 1.6); fadeIn(endG, f.anim);
+    }, function () { cross.setAttribute('opacity', 0); hd.setAttribute('opacity', 0); bnd.hide(); focusOff(svg); tip.hide(); });
+    sweep(sg, plotW + 16, f.anim, 0, 1250);
+    fadeIn(refG, f.anim, 1, 500);
+    pop(ed, f.anim, 1150); fadeIn(el_, f.anim, 1, 1200, 400);
     mark(el);
   }
 
@@ -581,39 +788,42 @@ table.heat tr.click td:first-child{font-weight:650}
     var f0 = F(), cats = arr(data.cats), stacks = arr(data.stacks).filter(Boolean), fmt = data.fmt || opts.fmt || f0.nf, H = data.height || 240, n = cats.length;
     if (!n || !stacks.length) return empty(el, opts, H);
     var f = prep(el, opts, H), W = f.W, svg = f.svg, tip = makeTip(el);
-    var M = { l: 44, r: 12, t: 34, b: 28 }, plotW = W - M.l - M.r, plotH = H - M.t - M.b;
+    /* legend first (wraps), so the plot top clears it */
+    var lx = 44, ly = 11, legItems = [];
+    stacks.forEach(function (s, k) { var w = textW(s.name) + 30; if (lx + w > W - 8 && lx > 44) { lx = 44; ly += 18; } legItems.push([lx, ly, s, k]); lx += w; });
+    var M = { l: 44, r: 12, t: ly + 23, b: 28 }, plotW = W - M.l - M.r, plotH = H - M.t - M.b;
+    legItems.forEach(function (it) {
+      mk('rect', { x: it[0], y: it[1] - 5, width: 10, height: 10, rx: 3, fill: it[2].color || 'var(--s' + ((it[3] % 8) + 1) + ')' }, svg);
+      txt(svg, it[0] + 15, it[1], it[2].name, { base: 'middle' });
+    });
     var totals = cats.map(function (_, i) { return sum(stacks.map(function (s) { return arr(s.values)[i]; })); });
     var tk = ticks(0, maxOf(totals, 1), 4), y1 = tk[tk.length - 1];
     var y = function (v) { return M.t + (1 - v / y1) * plotH; };
-    var slot = plotW / n, bw = Math.min(32, slot * 0.6), x = function (i) { return M.l + slot * (i + 0.5); };
-    grid(svg, tk, y, M.l, W - M.r, compact, M.l - 8);
+    var slot = plotW / n, bw = Math.min(24, slot * 0.62), x = function (i) { return M.l + slot * (i + 0.5); };
+    grid(svg, tk, y, M.l, W - M.r, compact, M.l - 8, f.anim);
     xLabels(svg, cats, x, H - 8, slot, true);
-    var lx = M.l;
-    stacks.forEach(function (s, k) {
-      mk('rect', { x: lx, y: 6, width: 9, height: 9, rx: 2, fill: s.color || 'var(--s' + ((k % 8) + 1) + ')' }, svg);
-      txt(svg, lx + 14, 11, s.name, { base: 'middle' });
-      lx += textW(s.name) + 30;
-    });
-    var g = mk('g', null, svg);
+    var bw2 = Math.min(slot - 2, bw + 14), bnd = band(svg, bw2, plotH + 8);
+    var g = clipGroup(svg, M.l - 4, 0, plotW + 8, y(0));
     cats.forEach(function (c, i) {
-      var cum = 0, segs = [];
+      var cum = 0, segs = [], cg = mk('g', { class: 'mk' }, g);
       stacks.forEach(function (s, k) { var v = num(arr(s.values)[i]); if (v > 0) { segs.push({ s: s, k: k, v: v, y0: cum, y1: cum + v }); cum += v; } });
       segs.forEach(function (sg, j) {
         var top = y(sg.y1), h = y(sg.y0) - top, color = sg.s.color || 'var(--s' + ((sg.k % 8) + 1) + ')', isTop = j === segs.length - 1;
-        if (isTop) mk('path', { d: rrTop(x(i) - bw / 2, top, bw, h, 4), fill: color }, g);
-        else if (h > 2) mk('rect', { x: R(x(i) - bw / 2), y: R(top + 2), width: R(bw), height: R(h - 2), fill: color }, g);
+        if (isTop) mk('path', { d: rrTop(x(i) - bw / 2, top, bw, h, 4), fill: color }, cg);
+        else if (h > 2) mk('rect', { x: R(x(i) - bw / 2), y: R(top + 2), width: R(bw), height: R(h - 2), fill: color }, cg);
       });
+      if (segs.length) rise(cg, 0, y(0) - y(cum) + 4, f.anim, stagger(i, n, 520), 720);
       hoverRect(svg, x(i) - slot / 2, M.t, slot, plotH, function (e) {
         var p = pointer(el, svg, W, H, e);
+        bnd.to(x(i) - bw2 / 2, M.t - 4); focusOn(svg, [cg]);
         tip.show(c, segs.slice().reverse().map(function (sg) { return [sg.s.color || 'var(--s' + ((sg.k % 8) + 1) + ')', sg.s.name, fmt(sg.v)]; })
           .concat([[null, 'Total', fmt(totals[i])]]), p.px, p.py);
-      }, tip.hide);
+      }, function () { bnd.hide(); focusOff(svg); tip.hide(); });
     });
-    growY(g, y(0), f.anim);
     mark(el);
   }
 
-  /** hbars(el, {items:[{label,value,color,sub,extra}], fmt, max, ref, refLabel, rowH=32, ci, valueLabel}) — horizontal bars, CI whiskers, ref line. */
+  /** hbars(el, {items:[{label,value,color,sub,extra}], fmt, max, ref, refLabel, rowH=32, ci, valueLabel, onClick}) — horizontal bars, track, CI whiskers, ref line. */
   function hbars(el, data, opts) {
     data = data || {}; opts = opts || {};
     var f0 = F(), items = arr(data.items).filter(Boolean), fmt = data.fmt || f0.nf, rowH = data.rowH || 32, ci = arr(data.ci), ref = num(data.ref);
@@ -624,31 +834,40 @@ table.heat tr.click td:first-child{font-weight:650}
     var labelW = Math.min(W * 0.36, Math.max(60, maxLen * 6.6 + 14)), x0 = labelW, x1 = W - 64, plotW = x1 - x0, chars = Math.floor((labelW - 10) / 6.6);
     var max = num(data.max) || Math.max(maxOf(items.map(function (it) { return it.value; }), 0), maxOf(ci.map(function (c) { return c && c[1]; }), 0), ref || 0);
     if (!(max > 0)) max = 1;
+    var track = !!num(data.max) || data.track === true;
     var xs = function (v) { return x0 + Math.max(0, v) / max * plotW; };
-    var g = mk('g', null, svg);
+    var bnd = band(svg, W, rowH - 2);
+    var g = clipGroup(svg, x0, 0, W - x0, H), n = items.length;
     items.forEach(function (it, i) {
       var cy = top + i * rowH + rowH / 2, v = num(it.value) || 0, color = it.color || 'var(--s1)', c = ci[i], hasCI = c && nn(num(c[0])) && nn(num(c[1]));
+      var dl = stagger(i, n, 420);
       txt(svg, x0 - 10, it.sub ? cy - 4 : cy, trunc(it.label, chars), { anchor: 'end', base: 'middle', fill: 'var(--text)', size: 12, cls: 'lbl' });
       if (it.sub) txt(svg, x0 - 10, cy + 9, trunc(it.sub, chars), { anchor: 'end', base: 'middle', fill: 'var(--faint)', size: 10.5 });
-      mk('path', { d: rrRight(x0, cy - 6, xs(v) - x0, 12, 4), fill: color }, g);
+      if (track) svg.insertBefore(mk('rect', { x: R(x0), y: R(cy - 6), width: R(plotW), height: 12, rx: 4, fill: 'var(--soft)' }), g);
+      var bar = mk('path', { d: rrRight(x0, cy - 6, xs(v) - x0, 12, 4), fill: color, class: 'mk' }, g);
+      rise(bar, -(xs(v) - x0) - 2, 0, f.anim, dl, 780);
       if (hasCI) {
-        mk('line', { x1: R(xs(c[0])), x2: R(xs(c[1])), y1: R(cy), y2: R(cy), stroke: 'var(--text)', 'stroke-width': 1.25, opacity: 0.6 }, svg);
-        [c[0], c[1]].forEach(function (cv) { mk('line', { x1: R(xs(cv)), x2: R(xs(cv)), y1: R(cy - 4), y2: R(cy + 4), stroke: 'var(--text)', 'stroke-width': 1.25, opacity: 0.6 }, svg); });
+        var cg = mk('g', { class: 'mk' }, svg);
+        mk('line', { x1: R(xs(c[0])), x2: R(xs(c[1])), y1: R(cy), y2: R(cy), stroke: 'var(--text)', 'stroke-width': 1.25, opacity: 0.6 }, cg);
+        [c[0], c[1]].forEach(function (cv) { mk('line', { x1: R(xs(cv)), x2: R(xs(cv)), y1: R(cy - 4), y2: R(cy + 4), stroke: 'var(--text)', 'stroke-width': 1.25, opacity: 0.6 }, cg); });
+        fadeIn(cg, f.anim, 1, dl + 520, 380);
       }
-      txt(svg, Math.max(xs(v), hasCI ? xs(c[1]) : 0) + 8, cy, fmt(v), { base: 'middle', fill: 'var(--text)', size: 12, weight: 600, cls: 'lbl' });
+      var vt = txt(svg, Math.max(xs(v), hasCI ? xs(c[1]) : 0) + 8, cy, fmt(v), { base: 'middle', fill: 'var(--text)', size: 12, weight: 650, cls: 'lbl' });
+      countText(vt, v, fmt, f.anim, dl, 780);
       var hr_ = hoverRect(svg, 0, top + i * rowH, W, rowH, function (e) {
         var p = pointer(el, svg, W, H, e);
+        bnd.to(0, top + i * rowH + 1); focusOn(svg, [bar, cg]);
         tip.show(it.label, [[color, data.valueLabel || 'Value', fmt(v)], it.sub ? [null, it.sub, ''] : null,
           hasCI ? [null, '95% CI', fmt(c[0]) + ' – ' + fmt(c[1])] : null].concat(arr(it.extra)), p.px, p.py);
-      }, tip.hide);
+      }, function () { bnd.hide(); focusOff(svg); tip.hide(); });
       if (typeof data.onClick === 'function') { hr_.style.cursor = 'pointer'; hr_.addEventListener('click', function () { data.onClick(i); }); }
     });
     if (nn(ref)) {
-      var rx = xs(ref);
-      dashed(svg, rx, top - 4, rx, H - 6, 'var(--faint)');
-      if (data.refLabel) txt(svg, rx, 11, data.refLabel, { anchor: rx > W * 0.7 ? 'end' : rx < W * 0.3 ? 'start' : 'middle', size: 10.5 });
+      var rx = xs(ref), rg = mk('g', null, svg);
+      dashed(rg, rx, top - 4, rx, H - 6, 'var(--faint)');
+      if (data.refLabel) txt(rg, rx, 11, data.refLabel, { anchor: rx > W * 0.7 ? 'end' : rx < W * 0.3 ? 'start' : 'middle', size: 10.5 });
+      fadeIn(rg, f.anim, 1, 300);
     }
-    growX(g, x0, f.anim);
     mark(el);
   }
 
@@ -662,41 +881,49 @@ table.heat tr.click td:first-child{font-weight:650}
     var f = prep(el, opts, H), W = f.W, svg = f.svg, tip = makeTip(el);
     var M = { l: 14, r: 46, t: 22, b: 28 }, plotW = W - M.l - M.r, plotH = H - M.t - M.b;
     var y = function (p) { return M.t + (1 - p) * plotH; };
-    var slot = plotW / n, bw = Math.min(32, slot * 0.6), x = function (i) { return M.l + slot * (i + 0.5); };
+    var slot = plotW / n, bw = Math.min(24, slot * 0.6), x = function (i) { return M.l + slot * (i + 0.5); };
+    var gg = mk('g', null, svg);
     [0, 0.2, 0.4, 0.6, 0.8, 1].forEach(function (p) {
       var yy = R(y(p)), is80 = p === 0.8;
-      if (is80) dashed(svg, M.l, yy, W - M.r, yy, 'var(--warn)');
-      else mk('line', { x1: M.l, x2: W - M.r, y1: yy, y2: yy, stroke: 'var(--line)', 'stroke-width': 1, 'shape-rendering': 'crispEdges' }, svg);
-      txt(svg, W - M.r + 8, yy, f0.pct(p, 0), { base: 'middle', fill: is80 ? 'var(--warn)' : 'var(--muted)' });
+      if (is80) dashed(gg, M.l, yy, W - M.r, yy, 'var(--warn)');
+      else mk('line', { x1: M.l, x2: W - M.r, y1: yy, y2: yy, stroke: 'var(--line)', 'stroke-width': 1, 'shape-rendering': 'crispEdges' }, gg);
+      txt(gg, W - M.r + 8, yy, f0.pct(p, 0), { base: 'middle', fill: is80 ? 'var(--warn)' : 'var(--muted)' });
     });
+    if (f.anim) fadeIn(gg, true, 1, 0, 420);
     xLabels(svg, items.map(function (it) { return it.label; }), x, H - 8, slot, false);
-    var g = mk('g', null, svg), cum = 0, pts = [], k80 = -1, labelAll = n <= 12 && slot >= 30;
+    var bw2 = Math.min(slot - 2, bw + 14), bnd = band(svg, bw2, plotH + 8);
+    var g = clipGroup(svg, M.l - 4, 0, plotW + 8, y(0)), cum = 0, pts = [], k80 = -1, labelAll = n <= 12 && slot >= 30, cols = [];
     items.forEach(function (it, i) {
-      var p = it.value / total, top = y(p), color = it.color || 'var(--s1)';
+      var p = it.value / total, top = y(p), color = it.color || 'var(--s1)', cg = mk('g', { class: 'mk' }, g);
       cum += p; pts.push([x(i), y(Math.min(1, cum))]);
       if (k80 < 0 && cum >= 0.8 - 1e-9) k80 = i;
       var h = y(0) - top;
-      mk('path', { d: rrTop(x(i) - bw / 2, top, bw, h, 4), fill: color }, g);
+      mk('path', { d: rrTop(x(i) - bw / 2, top, bw, h, 4), fill: color }, cg);
       /* count label: inside the column when it fits (the first column always meets the cumulative dot), else on the cap */
       if (labelAll || i < 3) {
-        if (h >= 20 && bw >= 24) txt(svg, x(i), top + 13, compact(it.value), { anchor: 'middle', size: 10.5, fill: 'var(--on-seq, #fff)', weight: 600, cls: 'lbl' });
-        else if (i > 0) txt(svg, x(i), top - 5, compact(it.value), { anchor: 'middle', size: 10.5, cls: 'lbl' });
+        if (h >= 20 && bw >= 24) txt(cg, x(i), top + 13, compact(it.value), { anchor: 'middle', size: 10.5, fill: 'var(--on-seq, #fff)', weight: 600, cls: 'lbl' });
+        else if (i > 0) txt(cg, x(i), top - 5, compact(it.value), { anchor: 'middle', size: 10.5, cls: 'lbl' });
       }
+      rise(cg, 0, h + 20, f.anim, stagger(i, n, 420), 700);
+      cols.push(cg);
       var c = cum;
       hoverRect(svg, x(i) - slot / 2, M.t, slot, plotH, function (e) {
         var pp = pointer(el, svg, W, H, e);
+        bnd.to(x(i) - bw2 / 2, M.t - 4); focusOn(svg, [cg]);
         tip.show(it.label, [[color, 'Count', f0.nf(it.value)], [null, 'Share', f0.pct(p, 1)], [null, 'Cumulative', f0.pct(c, 0)]], pp.px, pp.py);
-      }, tip.hide);
+      }, function () { bnd.hide(); focusOff(svg); tip.hide(); });
     });
+    var ag = mk('g', null, svg);
     if (k80 >= 0 && k80 < n - 1) {
       var gx = x(k80) + slot / 2;
-      dashed(svg, gx, M.t, gx, y(0), 'var(--warn)');
-      txt(svg, gx + (gx > W * 0.6 ? -6 : 6), M.t - 8, (k80 + 1) + ' of ' + n + ' → 80%', { anchor: gx > W * 0.6 ? 'end' : 'start', size: 10.5, fill: 'var(--warn)' });
+      dashed(ag, gx, M.t, gx, y(0), 'var(--warn)');
+      txt(ag, gx + (gx > W * 0.6 ? -6 : 6), M.t - 8, (k80 + 1) + ' of ' + n + ' → 80%', { anchor: gx > W * 0.6 ? 'end' : 'start', size: 10.5, fill: 'var(--warn)' });
     }
-    var line = mk('path', { d: linePath(pts), fill: 'none', stroke: 'var(--text)', 'stroke-width': 1.5, 'stroke-linejoin': 'round' }, svg);
-    var dg = mk('g', null, svg);
-    pts.forEach(function (p) { dot(dg, p[0], p[1], 3, 'var(--text)'); });
-    growY(g, y(0), f.anim); drawIn(line, f.anim, plotW * 1.5); fadeIn(dg, f.anim);
+    var line = mk('path', { d: linePath(pts), fill: 'none', stroke: 'var(--text)', 'stroke-width': 1.75, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+    var LD = 520, LT = 900;
+    drawIn(line, f.anim, plotW * 1.5, LD, LT);
+    pts.forEach(function (p, i) { var d = dot(svg, p[0], p[1], 3.5, 'var(--text)'); pop(d, f.anim, LD + LT * (i + 1) / n * 0.9, 420); });
+    fadeIn(ag, f.anim, 1, LD + LT, 420);
     mark(el);
   }
 
@@ -713,31 +940,34 @@ table.heat tr.click td:first-child{font-weight:650}
     var x = function (p) { return M.l + p * plotW; }, y = function (p) { return M.t + (1 - p) * plotH; };
     var at = function (p) { var idx = Math.max(0, Math.min(n, p * n)), lo = Math.floor(idx), hi = Math.min(n, lo + 1); return cum[lo] + (cum[hi] - cum[lo]) * (idx - lo); };
     var gini = 0; for (var k = 1; k <= n; k++) gini += (cum[k - 1] + cum[k]) / n; gini = 1 - gini;
-    grid(svg, [0, 0.25, 0.5, 0.75, 1], y, M.l, W - M.r, function (v) { return f0.pct(v, 0); }, M.l - 8);
+    grid(svg, [0, 0.25, 0.5, 0.75, 1], y, M.l, W - M.r, function (v) { return f0.pct(v, 0); }, M.l - 8, f.anim);
     [0, 0.25, 0.5, 0.75, 1].forEach(function (p) { txt(svg, x(p), H - M.b + 16, f0.pct(p, 0), { anchor: p === 0 ? 'start' : p === 1 ? 'end' : 'middle' }); });
     txt(svg, x(0.5), H - 6, 'Share of agents (ranked by AO count)', { anchor: 'middle', size: 10.5, fill: 'var(--faint)' });
     txt(svg, M.l - 8, 10, 'Share of AO', { anchor: 'end', size: 10.5, fill: 'var(--faint)' });
     dashed(svg, x(0), y(0), x(1), y(1), 'var(--faint)');
     var pts = cum.map(function (c, i) { return [x(i / n), y(c)]; });
-    var area = mk('path', { d: linePath(pts) + 'L' + R(x(0)) + ' ' + R(y(0)) + 'Z', fill: 'var(--teal)' }, svg);
-    var curve = mk('path', { d: linePath(pts), fill: 'none', stroke: 'var(--teal)', 'stroke-width': 2, 'stroke-linejoin': 'round' }, svg);
+    var sg = clipGroup(svg, M.l - 4, 0, plotW + 8, H);
+    mk('path', { d: linePath(pts) + 'L' + R(x(1)) + ' ' + R(y(0)) + 'L' + R(x(0)) + ' ' + R(y(0)) + 'Z', fill: vGrad(svg, 'var(--teal)', 0.26, 0.02) }, sg);
+    mk('path', { d: linePath(pts), fill: 'none', stroke: 'var(--teal)', 'stroke-width': 2.25, 'stroke-linejoin': 'round' }, sg);
     /* annotations sit below-right of their dot: the region under a concave curve is always empty */
     var ag = mk('g', null, svg), v10 = at(0.1), v20 = at(0.2), collide = Math.abs(y(v10) - y(v20)) < 18;
     [[0.1, v10, collide ? 30 : 14], [0.2, v20, 14]].forEach(function (a) {
       mk('line', { x1: R(x(a[0])), x2: R(x(a[0])), y1: R(y(0)), y2: R(y(a[1])), stroke: 'var(--line)', 'stroke-width': 1 }, ag);
-      dot(ag, x(a[0]), y(a[1]), 3.5, 'var(--teal)');
+      dot(ag, x(a[0]), y(a[1]), 4, 'var(--teal)');
       txt(ag, x(a[0]) + 8, y(a[1]) + a[2], 'Top ' + f0.pct(a[0], 0) + ' → ' + f0.pct(a[1], 0) + ' of AO', { size: 11, fill: 'var(--text)', weight: 600, cls: 'lbl' });
     });
     txt(ag, M.l + 10, M.t + 8, 'Gini ' + gini.toFixed(2), { size: 11.5, fill: 'var(--text)', weight: 600, cls: 'lbl' });
+    var hd = mk('circle', { cx: 0, cy: 0, r: 5, fill: 'var(--teal)', stroke: 'var(--card)', 'stroke-width': 2.5, class: 'glide', opacity: 0 }, svg);
     hoverRect(svg, M.l, M.t, plotW, plotH, function (e) {
       var pt = pointer(el, svg, W, H, e), p = Math.max(0, Math.min(1, (pt.x - M.l) / plotW));
+      place(hd, x(p), y(at(p)));
       tip.show('Top ' + f0.pct(p, 0) + ' of agents', [['var(--teal)', 'Share of AO', f0.pct(at(p), 0)], [null, 'Agents', f0.nf(Math.round(p * n)) + ' of ' + f0.nf(n)]], pt.px, pt.py);
-    }, tip.hide);
-    fadeIn(area, f.anim, 0.08); drawIn(curve, f.anim, plotW * 1.6); fadeIn(ag, f.anim);
+    }, function () { hd.setAttribute('opacity', 0); tip.hide(); });
+    sweep(sg, plotW + 8, f.anim, 0, 1200); fadeIn(ag, f.anim, 1, 1000, 450);
     mark(el);
   }
 
-  /** scatter(el, {points:[{x,y,r,label,color,sub}], xLabel, yLabel, refY, refX, yPct=true, height=320, ci}) — bubbles, dashed refs, CI whiskers. */
+  /** scatter(el, {points:[{x,y,r,label,color,sub}], xLabel, yLabel, refY, refX, yPct=true, height=320, ci, onClick}) — bubbles, dashed refs, CI whiskers. */
   function scatter(el, data, opts) {
     data = data || {}; opts = opts || {};
     var f0 = F(), H = data.height || 320, yPct = data.yPct !== false, ci = arr(data.ci);
@@ -752,7 +982,7 @@ table.heat tr.click td:first-child{font-weight:650}
     var xt = ticks(xmin >= 0 && xmin < xmax * 0.5 ? 0 : xmin, xmax, 5), yt = ticks(ymin >= 0 ? 0 : ymin, ymax, 4);
     var x = function (v) { return M.l + (v - xt[0]) / (xt[xt.length - 1] - xt[0]) * plotW; };
     var y = function (v) { return M.t + (yt[yt.length - 1] - v) / (yt[yt.length - 1] - yt[0]) * plotH; };
-    grid(svg, yt, y, M.l, W - M.r, fy, M.l - 8);
+    grid(svg, yt, y, M.l, W - M.r, fy, M.l - 8, f.anim);
     xt.forEach(function (v) { txt(svg, x(v), H - M.b + 16, fx(v), { anchor: 'middle' }); });
     if (data.xLabel) txt(svg, M.l + plotW / 2, H - 6, data.xLabel, { anchor: 'middle', size: 10.5, fill: 'var(--faint)' });
     if (data.yLabel) { var yl = txt(svg, 0, 0, data.yLabel, { anchor: 'middle', size: 10.5, fill: 'var(--faint)' }); yl.setAttribute('transform', 'translate(11 ' + R(M.t + plotH / 2) + ') rotate(-90)'); }
@@ -761,64 +991,74 @@ table.heat tr.click td:first-child{font-weight:650}
     if (nn(refX)) { dashed(svg, x(refX), M.t, x(refX), M.t + plotH); if (data.refXLabel) pill(svg, x(refX) + 5, M.t + 8, data.refXLabel); }
     var rmax = maxOf(pts.map(function (q) { return q.p.r; }), 0);
     var rad = function (p) { return rmax > 0 && nn(num(p.r)) ? 5 + 17 * Math.sqrt(Math.max(0, p.r) / rmax) : 6; };
+    var byX = pts.slice().sort(function (a, b) { return a.p.x - b.p.x; }); byX.forEach(function (q, k) { q.rank = k; });
     pts.sort(function (a, b) { return rad(b.p) - rad(a.p); });
-    var g = mk('g', null, svg), lg = mk('g', null, svg), circles = [];
+    var g = mk('g', null, svg), lg = mk('g', null, svg), n = pts.length;
     pts.forEach(function (q, k) {
-      var p = q.p, cx = x(p.x), cy = y(p.y), r = rad(p), color = p.color || 'var(--s1)';
-      if (q.c && nn(num(q.c[0])) && nn(num(q.c[1]))) mk('line', { x1: R(cx), x2: R(cx), y1: R(y(q.c[1])), y2: R(y(q.c[0])), stroke: color, 'stroke-width': 1, opacity: 0.5 }, g);
-      var c = mk('circle', { cx: R(cx), cy: R(cy), r: r, fill: color, 'fill-opacity': 0.6, stroke: 'var(--card)', 'stroke-width': 2 }, g);
+      var p = q.p, cx = x(p.x), cy = y(p.y), r = rad(p), color = p.color || 'var(--s1)', bg = mk('g', { class: 'mk' }, g), dl = stagger(q.rank, n, 650);
+      if (q.c && nn(num(q.c[0])) && nn(num(q.c[1]))) { var wl = mk('line', { x1: R(cx), x2: R(cx), y1: R(y(q.c[1])), y2: R(y(q.c[0])), stroke: color, 'stroke-width': 1.25, opacity: 0.55 }, bg); fadeIn(wl, f.anim, 0.55, dl + 300, 400); }
+      var c = mk('circle', { cx: R(cx), cy: R(cy), r: r, fill: color, 'fill-opacity': 0.62, stroke: 'var(--card)', 'stroke-width': 2 }, bg);
+      pop(c, f.anim, dl, 620);
       if (typeof data.onClick === 'function') { c.style.cursor = 'pointer'; (function (idx) { c.addEventListener('click', function () { data.onClick(idx); }); })(q.i !== undefined ? q.i : k); }
-      circles.push([c, r]);
       if (k < 3 && p.label && rmax > 0) {
         var lb = txt(lg, cx + r + 4, cy, trunc(p.label, 18), { base: 'middle', size: 11, cls: 'lbl' });
         lb.style.paintOrder = 'stroke'; lb.style.stroke = 'var(--card)'; lb.style.strokeWidth = '3px'; lb.style.strokeLinejoin = 'round';
       }
       c.addEventListener('mousemove', function (e) {
         var pt = pointer(el, svg, W, H, e);
+        focusOn(svg, [bg]); c.setAttribute('fill-opacity', 0.92); c.setAttribute('stroke', 'var(--text)');
         tip.show(p.label, [[color, data.xLabel || 'x', fx(p.x)], [null, data.yLabel || 'y', fy(p.y)],
           q.c && nn(num(q.c[0])) ? [null, '95% CI', fy(q.c[0]) + ' – ' + fy(q.c[1])] : null,
           nn(num(p.r)) ? [null, data.rLabel || 'Size', f0.nf(p.r)] : null, p.sub ? [null, p.sub, ''] : null], pt.px, pt.py);
-        c.setAttribute('fill-opacity', 0.9);
       });
-      c.addEventListener('mouseleave', function () { tip.hide(); c.setAttribute('fill-opacity', 0.6); });
+      c.addEventListener('mouseleave', function () { tip.hide(); focusOff(svg); c.setAttribute('fill-opacity', 0.62); c.setAttribute('stroke', 'var(--card)'); });
     });
-    if (f.anim) animate(true, DUR, function (t) { circles.forEach(function (c) { c[0].setAttribute('r', R(c[1] * t)); }); });
+    fadeIn(lg, f.anim, 1, 700, 400);
     mark(el);
   }
 
-  /** donut(el, {items:[{label,value,color}], total, centerLabel, size=180}) — annulus with sweep-in, center figure, legend. */
+  /** donut(el, {items:[{label,value,color}], total, centerLabel, size=180}) — annulus with sweep-in, hover pop-out, center figure, legend. */
   function donut(el, data, opts) {
     data = data || {}; opts = opts || {};
     var f0 = F(), size = data.size || 180, items = arr(data.items).filter(function (it) { return it && num(it.value) > 0; });
     var s = sum(items.map(function (it) { return it.value; })), total = num(data.total), base = total > s ? total : s;
     if (!items.length) return empty(el, opts, size);
-    var W0 = el.clientWidth || 600, right = W0 >= size + 170, legH = items.length * 20;
+    var W0 = el.clientWidth || 600, right = W0 >= size + 170, legH = items.length * 22;
     var H = right ? Math.max(size, legH) + 8 : size + 16 + legH;
     var f = prep(el, opts, H), W = f.W, svg = f.svg, tip = makeTip(el);
-    var cx = right ? size / 2 + 4 : W / 2, cy = size / 2 + 4, r1 = size / 2 - 4, thick = Math.max(12, Math.round(size * 0.11)), r0 = r1 - thick;
+    var cx = right ? size / 2 + 4 : W / 2, cy = size / 2 + 4, r1 = size / 2 - 6, thick = Math.max(12, Math.round(size * 0.12)), r0 = r1 - thick;
     mk('circle', { cx: R(cx), cy: R(cy), r: R((r0 + r1) / 2), fill: 'none', stroke: 'var(--soft)', 'stroke-width': thick }, svg);
     var a = -Math.PI / 2, arcs = [];
+    var cNum = txt(svg, cx, data.centerLabel ? cy - 2 : cy, f0.nf(base), { anchor: 'middle', base: data.centerLabel ? 'auto' : 'middle', size: Math.round(size * 0.15), weight: 700, fill: 'var(--text)', cls: 'lbl' });
+    var cLab = data.centerLabel ? txt(svg, cx, cy + 16, data.centerLabel, { anchor: 'middle', size: 11 }) : null;
     items.forEach(function (it, k) {
-      var a1 = a + it.value / base * Math.PI * 2, color = it.color || 'var(--s' + ((k % 8) + 1) + ')';
-      var path = mk('path', { d: arcPath(cx, cy, r0, r1, a, a1), fill: color, stroke: 'var(--card)', 'stroke-width': 2 }, svg);
+      var a1 = a + it.value / base * Math.PI * 2, color = it.color || 'var(--s' + ((k % 8) + 1) + ')', mid = (a + a1) / 2;
+      var path = mk('path', { d: arcPath(cx, cy, r0, r1, a, a1), fill: color, stroke: 'var(--card)', 'stroke-width': 2, class: 'mk' }, svg);
       arcs.push({ path: path, a0: a, a1: a1 });
-      path.addEventListener('mousemove', function (e) { var p = pointer(el, svg, W, H, e); tip.show(it.label, [[color, 'Count', f0.nf(it.value)], [null, 'Share', f0.pct(it.value / base, 0)]], p.px, p.py); });
-      path.addEventListener('mouseleave', tip.hide);
+      path.addEventListener('mousemove', function (e) {
+        var p = pointer(el, svg, W, H, e);
+        focusOn(svg, [path]); path.style.transform = 'translate(' + R(Math.cos(mid) * 5) + 'px,' + R(Math.sin(mid) * 5) + 'px)';
+        cNum.textContent = f0.pct(it.value / base, 0); if (cLab) cLab.textContent = trunc(it.label, 18);
+        tip.show(it.label, [[color, 'Count', f0.nf(it.value)], [null, 'Share', f0.pct(it.value / base, 0)]], p.px, p.py);
+      });
+      path.addEventListener('mouseleave', function () { focusOff(svg); path.style.transform = ''; cNum.textContent = f0.nf(base); if (cLab) cLab.textContent = data.centerLabel; tip.hide(); });
       a = a1;
     });
-    txt(svg, cx, data.centerLabel ? cy - 2 : cy, f0.nf(base), { anchor: 'middle', base: data.centerLabel ? 'auto' : 'middle', size: Math.round(size * 0.14), weight: 600, fill: 'var(--text)', cls: 'lbl' });
-    if (data.centerLabel) txt(svg, cx, cy + 15, data.centerLabel, { anchor: 'middle', size: 11 });
-    var lx = right ? size + 28 : 12, ly = right ? cy - legH / 2 + 10 : size + 22, chars = Math.max(6, Math.floor((W - lx - 110) / 6.8));
+    var lx = right ? size + 28 : 12, ly = right ? cy - legH / 2 + 11 : size + 22, chars = Math.max(6, Math.floor((W - lx - 110) / 6.8)), lgG = mk('g', null, svg);
     items.forEach(function (it, k) {
-      var yy = ly + k * 20, color = it.color || 'var(--s' + ((k % 8) + 1) + ')';
-      mk('rect', { x: lx, y: R(yy - 5), width: 9, height: 9, rx: 2, fill: color }, svg);
-      txt(svg, lx + 15, yy, trunc(it.label, chars), { base: 'middle', fill: 'var(--text)', size: 12, cls: 'lbl' });
-      txt(svg, W - 8, yy, f0.nf(it.value) + ' · ' + f0.pct(it.value / base, 0), { anchor: 'end', base: 'middle', size: 11.5 });
+      var yy = ly + k * 22, color = it.color || 'var(--s' + ((k % 8) + 1) + ')';
+      mk('rect', { x: lx, y: R(yy - 5), width: 10, height: 10, rx: 3, fill: color }, lgG);
+      txt(lgG, lx + 16, yy, trunc(it.label, chars), { base: 'middle', fill: 'var(--text)', size: 12, cls: 'lbl' });
+      txt(lgG, W - 8, yy, f0.nf(it.value) + ' · ' + f0.pct(it.value / base, 0), { anchor: 'end', base: 'middle', size: 11.5 });
     });
-    if (f.anim) animate(true, DUR, function (t) {
-      var end = -Math.PI / 2 + Math.PI * 2 * t;
-      arcs.forEach(function (ar) { ar.path.setAttribute('d', arcPath(cx, cy, r0, r1, ar.a0, Math.min(ar.a1, end))); });
-    });
+    if (f.anim) {
+      animate(true, 1150, function (t) {
+        var end = -Math.PI / 2 + Math.PI * 2 * t;
+        arcs.forEach(function (ar) { ar.path.setAttribute('d', arcPath(cx, cy, r0, r1, ar.a0, Math.min(ar.a1, end))); });
+      }, null, 0, E.inOut);
+      countText(cNum, base, f0.nf, true, 0, 1150);
+      fadeIn(lgG, true, 1, 350, 500);
+    }
     mark(el);
   }
 
@@ -831,24 +1071,29 @@ table.heat tr.click td:first-child{font-weight:650}
     var f = prep(el, opts, H), W = f.W, svg = f.svg, tip = makeTip(el);
     var maxLen = maxOf(steps.map(function (s) { return String(s.label == null ? '' : s.label).length; }), 4);
     var labelW = Math.min(W * 0.34, Math.max(70, maxLen * 6.6 + 14)), x0 = labelW, plotW = W - labelW - 72, chars = Math.floor((labelW - 10) / 6.6);
-    var max = maxOf(steps.map(function (s) { return s.value; }), 1) || 1, g = mk('g', null, svg);
+    var max = maxOf(steps.map(function (s) { return s.value; }), 1) || 1;
+    var bnd = band(svg, W, rowH + 4), g = clipGroup(svg, x0, 0, W - x0, H);
     steps.forEach(function (s, i) {
-      var yTop = 8 + i * (rowH + gap), cy = yTop + rowH / 2, v = Math.max(0, s.value), w = v / max * plotW, color = s.color || 'var(--teal)';
+      var yTop = 8 + i * (rowH + gap), cy = yTop + rowH / 2, v = Math.max(0, s.value), w = v / max * plotW, color = s.color || 'var(--teal)', dl = i * 170;
       txt(svg, x0 - 10, s.sub ? cy - 4 : cy, trunc(s.label, chars), { anchor: 'end', base: 'middle', fill: 'var(--text)', size: 12, cls: 'lbl' });
       if (s.sub) txt(svg, x0 - 10, cy + 9, trunc(s.sub, chars), { anchor: 'end', base: 'middle', fill: 'var(--faint)', size: 10.5 });
-      mk('path', { d: rrRight(x0, cy - 9, w, 18, 4), fill: color }, g);
-      txt(svg, x0 + w + 8, cy, f0.nf(v), { base: 'middle', fill: 'var(--text)', size: 12.5, weight: 600, cls: 'lbl' });
+      svg.insertBefore(mk('rect', { x: R(x0), y: R(cy - 9), width: R(plotW), height: 18, rx: 4, fill: 'var(--soft)' }), g);
+      var bar = mk('path', { d: rrRight(x0, cy - 9, w, 18, 4), fill: color, class: 'mk' }, g);
+      rise(bar, -w - 2, 0, f.anim, dl, 820);
+      var vt = txt(svg, x0 + w + 8, cy, f0.nf(v), { base: 'middle', fill: 'var(--text)', size: 12.5, weight: 650, cls: 'lbl' });
+      countText(vt, v, f0.nf, f.anim, dl, 820);
       if (i < n - 1) {
         var nx = Math.max(0, steps[i + 1].value), conv = v > 0 ? nx / v : null;
-        txt(svg, x0 + 4, yTop + rowH + gap / 2, (conv == null ? '–' : '↓ ' + f0.pct(conv, 0)) + '  ·  −' + f0.nf(v - nx), { base: 'middle', size: 11 });
+        var ct = txt(svg, x0 + 4, yTop + rowH + gap / 2, (conv == null ? '–' : '↓ ' + f0.pct(conv, 0)) + '  ·  −' + f0.nf(v - nx), { base: 'middle', size: 11 });
+        fadeIn(ct, f.anim, 1, dl + 600, 400);
       }
       hoverRect(svg, 0, yTop, W, rowH + (i < n - 1 ? gap : 0), function (e) {
         var p = pointer(el, svg, W, H, e);
+        bnd.to(0, yTop - 2); focusOn(svg, [bar]);
         tip.show(s.label, [[color, 'Count', f0.nf(v)], [null, 'Of first step', f0.pct(steps[0].value > 0 ? v / steps[0].value : 0, 0)],
           i > 0 && steps[i - 1].value > 0 ? [null, 'Of previous', f0.pct(v / steps[i - 1].value, 0)] : null, s.sub ? [null, s.sub, ''] : null], p.px, p.py);
-      }, tip.hide);
+      }, function () { bnd.hide(); focusOff(svg); tip.hide(); });
     });
-    growX(g, x0, f.anim);
     mark(el);
   }
 
@@ -866,39 +1111,43 @@ table.heat tr.click td:first-child{font-weight:650}
     var ys = []; bars.forEach(function (b) { ys.push(b.y0, b.y1); });
     var tk = ticks(Math.min(0, minOf(ys, 0)), maxOf(ys, 1), 4), lo = tk[0], hi = tk[tk.length - 1];
     var y = function (v) { return M.t + (hi - v) / (hi - lo) * plotH; };
-    var slot = plotW / n, bw = Math.min(36, slot * 0.6), x = function (i) { return M.l + slot * (i + 0.5); };
-    grid(svg, tk, y, M.l, W - M.r, compact, M.l - 8);
+    var slot = plotW / n, bw = Math.min(24, slot * 0.6), x = function (i) { return M.l + slot * (i + 0.5); };
+    grid(svg, tk, y, M.l, W - M.r, compact, M.l - 8, f.anim);
     mk('line', { x1: M.l, x2: W - M.r, y1: R(y(0)), y2: R(y(0)), stroke: 'var(--faint)', 'stroke-width': 1, 'shape-rendering': 'crispEdges' }, svg);
     xLabels(svg, bars.map(function (b) { return b.label; }), x, H - 8, slot, false);
+    var bw2 = Math.min(slot - 2, bw + 14), bnd = band(svg, bw2, plotH + 8);
     var signed = function (d) { return (d > 0 ? '+' : d < 0 ? '−' : '') + f0.nf(Math.abs(d)); };
+    var step = Math.min(110, 900 / n);
     bars.forEach(function (b, i) {
-      var top = Math.min(y(b.y0), y(b.y1)), h = Math.abs(y(b.y0) - y(b.y1)), g = mk('g', null, svg);
+      var top = Math.min(y(b.y0), y(b.y1)), h = Math.abs(y(b.y0) - y(b.y1)), g = mk('g', { class: 'mk' }, svg), dl = i * step;
       var color = b.total ? 'var(--faint)' : b.delta > 0 ? (data.upIsGood ? 'var(--good)' : 'var(--bad)') : b.delta < 0 ? (data.upIsGood ? 'var(--bad)' : 'var(--good)') : 'var(--line)';
       if (h < 1) mk('rect', { x: R(x(i) - bw / 2), y: R(top - 0.5), width: R(bw), height: 1, fill: color }, g);
       else mk('path', { d: (b.total || b.delta >= 0 ? rrTop : rrBottom)(x(i) - bw / 2, top, bw, h, 4), fill: color }, g);
-      growY(g, y(b.y0), f.anim);
-      if (i < n - 1) mk('line', { x1: R(x(i) + bw / 2), x2: R(x(i + 1) - bw / 2), y1: R(y(b.y1)), y2: R(y(b.y1)), stroke: 'var(--line)', 'stroke-width': 1 }, svg);
+      growY(g, y(b.y0), f.anim, dl);
+      if (i < n - 1) { var cn = mk('line', { x1: R(x(i) + bw / 2), x2: R(x(i + 1) - bw / 2), y1: R(y(b.y1)), y2: R(y(b.y1)), stroke: 'var(--line2)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, svg); fadeIn(cn, f.anim, 1, dl + 400, 300); }
       var up = b.total || b.delta >= 0;
-      txt(svg, x(i), up ? top - 6 : top + h + 14, b.total ? f0.nf(b.y1) : signed(b.delta), { anchor: 'middle', size: 11.5, fill: 'var(--text)', weight: b.total ? 600 : null, cls: 'lbl' });
+      var lt = txt(svg, x(i), up ? top - 6 : top + h + 14, b.total ? f0.nf(b.y1) : signed(b.delta), { anchor: 'middle', size: 11.5, fill: 'var(--text)', weight: b.total ? 650 : null, cls: 'lbl' });
+      fadeIn(lt, f.anim, 1, dl + 380, 320);
       hoverRect(svg, x(i) - slot / 2, M.t, slot, plotH, function (e) {
         var p = pointer(el, svg, W, H, e);
+        bnd.to(x(i) - bw2 / 2, M.t - 4); focusOn(svg, [g]);
         tip.show(b.label, b.total ? [[color, 'Total', f0.nf(b.y1)]] : [[color, 'Change', signed(b.delta)], [null, 'From → to', f0.nf(b.y0) + ' → ' + f0.nf(b.y1)]], p.px, p.py);
-      }, tip.hide);
+      }, function () { bnd.hide(); focusOff(svg); tip.hide(); });
     });
     mark(el);
   }
 
-  /** heatmap(el, {rows, cols, matrix, fmt, rowLink}) — <table class="heat"> colored with --seq0..5; row click → rowLink(i). Returns the table. */
+  /** heatmap(el, {rows, cols, matrix, fmt, rowLink, corner}) — <table class="heat"> colored with --seq0..5, cells cascade in, row/column crosshair on hover; row click → rowLink(i). Returns the table. */
   function heatmap(el, data, opts) {
     data = data || {}; opts = opts || {};
-    var f0 = F(), rows = arr(data.rows), cols = arr(data.cols), Mx = arr(data.matrix);
-    clear(el);
+    var f0 = F(), rows = arr(data.rows), cols = arr(data.cols), Mx = arr(data.matrix), anim = wantAnim(el, opts);
+    clear(el); if (el.classList) el.classList.remove('play');
     var flat = []; Mx.forEach(function (r) { arr(r).forEach(function (v) { if (nn(num(v))) flat.push(v); }); });
     var max = maxOf(flat, 0), fmt = data.fmt || (max <= 1 ? function (v) { return f0.pct(v, 0); } : f0.nf);
-    var table = document.createElement('table'); table.className = 'heat';
-    var thead = document.createElement('thead'), hr = document.createElement('tr');
+    var table = document.createElement('table'); table.className = 'heat' + (anim ? ' cascade' : '');
+    var thead = document.createElement('thead'), hr = document.createElement('tr'), heads = [];
     var corner = document.createElement('th'); corner.setAttribute('scope', 'col'); corner.textContent = data.corner || ''; hr.appendChild(corner);
-    cols.forEach(function (c) { var th = document.createElement('th'); th.setAttribute('scope', 'col'); th.textContent = c == null ? '' : String(c); hr.appendChild(th); });
+    cols.forEach(function (c) { var th = document.createElement('th'); th.setAttribute('scope', 'col'); th.textContent = c == null ? '' : String(c); hr.appendChild(th); heads.push(th); });
     thead.appendChild(hr); table.appendChild(thead);
     var tbody = document.createElement('tbody');
     rows.forEach(function (rl, i) {
@@ -906,6 +1155,8 @@ table.heat tr.click td:first-child{font-weight:650}
       th.setAttribute('scope', 'row'); th.textContent = rl == null ? '' : String(rl); tr.appendChild(th);
       cols.forEach(function (c, j) {
         var td = document.createElement('td'), v = num(Mx[i] && Mx[i][j]);
+        td.className = 'v';
+        if (anim) td.style.setProperty('--d', Math.min(900, (i + j) * 28) + 'ms');
         if (v == null) { td.textContent = '–'; td.style.background = 'var(--soft)'; td.style.color = 'var(--faint)'; }
         else {
           var k = v <= 0 || !(max > 0) ? 0 : Math.max(1, Math.min(5, Math.ceil(v / max * 5)));
@@ -914,11 +1165,12 @@ table.heat tr.click td:first-child{font-weight:650}
           td.textContent = fmt(v); td.title = rl + ' · ' + c + ': ' + fmt(v);
           if (td.dataset) td.dataset.k = String(k);
         }
-        td.style.textAlign = 'right'; td.style.fontVariantNumeric = 'tabular-nums';
+        td.addEventListener('mouseenter', function () { heads[j] && heads[j].classList.add('hc'); th.classList.add('hc'); });
+        td.addEventListener('mouseleave', function () { heads[j] && heads[j].classList.remove('hc'); th.classList.remove('hc'); });
         tr.appendChild(td);
       });
       if (typeof data.rowLink === 'function') {
-        tr.style.cursor = 'pointer'; tr.tabIndex = 0;
+        tr.className = 'click'; tr.tabIndex = 0;
         tr.addEventListener('click', function () { data.rowLink(i); });
         tr.addEventListener('keydown', function (e) { if (e && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault && e.preventDefault(); data.rowLink(i); } });
       }
@@ -927,11 +1179,12 @@ table.heat tr.click td:first-child{font-weight:650}
     table.appendChild(tbody);
     if (!rows.length || !cols.length) { var p = document.createElement('div'); p.className = 'empty'; p.textContent = 'No data'; p.style.color = 'var(--faint)'; el.appendChild(p); }
     el.appendChild(table);
+    if (anim) whenVisible(el, function () {});
     mark(el);
     return table;
   }
 
-  /** bulletRow(value, ref, {fmt, max, color, upIsGood=false, animate}) → div.bullet: value text (good/bad vs ref), 6px track, fill, 2px ref tick. */
+  /** bulletRow(value, ref, {fmt, max, color, upIsGood=false, animate}) → div.bullet: value text (good/bad vs ref), 6px track, fill (grows in when visible), 2px ref tick. */
   function bulletRow(value, ref, opts) {
     opts = opts || {};
     var f0 = F(), v = num(value), r = num(ref);
@@ -940,13 +1193,16 @@ table.heat tr.click td:first-child{font-weight:650}
     var wrap = document.createElement('div'); wrap.className = 'bullet';
     wrap.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;min-width:90px';
     var val = document.createElement('span'); val.className = 'v'; val.textContent = v == null ? '–' : fmt(v);
-    val.style.cssText = 'min-width:44px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;font-size:12px;color:' + (tone || 'var(--text)');
+    val.style.cssText = 'min-width:44px;text-align:right;font-weight:650;font-variant-numeric:tabular-nums;font-size:12px;color:' + (tone || 'var(--text)');
     var track = document.createElement('div'); track.className = 'track';
     track.style.cssText = 'position:relative;flex:1;height:6px;border-radius:3px;background:var(--soft);min-width:40px';
     var fill = document.createElement('div'); fill.className = 'fill';
     var pct = Math.max(0, Math.min(100, (v || 0) / max * 100));
     fill.style.cssText = 'position:absolute;left:0;top:0;height:100%;border-radius:3px;background:' + (opts.color || tone || 'var(--teal)') + ';width:' + R(pct) + '%';
-    if (opts.animate === true && !reduced()) { fill.style.width = '0%'; fill.style.transition = 'width .6s cubic-bezier(.2,.7,.2,1)'; raf(function () { fill.style.width = R(pct) + '%'; }); }
+    if (opts.animate !== false && !reduced() && io) {
+      fill.style.width = '0%'; fill.style.transition = 'width .9s cubic-bezier(.2,.7,.2,1)';
+      raf(function () { whenVisible(wrap, function () { setTimeout(function () { fill.style.width = R(pct) + '%'; }, 120); }); });
+    }
     track.appendChild(fill);
     if (r != null) {
       var tick = document.createElement('div'); tick.className = 'ref';
@@ -958,7 +1214,7 @@ table.heat tr.click td:first-child{font-weight:650}
     return wrap;
   }
 
-  /** calHeat(el, {days:[{d,value,n}], weeks=12, fmt, label}) — GitHub-style calendar heat (Mon-start weeks), tooltip. */
+  /** calHeat(el, {days:[{d,value,n}], weeks=12, fmt, label}) — GitHub-style calendar heat (Mon-start weeks) that ripples in, tooltip. */
   function calHeat(el, data, opts) {
     data = data || {}; opts = opts || {};
     var f0 = F(), days = arr(data.days).filter(function (d) { return d && nn(num(d.d)); }), weeks = data.weeks || 12;
@@ -986,7 +1242,8 @@ table.heat tr.click td:first-child{font-weight:650}
         if (!e) fill = 'var(--soft)';
         else if (!(e.n > 0) || !nn(num(e.value))) fill = 'var(--seq0)';
         else { k = Math.max(1, Math.min(5, Math.ceil(e.value / (maxV || 1) * 5))); fill = 'var(--seq' + k + ')'; }
-        var rect = mk('rect', { x: xw, y: yy, width: cs, height: cs, rx: 2, fill: fill, opacity: e ? 1 : 0.6 }, g);
+        var rect = mk('rect', { x: xw, y: yy, width: cs, height: cs, rx: 3, fill: fill, opacity: e ? 1 : 0.6, class: 'cell' + (f.anim ? ' pop' : '') }, g);
+        if (f.anim) rect.style.setProperty('--d', (w * 34 + row * 10) + 'ms');
         (function (d, e, fill) {
           rect.addEventListener('mousemove', function (ev) {
             var p = pointer(el, svg, W, H, ev);
@@ -999,16 +1256,16 @@ table.heat tr.click td:first-child{font-weight:650}
     }
     var lgY = H - 8, sq = Math.max(7, Math.round(cs * 0.7)), lgX = W - 6 * (sq + 2) - 36;
     txt(svg, lgX - 6, lgY, 'Less', { anchor: 'end', base: 'middle', size: 10.5, fill: 'var(--faint)' });
-    for (var s = 0; s <= 5; s++) mk('rect', { x: lgX + s * (sq + 2), y: R(lgY - sq / 2), width: sq, height: sq, rx: 1.5, fill: 'var(--seq' + s + ')' }, svg);
+    for (var s = 0; s <= 5; s++) mk('rect', { x: lgX + s * (sq + 2), y: R(lgY - sq / 2), width: sq, height: sq, rx: 2, fill: 'var(--seq' + s + ')' }, svg);
     txt(svg, lgX + 6 * (sq + 2) + 4, lgY, 'More', { base: 'middle', size: 10.5, fill: 'var(--faint)' });
-    fadeIn(g, f.anim);
+    if (f.anim) whenVisible(el, function () {});
     mark(el);
   }
 
   window.NPSCharts = {
     countUp: countUp, sparkline: sparkline, trend: trend, stackedCols: stackedCols, hbars: hbars, pareto: pareto,
     lorenz: lorenz, scatter: scatter, donut: donut, funnel: funnel, waterfall: waterfall, heatmap: heatmap,
-    bulletRow: bulletRow, calHeat: calHeat, tipHTML: tipHTML
+    bulletRow: bulletRow, calHeat: calHeat, tipHTML: tipHTML, whenVisible: whenVisible, flushAll: flushAll
   };
 })();
 
@@ -1654,7 +1911,7 @@ const avatar=(name,color,lg)=>h("span",{class:"av"+(lg?" lg":""),style:"backgrou
 const chg=(v,{d=0,unit="",bad="up"}={})=>v==null||isNaN(v)?h("span",{class:"flat",text:"—"}):h("span",{class:Math.abs(v)<1e-9||bad==="none"?"flat":(v>0)===(bad==="up")?"up":"down",text:(v>0?"▲ ":v<0?"▼ ":"")+sg(v,d)+unit});
 const tag=(t,k)=>h("span",{class:"tag "+k,text:t});
 function strong(t){return String(t).split(/(\*\*[^*]+\*\*)/).filter(Boolean).map(p=>p.startsWith("**")?h("strong",{text:p.slice(2,-2)}):p);}
-function table(cols,rows,{onRow,rowClass}={}){const tb=h("tbody");for(const r of rows){const tr=h("tr",{class:[onRow?"click":"",rowClass?rowClass(r):""].join(" ").trim()||null});if(onRow){tr.tabIndex=0;tr.addEventListener("click",()=>onRow(r));tr.addEventListener("keydown",e=>{if(e.key==="Enter")onRow(r);});}
+function table(cols,rows,{onRow,rowClass}={}){const tb=h("tbody");let ri=0;for(const r of rows){const tr=h("tr",{class:[onRow?"click":"",rowClass?rowClass(r):""].join(" ").trim()||null,style:`--r:${ri++}`});if(onRow){tr.tabIndex=0;tr.addEventListener("click",()=>onRow(r));tr.addEventListener("keydown",e=>{if(e.key==="Enter")onRow(r);});}
   for(const c of cols){const v=c.f(r);const td=h("td",{class:(c.n?"n ":"")+(c.cls||"")});if(v!=null&&v.nodeType)td.append(v);else td.textContent=v==null?"":v;tr.append(td);}tb.append(tr);}
   return h("div",{class:"tw"},h("table",null,h("thead",null,h("tr",null,cols.map(c=>h("th",{class:c.n?"n":null,text:c.t})))),tb));}
 function card(cls,titleTxt,sub,body,{right,note}={}){return h("section",{class:"card pad "+(cls||"")},titleTxt?h("div",{class:"ch"},h("div",null,h("h2",{text:titleTxt}),sub?h("p",{text:sub}):null),right?h("div",{class:"right"},right):null):null,body,note?h("div",{class:"foot-note",text:note}):null);}
@@ -1740,9 +1997,9 @@ function moveThumb(seg){if(!seg)return;const on=seg.querySelector("button[aria-p
 
 /* ===================== shared blocks ===================== */
 function brief(c){const ins=IN.insights(c);const plan=IN.actionPlan(c,ins);const ICO={risk:"!",win:"✓",calibration:"≠",coverage:"◔",behaviour:"↗",concentration:"◎",quality:"⧉",speed:"◷",tenure:"⌛"};
-  const list=h("div",{class:"ins"},ins.length?ins.map(i=>h("div",{class:"ic s"+i.severity},h("span",{class:"ico","aria-hidden":"true",text:ICO[i.kind]||"•"}),h("div",null,h("div",{class:"t"},strong(i.title)),h("div",{class:"b"},strong(i.body)),i.evidence?h("div",{class:"e",text:i.evidence}):null,
+  const list=h("div",{class:"ins"},ins.length?ins.map((i,k)=>h("div",{class:"ic st s"+i.severity,style:`--k:${k}`},h("span",{class:"ico","aria-hidden":"true",text:ICO[i.kind]||"•"}),h("div",null,h("div",{class:"t"},strong(i.title)),h("div",{class:"b"},strong(i.body)),i.evidence?h("div",{class:"e",text:i.evidence}):null,
       h("div",{class:"a"},i.owner?h("span",{class:"own",text:i.owner}):null,h("span",{text:i.action}),i.link?h("button",{type:"button",onclick:()=>followLink(i.link),text:"Open →"}):null)))):h("div",{class:"empty",text:"Nothing significant to report for this scope."}));
-  const planEl=h("div",{class:"plan"},plan.length?plan.map(p=>h("div",{class:"row"},h("span",{class:"when",text:p.when}),h("div",null,h("div",{text:p.what}),h("div",{class:"who",text:p.who}),p.metric?h("div",{class:"metric",text:"Measure: "+p.metric}):null))):h("div",{class:"empty",text:"No actions needed."}));
+  const planEl=h("div",{class:"plan"},plan.length?plan.map((p,k)=>h("div",{class:"row st",style:`--k:${k+1}`},h("span",{class:"when",text:p.when}),h("div",null,h("div",{text:p.what}),h("div",{class:"who",text:p.who}),p.metric?h("div",{class:"metric",text:"Measure: "+p.metric}):null))):h("div",{class:"empty",text:"No actions needed."}));
   return h("div",{class:"brief"},card("","Executive brief","Ranked by impact. Every claim is significance-tested against the floor; evidence shown under each line.",list),card("","Action plan","Who does what, and when we check it moved",planEl));}
 function followLink(l){if(!l)return;go({om:l.om!==undefined?l.om:(l.level==="floor"?null:S.om),tl:l.tl!==undefined?l.tl:(l.level==="floor"||l.level==="om"?null:S.tl),agent:l.agent!==undefined?l.agent:null});}
 function trendCard(c){const W=c.W.filter(r=>r.scrub<=c.asOf);const wkly=IN.weekly(c,W,12);const days=IN.daily?IN.daily(W,84):[];
@@ -1885,21 +2142,39 @@ function renderRail(c){
   $("#crumbs").replaceChildren(h("span",{class:"muted",text:"Viewing"}),...cr.flatMap(([t,fn,cur],i)=>[i?h("span",{class:"sep",text:"›"}):null,cur?h("b",{text:t}):h("button",{type:"button",onclick:fn,text:t})]).filter(Boolean),
     h("span",{class:"sep",text:"·"}),h("span",{text:`${nf(c.F.length)} scrubs`}),...(c.ranged?[h("span",{class:"sep",text:`· ${S.basis==="scrub"?"scrub":"survey"} dates ${c.from==null?"start":fd(c.from,"dm")} – ${c.to==null?"end":fd(c.to)}`})]:[]));
   $("#snap").textContent=`${FILE} · ${nf(ROWS.length)} scrubs · ${fd(c.minScrub,"dm")} – ${fd(c.maxScrub)}`+(ROSTER.size?` · roster ${nf(ROSTER.size)}`:"");}
-function renderTabs(tabs){const bar=$("#tabs");bar.replaceChildren(...tabs.map(t=>h("button",{role:"tab",type:"button","aria-selected":String(t.id===S.tab),onclick:()=>{S.tab=t.id;render();}},t.label,t.n!=null?h("span",{class:"n",text:nf(t.n)}):null)));}
+let TT=null;const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+function renderTabs(tabs){const bar=$("#tabs");const th=h("span",{class:"tthumb","aria-hidden":"true"});
+  bar.replaceChildren(th,...tabs.map(t=>h("button",{role:"tab",type:"button","aria-selected":String(t.id===S.tab),onclick:()=>{S.tab=t.id;render();}},t.label,t.n!=null?h("span",{class:"n",text:nf(t.n)}):null)));
+  bar.classList.add("thumbed");posThumb(true);}
+/* the selected-tab pill glides from the previous tab to the new one */
+function posThumb(glide){const bar=$("#tabs"),th=bar.querySelector(".tthumb"),sel=bar.querySelector('button[aria-selected="true"]');if(!th)return;if(!sel){th.style.display="none";return;}
+  const x=sel.offsetLeft,w=sel.offsetWidth;if(glide&&TT&&!RM()){th.style.transition="none";th.style.transform=`translateX(${TT.x}px)`;th.style.width=TT.w+"px";void th.offsetWidth;th.style.transition="";}
+  th.style.transform=`translateX(${x}px)`;th.style.width=w+"px";TT={x,w};if(glide)sel.scrollIntoView({block:"nearest",inline:"nearest"});}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>posThumb(false));
+/* cards fade up as they scroll into view; cards entering together are staggered */
+let revIO=null;
+function setupReveal(root){if(revIO)revIO.disconnect();if(!("IntersectionObserver" in window)||RM())return;
+  revIO=new IntersectionObserver(es=>{let k=0;for(const e of es)if(e.isIntersecting){e.target.style.setProperty("--sd",(k++*85)+"ms");e.target.classList.add("in");revIO.unobserve(e.target);}},{rootMargin:"0px 0px -6% 0px",threshold:0});
+  for(const c of root.querySelectorAll(".g12>.card,.brief>.card")){c.classList.add("sr");revIO.observe(c);}}
+window.addEventListener("beforeprint",()=>document.querySelectorAll(".sr").forEach(c=>c.classList.add("in")));
+/* cursor spotlight on KPI tiles and card edges */
+let spotRaf=0,spotEv=null;
+document.addEventListener("pointermove",e=>{spotEv=e;if(spotRaf)return;spotRaf=requestAnimationFrame(()=>{spotRaf=0;const t=spotEv.target&&spotEv.target.closest?spotEv.target.closest(".kpi,.card"):null;if(!t)return;const r=t.getBoundingClientRect();t.style.setProperty("--mx",(spotEv.clientX-r.left)+"px");t.style.setProperty("--my",(spotEv.clientY-r.top)+"px");});},{passive:true});
 
 /* ===================== hero ===================== */
 function ringSVG(val,ref){const NS="http://www.w3.org/2000/svg",s=document.createElementNS(NS,"svg");s.setAttribute("viewBox","0 0 200 200");s.setAttribute("role","img");s.setAttribute("aria-label",`Agent Opportunity ${pct(val,1)}`);
   const mk=(t,a)=>{const e=document.createElementNS(NS,t);for(const[k,v]of Object.entries(a))e.setAttribute(k,v);s.append(e);return e;};const C=2*Math.PI*78;
-  mk("circle",{cx:100,cy:100,r:78,fill:"none",stroke:"#ffffff22","stroke-width":14});
-  const bad=ref!=null&&val>ref;const arc=mk("circle",{cx:100,cy:100,r:78,fill:"none",stroke:bad?"#ff9aa2":"#7fe0c6","stroke-width":14,"stroke-linecap":"round","stroke-dasharray":`${C*(val||0)} ${C}`,transform:"rotate(-90 100 100)",style:"transition:stroke-dasharray 1.1s cubic-bezier(.2,.7,.2,1)"});
+  for(let i=0;i<60;i++){const a=-Math.PI/2+2*Math.PI*i/60,mj=i%6===0,r0=mj?90:92.5;mk("line",{x1:100+r0*Math.cos(a),y1:100+r0*Math.sin(a),x2:100+96*Math.cos(a),y2:100+96*Math.sin(a),stroke:mj?"#ffffff4d":"#ffffff1f","stroke-width":mj?1.6:1,"stroke-linecap":"round"});}
+  mk("circle",{cx:100,cy:100,r:78,fill:"none",stroke:"#ffffff1f","stroke-width":14});
+  const bad=ref!=null&&val>ref;const arc=mk("circle",{cx:100,cy:100,r:78,fill:"none",stroke:bad?"#ff9aa2":"#7fe0c6","stroke-width":14,"stroke-linecap":"round","stroke-dasharray":`${C*(val||0)} ${C}`,transform:"rotate(-90 100 100)",style:`transition:stroke-dasharray 1.4s cubic-bezier(.2,.7,.2,1);filter:drop-shadow(0 0 7px ${bad?"#ff9aa288":"#7fe0c688"})`});
   if(!matchMedia("(prefers-reduced-motion: reduce)").matches){arc.setAttribute("stroke-dasharray",`0 ${C}`);requestAnimationFrame(()=>requestAnimationFrame(()=>arc.setAttribute("stroke-dasharray",`${C*(val||0)} ${C}`)));}
   if(ref!=null){const a=-Math.PI/2+2*Math.PI*ref;const x1=100+68*Math.cos(a),y1=100+68*Math.sin(a),x2=100+90*Math.cos(a),y2=100+90*Math.sin(a);mk("line",{x1,y1,x2,y2,stroke:"#ffd27a","stroke-width":3,"stroke-linecap":"round"});}
-  const t=mk("text",{x:100,y:96,"text-anchor":"middle",style:"font:800 38px/1 var(--font);fill:#fff;letter-spacing:-1.5px"});t.textContent=pct(val,1);
+  const t=mk("text",{x:100,y:96,"text-anchor":"middle",style:"font:800 38px/1 var(--font);fill:#fff;letter-spacing:-1.5px"});t.textContent=pct(val,1);charts.push(()=>CH.countUp(t,val||0,{fmt:v=>pct(v,1),duration:1400}));
   const t2=mk("text",{x:100,y:120,"text-anchor":"middle",style:"font:600 10px var(--font);fill:#b9cad6;letter-spacing:.4px"});t2.textContent="AGENT OPPORTUNITY";
   if(ref!=null){const t3=mk("text",{x:100,y:140,"text-anchor":"middle",style:"font:600 12px var(--font);fill:#ffd27a"});t3.textContent=`floor ${pct(ref)}`;}
   return s;}
 function kpi(l,v,subKids,{spark,ref,cls,fmt}={}){const el=h("div",{class:"kpi "+(cls||"")},h("span",{class:"l",text:l}),h("span",{class:"v num",text:typeof v==="number"?fmt(0):v}),h("span",{class:"s"},subKids),spark?h("div",{class:"sp chart"}):null);
-  if(typeof v==="number")charts.push(()=>CH.countUp(el.querySelector(".v"),v,{fmt}));if(spark)charts.push(()=>CH.sparkline(el.querySelector(".sp"),spark,{ref,color:"#ffffffb3",height:30}));return el;}
+  if(typeof v==="number")charts.push(()=>CH.countUp(el.querySelector(".v"),v,{fmt}));if(spark)charts.push(()=>CH.sparkline(el.querySelector(".sp"),spark,{ref,color:"#ffffffb3",height:30,halo:true}));return el;}
 function hero(c){const H=IN.headline(c);const F=c.F;const who=S.agent?(AN(S.agent)||S.agent):S.tl?LN(S.tl)+"'s team":S.om?S.om+"'s group":"Whole floor";
   const lvl={floor:"Director view",om:"Ops manager view",tl:"Team leader view",agent:"Agent view"}[c.level];
   const fmTxt=S.period==="Month to date"||S.period==="Last month"?` · ${fmLabel(S.period==="Month to date"?fm(c.asOf):fm(c.asOf)-1)} (${fmRange(S.period==="Month to date"?fm(c.asOf):fm(c.asOf)-1)})`:"";
@@ -2073,7 +2348,7 @@ function render(){closeDD();const c=ctx();renderRail(c);charts.length=0;const vi
   const tabs=c.F.length?tabsFor(c):[];if(!tabs.some(t=>t.id===S.tab))S.tab=tabs.length?tabs[0].id:"overview";renderTabs(tabs);
   let kids;if(!c.F.length)kids=[card("","No scrubs match this scope",null,h("div",{class:"empty",text:"Choose a wider period or clear a filter."}))];
   else{kids=[hero(c)];if(c.level==="tl"){const t=tlCard(c);if(t)kids.push(t);}if(c.level==="agent")kids.push(agentCard(c));const tb=tabs.find(t=>t.id===S.tab);if(S.tab==="overview")kids.push(...tb.b());else kids.push(...tb.b());}
-  view.replaceChildren(...kids);kids.forEach((k,i)=>k.style.setProperty("--i",String(Math.min(i,8))));void view.offsetWidth;view.classList.add("reveal");
+  view.replaceChildren(...kids);kids.forEach((k,i)=>k.style.setProperty("--i",String(Math.min(i,8))));setupReveal(view);void view.offsetWidth;view.classList.add("reveal");
   $("#footnote").textContent=`Team leader = the person who submitted the scrub (${ROSTER.size?"matched to the roster TL name":"named from the submitter email"}). Agent Opportunity % = controllable detractors ÷ all scrubbed detractors. "This week" = the 7 days up to the latest scrub in the period vs the 7 days before, counted on all dates in scope. Intervals are 95% Wilson; gaps are two-proportion z-tests. Fiscal months run from the ${FM_START}th to the ${FM_START-1}st and are named by the month they end in.`;
   requestAnimationFrame(()=>charts.splice(0).forEach(f=>f()));}
 let rt,lw=window.innerWidth;window.addEventListener("resize",()=>{if(Math.abs(window.innerWidth-lw)<40)return;lw=window.innerWidth;clearTimeout(rt);rt=setTimeout(render,200);});
