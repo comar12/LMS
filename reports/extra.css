@@ -26,3 +26,5 @@
 .agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 @media(max-width:1150px){.kpis{grid-template-columns:repeat(3,1fr)}.headline.four{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.kpis{grid-template-columns:1fr 1fr}.headline.four{grid-template-columns:1fr}}
+
+.day{cursor:pointer;border:1px solid transparent;transition:background .16s,transform .16s,border-color .16s;font:inherit;color:inherit}.day:hover{background:var(--soft);transform:translateY(-1px);border-color:var(--line)}.day.sel{background:var(--teal-soft);border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,123,134,.15)}.day.sel b{color:var(--teal)}
