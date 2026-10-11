@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const STORAGE_PREFIX = 'cip.v1.';
-const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review'];
+const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links'];
 
 const store = (() => {
   let ok = false;
@@ -94,6 +94,10 @@ function defaultPrefs() {
 function defaultReview() {
   return { marks: {}, picks: {} };
 }
+/** Quick Links start from the preset built into this copy of the app (empty in the shared copy). */
+function initialLinks() {
+  return sanitizeLinks({ items: DATA.seedLinks || [] });
+}
 function emptyEdits() {
   return { progress: null, challenges: null, plan: null, followup: null };
 }
@@ -120,7 +124,8 @@ const state = {
   combos: [],
   drafts: [],
   review: defaultReview(),
-  ui: { view: 'all', cat: null, query: '', openId: null, sVersion: {}, visibleIds: [], returnFocusKey: null },
+  links: { items: [] },
+  ui: { view: 'all', cat: null, query: '', linkQuery: '', openId: null, sVersion: {}, visibleIds: [], returnFocusKey: null },
 };
 
 /* ---------- Sanitizers (used for storage and imports; never trust stored data) ---------- */
@@ -185,6 +190,30 @@ function sanitizeReview(o) {
     if (Array.isArray(picks[it.id])) out.picks[it.id] = picks[it.id].filter((id) => it.gaps.includes(id));
   }
   return out;
+}
+
+function sanitizeLinks(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const items = [];
+  const seen = new Set();
+  for (const l of Array.isArray(src.items) ? src.items.slice(0, 300) : []) {
+    if (!l || typeof l !== 'object') continue;
+    const name = str(l.name, 80).trim();
+    if (!name) continue;
+    let id = isId(l.id) ? l.id : uid('link');
+    if (seen.has(id)) id = uid('link');
+    seen.add(id);
+    items.push({
+      id,
+      name,
+      url: str(l.url, 1000).trim(),
+      group: str(l.group, 40).trim() || 'Other',
+      tag: str(l.tag, 30).trim(),
+      note: str(l.note, 300).trim(),
+      pinned: l.pinned === true,
+    });
+  }
+  return { items };
 }
 
 function sanitizeExample(v) {
@@ -399,6 +428,11 @@ function loadSlice(key) {
     case 'combos': state.combos = sanitizeCombos(store.get('combos', [])); break;
     case 'drafts': state.drafts = sanitizeDrafts(store.get('drafts', [])); break;
     case 'review': state.review = sanitizeReview(store.get('review', null)); break;
+    case 'links': {
+      const raw = store.get('links', null);
+      state.links = raw == null ? initialLinks() : sanitizeLinks(raw);
+      break;
+    }
     default: break;
   }
 }

@@ -885,6 +885,67 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Quick Links: add, open safely, copy, pin, undo delete, paste rows, back up', async () => {
+    const { page, context } = await newPage({ hash: '#/links' });
+    assert((await page.locator('.empty__title').innerText()) === 'No links yet', 'The shared copy should start with no links');
+    // Add one link without a scheme and one value that is not a web address.
+    const add = async (name, url, group, tag) => {
+      await page.getByRole('button', { name: 'Add link', exact: true }).first().click();
+      await page.fill('#lk-name', name);
+      await page.fill('#lk-url', url);
+      await page.fill('#lk-group', group);
+      await page.fill('#lk-tag', tag);
+      await page.locator('.modal').getByRole('button', { name: 'Add link' }).click();
+      await page.waitForTimeout(150);
+    };
+    await add('Repeat dashboard', 'example.com/views/repeats?:iid=1', 'Dashboards', 'AICR');
+    await add('Call server', '10.0.0.5', 'Tools', '');
+    await add('Bad link', 'javascript:alert(1)', 'Tools', '');
+    const open = page.getByRole('link', { name: 'Open Repeat dashboard (new tab)' });
+    assert((await open.getAttribute('href')) === 'https://example.com/views/repeats?:iid=1', 'Address without https:// was not completed');
+    assert((await open.getAttribute('target')) === '_blank' && (await open.getAttribute('rel')).includes('noopener'), 'Links must open in a new tab without opener access');
+    assert((await page.locator('a[href^="javascript"]').count()) === 0, 'A javascript: address became a link');
+    assert((await clickCopy(page, 'Copy Call server')) === '10.0.0.5', 'Copy of a non-web value failed');
+    await page.getByRole('button', { name: 'Copy link: Repeat dashboard' }).click();
+    await page.waitForTimeout(150);
+    assert((await clipboard(page)) === 'https://example.com/views/repeats?:iid=1', 'Copy link failed');
+    // Pin, then delete and undo.
+    await page.getByRole('button', { name: 'Pin Call server' }).click();
+    await page.waitForTimeout(150);
+    assert((await page.locator('section[aria-labelledby="lk-sec-pinned"] .lk-row__name').allInnerTexts()).join() === 'Call server', 'Pinned section is wrong');
+    await page.getByRole('button', { name: 'Delete Bad link' }).click();
+    await page.waitForTimeout(150);
+    assert((await page.locator('.lk-row__name', { hasText: 'Bad link' }).count()) === 0, 'Delete failed');
+    await page.locator('.toast button', { hasText: 'Undo' }).click();
+    await page.waitForTimeout(150);
+    assert((await page.locator('.lk-row__name', { hasText: 'Bad link' }).count()) === 1, 'Undo failed');
+    // Paste rows copied from a spreadsheet: KPI, name, description, link; stray lines are ignored.
+    await page.getByRole('button', { name: 'Paste from a spreadsheet' }).click();
+    await page.fill('#lk-paste', 'KPI\tDashboard\tDescription\tLink\nQA\tQA scores\tWeekly QA results\thttps://example.org/qa\nPower BI\nNPS\tNPS dashboard\t\t\nWiki\texample.net/wiki');
+    await page.fill('#lk-paste-group', 'Pasted');
+    await page.getByRole('button', { name: 'Add links' }).click();
+    await page.waitForTimeout(200);
+    const qa = page.locator('.lk-row', { hasText: 'QA scores' });
+    assert((await qa.locator('.kpi').innerText()) === 'QA' && (await qa.locator('.lk-row__note').innerText()) === 'Weekly QA results', 'Pasted columns were mapped wrongly');
+    assert((await page.locator('.lk-row', { hasText: 'NPS dashboard' }).getByRole('button', { name: 'Add address' }).count()) === 1, 'A row without a link should ask for its address');
+    assert((await page.locator('.lk-row__name', { hasText: 'Power BI' }).count()) === 0, 'A stray line was imported');
+    // Filter, persistence, and backup.
+    await page.fill('#lkFilter', 'aicr');
+    await page.waitForTimeout(100);
+    assert((await page.locator('.lk-row__name').allInnerTexts()).join() === 'Repeat dashboard', 'Filter failed');
+    await page.reload();
+    await page.waitForSelector('.lk-row');
+    assert((await page.locator('.lk-row').count()) === 7, 'Links did not persist (expected 6 links plus 1 pinned row)');
+    const backup = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.links')));
+    assert(backup.items.length === 6, 'Stored link count is wrong');
+    await page.goto(URL + '#/settings');
+    await page.waitForSelector('.page-title');
+    const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Export backup/ }).click()]);
+    const json = JSON.parse(fs.readFileSync(await download.path(), 'utf8'));
+    assert(json.data.links && json.data.links.items.length === 6, 'Export backup does not include quick links');
+    await finish(page, context);
+  });
+
   await browser.close();
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} test groups passed.`);

@@ -19,6 +19,7 @@ function exportPayload() {
       combos: state.combos,
       drafts: state.drafts,
       builder: state.builder,
+      links: state.links,
     },
   };
 }
@@ -83,6 +84,7 @@ function parseImport(text) {
       combos: sanitizeCombos(d.combos),
       drafts: sanitizeDrafts(d.drafts),
       builder: d.builder ? sanitizeBuilder(d.builder) : null,
+      links: d.links ? sanitizeLinks(d.links) : null,
     },
   };
 }
@@ -103,7 +105,10 @@ function applyImport(pack, mode) {
     state.combos = pack.combos;
     state.drafts = pack.drafts;
     state.builder = pack.builder || defaultBuilder();
+    // Backups made before Quick Links existed have no links; keep the current ones.
+    if (pack.links) state.links = pack.links;
   } else {
+    if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items) };
     pack.favorites.forEach((id) => state.favorites.add(id));
     state.custom = { opps: mergeById(state.custom.opps, pack.custom.opps), strengths: mergeById(state.custom.strengths, pack.custom.strengths) };
     state.overrides = { opps: { ...state.overrides.opps, ...pack.overrides.opps }, strengths: { ...state.overrides.strengths, ...pack.overrides.strengths } };
@@ -130,6 +135,7 @@ function handleImportText(text) {
     plural(pack.favorites.length, 'favorite'),
     plural(pack.combos.length, 'saved combination'),
     plural(pack.drafts.length, 'draft'),
+    plural(pack.links ? pack.links.items.length : 0, 'quick link'),
   ];
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
   const replace = h('button', { type: 'button', class: 'btn btn--danger' }, 'Replace everything');
@@ -172,7 +178,7 @@ async function resetCustomizations() {
 }
 
 async function clearAllData() {
-  if (!(await confirmDialog({ title: 'Clear all local data?', message: 'This removes everything this app saved in this browser: templates, favorites, combinations, drafts, Builder content, and settings. The built-in library is not affected.', confirmLabel: 'Clear everything', danger: true }))) return;
+  if (!(await confirmDialog({ title: 'Clear all local data?', message: 'This removes everything this app saved in this browser: templates, favorites, combinations, drafts, Builder content, quick links, and settings. The built-in library is not affected.', confirmLabel: 'Clear everything', danger: true }))) return;
   STATE_KEYS.forEach((k) => store.remove(k));
   state.settings = { ...DEFAULT_SETTINGS };
   state.prefs = defaultPrefs();
@@ -183,6 +189,7 @@ async function clearAllData() {
   state.combos = [];
   state.drafts = [];
   state.review = defaultReview();
+  state.links = initialLinks();
   store.remove('brandcss');
   applyTheme();
   applyBrand();

@@ -1,1 +1,5 @@
 tests/last-run.json
+# Personal Quick Links presets and copies built from them contain internal addresses
+*links*.json
+*_MyLinks.html
+My_Copy.html

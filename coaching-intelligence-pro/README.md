@@ -39,6 +39,10 @@ To see it working first, watch the 55-second walkthrough: [`docs-walkthrough.mp4
   use **Pick from screen** to take them from the logo. Text colors adjust automatically so everything keeps
   WCAG AA contrast in light and dark mode. The built-in teal and navy are placeholders, not official VXI
   brand values.
+- **Quick Links**: the dashboards, tools, and forms you open every day, grouped and searchable, with Open, Copy,
+  and Pin. Paste rows straight from a spreadsheet, and anything that is not a web address (such as a server
+  address) gets a Copy button instead of a link. Links open in a new tab; the app itself still makes no network
+  requests. The shared copy starts empty, so internal addresses never end up in this repository.
 - Reference cards for **Hold vs. Mute vs. Dead Air vs. Research Time** and the **sales conversation flow**, plus a
   Quick Guide for new team leaders.
 
@@ -85,5 +89,7 @@ tests/
 ```
 python3 tools/validate_content.py --strict # check all content (warnings count as errors)
 python3 tools/build.py --check             # build the single HTML file and syntax-check the JavaScript
+python3 tools/build.py --links my-links.json --out My_Copy.html
+                                           # personal copy with Quick Links preloaded (both files are git-ignored)
 NODE_PATH=$(npm root -g) node tests/e2e.cjs   # run the browser tests against the built file
 ```

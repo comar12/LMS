@@ -43,6 +43,7 @@ function renderSidebar() {
       navItem({ view: 'favorites', label: 'Favorites', iconName: 'star', count: state.favorites.size }),
       navItem({ view: 'builder', label: 'Coaching Builder', iconName: 'clipboard', badge: bc || null, count: bc ? null : 0 }),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Personal'),
+      navItem({ view: 'links', label: 'Quick Links', iconName: 'link', count: state.links.items.length }),
       navItem({ view: 'templates', label: 'My Templates', iconName: 'folder', count: customCount }),
       navItem({ view: 'settings', label: 'Settings & Data', iconName: 'sliders' })
     ),
@@ -385,6 +386,7 @@ function renderMain() {
   }
   if (v === 'strengths') renderStrengthsView(main);
   else if (v === 'sales-toolkit') renderSalesToolkit(main);
+  else if (v === 'links') renderLinks(main);
   else if (v === 'builder') renderBuilder(main);
   else if (v === 'templates') renderTemplates(main);
   else if (v === 'settings') renderSettings(main);
@@ -395,7 +397,7 @@ function renderMain() {
 function titleForView() {
   const v = state.ui.view;
   if (v === 'cat') return (CAT_MAP[state.ui.cat] || {}).nav || 'Category';
-  return { all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
+  return { all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
 }
 
 /** Re-render everything that depends on state, keeping focus and scroll where they were. */
