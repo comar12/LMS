@@ -18,9 +18,20 @@ Dependency-free, plain ES2020, no build step. Include with `<script src="charts.
 * **Every chart returns** `{ tableView(): string[][], destroy() }` (first row is the header; values are formatted)
   and, for multi-series charts, `series: [{name, color, kind}]` (`kind`: `line | dashed | area | bar | dot`) so the host can render a legend.
   `calendar`/`heatmap` also return `scale: {min, max, colors}` for a scale legend.
-* **Animation**: lines draw in (750 ms), areas/cells fade, bars grow from the baseline (15 ms stagger), dots pop,
-  the gauge sweeps and numbers count up. Honoured `prefers-reduced-motion` skips all of it. Re-rendering into the same
-  container replays the enter animation with the new data.
+* **Animation**: every entrance is a finite Web Animation created synchronously inside the render call (`fill: backwards`,
+  staggered by `delay`), so a host can pause an off-screen chart straight after rendering with
+  `container.getAnimations({subtree: true}).forEach(a => a.pause())` and `.play()` them when it scrolls into view.
+  Gridlines and axis labels fade in first (250 ms), then the data; each chart settles within ~1.2 s and no stagger spans
+  more than 450 ms, whatever the mark count. Lines draw left to right on one shared clock (markers, extreme labels and the
+  gradient area wash follow the pen; end dots land with their line, then give two soft halo pulses, the one accent that
+  runs to ~2.4 s; end labels come last). Columns grow left to right (stacks fill bottom-up), bullets grow row by row with
+  the target tick dropping in after, waterfall steps cascade with their connectors, calendar/heatmap cells ripple in
+  diagonally, scatter dots pop in x order after the reference lines draw, slope lines draw with a stagger, cumulative
+  target and actual draw together with the projection carrying on, small multiples draw cell by cell, histogram bins grow
+  in turn, and the gauge sweeps with its figure counting in step before a rounded end-cap pops. Hovering a column, bar,
+  waterfall step, histogram bin or bullet row dims the other categories to 40 % (150 ms); crosshair points enlarge to
+  r 5.5. Honoured `prefers-reduced-motion` skips all motion (that transition included); the static render is complete on
+  its own. Re-rendering into the same container cancels the previous entrance and replays it with the new data.
 * Formatting: `format`/`yFormat` is `(value) => string`; default `Charts.format` compacts to `1.2K / 3.4M`.
 
 ## API (all take `(el, opts)` unless noted; common opts: `height`, `tip`, `hideTip`, `format`)
