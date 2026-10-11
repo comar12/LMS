@@ -53,3 +53,26 @@ html.coachflow-night .gs{--gs-card:#172033;--gs-muted:#aab4c5;--gs-ok:#6fcf8e;--
 .gs-about h3{color:var(--gs-ink);font-size:.95rem;margin:0 0 .3rem}.gs-about p{margin:0 0 .5rem;max-width:75ch}
 @media (max-width:520px){.gs-t{font-size:1.1rem}.gs-box{width:28px;height:28px}.gs-box[aria-checked="true"]:after{left:9px;top:3px}}
 @media (prefers-reduced-motion:reduce){.gs-bar i{transition:none}}
+/* Motion, in the Academy's vocabulary: the gate's parts arrive one after another, a ticked line seals with a ring, opened checks rise, the confirmation seals. Reduced motion keeps everything still. */
+.gs-seal{display:inline-grid;place-items:center;width:1.4rem;height:1.4rem;border-radius:999px;border:2px solid var(--gs-ok);color:var(--gs-ok);background:var(--gs-card);margin-right:.45rem;vertical-align:-.3em;position:relative}
+.gs-seal svg{width:.8rem;height:.8rem}
+.gs-n{display:inline-block}
+@media (prefers-reduced-motion:no-preference){
+.gs [data-gs-i="1"]{--gs-i:1}.gs [data-gs-i="2"]{--gs-i:2}.gs [data-gs-i="3"]{--gs-i:3}.gs [data-gs-i="4"]{--gs-i:4}.gs [data-gs-i="8"]{--gs-i:8}
+#gs-cards>.gs-card:nth-child(2){--gs-c:1}#gs-cards>.gs-card:nth-child(3){--gs-c:2}#gs-cards>.gs-card:nth-child(4){--gs-c:3}
+.gs.gs-opening [data-gs-i]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) calc(var(--gs-i,0) * 55ms) backwards}
+.gs.gs-opening .gs-card{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) calc(300ms + var(--gs-c,0) * 70ms) backwards}
+.gs.gs-opening .gs-card .gs-n{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out) calc(390ms + var(--gs-c,0) * 70ms) backwards}
+.gs-pill[data-just]{animation:gs-press var(--m-segment,.32s) var(--e-settle,ease-out)}
+.gs-card[data-just] .gs-box[aria-checked="true"]{animation:ca-seal-in var(--m-disclose,.22s) var(--e-settle,ease-out) backwards,ca-seal-glow .9s ease-out}
+.gs-card[data-just] .gs-box[aria-checked="false"]{animation:gs-press var(--m-segment,.32s) var(--e-settle,ease-out)}
+.gs-card.done[data-just]{animation:gs-done var(--m-segment,.32s) var(--e-out,ease-out)}
+.gs-det[data-just]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) calc(var(--gs-c,0) * 45ms) backwards}
+.gs-ok-panel[data-just]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
+.gs-ok-panel[data-just] .gs-seal{animation:ca-seal-in var(--m-disclose,.22s) var(--e-settle,ease-out) .12s backwards}
+.gs-ok-panel[data-just] .gs-seal:after{content:"";position:absolute;inset:-.3rem;border-radius:999px;border:2px solid var(--gs-ok);opacity:0;animation:sl-ring var(--m-segment,.32s) var(--e-out,ease-out) .24s}
+.gs-prog span[data-just]{animation:gs-tick var(--m-disclose,.22s) var(--e-settle,ease-out) backwards}
+@keyframes gs-press{0%{transform:scale(.94)}60%{transform:scale(1.03)}to{transform:none}}
+@keyframes gs-done{from{background-color:var(--gs-card);border-color:var(--gs-line)}}
+@keyframes gs-tick{0%{opacity:.3;transform:translateY(.3rem)}to{opacity:1;transform:none}}
+}

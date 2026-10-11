@@ -1,0 +1,30 @@
+/* CoachFlow motion layer: the moves My Shift has, on every station. A station's parts arrive one after another and its numbered nodes pop in order; whatever you pick pops as it fills; content that opens rises into place; counts tick over; the current station's dot pops with a ring, or its underline draws in; marking a lesson reviewed seals it. Everything reuses the Academy's own keyframes (sl-coach-in, sl-node-arrive, sl-ring, sl-draw-across, ca-seal-in, ca-seal-glow) and timing tokens. Reduced motion keeps everything still. */
+@media (prefers-reduced-motion:no-preference){
+:where([data-cf-i="1"]){--cf-i:1}:where([data-cf-i="2"]){--cf-i:2}:where([data-cf-i="3"]){--cf-i:3}:where([data-cf-i="4"]){--cf-i:4}:where([data-cf-i="5"]){--cf-i:5}:where([data-cf-i="6"]){--cf-i:6}:where([data-cf-i="7"]){--cf-i:7}:where([data-cf-i="8"]){--cf-i:8}
+:where([data-cf-n="1"]){--cf-n:1}:where([data-cf-n="2"]){--cf-n:2}:where([data-cf-n="3"]){--cf-n:3}:where([data-cf-n="4"]){--cf-n:4}:where([data-cf-n="5"]){--cf-n:5}:where([data-cf-n="6"]){--cf-n:6}:where([data-cf-n="7"]){--cf-n:7}:where([data-cf-n="8"]){--cf-n:8}
+:where([data-cf-r="1"]){--cf-r:1}:where([data-cf-r="2"]){--cf-r:2}:where([data-cf-r="3"]){--cf-r:3}:where([data-cf-r="4"]){--cf-r:4}:where([data-cf-r="5"]){--cf-r:5}:where([data-cf-r="6"]){--cf-r:6}:where([data-cf-r="7"]){--cf-r:7}:where([data-cf-r="8"]){--cf-r:8}:where([data-cf-r="9"]){--cf-r:9}:where([data-cf-r="10"]){--cf-r:10}:where([data-cf-r="11"]){--cf-r:11}
+
+/* Picking: the dot, ring or box of what you choose pops as it fills. */
+:where(.sl-chip[aria-pressed="true"])::before{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out)}
+:where(#main) input:is([type="checkbox"],[type="radio"]):checked{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out)}
+:where(.sl-choice[aria-checked="true"]) .sl-choice-ring{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out)}
+:where(.ca-select-card[aria-checked="true"]) > span[aria-hidden="true"]:last-child{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out)}
+
+/* Finishing: an answered stage's node and badge pop; the current station's dot pops and sends out a ring, or its underline draws in. */
+:where(.sl-cf-rail-list > li[data-complete="true"]) .sl-cf-node{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out)}
+:where([data-testid="call-flow-stage-state"][data-state="complete"]){animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out)}
+:where(.sl-route-stop[data-current]) .sl-route-node{position:relative;animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out)}
+:where(.sl-route-stop[data-current]) .sl-route-node::after{content:"";position:absolute;inset:-5px;border:2px solid var(--sl-signal,#c4540c);border-radius:999px;opacity:0;pointer-events:none;animation:sl-ring var(--m-segment,.32s) var(--e-out,ease-out) var(--m-press,.12s)}
+:where(.sl-signal-nav--row) :is(.sl-nav-home,.sl-nav-reference)[aria-current="page"]::after{transform-origin:left center;animation:sl-draw-across var(--m-segment,.32s) var(--e-out,ease-out)}
+
+/* Opening: content that appears rises into place, counts tick over, a lesson marked reviewed seals. */
+:where([data-cf-rise]){animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) calc(var(--cf-r,0) * 35ms) backwards}
+:where([data-cf-tick]){animation:cf-tick var(--m-disclose,.22s) var(--e-settle,ease-out) backwards}
+:where([data-cf-seal]){animation:ca-seal-glow .9s ease-out}
+:where([data-cf-seal]) svg{animation:ca-seal-in var(--m-disclose,.22s) var(--e-settle,ease-out) backwards}
+@keyframes cf-tick{0%{opacity:.3;transform:translateY(.3rem)}to{opacity:1;transform:none}}
+
+/* Arriving: a station's parts come in one after another, its numbered nodes pop in order. Last, so it wins while it plays. */
+:where(#main.cf-arriving) [data-cf-i]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) calc(var(--cf-i,0) * 55ms) backwards}
+:where(#main.cf-arriving) [data-cf-n]{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out) calc(var(--cf-i,0) * 55ms + 90ms + var(--cf-n,0) * 45ms) backwards}
+}
