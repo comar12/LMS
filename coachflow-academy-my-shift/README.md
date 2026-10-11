@@ -64,22 +64,32 @@ a CSV download; nothing is sent anywhere.
   box logs the call (Ctrl+Enter from anywhere); the cursor goes back to the
   account box afterwards.
 
-The CSV adds `transfer_reason`, `repeat_7d`, `agent` and `call_id` columns,
-and the file is named after the agent (`my-shift-<name>-<date>.csv`).
+### Who is logging
+
+The top of My Shift asks once for the agent's name and HR ID (numbers only)
+and remembers them on that computer. Every call is stamped with the HR ID; if
+someone else uses the computer, "Not you? Change" switches agent, ends the
+previous agent's running shift, and each agent's list, summary and file hold
+only their own calls. Download CSV asks for the name and HR ID first if they
+are missing.
+
+The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id` and `call_id`
+columns, and the file is named `my-shift-<name>-<hr id>-<date>.csv`.
 
 ## The team board
 
 A leader adds the agents' CSV files (drop them in or choose them) and sees,
 for the latest day, the last 7 days or every day in the files: calls, GSR and
 XM offer rates and sales, calls that came back within 7 days, transfers and
-satisfaction; the same per agent with a practice suggestion (the reason that
+satisfaction; the same per agent, by name and HR ID, with a practice suggestion (the reason that
 comes up more for that agent than for the team); the top reasons for not
 offering, for a no and for transfers, each with its practice link; and every
 account that called the team twice within 7 days, masked to the last four
 digits unless the leader asks for the full numbers. A one-line team summary
 can be copied for the supervisor. Files are read in the browser and nothing
 is stored: a reload empties the board. A call that appears in two files is
-counted once; rows whose date or account number a spreadsheet has rewritten
+counted once, and files with the same HR ID are one agent even if the name is
+spelt differently (the leader is told); rows whose date or account number a spreadsheet has rewritten
 are named rather than guessed. "See it with example data" fills the board
 with made-up calls for ten agents. `my-shift-new-features.mp4` shows the
 repeat-caller note, a transfer, the practice card and the board.

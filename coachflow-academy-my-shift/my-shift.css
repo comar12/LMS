@@ -54,6 +54,19 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 .ms-tab:hover{color:var(--color-ink);background:var(--color-canvas)}
 .ms-tab[aria-current="page"]{color:var(--color-action-text);background:var(--color-action-soft);border-color:var(--sl-signal)}
 .ms-tab:focus-visible{outline:2px solid var(--color-action);outline-offset:2px}
+/* Who is logging: name and HR ID, asked once. */
+.ms-who{margin-top:1rem;max-width:44rem;font-size:.9375rem;color:var(--color-body)}
+.ms-who p{margin:0}
+.ms-who[data-state="set"]{display:flex;flex-wrap:wrap;align-items:center;gap:0 1rem}
+.ms-who[data-state="set"] b{color:var(--color-ink)}
+.ms-who[data-state="set"] .sl-link-button{min-height:2.25rem;padding:0;font-size:.875rem}
+.ms-who[data-state="edit"]{border:1px solid var(--color-line);border-left:4px solid var(--sl-signal);border-radius:var(--radius-control-md);background:var(--color-surface);padding:.75rem 1rem}
+.ms-who-h{font-family:var(--sl-font-signal,inherit);font-weight:700;color:var(--color-ink);margin-bottom:.5rem!important}
+.ms-who-row{display:grid;gap:.75rem;align-items:end}
+@media (min-width:40rem){.ms-who-row{grid-template-columns:minmax(0,1fr) 10rem auto}}
+.ms-who-btns{display:flex;align-items:center;gap:.75rem}
+.ms-who-help{font-size:.8125rem;color:var(--color-muted)}
+.tb-file .ms-input.tb-id{flex:0 1 7rem;max-width:7rem;font-variant-numeric:tabular-nums}
 /* Faster logging: same as last call, and the keys. */
 .ms-quick{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin:0 0 1rem}
 .ms-quick .ms-btn-sm[hidden]{display:none}
@@ -148,7 +161,7 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 #my-shift tr.ms-row[data-new]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
 #my-shift tr.ms-row[data-new] td{animation:ms-settle .9s ease-out both}
 #my-shift [data-tick]{animation:ms-tick var(--m-disclose,.22s) var(--e-settle,ease-out) backwards}
-#my-shift .ms-repeat,#my-shift .ms-next,#my-shift .tb-example{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
+#my-shift .ms-repeat,#my-shift .ms-next,#my-shift .tb-example,#my-shift .ms-who{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
 #my-shift .ms-repeat-h svg{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out) var(--m-press,.12s) backwards}
 #my-shift .tb-bars li:nth-child(2){--tb-n:1}#my-shift .tb-bars li:nth-child(3){--tb-n:2}#my-shift .tb-bars li:nth-child(4){--tb-n:3}#my-shift .tb-bars li:nth-child(5){--tb-n:4}#my-shift .tb-bars li:nth-child(6){--tb-n:5}
 #my-shift .tb-fill{transform-origin:left center;animation:sl-draw-across var(--m-segment,.32s) var(--e-out,ease-out) calc(var(--tb-base,0ms) + var(--tb-n,0) * 45ms) backwards}
