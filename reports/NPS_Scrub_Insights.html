@@ -1605,7 +1605,12 @@ const iso=dn=>dn==null?"":new Date(dn*864e5).toISOString().slice(0,10);
 const fd=(dn,f)=>{if(dn==null||!isFinite(dn))return"—";const d=new Date(dn*864e5);const m=MON[d.getUTCMonth()],y=d.getUTCFullYear(),day=d.getUTCDate();
   if(f==="dm")return day+" "+m;if(f==="ddm")return DOWN[d.getUTCDay()]+" "+day+" "+m;return day+" "+m+" "+y;};
 const dowOf=dn=>((dn%7)+11)%7;const wk=dn=>dn-((dowOf(dn)+6)%7);
+const FM_START=22;
 const ym=dn=>{const d=new Date(dn*864e5);return d.getUTCFullYear()*12+d.getUTCMonth();};const ymStart=k=>Date.UTC(Math.floor(k/12),k%12,1)/864e5;
+// fiscal month key = calendar month in which the fiscal month ENDS (22 Sep–21 Oct → "Oct")
+const fm=dn=>{const d=new Date(dn*864e5);const k=d.getUTCFullYear()*12+d.getUTCMonth();return d.getUTCDate()>=FM_START?k+1:k;};
+const fmStart=k=>Date.UTC(Math.floor((k-1)/12),(k-1)%12,FM_START)/864e5;const fmEnd=k=>Date.UTC(Math.floor(k/12),k%12,FM_START-1)/864e5;
+const fmLabel=k=>MON[k%12]+" "+String(Math.floor(k/12)).slice(2);const fmRange=k=>`${fd(fmStart(k),"dm")} – ${fd(fmEnd(k),"dm")}`;
 const norm=x=>String(x==null?"":x).toLowerCase().replace(/[^a-z0-9]/g,"");
 const todayDn=()=>{const t=new Date();return Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())/864e5;};
 function toDay(v){if(v==null||v==="")return null;if(typeof v==="number"&&isFinite(v))return Math.floor(v)-25569;
@@ -1693,13 +1698,13 @@ function showMsg(k,t){const m=$("#msg");m.replaceChildren();if(k)m.append(h("div
 
 /* ===================== state & scope ===================== */
 const S={level:"floor",om:null,tl:null,agent:null,period:"Month to date",basis:"scrub",from:null,to:null};
-const PERIODS=["All time","Last 30 days","Month to date","Last month","Last 7 days","Latest day","Custom"];
+const PERIODS=["All time","Last 30 days","Month to date","Last month","Last 7 days","Latest day","Custom"];const PLABEL=p=>p==="Month to date"?"Fiscal month to date":p==="Last month"?"Last fiscal month":p;
 function ctx(){
   const all=ROWS;const maxScrub=maxOf(all.map(r=>r.scrub));const bd=r=>S.basis==="scrub"?r.scrub:r.sdate;
   let anchor=maxScrub;if(S.basis==="survey"){const sd=all.map(r=>r.sdate).filter(v=>v!=null&&v<=maxScrub);if(sd.length)anchor=maxOf(sd);}
   let from=null,to=null;const p=S.period;
   if(p==="Latest day")from=to=anchor;else if(p==="Last 7 days"){from=anchor-6;to=anchor;}else if(p==="Last 30 days"){from=anchor-29;to=anchor;}
-  else if(p==="Month to date"){from=ymStart(ym(anchor));to=anchor;}else if(p==="Last month"){from=ymStart(ym(anchor)-1);to=ymStart(ym(anchor))-1;}else if(p==="Custom"){from=S.from;to=S.to;}
+  else if(p==="Month to date"){from=fmStart(fm(anchor));to=anchor;}else if(p==="Last month"){from=fmStart(fm(anchor)-1);to=fmEnd(fm(anchor)-1);}else if(p==="Custom"){from=S.from;to=S.to;}
   const ranged=from!=null||to!=null;const inP=r=>{if(!ranged)return true;const v=bd(r);return v!=null&&(from==null||v>=from)&&(to==null||v<=to);};
   const omF=r=>!S.om||r.om===S.om;const tlF=r=>!S.tl||r.lk===S.tl;const agF=r=>!S.agent||r.bpid===S.agent;
   const P=all.filter(inP);const D=P.filter(omF);const F=D.filter(tlF).filter(agF);const W=all.filter(omF).filter(tlF).filter(agF);
@@ -1724,17 +1729,17 @@ function renderNav(c){
   if(S.level==="floor"&&oms.length)pk.append(h("div",null,h("div",{class:"flab",text:"Ops managers"}),h("div",{class:"chips"},oms.map(([o,n])=>h("button",{class:"chip plain",type:"button",onclick:()=>drillOM(o)},`${o} · ${n} agents`)))));
   if(S.level==="floor"||S.level==="om")pk.append(h("div",null,h("div",{class:"flab",text:S.om?`Team leaders · ${S.om}`:"Team leaders (submitters)"}),h("div",{class:"chips"},tls.map(([L,n])=>h("button",{class:"chip",type:"button",title:L.form?`Form name: ${L.form}`:null,onclick:()=>drillTL(L.key)},avatar(L.name,L.color),`${L.name} · ${n}`)))));
   if(S.level==="tl"||S.level==="agent"){const sib=tls.filter(([L])=>true);pk.append(h("div",null,h("div",{class:"flab",text:"Switch team leader"}),h("div",{class:"chips"},sib.map(([L,n])=>h("button",{class:"chip",type:"button","aria-pressed":String(L.key===S.tl),onclick:()=>go({tl:L.key,agent:null,om:S.om||L.om||null})},avatar(L.name,L.color),L.name)))));}
-  $("#periodChips").replaceChildren(...PERIODS.map(p=>h("button",{class:"chip plain",type:"button","aria-pressed":String(S.period===p),onclick:()=>{S.period=p;render();}},p)));
+  $("#periodChips").replaceChildren(...PERIODS.map(p=>h("button",{class:"chip plain",type:"button","aria-pressed":String(S.period===p),onclick:()=>{S.period=p;render();},title:p==="Month to date"||p==="Last month"?`Fiscal month runs ${FM_START}th → ${FM_START-1}st`:null},PLABEL(p))));
   document.querySelectorAll("#basisSeg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===S.basis)));moveThumb($("#basisSeg"));
   $("#customBox").hidden=S.period!=="Custom";$("#fFrom").value=iso(S.from);$("#fTo").value=iso(S.to);
-  $("#scope").replaceChildren("Showing ",h("b",{text:S.agent?(AN(S.agent)||S.agent):S.tl?LN(S.tl)+"'s team":S.om?S.om:"the whole floor"})," · ",h("b",{text:S.period}),c.ranged?` (${S.basis==="scrub"?"scrub":"survey"} dates ${c.from==null?"start":fd(c.from,"dm")} – ${c.to==null?"end":fd(c.to)})`:"",` · ${nf(c.F.length)} scrubs · latest scrub ${fd(c.asOf)}`);
+  $("#scope").replaceChildren("Showing ",h("b",{text:S.agent?(AN(S.agent)||S.agent):S.tl?LN(S.tl)+"'s team":S.om?S.om:"the whole floor"})," · ",h("b",{text:PLABEL(S.period)}),c.ranged?` (${S.basis==="scrub"?"scrub":"survey"} dates ${c.from==null?"start":fd(c.from,"dm")} – ${c.to==null?"end":fd(c.to)})`:"",` · ${nf(c.F.length)} scrubs · latest scrub ${fd(c.asOf)}`);
   $("#snap").textContent=`${FILE} · ${nf(ROWS.length)} scrubs · ${fd(c.minScrub,"dm")} – ${fd(c.maxScrub)}`+(ROSTER.size?` · roster ${nf(ROSTER.size)}`:"");
   $("#bpids").replaceChildren(...[...new Set(ROWS.map(r=>r.bpid))].sort().map(b=>h("option",{value:(AN(b)?AN(b)+" · ":"")+b})));}
 function moveThumb(seg){if(!seg)return;const on=seg.querySelector("button[aria-pressed=true]"),th=seg.querySelector(".thumb");if(!on||!th)return;th.style.width=on.offsetWidth+"px";th.style.transform=`translateX(${on.offsetLeft-4}px)`;}
 
 /* ===================== shared blocks ===================== */
 function headline(c){const H=IN.headline(c);const who=S.agent?(AN(S.agent)||S.agent):S.tl?LN(S.tl)+"'s team":S.om?S.om+"'s group":"Across the floor";
-  return h("section",{class:"card pad head"},h("div",null,h("div",{class:"eyebrow",text:`${who} · ${S.period}`}),h("h1",null,h("em",{text:H.big})," ",H.text),h("p",{class:"sub",text:H.sub||""})),
+  return h("section",{class:"card pad head"},h("div",null,h("div",{class:"eyebrow",text:`${who} · ${PLABEL(S.period)}${S.period==="Month to date"||S.period==="Last month"?" · "+fmLabel(S.period==="Month to date"?fm(c.asOf):fm(c.asOf)-1)+" ("+fmRange(S.period==="Month to date"?fm(c.asOf):fm(c.asOf)-1)+")":""}`}),h("h1",null,h("em",{text:H.big})," ",H.text),h("p",{class:"sub",text:H.sub||""})),
     h("div",{style:"display:flex;flex-direction:column;gap:8px;align-items:flex-start"},h("span",{class:"status "+(H.status?H.status.kind:"flat"),text:H.status?H.status.label:"—"}),H.statusSub?h("span",{class:"muted small",text:H.statusSub}):null));}
 function kpi(l,v,subKids,{spark,ref,cls,fmt}={}){const el=h("div",{class:"card kpi "+(cls||"")},h("span",{class:"l",text:l}),h("span",{class:"v num",text:typeof v==="number"?fmt(0):v}),h("span",{class:"s"},subKids),spark?h("div",{class:"sp chart"}):null);
   if(typeof v==="number")charts.push(()=>CH.countUp(el.querySelector(".v"),v,{fmt}));if(spark)charts.push(()=>CH.sparkline(el.querySelector(".sp"),spark,{ref}));return el;}
@@ -1761,6 +1766,37 @@ function trendCard(c){const W=c.W.filter(r=>r.scrub<=c.asOf);const wkly=IN.weekl
     legend([["var(--c-ao)","Agent Opportunity %","ln"],[null,"Floor "+pct(c.floorAll),"dash"],["var(--faint)","Scrubs"]]),
     chart(b=>CH.trend(b,{cats:wkly.map(w=>fd(w.wk,"dm")),values:wkly.map(w=>w.rate),lower:wkly.map(w=>w.lo),upper:wkly.map(w=>w.hi),vol:wkly.map(w=>w.n),ref:c.floorAll,refLabel:"Floor",height:280}),280),
     cal?h("div",{style:"margin-top:14px"},h("div",{class:"flab",text:"Daily controllable rate · last 12 weeks"}),cal):null));}
+/* ===== movement: day over day, fiscal month over month, behaviours over time ===== */
+const SLOTS=["var(--s1)","var(--s2)","var(--s3)","var(--s4)","var(--s5)","var(--s6)","var(--s7)","var(--s8)"];
+function movement(c){const W=c.W.filter(r=>r.scrub<=c.asOf);const g=h("div",{class:"g12"});
+  // (a) daily submissions by RCA, last 30 scrub days
+  const days=[...new Set(W.map(r=>r.scrub))].sort((a,b)=>a-b).slice(-30);const dg=groupBy(W,r=>r.scrub);
+  g.append(card("c6","Day over day — submissions",`Scrubs submitted per day by RCA · last ${days.length} scrub days`,h("div",null,
+    chart(b=>CH.stackedCols(b,{cats:days.map(d=>fd(d,"dm")),stacks:RCAS.map(x=>({name:SHORT[x],color:COLOR[x],values:days.map(d=>count(dg.get(d)||[],r=>r.rca===x))})),height:260}),260))));
+  // (b) daily AO% with 7-day moving average + volume
+  const rates=days.map(d=>aoRate(dg.get(d)||[]));const ma=days.map((d,i)=>{const win=days.slice(Math.max(0,i-6),i+1).flatMap(x=>dg.get(x)||[]);return aoRate(win);});
+  g.append(card("c6","Day over day — Agent Opportunity %","Dots = each day · line = 7-day rolling rate · grey bars = volume · dashed = floor",h("div",null,legend([["var(--c-ao)","7-day rolling Agent Opp %","ln"],[null,"Floor "+pct(c.floorAll),"dash"]]),
+    chart(b=>CH.trend(b,{cats:days.map(d=>fd(d,"dm")),values:ma,vol:days.map(d=>(dg.get(d)||[]).length),ref:c.floorAll,refLabel:"Floor",height:260}),260),
+    table([{t:"Day",f:r=>fd(r.d,"ddm")},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Agent Opp",n:1,f:r=>nf(r.ao)},{t:"Agent Opp %",n:1,f:r=>pct(r.rate)},{t:"DoD Δ scrubs",n:1,f:r=>chg(r.dn,{bad:"none"})},{t:"DoD Δ pts",n:1,f:r=>chg(r.dr,{d:1,unit:" pts"})}],
+      days.slice(-7).reverse().map((d,i,arr)=>{const a=dg.get(d)||[],prevD=days[days.indexOf(d)-1],p=prevD!=null?(dg.get(prevD)||[]):null;return{d,n:a.length,ao:count(a,isAO),rate:aoRate(a),dn:p?a.length-p.length:null,dr:p&&aoRate(p)!=null&&aoRate(a)!=null?(aoRate(a)-aoRate(p))*100:null};})))));
+  // (c) fiscal month over month
+  const fmKeys=[...new Set(W.map(r=>fm(r.scrub)))].sort((a,b)=>a-b).slice(-7);const fg=groupBy(W,r=>fm(r.scrub));
+  const fmRows=fmKeys.map((k,i)=>{const a=fg.get(k)||[];const prev=i?fg.get(fmKeys[i-1])||[]:null;const ci=IN.wilson(count(a,isAO),a.length);return{k,a,n:a.length,ao:count(a,isAO),rate:aoRate(a),ci,agents:new Set(a.map(r=>r.bpid)).size,leaders:new Set(a.map(r=>r.lk)).size,dn:prev?a.length-prev.length:null,dr:prev&&aoRate(prev)!=null?(aoRate(a)-aoRate(prev))*100:null,partial:k===fm(c.asOf)};});
+  g.append(card("c6","Month over month — volume by RCA",`Fiscal months run ${FM_START}th → ${FM_START-1}st and are named by the month they end in · current month is to date`,
+    chart(b=>CH.stackedCols(b,{cats:fmRows.map(r=>fmLabel(r.k)+(r.partial?" (MTD)":"")),stacks:RCAS.map(x=>({name:SHORT[x],color:COLOR[x],values:fmRows.map(r=>count(r.a,q=>q.rca===x))})),height:260}),260)));
+  g.append(card("c6","Month over month — Agent Opportunity %","Bars with 95% intervals · dashed = all-time baseline",h("div",null,
+    chart(b=>CH.hbars(b,{items:fmRows.map(r=>({label:`${fmLabel(r.k)}${r.partial?" (MTD)":""} · ${fmRange(r.k)}`,value:r.rate||0,color:(r.rate||0)>c.baseline?"var(--bad)":"var(--good)",extra:[[null,"Scrubs",nf(r.n)],[null,"Agents",nf(r.agents)],[null,"Leaders",nf(r.leaders)]]})),ci:fmRows.map(r=>r.ci?[r.ci.lo,r.ci.hi]:null),fmt:v=>pct(v),max:1,ref:c.baseline,refLabel:"Baseline",rowH:34}),40+34*fmRows.length),
+    table([{t:"Fiscal month",f:r=>h("span",null,h("b",{text:fmLabel(r.k)+(r.partial?" (MTD)":"")}),h("small",{class:"muted",text:" "+fmRange(r.k)}))},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Agents",n:1,f:r=>nf(r.agents)},{t:"Agent Opp",n:1,f:r=>nf(r.ao)},{t:"Agent Opp %",n:1,f:r=>pct(r.rate,1)},{t:"MoM Δ scrubs",n:1,f:r=>chg(r.dn,{bad:"none"})},{t:"MoM Δ pts",n:1,f:r=>chg(r.dr,{d:1,unit:" pts"})}],[...fmRows].reverse()))));
+  // (e) behaviours week by week (top 6 T2), 12 weeks
+  const wk0=wk(c.asOf);const wks=Array.from({length:12},(_,i)=>wk0-7*(11-i));const ao=W.filter(isAO);const topT=AGT.map(t=>({t,n:count(ao,r=>r.t2===t)})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,6).map(x=>x.t);
+  if(topT.length)g.append(card("c6","Behaviours week by week","Agent Opportunity count by behaviour · top 6 behaviours · last 12 weeks",chart(b=>CH.stackedCols(b,{cats:wks.map(w=>fd(w,"dm")),stacks:topT.map((t,i)=>({name:t,color:SLOTS[i],values:wks.map(w=>count(ao,r=>r.t2===t&&wk(r.scrub)===w))})),height:280}),280)));
+  // (f) behaviours month over month share heat
+  const bRows=AGT.map(t=>({t,n:count(ao,r=>r.t2===t)})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,10);
+  if(bRows.length&&fmKeys.length)g.append(card("c6","Behaviours month over month","Share of each fiscal month's Agent Opportunity · darker = bigger share",h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:bRows.map(x=>x.t),cols:fmRows.map(r=>fmLabel(r.k)+(r.partial?"*":"")),matrix:bRows.map(x=>fmRows.map(r=>{const a=r.a.filter(isAO);return share(count(a,q=>q.t2===x.t),a.length)||0;})),fmt:v=>v?pct(v):""})))));
+  // (g) who submits when: leaders × last 14 scrub days
+  if(c.level!=="tl"&&c.level!=="agent"){const d14=days.slice(-14);const lg=[...groupBy(W.filter(r=>d14.includes(r.scrub)),r=>r.lk)].sort((a,b)=>b[1].length-a[1].length);
+    if(lg.length)g.append(card("c12","Who submits when",`Scrubs submitted per team leader per day · last ${d14.length} scrub days · click a row to open the leader`,h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:lg.map(([k,a])=>`${LN(k)} (${a.length})`),cols:d14.map(d=>fd(d,"dm")),matrix:lg.map(([,a])=>d14.map(d=>count(a,r=>r.scrub===d))),fmt:v=>v?nf(v):"",rowLink:i=>drillTL(lg[i][0])})))));}
+  return[h("div",{class:"g12"},h("section",{class:"card pad c12",style:"padding-bottom:6px"},h("div",{class:"ch"},h("div",null,h("h2",{text:"Movement"}),h("p",{text:"Day over day, fiscal month over month, and how the behaviours are shifting"}))))),g];}
 function leaderTable(c,ls){const fl=c.floor;ls=[...ls].sort((a,b)=>a.aoP-b.aoP);let rk=0;const ranked=ls.filter(l=>l.n>=TH.minVol);ranked.forEach((l,i)=>l._rank=i+1);
   return table([{t:"Rank",f:r=>r._rank?h("span",{class:"rank"+(r._rank<=3?" r"+r._rank:""),text:String(r._rank)}):h("span",{class:"rank",text:"—"})},
     {t:"Team leader",f:r=>h("span",{class:"namecell"},avatar(r.L.name,r.L.color),h("span",null,h("b",{text:r.L.name}),h("small",{text:`${r.om||r.L.om||"—"} · ${nf(r.agents)}${r.rosterAgents?" of "+nf(r.rosterAgents):""} agents`})))},
@@ -1818,19 +1854,19 @@ function dowCard(c,cls){const d=IN.dow?IN.dow(c.F):[];const rows=d.filter(x=>x.n
   return card(cls||"c6","Which call days hurt most","Agent Opportunity % by the weekday the customer was surveyed",chart(b=>CH.hbars(b,{items:rows.map(x=>({label:`${x.label} · ${nf(x.n)} surveys`,value:x.rate||0,color:(x.rate||0)>c.floor?"var(--bad)":"var(--good)"})),ci:rows.map(x=>x.ci?[x.ci.lo,x.ci.hi]:null),fmt:v=>pct(v),max:1,ref:c.floor,refLabel:"Floor",rowH:32}),40+32*rows.length));}
 
 /* ===================== views ===================== */
-function vFloor(c){const ls=IN.leaderStats(c);const out=[headline(c),kpiBand(c),brief(c),h("div",{class:"g12"},trendCard(c))];
+function vFloor(c){const ls=IN.leaderStats(c);const out=[headline(c),kpiBand(c),brief(c),h("div",{class:"g12"},trendCard(c)),...movement(c)];
   const idle=idleStrip(c);const g=h("div",{class:"g12"});if(ROSTER.size){const oc=omCard(c);if(oc)g.append(oc);g.append(funnelCard(c,"c6"));}
   g.append(card("c12","Team leaders","Lowest Agent Opportunity % first. The reading column separates a genuine performance gap from a tagging difference (two-proportion test vs the floor).",h("div",null,idle,leaderTable(c,ls))));
   g.append(scatterCard(c,ls),paretoCard(c,"c6"),waterfallCard(c,"c6"),concentrationCard(c,"c6"),heatCard(c,"c12","tl"),agentsTable(c,c.F,{limit:15}));
   if(ROSTER.size)g.append(tenureCard(c,"c6"));g.append(mixCard(c,"c6"));const dw=dowCard(c,"c6");if(dw)g.append(dw);g.append(qualityCard(c,"c6"));out.push(g);return out;}
-function vOM(c){const ls=IN.leaderStats(c);const out=[headline(c),kpiBand(c),brief(c),h("div",{class:"g12"},trendCard(c))];const g=h("div",{class:"g12"});
+function vOM(c){const ls=IN.leaderStats(c);const out=[headline(c),kpiBand(c),brief(c),h("div",{class:"g12"},trendCard(c)),...movement(c)];const g=h("div",{class:"g12"});
   g.append(card("c12",`Team leaders · ${S.om}`,"Lowest Agent Opportunity % first · reading = genuine gap vs tagging difference",h("div",null,idleStrip(c),leaderTable(c,ls))));
   g.append(scatterCard(c,ls),funnelCard(c,"c6"),paretoCard(c,"c6"),waterfallCard(c,"c6"),heatCard(c,"c12","tl"),agentsTable(c,c.F,{limit:15}),concentrationCard(c,"c6"),tenureCard(c,"c6"),mixCard(c,"c6"),qualityCard(c,"c6"));out.push(g);return out;}
 function vTL(c){const me=IN.leaderStats(c,c.D).find(l=>l.lk===S.tl)||IN.leaderStats(c,c.F)[0];const out=[headline(c),kpiBand(c)];
   if(me){const v=me.verdict||"";const kind=/lenient|strict/.test(v)?"warn":v==="aligned"?"good":"flat";
     out.push(h("div",{class:"g12"},card("c12",null,null,h("div",{style:"display:flex;gap:16px;align-items:center;flex-wrap:wrap"},avatar(me.L.name,me.L.color,true),h("div",{class:"grow"},h("h2",{style:"font-size:19px",text:me.L.name}),h("div",{class:"muted small",text:`${me.L.form?"Form name "+me.L.form+" · ":""}${me.L.om||"—"} · ${nf(me.agents)}${me.rosterAgents?" of "+nf(me.rosterAgents):""} agents scrubbed · ${nf(me.n)} scrubs`})),
       h("div",{style:"display:flex;flex-direction:column;gap:6px;align-items:flex-end"},tag("Reading: "+v,kind),h("span",{class:"muted small",text:me.reason||""}))))));}
-  out.push(brief(c),h("div",{class:"g12"},trendCard(c)));const g=h("div",{class:"g12"});
+  out.push(brief(c),h("div",{class:"g12"},trendCard(c)),...movement(c));const g=h("div",{class:"g12"});
   g.append(agentsTable(c,c.F,{limit:40,title:"My agents",sub:"Everyone with an Agent Opportunity in the period · click a row for the agent view"}),heatCard(c,"c12","agent"),paretoCard(c,"c6"),waterfallCard(c,"c6"),concentrationCard(c,"c6"),mixCard(c,"c6"),qualityCard(c,"c6"));
   const dw=dowCard(c,"c6");if(dw)g.append(dw);out.push(g);return out;}
 function vAgent(c){const g=c.W.filter(r=>r.bpid===S.agent).sort((a,b)=>b.scrub-a.scrub);const a=ROSTER.get(S.agent);const st=IN.agentStats(c,g)[0];const inP=c.F;const ao=inP.filter(isAO);
@@ -1850,7 +1886,7 @@ function render(){const c=ctx();renderNav(c);charts.length=0;const view=$("#view
   let kids;if(!c.F.length)kids=[card("","No scrubs match this scope",null,h("div",{class:"empty",text:"Choose a wider period or go up a level."}))];
   else kids=({floor:vFloor,om:vOM,tl:vTL,agent:vAgent})[c.level](c);
   view.replaceChildren(...kids);kids.forEach((k,i)=>k.style.setProperty("--i",String(Math.min(i,8))));void view.offsetWidth;view.classList.add("reveal");
-  $("#footnote").textContent=`Team leader = the person who submitted the scrub (${ROSTER.size?"matched to the roster TL name":"named from the submitter email"}). Agent Opportunity % = controllable detractors ÷ all scrubbed detractors. "This week" = the 7 days up to the latest scrub in the period vs the 7 days before, counted on all dates in scope. Intervals are 95% Wilson; gaps are two-proportion z-tests. KPI buckets: QA · Repeat (aiCR) · Transfer (ITG) · AHT/Hold.`;
+  $("#footnote").textContent=`Team leader = the person who submitted the scrub (${ROSTER.size?"matched to the roster TL name":"named from the submitter email"}). Agent Opportunity % = controllable detractors ÷ all scrubbed detractors. "This week" = the 7 days up to the latest scrub in the period vs the 7 days before, counted on all dates in scope. Intervals are 95% Wilson; gaps are two-proportion z-tests. KPI buckets: QA · Repeat (aiCR) · Transfer (ITG) · AHT/Hold. Fiscal months run from the ${FM_START}th to the ${FM_START-1}st and are named by the month they end in.`;
   requestAnimationFrame(()=>charts.splice(0).forEach(f=>f()));}
 let rt,lw=window.innerWidth;window.addEventListener("resize",()=>{if(Math.abs(window.innerWidth-lw)<40)return;lw=window.innerWidth;clearTimeout(rt);rt=setTimeout(render,200);});
 
