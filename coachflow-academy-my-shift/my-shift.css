@@ -67,6 +67,61 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 .ms-who-btns{display:flex;align-items:center;gap:.75rem}
 .ms-who-help{font-size:.8125rem;color:var(--color-muted)}
 .tb-file .ms-input.tb-id{flex:0 1 7rem;max-width:7rem;font-variant-numeric:tabular-nums}
+/* Warm-up before the shift, and personal goals. */
+.ms-warm{margin:.25rem 0 .75rem;max-width:var(--sl-measure,68ch)}
+.ms-warm p{margin:0}
+.ms-warm[data-state="todo"]{border:1px solid var(--color-line);border-left:4px solid var(--sl-signal);border-radius:var(--radius-control-md);background:var(--color-surface);padding:.625rem 1rem .75rem}
+.ms-warm[data-state="done"]{font-size:.875rem;color:var(--color-body)}
+.ms-warm[data-state="done"] .sl-link-button{min-height:2rem;font-size:.8125rem}
+.ms-warm-act{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin-top:.5rem!important}
+.ms-goals{margin-top:.5rem}
+.ms-goals p{margin:0}
+.ms-goal-none{font-size:.875rem;color:var(--color-muted)}
+.ms-goal-none .sl-link-button,.ms-goal-edit{min-height:2.25rem;font-size:.875rem}
+.ms-goal-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.75rem}
+.ms-goal{border:1px solid var(--color-line);border-radius:var(--radius-control-md);background:var(--color-surface);padding:.5rem .75rem .6rem}
+.ms-goal-h{display:flex;justify-content:space-between;gap:.5rem;font-size:.8125rem;font-weight:600;color:var(--color-body)}
+.ms-goal-h b{color:var(--color-ink)}
+.ms-meter{position:relative;display:block;height:.5rem;margin:.4rem 0 .35rem;border-radius:999px;background:var(--color-canvas);box-shadow:inset 0 0 0 1px var(--color-line)}
+.ms-meter-fill{position:absolute;left:0;top:0;bottom:0;width:var(--w,0%);border-radius:inherit;background:var(--sl-signal);transition:width var(--m-segment,.32s) var(--e-out,ease-out)}
+.ms-goal.met .ms-meter-fill{background:var(--sl-done,#159b80)}
+.ms-meter-goal{position:absolute;top:-.2rem;bottom:-.2rem;left:var(--w,0%);width:2px;margin-left:-1px;border-radius:1px;background:var(--color-ink)}
+.ms-goal-s{font-size:.8125rem;color:var(--color-body)}
+.ms-goal.met .ms-goal-s{color:var(--color-success-text);font-weight:600}
+.ms-goal-s .ms-seal{width:1rem;height:1rem;margin-right:.3rem}
+.ms-goal-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(12rem,1fr));gap:.75rem}
+.ms-unit{display:flex;align-items:center;gap:.5rem;font-size:.875rem;color:var(--color-body);white-space:nowrap}
+.ms-unit .ms-input{width:4.5rem}
+/* Customer said: the Academy's answers during the call. */
+.ms-said{margin:0 0 1rem;border:1px solid var(--color-line);border-left:4px solid var(--color-insight,#2b8fd6);border-radius:var(--radius-control-md);background:var(--color-surface);padding:.75rem 1rem}
+.ms-said[hidden]{display:none}
+.ms-said-row{display:flex;align-items:center;gap:.75rem}
+.ms-said-row .sl-link-button{flex:none;white-space:nowrap}
+.ms-said-list{list-style:none;margin:.5rem 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));gap:.4rem}
+.ms-said-list[hidden],.ms-said-card[hidden]{display:none}
+.ms-said-item{width:100%;min-height:2.5rem;padding:.4rem .75rem;text-align:left;border:1px solid var(--color-line-strong);border-radius:var(--radius-control-sm);background:var(--color-canvas);color:var(--color-ink);font:inherit;font-size:.875rem;cursor:pointer;transition:border-color var(--m-hover,.18s) var(--e-out,ease-out)}
+.ms-said-item:hover{border-color:var(--sl-signal)}
+.ms-said-item:focus-visible,.ms-said-card h3:focus-visible{outline:2px solid var(--color-action);outline-offset:2px}
+.ms-said-card{margin-top:.5rem}
+.ms-said-card h3{margin:0 0 .4rem;font-family:var(--sl-font-signal,inherit);font-size:1.0625rem;font-weight:700;color:var(--color-ink)}
+.ms-said-card dl{margin:0;display:grid;grid-template-columns:minmax(7rem,max-content) 1fr;gap:.35rem 1rem;font-size:.875rem}
+.ms-said-card dt{font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--color-muted);padding-top:.15rem}
+.ms-said-card dd{margin:0;color:var(--color-body)}
+.ms-said-card dd ul{margin:0;padding-left:1.1rem}
+.ms-said-ask{font-weight:600;color:var(--color-ink)!important}
+.ms-said-act{display:flex;flex-wrap:wrap;align-items:center;gap:0 1.25rem;margin:.5rem 0 0}
+.ms-said-act .sl-link-button{padding:0}
+.ms-said-act .sl-coach-link{margin-top:0}
+@media (max-width:30rem){.ms-said-card dl{grid-template-columns:1fr}.ms-said-card dt{padding-top:.4rem}}
+/* My week. */
+.ms-week-lead{margin:0 0 .75rem}
+.ms-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.5rem;max-width:30rem;margin-bottom:.25rem}
+.ms-day{display:grid;justify-items:center;gap:.2rem;font-size:.75rem;color:var(--color-muted)}
+.ms-day b{min-height:1.1em;font-size:.8125rem;color:var(--color-ink)}
+.ms-day-bar{position:relative;display:block;width:100%;max-width:2.25rem;height:4rem;border-radius:.4rem;background:var(--color-canvas);box-shadow:inset 0 0 0 1px var(--color-line);overflow:hidden}
+.ms-day-fill{position:absolute;left:0;right:0;bottom:0;height:var(--h,0%);border-radius:4px 4px 0 0;background:var(--sl-signal)}
+.ms-day.today .ms-day-d{font-weight:700;color:var(--color-ink)}
+.ms-up{color:var(--color-success-text);font-weight:600}.ms-down{color:var(--color-risk-text);font-weight:600}
 /* Faster logging: same as last call, and the keys. */
 .ms-quick{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin:0 0 1rem}
 .ms-quick .ms-btn-sm[hidden]{display:none}
@@ -161,11 +216,13 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 #my-shift tr.ms-row[data-new]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
 #my-shift tr.ms-row[data-new] td{animation:ms-settle .9s ease-out both}
 #my-shift [data-tick]{animation:ms-tick var(--m-disclose,.22s) var(--e-settle,ease-out) backwards}
-#my-shift .ms-repeat,#my-shift .ms-next,#my-shift .tb-example,#my-shift .ms-who{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
+#my-shift .ms-repeat,#my-shift .ms-next,#my-shift .tb-example,#my-shift .ms-who,#my-shift .ms-said,#my-shift .ms-said-card,#my-shift .ms-warm[data-state="todo"]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
 #my-shift .ms-repeat-h svg{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out) var(--m-press,.12s) backwards}
 #my-shift .tb-bars li:nth-child(2){--tb-n:1}#my-shift .tb-bars li:nth-child(3){--tb-n:2}#my-shift .tb-bars li:nth-child(4){--tb-n:3}#my-shift .tb-bars li:nth-child(5){--tb-n:4}#my-shift .tb-bars li:nth-child(6){--tb-n:5}
 #my-shift .tb-fill{transform-origin:left center;animation:sl-draw-across var(--m-segment,.32s) var(--e-out,ease-out) calc(var(--tb-base,0ms) + var(--tb-n,0) * 45ms) backwards}
 #my-shift.ms-opening .tb-fill{--tb-base:calc(var(--ms-i,4) * 55ms + 160ms)}
+#my-shift .ms-day-fill{transform-origin:bottom center;animation:ms-grow var(--m-segment,.32s) var(--e-out,ease-out) backwards}
+@keyframes ms-grow{0%{transform:scaleY(0)}}
 #my-shift .tb-file{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
 .ms-seal{animation:ca-seal-in var(--m-disclose,.22s) var(--e-settle,ease-out) backwards}
 .ms-seal:after{content:"";position:absolute;inset:-.3rem;border-radius:999px;border:2px solid var(--sl-done,#159b80);opacity:0;animation:sl-ring var(--m-segment,.32s) var(--e-out,ease-out) var(--m-press,.12s)}
@@ -175,4 +232,4 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 @keyframes ms-settle{0%{background-color:var(--color-success-soft)}to{background-color:transparent}}
 @keyframes ms-tick{0%{opacity:.3;transform:translateY(.3rem)}to{opacity:1;transform:none}}
 }
-@media (prefers-reduced-motion:reduce){.ms-ring .fg{transition:none}}
+@media (prefers-reduced-motion:reduce){.ms-ring .fg,.ms-meter-fill{transition:none}}

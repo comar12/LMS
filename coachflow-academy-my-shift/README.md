@@ -7,7 +7,7 @@ bundle is modified; the extra scripts add three routes and one motion layer:
 - `#/academy/sales-integrity-gate` — the simplified four-tick Sales Integrity
   Gate (`gate-simple.js`, `gate-simple.css`, `gate-data.js`).
 - `#/academy/my-shift` — the shift timer and call log (`my-shift.js`,
-  `my-shift.css`). "My Shift" is a working name.
+  `my-shift.css`, `my-shift-concerns.js`). "My Shift" is a working name.
 - `#/academy/my-shift/team-board` — the team board for leaders, a second tab
   of the same station (same files).
 - Every station — the same motion My Shift has (`motion.js`, `motion.css`).
@@ -73,8 +73,32 @@ previous agent's running shift, and each agent's list, summary and file hold
 only their own calls. Download CSV asks for the name and HR ID first if they
 are missing.
 
-The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id` and `call_id`
-columns, and the file is named `my-shift-<name>-<hr id>-<date>.csv`.
+The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id` and
+`warmup` columns, and the file is named `my-shift-<name>-<hr id>-<date>.csv`.
+
+### Warm-up, goals, "Customer said" and My week
+
+- **5-minute warm-up.** Before the shift, a card names one Scenario Lab call
+  to practise: the one for the reason that came up most on the agent's last
+  working day, or the every-call practice when nothing stood out. "Mark as
+  done" or "Skip today"; a done warm-up goes into the summary and the CSV.
+- **Personal goals.** The agent sets their own goals for the day: GSR offer
+  rate, XM offer rate and sales (GSR + XM). Each shows a meter with the goal
+  marked and how many more calls with an offer, or more sales, reach it. Goals
+  are kept per HR ID and carry over to the next day.
+- **"Customer said".** A button in "Log this call" opens the Academy's 16
+  customer concerns (`my-shift-concerns.js`, copied from `academy.js`). A few
+  words find one; its card gives what to find out, what to ask, what to do
+  if there is a real need, what has to happen before anything is agreed, when
+  to stop and what not to say, with the Scenario Lab call that practises it.
+  Concerns for the call type picked come first. Nothing here is logged.
+- **My week.** The agent's own last 7 days against the 7 before: calls, GSR
+  and XM offer rates, sales, resolved, repeat callers and transfers, each
+  marked better or worse, and a bar for each day's calls. Only the agent sees
+  it.
+
+The team board adds a Warm-up column: the days each agent did the warm-up
+out of the days they worked.
 
 ## The team board
 
