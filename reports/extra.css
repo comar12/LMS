@@ -47,3 +47,4 @@
 .day .v{font-size:10px;font-weight:600}
 .kpi .l{padding-right:62px;white-space:normal;line-height:1.25;min-height:30px}
 td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[style*="color:#fff"] .xgc i{opacity:.85}
+.rhint{font-size:12px;color:var(--muted);align-self:center}

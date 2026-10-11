@@ -27,7 +27,7 @@ def load(TRACKER, ROSTER):
         return None
 
     s["ct"] = pd.to_datetime(s["Completion time"])
-    s["Date"] = (s["ct"] - pd.Timedelta(hours=12)).dt.normalize()  # business day: 15:00 Cairo -> 07:00 next day
+    s["Date"] = (s["ct"] - pd.Timedelta(hours=12)).dt.normalize()  # business day: 14:00 Cairo -> 07:00 next day (cut at noon)
     s["hr_raw"] = s["HRID"].fillna("").astype(str).str.strip()
     s["hr"] = s["hr_raw"].apply(map_hrid)
     s["in_roster"] = s["hr"].notna().astype(int)

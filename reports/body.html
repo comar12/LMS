@@ -13,7 +13,7 @@
 
   <section class="panel hero">
     <div class="hero-top">
-      <div><span class="eyebrow">VXI | TSX · Cairo Repair · Sales performance</span><h1>Sales Performance</h1><p id="heroSub">XM lines and GSR units per business day (15:00 Cairo → 07:00 next morning) · attributed to ops managers, team leaders and agents through the roster</p></div>
+      <div><span class="eyebrow">VXI | TSX · Cairo Repair · Sales performance</span><h1>Sales Performance</h1><p id="heroSub">XM lines and GSR units per business day (14:00 Cairo → 07:00 next morning) · attributed to ops managers, team leaders and agents through the roster</p></div>
       <div class="hero-period"><span class="period-label">Summary period</span><div class="segmented" id="presets"></div><span class="period-label" id="periodLabel"></span></div>
     </div>
     <div class="daystrip">
@@ -45,7 +45,7 @@
   <section class="view" id="v-exec">
     <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Executive summary</span><h2 id="execTitle">What a VP needs to know</h2><p id="execSub"></p></div><span class="count-chip" id="attnCount">0 items</span></div><div class="callouts" id="execSummary"></div></div>
     <div class="kpis" id="kpis"></div>
-    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Day-over-day replay</span><h2>Watch the period unfold, product by product</h2><p>Press play to step through every business day in the selected period · XM lines and each GSR type · thin marker = the previous day · chip = change vs the previous day</p></div></div><div id="replayX"></div></div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Day-over-day replay</span><h2>Watch the period unfold, product by product</h2><p>Replays every business day in the selected period automatically · XM lines and each GSR type · click a day on the timeline to hold it</p></div></div><div id="replayX"></div></div>
     <div class="chart-grid">
       <div class="panel"><div class="panel-head"><div><h2>Daily sales by product vs target</h2><p>Selected period · current filters · stacked = XM lines + each GSR type · dashed line = target for this scope</p></div><button class="text-button" data-tv="c1">Table view</button></div><div class="panel-body"><div class="headline" id="dailyHead"></div><figure id="c1"></figure><div class="legend" id="mixLegend1"></div></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Fiscal month pacing</h2><p id="cumSub">Cumulative units vs cumulative target · dotted = projection at the current 7-day pace</p></div><button class="text-button" data-tv="c2">Table view</button></div><div class="panel-body"><figure id="c2"></figure><div class="legend"><span><i class="k"></i>Actual</span><span><i class="k dash"></i>Target</span><span><i class="k" style="border-color:var(--muted);border-top-style:dotted"></i>Projection</span></div><div class="chart-foot" id="cumFoot"></div></div></div>
@@ -88,7 +88,7 @@
     <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Team leader view</span><h2 id="leaderName">Team</h2><p id="leaderInfo"></p></div><div style="display:flex;gap:8px;align-items:center"><div class="picker" id="pk-leader" style="min-width:240px"></div></div></div>
       <div class="panel-body"><div class="headline four" id="leaderHead"></div><div class="grid-two" style="margin-bottom:0"><div><figure id="c13"></figure><div class="legend" id="mixLegendL"></div></div><div><figure id="c14"></figure><div class="legend"><span><i class="k" style="border-color:var(--s3)"></i>Participation % (agents who sold ÷ HC)</span></div></div></div></div></div>
     <div class="grid-two">
-      <div class="panel" style="grid-column:1 / -1"><div class="panel-head"><div><span class="eyebrow">Day-over-day replay</span><h2>This team, day by day</h2><p>Press play to step through the period · XM lines and each GSR type for the selected team</p></div></div><div id="replayL"></div></div>
+      <div class="panel" style="grid-column:1 / -1"><div class="panel-head"><div><span class="eyebrow">Day-over-day replay</span><h2>This team, day by day</h2><p>Replays the period automatically · XM lines and each GSR type for the selected team · click a day on the timeline to hold it</p></div></div><div id="replayL"></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Agents vs target</h2><p>Sales (XM + GSR) per business day per agent · tick = target</p></div><button class="text-button" data-tv="c15">Table view</button></div><div class="panel-body"><figure id="c15"></figure></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Coaching priorities</h2><p>Score blends gap to target, days since last sale and position vs team median · Production agents first, Training agents scaled down</p></div></div><div class="table-wrap" id="coachTable"></div></div>
     </div>
@@ -141,6 +141,6 @@
       <div class="panel"><div class="panel-head"><div><h2>Definitions &amp; assumptions</h2></div></div><div class="method-list" id="defs"></div></div>
     </div>
   </section>
-  <footer><span>VXI | TSX · Cairo Repair Sales</span><span id="footerMid"></span><span>Business days 15:00 → 07:00 Cairo · equal totals share a rank</span></footer>
+  <footer><span>VXI | TSX · Cairo Repair Sales</span><span id="footerMid"></span><span>Business days 14:00 → 07:00 Cairo · equal totals share a rank</span></footer>
 </main>
 <div class="tip" id="tip"></div><div class="toast" id="toast"></div>
