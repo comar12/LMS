@@ -67,6 +67,20 @@ a CSV download; nothing is sent anywhere.
   customer asks for is fine. Picking "Follow-up" for GSR or XM shows that
   rule under the reason, and the note box asks for the call back the customer
   asked for and when.
+- **Before you hang up.** When a call is not resolved or escalated, three
+  boxes appear: gave the ticket or reference number, told them what happens
+  next, gave no time frame that couldn't be confirmed. They are optional; an
+  unticked one is counted as something to coach. A repeat caller's note says
+  what they were not given last time.
+- **QA self-check.** When a GSR or XM sale is completed, the simplified
+  gate's four checks appear (before pitching, before approval, before
+  activating, no red line), with a link to the Sales Integrity Gate. Also
+  optional. These are the gate's own statements for now; they can be swapped
+  for the QA team's form items.
+
+Both are counted in the rail, the summary and the CSV (`next_steps` and
+`qa_check`: the ticked items, `none` when nothing was ticked, empty when the
+check did not apply). Calls logged before this change are not counted.
 
 ### Who is logging
 
@@ -77,8 +91,9 @@ previous agent's running shift, and each agent's list, summary and file hold
 only their own calls. Download CSV asks for the name and HR ID first if they
 are missing.
 
-The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id` and
-`warmup` columns, and the file is named `my-shift-<name>-<hr id>-<date>.csv`.
+The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id`,
+`warmup`, `next_steps` and `qa_check` columns, and the file is named
+`my-shift-<name>-<hr id>-<date>.csv`.
 
 ### Warm-up, goals, "Customer said" and My week
 
@@ -103,6 +118,11 @@ The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id` and
 
 The team board adds a Warm-up column: the days each agent did the warm-up
 out of the days they worked.
+
+The board also shows, per agent and for the team, the unresolved calls with
+next steps given in full and the sales with the QA self-check fully ticked,
+two tiles for them, and a "Left unticked" column with the items missed most
+and where to practise them.
 
 ## The team board
 
