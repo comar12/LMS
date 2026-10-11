@@ -271,6 +271,39 @@ function debounce(fn, ms) {
   return wrapped;
 }
 
+/** Append children to a page, skipping the null slots used for optional sections (native append would print "null"). */
+function put(el, ...kids) {
+  el.append(...kids.flat(Infinity).filter((k) => k !== null && k !== undefined && k !== false));
+  return el;
+}
+
+/** Local calendar dates as YYYY-MM-DD, so follow-up dates do not shift with time zones. */
+function isoDay(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function parseDay(s) {
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function todayDay() {
+  return isoDay(new Date());
+}
+function addDays(s, n) {
+  const d = parseDay(s);
+  d.setDate(d.getDate() + n);
+  return isoDay(d);
+}
+function daysFromToday(s) {
+  return Math.round((parseDay(s) - parseDay(todayDay())) / 86400000);
+}
+function fmtDay(s, long) {
+  try {
+    return parseDay(s).toLocaleDateString(undefined, long ? { month: 'long', day: 'numeric' } : { month: 'short', day: 'numeric' });
+  } catch (e) {
+    return s;
+  }
+}
+
 function uid(prefix) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }

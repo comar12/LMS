@@ -31,6 +31,11 @@ To see it working first, watch the one-minute walkthrough: [`docs-walkthrough.mp
   Met, Opportunity, or N/A while you listen; a progress ring and a KPI risk summary show where repeat-contact
   (aiCR) and transfer risk came from. Opportunities go to the Coaching Builder and met steps become observed
   strengths. Each call type keeps its own review.
+- **Follow-Up Tracker**: choose **Track this plan** in the Coaching Builder, label the plan with a code (never a
+  name), and the tracker shows when the promised call reviews and weekly check-ins are due or overdue. Log each
+  reviewed call or check-in as Met, Not met, or N/A per behavior. **Copy progress** and **Use in Builder** write
+  the "What progress has been made" section only from what you logged, so progress is never assumed. Labels and
+  notes are never copied into coaching text.
 - **ABS & Attrition**: 14 coaching entries on attendance, punctuality, schedule adherence, engagement, stress,
   confidence, growth, and team connection, plus a toolkit for new team leaders: a step-by-step attendance
   conversation, return-to-work lines, stay conversation questions, early warning signs, and recognition ideas
@@ -62,8 +67,8 @@ To see it working first, watch the one-minute walkthrough: [`docs-walkthrough.mp
 
 - The page never connects to the internet. A Content Security Policy blocks all network access, and there is
   no tracking or analytics.
-- Your favorites, templates, drafts, brand colors, and settings are saved in this browser's local storage.
-  That storage belongs to this browser and profile only. It is not shared with other browsers or computers, it
+- Your favorites, templates, drafts, follow-up plans, brand colors, and settings are saved in this browser's
+  local storage. That storage belongs to this browser and profile only. It is not shared with other browsers or computers, it
   is not available in private windows, and clearing browser data deletes it. Use **Settings & Data → Export
   backup** regularly.
 - Never type agent or customer names, BPIDs, HRIDs, Avaya IDs, account numbers, or interaction IDs into the
@@ -97,7 +102,7 @@ tools/
   build.py             builds VXI_Coaching_Intelligence_Pro.html
 tests/
   e2e.cjs              browser tests (Playwright + Chromium): the ten QA scenarios plus copy, storage,
-                       import, Builder, Home, Call Review, ABS & Attrition, Sales Toolkit, Quick Links,
+                       import, Builder, Home, Call Review, ABS & Attrition, Follow-Up Tracker, Sales Toolkit, Quick Links,
                        and brand color checks
 ```
 

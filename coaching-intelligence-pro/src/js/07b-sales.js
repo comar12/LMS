@@ -94,7 +94,7 @@ function oppChips(ids, fkPrefix) {
 
 /* ---------- Sales flow ---------- */
 function renderFlowTab(panel) {
-  panel.append(
+  put(panel, 
     h(
       'ol',
       { class: 'tk-steps' },
@@ -124,7 +124,7 @@ function renderOffersTab(panel) {
   const bullets = (items, iconName) => h('ul', { class: 'tk-bullets' }, items.map((t) => h('li', null, icon(iconName || 'check'), t)));
   const block = (title, ...kids) => h('section', { class: 'tk-block' }, h('h3', { class: 'tk-block__title' }, title), ...kids);
   const objectionText = [o.objection.acknowledge, o.objection.clarify, o.objection.respond].filter(Boolean).join(' ');
-  panel.append(
+  put(panel, 
     segmented({
       label: 'Offer type',
       value: o.id,
@@ -180,7 +180,7 @@ function renderOffersTab(panel) {
 
 /* ---------- Objections ---------- */
 function renderObjectionsTab(panel) {
-  panel.append(
+  put(panel, 
     h('p', { class: 'notice notice--info', style: 'margin-bottom:16px' }, icon('info'), h('span', { class: 'notice__body' }, SALES.objectionPrinciple)),
     h(
       'div',
@@ -221,7 +221,7 @@ function renderObjectionsTab(panel) {
 
 /* ---------- Buying signals ---------- */
 function renderSignalsTab(panel) {
-  panel.append(
+  put(panel, 
     h('p', { class: 'hint', style: 'margin-bottom:14px' }, icon('info'), 'Buying signals can come up at any point. Follow up with a question right away, but present the offer only after the concern is resolved and confirmed.'),
     h(
       'ul',
@@ -241,7 +241,7 @@ function renderSignalsTab(panel) {
 
 function renderSalesToolkit(main) {
   const tab = SALES_TAB_IDS.includes(state.prefs.salesTab) ? state.prefs.salesTab : 'review';
-  main.append(
+  put(main, 
     pageHead({
       eyebrow: [h('span', { class: 'group__icon cat-sales', style: 'width:22px;height:22px;border-radius:6px' }, icon('tag', 'icon--sm')), 'Sales & Retention'],
       title: 'Sales Toolkit',
@@ -257,5 +257,5 @@ function renderSalesToolkit(main) {
   else if (tab === 'objections') renderObjectionsTab(panel);
   else if (tab === 'signals') renderSignalsTab(panel);
   else renderReviewTab(panel, 'sales');
-  main.append(panel);
+  put(main, panel);
 }

@@ -393,7 +393,7 @@ function renderTemplates(main) {
   const editedStrengths = Object.keys(state.overrides.strengths).map(getStrength).filter(Boolean);
   const iconBtn = (name, label, fk, fn) => h('button', { type: 'button', class: 'icon-btn icon-btn--sm', 'aria-label': label, title: label, 'data-fk': fk, onclick: fn }, icon(name));
 
-  main.append(
+  put(main, 
     pageHead({
       title: 'My Templates',
       sub: 'Create your own coaching entries and strengths, or customize the wording of any built-in entry. Built-in originals are always kept and can be restored.',
@@ -407,7 +407,7 @@ function renderTemplates(main) {
   const card = (title, iconName, children, extra) =>
     h('section', { class: 'card', 'aria-label': title }, h('div', { class: 'card__head' }, h('h2', { class: 'card__title' }, icon(iconName), title), extra || null), h('div', { class: 'card__body' }, children));
 
-  main.append(
+  put(main, 
     h(
       'div',
       { class: 'two-col' },

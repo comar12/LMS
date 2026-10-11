@@ -58,7 +58,7 @@ function peopleTabs(current) {
 function renderAttendanceTab(panel) {
   const steps = PEOPLE.attendance.steps;
   const all = steps.map((s, i) => `${i + 1}. ${s.title}\n${s.say}`).join('\n\n');
-  panel.append(
+  put(panel, 
     h(
       'div',
       { class: 'pk-bar' },
@@ -84,7 +84,7 @@ function renderAttendanceTab(panel) {
 
 function renderReturnTab(panel) {
   const lines = PEOPLE.returnToWork.lines;
-  panel.append(
+  put(panel, 
     h('div', { class: 'pk-bar' }, h('p', { class: 'pk-bar__text' }, PEOPLE.returnToWork.intro), copyButton(lines.map((l) => l.say).join('\n\n'), { label: 'Copy all lines', srLabel: 'Copy all return-to-work lines', fk: 'pk-rtw-all' })),
     h('h2', { class: 'sr-only' }, 'Return-to-work lines'),
     h('div', { class: 'pk-stack' }, lines.map((l, i) => h('div', { class: 'pk-card', style: `--i:${i}` }, scriptLine(l.say, { label: l.label, fk: `pk-rtw:${i}`, srLabel: `Copy line: ${l.label}` }))))
@@ -92,7 +92,7 @@ function renderReturnTab(panel) {
 }
 
 function renderStayTab(panel) {
-  panel.append(
+  put(panel, 
     h('div', { class: 'pk-bar' }, h('p', { class: 'pk-bar__text' }, PEOPLE.stay.intro)),
     h(
       'div',
@@ -110,7 +110,7 @@ function renderStayTab(panel) {
 }
 
 function renderSignsTab(panel) {
-  panel.append(
+  put(panel, 
     h('p', { class: 'notice', role: 'note', style: 'margin-bottom:16px' }, icon('info'), h('span', { class: 'notice__body' }, 'These are signals to check in on, never conclusions. One sign on its own proves nothing; a change from someone\'s usual pattern is what is worth a conversation.')),
     h(
       'div',
@@ -131,7 +131,7 @@ function renderSignsTab(panel) {
 
 function renderRecognitionTab(panel) {
   const rec = PEOPLE.recognition;
-  panel.append(
+  put(panel, 
     h('div', { class: 'pk-bar' }, h('p', { class: 'pk-bar__text' }, rec.intro)),
     h('h2', { class: 'sr-only' }, 'Recognition ideas'),
     h('div', { class: 'pk-grid pk-grid--ideas' }, rec.ideas.map((idea, i) => h('div', { class: 'pk-idea', style: `--i:${i}` }, h('span', { class: 'pk-idea__icon', 'aria-hidden': 'true' }, icon('award')), h('h3', { class: 'pk-idea__title' }, idea.title), h('p', { class: 'pk-idea__text' }, idea.detail)))),
@@ -146,7 +146,7 @@ function renderRecognitionTab(panel) {
 
 function renderPeopleToolkit(main) {
   const tab = PEOPLE_TAB_IDS.includes(state.prefs.peopleTab) ? state.prefs.peopleTab : 'attendance';
-  main.append(
+  put(main, 
     pageHead({
       eyebrow: [h('span', { class: 'group__icon cat-people', style: 'width:22px;height:22px;border-radius:6px' }, icon('users', 'icon--sm')), 'ABS & Attrition'],
       title: 'ABS & Attrition Toolkit',
@@ -162,5 +162,5 @@ function renderPeopleToolkit(main) {
   else if (tab === 'signs') renderSignsTab(panel);
   else if (tab === 'recognition') renderRecognitionTab(panel);
   else renderAttendanceTab(panel);
-  main.append(panel);
+  put(main, panel);
 }

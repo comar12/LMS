@@ -268,7 +268,7 @@ function renderReviewTab(panel, typeId) {
   const items = reviewItems(typeId);
   const flowTitleId = `rvFlowTitle-${typeId}`;
   const skillTitleId = `rvSkillTitle-${typeId}`;
-  panel.append(
+  put(panel, 
     h('p', { class: 'hint', style: 'margin-bottom:14px' }, icon('info'), 'Mark each step as you listen to the call. Opportunities can be sent to the Coaching Builder, and steps you mark as met can be added as observed strengths. Nothing is added until you choose.'),
     reviewScorecard(typeId),
     h(
@@ -345,7 +345,7 @@ function reviewTypePicker(current) {
 function renderCallReview(main) {
   const typeId = REVIEW_TYPE_IDS.includes(state.review.type) ? state.review.type : 'tech';
   const t = REVIEW_TYPE_MAP[typeId];
-  main.append(
+  put(main, 
     pageHead({
       eyebrow: [h('span', { class: 'group__icon cat-tech', style: 'width:22px;height:22px;border-radius:6px' }, icon('checklist', 'icon--sm')), 'Coaching'],
       title: 'Call Review',
@@ -355,10 +355,10 @@ function renderCallReview(main) {
     reviewTypePicker(typeId)
   );
   const panel = h('div', { class: `tk-panel rt-panel${takeTabAnim()}`, role: 'tabpanel', id: 'rt-panel', 'aria-labelledby': `rt-tab-${typeId}`, tabindex: '-1' });
-  panel.append(h('p', { class: 'rt-intro' }, t.intro));
+  put(panel, h('p', { class: 'rt-intro' }, t.intro));
   if (typeId === 'sales') {
-    panel.append(h('p', { class: 'notice', role: 'note', style: 'margin-bottom:16px' }, icon('alert'), h('span', { class: 'notice__body' }, DATA.salesToolkit.notOffer, ' ', h('a', { href: '#/sales-toolkit', 'data-fk': 'rt-to-toolkit' }, 'Open the Sales Toolkit'))));
+    put(panel, h('p', { class: 'notice', role: 'note', style: 'margin-bottom:16px' }, icon('alert'), h('span', { class: 'notice__body' }, DATA.salesToolkit.notOffer, ' ', h('a', { href: '#/sales-toolkit', 'data-fk': 'rt-to-toolkit' }, 'Open the Sales Toolkit'))));
   }
   renderReviewTab(panel, typeId);
-  main.append(panel);
+  put(main, panel);
 }

@@ -20,6 +20,7 @@ function exportPayload() {
       drafts: state.drafts,
       builder: state.builder,
       links: state.links,
+      tracker: state.tracker,
     },
   };
 }
@@ -85,6 +86,7 @@ function parseImport(text) {
       drafts: sanitizeDrafts(d.drafts),
       builder: d.builder ? sanitizeBuilder(d.builder) : null,
       links: d.links ? sanitizeLinks(d.links) : null,
+      tracker: d.tracker ? sanitizeTracker(d.tracker) : null,
     },
   };
 }
@@ -107,7 +109,9 @@ function applyImport(pack, mode) {
     state.builder = pack.builder || defaultBuilder();
     // Backups made before Quick Links existed have no links; keep the current ones.
     if (pack.links) state.links = pack.links;
+    if (pack.tracker) state.tracker = pack.tracker;
   } else {
+    if (pack.tracker) state.tracker = { plans: mergeById(state.tracker.plans, pack.tracker.plans) };
     if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items) };
     pack.favorites.forEach((id) => state.favorites.add(id));
     state.custom = { opps: mergeById(state.custom.opps, pack.custom.opps), strengths: mergeById(state.custom.strengths, pack.custom.strengths) };
@@ -136,6 +140,7 @@ function handleImportText(text) {
     plural(pack.combos.length, 'saved combination'),
     plural(pack.drafts.length, 'draft'),
     plural(pack.links ? pack.links.items.length : 0, 'quick link'),
+    plural(pack.tracker ? pack.tracker.plans.length : 0, 'follow-up plan'),
   ];
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
   const replace = h('button', { type: 'button', class: 'btn btn--danger' }, 'Replace everything');
@@ -178,7 +183,7 @@ async function resetCustomizations() {
 }
 
 async function clearAllData() {
-  if (!(await confirmDialog({ title: 'Clear all local data?', message: 'This removes everything this app saved in this browser: templates, favorites, combinations, drafts, Builder content, quick links, and settings. The built-in library is not affected.', confirmLabel: 'Clear everything', danger: true }))) return;
+  if (!(await confirmDialog({ title: 'Clear all local data?', message: 'This removes everything this app saved in this browser: templates, favorites, combinations, drafts, Builder content, follow-up plans, quick links, and settings. The built-in library is not affected.', confirmLabel: 'Clear everything', danger: true }))) return;
   STATE_KEYS.forEach((k) => store.remove(k));
   state.settings = { ...DEFAULT_SETTINGS };
   state.prefs = defaultPrefs();
@@ -190,6 +195,7 @@ async function clearAllData() {
   state.drafts = [];
   state.review = defaultReview();
   state.links = initialLinks();
+  state.tracker = { plans: [] };
   store.remove('brandcss');
   applyTheme();
   applyBrand();
@@ -234,8 +240,8 @@ function renderSettings(main) {
       label
     );
 
-  main.append(pageHead({ title: 'Settings & Data', sub: 'Defaults for action plans and copying, appearance, and the data this app keeps in your browser.' }));
-  main.append(
+  put(main, pageHead({ title: 'Settings & Data', sub: 'Defaults for action plans and copying, appearance, and the data this app keeps in your browser.' }));
+  put(main, 
     h(
       'div',
       { class: 'two-col' },

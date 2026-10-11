@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const STORAGE_PREFIX = 'cip.v1.';
-const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links'];
+const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker'];
 
 const store = (() => {
   let ok = false;
@@ -90,6 +90,7 @@ function defaultPrefs() {
     salesTab: 'review',
     salesOffer: 'xm',
     peopleTab: 'attendance',
+    trackerFilter: 'active',
     brand: null,
   };
 }
@@ -128,6 +129,7 @@ const state = {
   drafts: [],
   review: defaultReview(),
   links: { items: [] },
+  tracker: { plans: [] },
   ui: { view: 'all', cat: null, query: '', linkQuery: '', openId: null, sVersion: {}, visibleIds: [], returnFocusKey: null },
 };
 
@@ -173,6 +175,7 @@ function sanitizePrefs(o) {
   if (SALES_TAB_IDS.includes(src.salesTab)) p.salesTab = src.salesTab;
   if (SALES_OFFER_IDS.includes(src.salesOffer)) p.salesOffer = src.salesOffer;
   if (PEOPLE_TAB_IDS.includes(src.peopleTab)) p.peopleTab = src.peopleTab;
+  if (['active', 'done', 'all'].includes(src.trackerFilter)) p.trackerFilter = src.trackerFilter;
   if (src.brand && typeof src.brand === 'object') {
     const hex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
     const primary = hex(src.brand.primary);
@@ -201,6 +204,48 @@ function sanitizeReview(o) {
   }
   if (REVIEW_TYPE_IDS.includes(src.type)) out.type = src.type;
   return out;
+}
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const isIsoDate = (v) => typeof v === 'string' && ISO_DATE.test(v) && !Number.isNaN(new Date(v + 'T00:00:00').getTime());
+
+/** Follow-up plans: a label the supervisor chooses (never a name), the focus entries, the plan settings, and logged results. */
+function sanitizeTracker(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const plans = [];
+  const seen = new Set();
+  for (const p of Array.isArray(src.plans) ? src.plans.slice(0, 300) : []) {
+    if (!p || typeof p !== 'object') continue;
+    let id = isId(p.id) ? p.id : uid('plan');
+    if (seen.has(id)) id = uid('plan');
+    seen.add(id);
+    const focus = [...new Set(strList(p.focus, 40, 80).filter(isId))];
+    if (!focus.length) continue;
+    const settings = sanitizeSettings({ duration: p.duration, calls: p.calls, followup: p.followup });
+    const logs = [];
+    for (const l of Array.isArray(p.logs) ? p.logs.slice(0, 200) : []) {
+      if (!l || typeof l !== 'object' || !isIsoDate(l.date)) continue;
+      const results = {};
+      const raw = l.results && typeof l.results === 'object' ? l.results : {};
+      for (const fid of focus) if (['met', 'miss', 'na'].includes(raw[fid])) results[fid] = raw[fid];
+      if (!Object.keys(results).length) continue;
+      logs.push({ id: isId(l.id) ? l.id : uid('log'), kind: l.kind === 'checkin' ? 'checkin' : 'call', date: l.date, results, note: str(l.note, 300).trim() });
+    }
+    logs.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    plans.push({
+      id,
+      label: str(p.label, 40).trim() || 'Agent',
+      start: isIsoDate(p.start) ? p.start : isoDay(new Date()),
+      duration: settings.duration,
+      calls: settings.calls,
+      followup: settings.followup,
+      focus,
+      status: p.status === 'done' ? 'done' : 'active',
+      created: num(p.created) || Date.now(),
+      logs,
+    });
+  }
+  return { plans };
 }
 
 function sanitizeLinks(o) {
@@ -439,6 +484,7 @@ function loadSlice(key) {
     case 'combos': state.combos = sanitizeCombos(store.get('combos', [])); break;
     case 'drafts': state.drafts = sanitizeDrafts(store.get('drafts', [])); break;
     case 'review': state.review = sanitizeReview(store.get('review', null)); break;
+    case 'tracker': state.tracker = sanitizeTracker(store.get('tracker', null)); break;
     case 'links': {
       const raw = store.get('links', null);
       state.links = raw == null ? initialLinks() : sanitizeLinks(raw);

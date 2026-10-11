@@ -7,7 +7,7 @@ function builderCount() {
   return b.opps.filter((id) => getOpp(id)).length + b.strengths.filter((s) => getStrength(s.id)).length;
 }
 
-function navItem({ view, cat, label, iconName, count, badge, dotCat }) {
+function navItem({ view, cat, label, iconName, count, badge, badgeLabel, dotCat }) {
   const href = view === 'cat' ? `#/cat/${cat}` : `#/${view}`;
   const current = state.ui.view === view && (view !== 'cat' || state.ui.cat === cat);
   return h(
@@ -15,7 +15,7 @@ function navItem({ view, cat, label, iconName, count, badge, dotCat }) {
     { class: 'nav__item', href, 'aria-current': current ? 'page' : null, 'data-fk': `nav:${view}:${cat || ''}` },
     dotCat ? h('span', { class: `nav__dot cat-${dotCat}`, style: 'background:var(--cc)' }) : icon(iconName),
     h('span', { class: 'nav__label' }, label),
-    badge ? h('span', { class: 'nav__badge', 'aria-label': `${badge} selected` }, String(badge)) : count != null ? h('span', { class: 'nav__count' }, String(count)) : null
+    badge ? h('span', { class: `nav__badge${badgeLabel ? ' nav__badge--alert' : ''}`, 'aria-label': badgeLabel || `${badge} selected` }, String(badge)) : count != null ? h('span', { class: 'nav__count' }, String(count)) : null
   );
 }
 
@@ -24,6 +24,7 @@ function renderSidebar() {
   content.opps.forEach((o) => (counts[o.cat] = (counts[o.cat] || 0) + 1));
   const customCount = state.custom.opps.length + state.custom.strengths.length + Object.keys(state.overrides.opps).length + Object.keys(state.overrides.strengths).length;
   const bc = builderCount();
+  const dueN = trackerDueCount();
   els.sidebar.replaceChildren(
     h(
       'div',
@@ -45,6 +46,7 @@ function renderSidebar() {
       navItem({ view: 'people-toolkit', label: 'ABS & Attrition Toolkit', iconName: 'users' }),
       navItem({ view: 'favorites', label: 'Favorites', iconName: 'star', count: state.favorites.size }),
       navItem({ view: 'builder', label: 'Coaching Builder', iconName: 'clipboard', badge: bc || null, count: bc ? null : 0 }),
+      navItem({ view: 'tracker', label: 'Follow-Up Tracker', iconName: 'calendar', badge: dueN || null, badgeLabel: dueN ? `${dueN} due or overdue` : null, count: dueN ? null : state.tracker.plans.filter((p) => p.status === 'active').length }),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Personal'),
       navItem({ view: 'links', label: 'Quick Links', iconName: 'link', count: state.links.items.length }),
       navItem({ view: 'templates', label: 'My Templates', iconName: 'folder', count: customCount }),
@@ -332,10 +334,10 @@ function renderLibrary(main) {
     title = 'Favorites';
     sub = 'Your starred opportunities for quick access. Use the star on any card to add or remove one.';
   }
-  main.append(pageHead({ eyebrow, title, sub }), libraryToolbar());
+  put(main, pageHead({ eyebrow, title, sub }), libraryToolbar());
 
-  if (cat && (cat.id === 'hold' || cat.id === 'sales')) main.append(refCard(cat.id));
-  if (cat && cat.id === 'people') main.append(peoplePromo());
+  if (cat && (cat.id === 'hold' || cat.id === 'sales')) put(main, refCard(cat.id));
+  if (cat && cat.id === 'people') put(main, peoplePromo());
 
   if (q) {
     const meta = h('p', { class: 'result-meta', role: 'status' });
@@ -347,14 +349,14 @@ function renderLibrary(main) {
     if (view !== 'all') {
       meta.append(' · ', h('button', { type: 'button', class: 'btn btn--ghost btn--sm', style: 'display:inline-flex;vertical-align:middle', onclick: () => navigate('all') }, 'Search all opportunities'));
     }
-    main.append(meta);
+    put(main, meta);
   }
 
   if (!items.length) {
     if (view === 'favorites' && !scopeCount) {
-      main.append(emptyState({ iconName: 'star', title: 'No favorites yet', text: 'Star the opportunities you coach most often and they will appear here.', action: h('a', { class: 'btn', href: '#/all' }, 'Browse all opportunities') }));
+      put(main, emptyState({ iconName: 'star', title: 'No favorites yet', text: 'Star the opportunities you coach most often and they will appear here.', action: h('a', { class: 'btn', href: '#/all' }, 'Browse all opportunities') }));
     } else {
-      main.append(
+      put(main, 
         emptyState({
           iconName: 'search',
           title: 'Nothing matches yet',
@@ -370,7 +372,7 @@ function renderLibrary(main) {
     for (const c of CATS) {
       const list = items.filter((o) => o.cat === c.id);
       if (!list.length) continue;
-      main.append(
+      put(main, 
         h(
           'section',
           { class: `group cat-${c.id}`, 'aria-labelledby': `grp-${c.id}` },
@@ -387,7 +389,7 @@ function renderLibrary(main) {
       );
     }
   } else {
-    main.append(h('h2', { class: 'sr-only' }, q ? 'Search results' : 'Coaching opportunities'), cardGrid(items, search.tokens));
+    put(main, h('h2', { class: 'sr-only' }, q ? 'Search results' : 'Coaching opportunities'), cardGrid(items, search.tokens));
   }
 }
 
@@ -404,13 +406,14 @@ function renderMain() {
     state.ui.enterAnim = false;
   }
   if (!store.ok && (v === 'builder' || v === 'templates' || v === 'settings')) {
-    main.append(h('p', { class: 'banner', role: 'note' }, icon('alert'), h('span', null, 'Browser storage is unavailable (for example in some private windows or locked-down browsers). Everything works, but changes are lost when this tab closes. Use Export in Settings & Data to keep a copy.')));
+    put(main, h('p', { class: 'banner', role: 'note' }, icon('alert'), h('span', null, 'Browser storage is unavailable (for example in some private windows or locked-down browsers). Everything works, but changes are lost when this tab closes. Use Export in Settings & Data to keep a copy.')));
   }
   if (v === 'home') renderHome(main);
   else if (v === 'strengths') renderStrengthsView(main);
   else if (v === 'sales-toolkit') renderSalesToolkit(main);
   else if (v === 'call-review') renderCallReview(main);
   else if (v === 'people-toolkit') renderPeopleToolkit(main);
+  else if (v === 'tracker') renderTracker(main);
   else if (v === 'links') renderLinks(main);
   else if (v === 'builder') renderBuilder(main);
   else if (v === 'templates') renderTemplates(main);
@@ -422,7 +425,7 @@ function renderMain() {
 function titleForView() {
   const v = state.ui.view;
   if (v === 'cat') return (CAT_MAP[state.ui.cat] || {}).nav || 'Category';
-  return { home: 'Home', all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', 'call-review': 'Call Review', 'people-toolkit': 'ABS & Attrition Toolkit', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
+  return { home: 'Home', all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', 'call-review': 'Call Review', 'people-toolkit': 'ABS & Attrition Toolkit', tracker: 'Follow-Up Tracker', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
 }
 
 /** Re-render everything that depends on state, keeping focus and scroll where they were. */

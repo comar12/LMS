@@ -167,7 +167,7 @@ function renderLinks(main) {
       })
     );
   }
-  main.append(
+  put(main, 
     pageHead({
       eyebrow: [h('span', { class: 'group__icon cat-custom', style: 'width:22px;height:22px;border-radius:6px' }, icon('link', 'icon--sm')), 'Daily tools'],
       title: 'Quick Links',

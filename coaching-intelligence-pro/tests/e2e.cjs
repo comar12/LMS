@@ -1085,6 +1085,99 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Follow-Up Tracker: track from the Builder, log results, honest progress text, due dates', async () => {
+    const day = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+    const { page, context } = await newPage({
+      hash: '#/builder',
+      init: () => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['dis-insufficient-probing', 'own-unnecessary-transfer', 'people-late-login'], strengths: [] })); } },
+    });
+    await page.reload();
+    await page.waitForSelector('.builder');
+    await page.getByRole('button', { name: 'Track this plan' }).click();
+    await page.fill('#tr-label', 'Agent 1234567');
+    assert((await page.locator('.modal .pii').count()) === 1, 'A long number in the label should show an identifier warning');
+    await page.fill('#tr-label', 'Agent 4');
+    await page.getByRole('button', { name: 'Start tracking' }).click();
+    await page.goto(URL + '#/tracker');
+    const card = page.locator('.plan', { hasText: 'Agent 4' });
+    await card.waitFor();
+    assert(/On track/.test(await card.locator('.due-chip').innerText()), 'A new plan should be on track');
+    assert((await card.locator('.ring__value').innerText()).replace(/\s/g, '') === '0/7', 'Targets should be five call reviews plus two weekly check-ins');
+    // Log one call review and one check-in.
+    await card.getByRole('button', { name: 'Log call review' }).click();
+    const rows = page.locator('.tr-logrow');
+    assert((await rows.count()) === 2, 'Call review should list only the call behaviors');
+    await page.getByRole('button', { name: 'Save call review' }).click();
+    assert(!(await page.locator('.modal .field__error').isHidden()), 'Saving without answers should be blocked');
+    await rows.nth(0).getByRole('button', { name: 'Met', exact: true }).click();
+    await rows.nth(1).getByRole('button', { name: 'Not met' }).click();
+    await page.getByRole('button', { name: 'Save call review' }).click();
+    await card.getByRole('button', { name: 'Log check-in' }).click();
+    assert((await page.locator('.tr-logrow').count()) === 1, 'Check-in should list only the attendance behavior');
+    await page.locator('.tr-logrow').first().getByRole('button', { name: 'Met', exact: true }).click();
+    await page.getByRole('button', { name: 'Save check-in' }).click();
+    assert((await card.locator('.ring__value').innerText()).replace(/\s/g, '') === '2/7', 'Ring did not count the logged follow-ups');
+    const start = await page.evaluate(() => new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric' }));
+    const f = (id) => oppById[id].b.focus;
+    const expected = `Since our coaching session on ${start}, I reviewed one of your calls. The expected standard for ${f('dis-insufficient-probing')} was met on the call reviewed. The expected standard for ${f('own-unnecessary-transfer')} was not yet met on the call reviewed. We also held one check-in. The expected standard for ${f('people-late-login')} was met on the check-in.`;
+    const progress = await clickCopy(page, 'Copy progress for Agent 4');
+    assert(progress === expected, 'Progress text is wrong:\n' + progress + '\nexpected:\n' + expected);
+    assertClean(progress, 'tracker progress');
+    assert(!progress.includes('Agent 4'), 'The plan label must never appear in coaching text');
+    await card.getByRole('button', { name: 'Use in Builder' }).click();
+    await page.waitForSelector('.out-sec__text');
+    assert((await page.locator('.out-sec__text').first().inputValue()).startsWith(expected), 'Progress did not reach the Builder progress section');
+    // An overdue plan shows on the badge and on Home.
+    await page.evaluate((st) => {
+      const t = JSON.parse(localStorage.getItem('cip.v1.tracker'));
+      t.plans.push({ id: 'plan-old', label: 'Agent 9', start: st, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] });
+      localStorage.setItem('cip.v1.tracker', JSON.stringify(t));
+    }, day(-10));
+    await page.goto(URL + '#/tracker');
+    await page.reload();
+    const old = page.locator('.plan', { hasText: 'Agent 9' });
+    await old.waitFor();
+    assert(/^Overdue/.test(await old.locator('.due-chip').innerText()), 'A plan past its review date should be overdue');
+    assert((await page.locator('.plan').first().locator('.plan__label').innerText()) === 'Agent 9', 'Overdue plans should be listed first');
+    assert((await page.locator('a[href="#/tracker"] .nav__badge').getAttribute('aria-label')) === '1 due or overdue', 'Sidebar badge is wrong');
+    await page.goto(URL + '#/home');
+    assert((await page.locator('.due-strip').innerText()).includes('1 follow-up is due or overdue'), 'Home did not show the due follow-up');
+    // Complete, filter, back up.
+    await page.goto(URL + '#/tracker');
+    await old.getByRole('button', { name: 'Plan' }).click();
+    await page.getByRole('button', { name: 'Mark plan complete' }).click();
+    assert((await page.locator('.plan', { hasText: 'Agent 9' }).count()) === 0, 'Completed plan should leave the Active list');
+    await page.getByRole('button', { name: /Completed \(1\)/ }).click();
+    assert((await page.locator('.plan', { hasText: 'Agent 9' }).locator('.due-chip').innerText()) === 'Completed', 'Completed filter is wrong');
+    await page.goto(URL + '#/settings');
+    const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Export backup/ }).click()]);
+    const json = JSON.parse(fs.readFileSync(await download.path(), 'utf8'));
+    assert(json.data.tracker && json.data.tracker.plans.length === 2, 'Backup does not include follow-up plans');
+    await finish(page, context);
+  });
+
+  await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
+    const { page, context } = await newPage({ hash: '#/home' });
+    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/links', '#/templates', '#/settings'];
+    const sweep = async (label) => {
+      for (const v of views) {
+        await page.goto(URL + v);
+        await page.waitForSelector('#pageTitle');
+        const bad = await page.evaluate(() => /(^|\s)(null|undefined|NaN)(\s|$)/.test(document.getElementById('main').innerText));
+        assert(!bad, `${label} ${v}: page shows null, undefined, or NaN`);
+      }
+    };
+    await sweep('empty');
+    await page.evaluate(() => {
+      localStorage.setItem('cip.v1.links', JSON.stringify({ items: [{ id: 'link-a1', name: 'Dashboard', url: 'example.com', group: 'Daily', pinned: true }] }));
+      localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-a1', label: 'Agent 1', start: '2026-01-05', duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }] }));
+      localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['hold-dead-air'], strengths: [] }));
+    });
+    await page.reload();
+    await sweep('with data');
+    await finish(page, context);
+  });
+
   await browser.close();
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} test groups passed.`);

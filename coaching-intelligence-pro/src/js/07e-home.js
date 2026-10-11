@@ -91,7 +91,7 @@ function renderHome(main) {
     )
   );
 
-  const stats = h('div', { class: 'stats' }, stat(content.opps.length, 'coaching entries', 'layers'), stat(content.strengths.length, 'strengths', 'thumb'), stat(REVIEW_TYPES.length, 'call review types', 'checklist'), stat(state.links.items.length, 'quick links', 'link'));
+  const stats = h('div', { class: 'stats' }, stat(content.opps.length, 'coaching entries', 'layers'), stat(content.strengths.length, 'strengths', 'thumb'), stat(state.tracker.plans.filter((p) => p.status === 'active').length, 'plans being tracked', 'calendar'), stat(state.links.items.length, 'quick links', 'link'));
 
   const kpiTiles = h(
     'div',
@@ -123,9 +123,9 @@ function renderHome(main) {
     { class: 'home-grid' },
     homeTile({ href: '#/call-review', iconName: 'checklist', title: 'Call Review', text: 'Technical, Billing, Service, and Sales checklists that feed the Builder', cat: 'tech', fk: 'home-t-review' }),
     homeTile({ href: '#/builder', iconName: 'clipboard', title: 'Coaching Builder', text: 'Combine behaviors into one ready-to-paste coaching entry', cat: 'own', badge: bc ? String(bc) : null, fk: 'home-t-builder' }),
+    homeTile({ href: '#/tracker', iconName: 'calendar', title: 'Follow-Up Tracker', text: 'Log reviews and check-ins; progress is written from your results', cat: 'own', badge: trackerDueCount() ? `${trackerDueCount()} due` : null, fk: 'home-t-tracker' }),
     homeTile({ href: '#/people-toolkit', iconName: 'users', title: 'ABS & Attrition Toolkit', text: 'Attendance talks, stay conversations, warning signs, recognition', cat: 'people', fk: 'home-t-people' }),
     homeTile({ href: '#/sales-toolkit', iconName: 'tag', title: 'Sales Toolkit', text: 'Sales flow, offer guides, objections, and buying signals', cat: 'sales', fk: 'home-t-sales' }),
-    homeTile({ href: '#/strengths', iconName: 'thumb', title: 'Things Went Well', text: 'Specific, ready-to-paste recognition for what you observed', cat: 'bill', fk: 'home-t-strengths' }),
     homeTile({ href: '#/links', iconName: 'link', title: 'Quick Links', text: state.links.items.length ? `${plural(state.links.items.length, 'dashboard, tool, or form', 'dashboards, tools, and forms')} one click away` : 'Add the dashboards and forms you open every day', cat: 'dis', fk: 'home-t-links' })
   );
 
@@ -145,8 +145,19 @@ function renderHome(main) {
 
   const section = (title, iconName, body, extra) => h('section', { class: 'home-sec', 'aria-label': title }, h('div', { class: 'home-sec__head' }, h('h2', { class: 'home-sec__title' }, icon(iconName), title), extra || null), body);
 
+  const dueN = trackerDueCount();
+  const dueStrip = dueN
+    ? h(
+        'a',
+        { class: 'due-strip', href: '#/tracker', 'data-fk': 'home-due' },
+        h('span', { class: 'due-strip__icon', 'aria-hidden': 'true' }, icon('alert')),
+        h('span', { class: 'due-strip__text' }, h('strong', null, `${plural(dueN, 'follow-up')} ${dueN === 1 ? 'is' : 'are'} due or overdue.`), ' Log your call reviews and check-ins so the next coaching reflects what really happened.'),
+        h('span', { class: 'due-strip__go' }, 'Open tracker', icon('arrow-right'))
+      )
+    : null;
   const parts = [
     hero,
+    dueStrip,
     stats,
     section('Coach by KPI', 'target', kpiTiles, h('span', { class: 'sec__sub' }, 'opens the library filtered to that KPI')),
     section('Quick actions', 'sparkle', actions),
@@ -160,6 +171,6 @@ function renderHome(main) {
       : null,
     section('Browse by category', 'layers', cats),
   ];
-  main.append(...parts.filter(Boolean));
+  put(main, ...parts.filter(Boolean));
   if (main.classList.contains('anim-enter')) countUp(main);
 }

@@ -537,6 +537,7 @@ function outputColumn() {
       'div',
       { class: 'out-head' },
       h('h2', { class: 'out-head__title', id: 'outTitle' }, 'Generated coaching entry'),
+      h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'otrack', disabled: !state.builder.opps.some((id) => getOpp(id)), onclick: openTrackFromBuilder }, icon('calendar'), 'Track this plan'),
       copyButton(
         () => (hasAny ? builderAllText() : ''),
         { label: 'Copy all sections', srLabel: 'Copy all four coaching sections', primary: true, size: 'md', fk: 'ocopy:all', emptyMessage: 'Add opportunities or observed strengths first.' }
@@ -570,7 +571,7 @@ async function resetBuilder() {
 
 function renderBuilder(main) {
   lastGenerated = composeBuilder();
-  main.append(
+  put(main, 
     pageHead({
       title: 'Coaching Builder',
       sub: 'Combine several opportunities and the strengths you observed into one cohesive coaching entry, with a single consolidated SMART plan and follow-up. Edit any section before copying; your edits are kept.',

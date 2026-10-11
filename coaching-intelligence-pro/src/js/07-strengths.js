@@ -65,7 +65,7 @@ function renderStrengthsView(main) {
   const items = search.results.map((r) => r.item);
   const selected = selectedStrengths();
 
-  main.append(
+  put(main, 
     pageHead({
       title: 'Things Went Well',
       sub: `${content.strengths.length} reusable strengths, each with two or more wordings, written directly to the agent. Mark only what you observed; nothing positive is ever added to coaching text unless you select it.`,
@@ -97,14 +97,14 @@ function renderStrengthsView(main) {
       )
     )
   );
-  if (q) main.append(h('p', { class: 'result-meta', role: 'status' }, items.length ? [h('strong', null, plural(items.length, 'strength')), ` match “${q}”`] : `No strengths match “${q}”`));
+  if (q) put(main, h('p', { class: 'result-meta', role: 'status' }, items.length ? [h('strong', null, plural(items.length, 'strength')), ` match “${q}”`] : `No strengths match “${q}”`));
   if (!items.length) {
-    main.append(emptyState({ iconName: 'thumb', title: 'No strengths found', text: 'Try another word, or clear the area filter.' }));
+    put(main, emptyState({ iconName: 'thumb', title: 'No strengths found', text: 'Try another word, or clear the area filter.' }));
   } else {
-    main.append(h('h2', { class: 'sr-only' }, 'Strengths'), h('div', { class: 's-grid' }, items.map((s) => strengthCard(s, search.tokens))));
+    put(main, h('h2', { class: 'sr-only' }, 'Strengths'), h('div', { class: 's-grid' }, items.map((s) => strengthCard(s, search.tokens))));
   }
   if (selected.length) {
-    main.append(
+    put(main, 
       h(
         'div',
         { class: 'selection-bar', role: 'region', 'aria-label': 'Selected strengths' },
