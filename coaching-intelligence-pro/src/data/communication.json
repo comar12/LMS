@@ -1,0 +1,510 @@
+[
+  {
+    "id": "com-missing-empathy",
+    "cat": "com",
+    "title": "Missing Empathy",
+    "desc": "Moving straight into the task without recognizing how the situation is affecting the customer.",
+    "kw": ["empathy", "empathize", "empathetic", "sympathy", "feelings", "frustration", "frustrated", "upset", "angry", "customer angry", "cold", "robotic", "uncaring", "soft skills", "no empathy"],
+    "tags": ["Soft Skills", "Customer Connection"],
+    "kpi": ["QA"],
+    "theme": "connect",
+    "feedback": "When the customer explained the issue, you moved directly into troubleshooting without acknowledging how the situation was affecting them. The customer had shared their frustration, and responding to that before starting the work is what tells them you understand why the call matters. Without that moment, even accurate troubleshooting can feel cold, and a frustrated customer may be less patient with the steps that follow. Next time, acknowledge the concern, express empathy that reflects their specific situation, and explain how you will help before beginning the investigation.",
+    "impact": "Missing empathy usually happens when the focus shifts to solving the problem as quickly as possible. That instinct is a good one, but it skips the step that makes the customer feel understood. Customers who feel their frustration was not recognized often stay guarded, repeat their concerns, or push back on troubleshooting steps. This can lengthen the call, increase the chance of an escalation request, and lower satisfaction, even when the issue is resolved correctly.",
+    "plan": "Over the next {duration}, you will respond to every concern with a brief acknowledgement and an empathy statement that reflects what the customer actually shared, such as the impact on their work, family, or schedule, before beginning troubleshooting. Avoid relying on general phrases on their own, and connect your empathy to a clear next step. We will review {calls} applicable calls within {followup}, targeting a personalized empathy statement before troubleshooting begins in all {calls} calls.",
+    "followup": "During our session, we will listen to the opening of this call together and practice two or three empathy statements that would have fit the customer's situation. I will review {calls} of your applicable calls within {followup}, and we will have a short midweek check-in to discuss what is working. At the end of the {durationAdj} coaching period, we will review the results together and decide whether the plan is complete or needs more time.",
+    "example": [
+      { "say": "I'm really sorry your internet has been dropping all week, especially while you're working from home. That is a lot to deal with, and I'm going to get this sorted out for you. Let me start by checking the connection on your equipment." }
+    ],
+    "questions": [
+      "What did you notice about how the customer was feeling when they first explained the issue?",
+      "What could you have said before beginning troubleshooting to show you understood the impact on them?",
+      "How do you think the rest of the call would have changed if the customer felt heard at the start?"
+    ],
+    "strengths": ["s-troubleshooting", "s-ownership", "s-tone", "s-resolution"],
+    "b": {
+      "obs": "moved into troubleshooting without first acknowledging how the situation was affecting the customer",
+      "focus": "personalized empathy",
+      "commit": "respond to every concern with an acknowledgement and a personalized empathy statement before beginning troubleshooting",
+      "m": "an acknowledgement and personalized empathy statement before troubleshooting begins",
+      "coach": "a side-by-side review of the call opening with empathy statement practice"
+    }
+  },
+  {
+    "id": "com-generic-empathy",
+    "cat": "com",
+    "title": "Generic / Non-Personalized Empathy",
+    "desc": "Empathy that sounds scripted, generic, or repeated, and does not connect to the situation the customer actually described.",
+    "kw": ["generic empathy", "scripted empathy", "scripted", "canned", "canned response", "robotic", "insincere", "fake empathy", "repetitive", "repeated apology", "over apologizing", "not personalized", "personalized empathy", "empathy statement", "same phrase", "i understand your frustration", "sorry for the inconvenience"],
+    "tags": ["Soft Skills", "Customer Connection", "Personalization"],
+    "kpi": ["QA"],
+    "theme": "connect",
+    "feedback": "In this interaction, you offered empathy, but it came across as a general statement rather than a response to what the customer had told you. Phrases such as 'I understand your frustration' or 'sorry for the inconvenience', especially when repeated, can sound scripted and suggest the customer is being handled rather than heard. The customer had described a specific situation, and an empathy statement that overlooks those details often feels hollow and may leave them more frustrated than before. Going forward, connect your empathy to something the customer actually shared, such as the impact on their work, family, or plans, and vary your wording so it sounds natural each time.",
+    "impact": "Generic empathy usually comes from relying on a familiar phrase to fill the moment instead of responding to the details the customer had shared. Customers can tell the difference between a set phrase and a sincere response, and a statement that could apply to anyone may make them feel like one more call in the queue. That can reduce trust in the rest of the conversation, lower QA results on empathy, and make an upset customer harder to settle.",
+    "plan": "For the next {duration}, you will build each empathy statement around a detail the customer has shared, such as a missed workday, a family member relying on the service, or a bill that came in higher than expected. Before responding, pick out that detail and name it in your own words. Avoid stock phrases on their own, and do not use the same empathy line twice in one call. We will review {calls} applicable calls within {followup}, targeting at least one personalized empathy statement tied to the customer's situation in all {calls} calls, with no repeated stock phrases.",
+    "followup": "During our session, we will take three common situations, such as an outage during the workday, a higher bill, and a missed appointment, and practice turning a general apology into a statement that reflects each customer's details. I will review {calls} of your calls within {followup}, listening for empathy that uses the customer's own words. We will check in midweek on which statements feel natural to you, and at the end of the {durationAdj} plan we will decide together whether more practice is needed.",
+    "example": [
+      { "label": "Technical concern", "say": "Losing your connection every evening while your kids are trying to finish homework is stressful. Let's get to the bottom of it, starting with a look at your equipment." },
+      { "label": "Billing concern", "say": "Opening a bill that is higher than you planned for, right after you set your budget for the month, is frustrating. I'm going to walk through each change with you so you know exactly where it came from." }
+    ],
+    "questions": [
+      "What specific details did the customer share that you could have built your empathy statement around?",
+      "How might a phrase like 'sorry for the inconvenience' sound to a customer who has just described a much bigger problem?",
+      "Which situations do you hear most often, and what would a personalized empathy statement sound like for each one?"
+    ],
+    "strengths": ["s-acknowledgement", "s-tone", "s-ownership", "s-resolution"],
+    "b": {
+      "obs": "offered empathy through a general or repeated phrase that did not reflect the specific situation the customer described",
+      "focus": "situation-specific empathy",
+      "commit": "replace stock apology phrases with empathy that names the customer's specific situation and how it is affecting them",
+      "m": "an empathy statement that reflects the customer's own details, with no repeated stock phrases",
+      "coach": "a practice exercise turning general apologies into situation-specific empathy statements"
+    },
+    "note": "Listen for whether the same empathy line was repeated during the call. The weak phrases quoted in this entry are examples of what to avoid, not model language."
+  },
+  {
+    "id": "com-missing-acknowledgement",
+    "cat": "com",
+    "title": "Missing Acknowledgement",
+    "desc": "Moving ahead without restating or confirming the customer's concern or request, so the customer is not sure their reason for calling was understood.",
+    "kw": ["acknowledgement", "acknowledgment", "acknowledge", "no acknowledgement", "missing acknowledgement", "did not acknowledge", "restate", "restating", "restate the concern", "confirm the concern", "summarize the issue", "reason for call", "recognize the request", "understanding the request", "heard"],
+    "tags": ["Soft Skills", "Customer Connection", "Understanding"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "connect",
+    "feedback": "After the customer described the reason for the call, you moved straight into the account without restating what they needed. Unlike empathy, which responds to feelings, acknowledgement confirms the request itself, such as 'So your bill went up this month, and you'd like to know why.' Without that moment, the customer has no way of knowing you understood the request correctly, and a misunderstanding may not surface until much later in the call. That can make the customer repeat themselves or feel the conversation is heading in the wrong direction. The expectation is to restate the concern in one clear sentence and confirm it with the customer before you begin working on it.",
+    "impact": "Missing acknowledgement often comes from recognizing the issue quickly and wanting to save time by going straight to the fix. When the request is not restated, the customer cannot confirm you heard it correctly, so a misunderstanding may lead to work on the wrong issue, a longer call, or a repeat contact when the actual concern is left unresolved. A brief restatement also tells the customer the call is on track, which usually makes the rest of the conversation easier.",
+    "plan": "Starting with your next call and continuing for {duration}, you will restate each customer's concern or request in one clear sentence as soon as they finish explaining it, then confirm you have it right with a quick question such as 'Did I get that right?' When a customer raises more than one concern, restate each one and agree on the order you will handle them. We will review {calls} applicable calls within {followup}, with the goal of a clear restatement and confirmation of the concern before any solution is offered in all {calls} calls.",
+    "followup": "During our session, we will listen to the start of this call side by side and pause right after the customer explains the concern, so you can practice restating it in one sentence. I will then review {calls} of your calls within {followup}, noting where the restatement happened and whether the customer confirmed it. We will compare notes midweek, and at the end of the {duration} we will decide whether this step has become a natural part of your calls or needs more practice.",
+    "example": [
+      { "label": "Billing request", "say": "So your bill went up this month even though nothing on your service changed, and you'd like to know where the increase came from. Is that correct?" },
+      { "label": "Technical request", "say": "Let me make sure I have this right. Your internet is working, but the TV box in the bedroom has had no picture since yesterday. Did I get that right?" }
+    ],
+    "questions": [
+      "After the customer finished explaining, what could you have said to show you understood the request?",
+      "How would restating the concern have helped you confirm you were working on the right issue?",
+      "When a customer brings up more than one concern, how will you acknowledge each one before starting?"
+    ],
+    "strengths": ["s-empathy", "s-tone", "s-troubleshooting", "s-resolution"],
+    "b": {
+      "obs": "moved ahead without restating the customer's request, so they had no confirmation that it was understood correctly",
+      "focus": "acknowledging the request",
+      "commit": "restate the customer's concern in one clear sentence and confirm it is correct before offering a solution",
+      "m": "the concern restated and confirmed with the customer before a solution is offered",
+      "coach": "a side-by-side listen that pauses after the concern to practice restating it"
+    }
+  },
+  {
+    "id": "com-weak-assurance",
+    "cat": "com",
+    "title": "Weak or Missing Assurance",
+    "desc": "Not clearly stating that the concern will be taken care of and how, or using uncertain phrases that leave the customer unsure the issue is being handled.",
+    "kw": ["assurance", "assure", "no assurance", "weak assurance", "reassurance", "reassure", "i'll try", "let's see", "uncertain", "hesitant", "not confident", "confidence", "ownership statement", "take care of it", "i will help", "commitment"],
+    "tags": ["Soft Skills", "Confidence", "Customer Connection"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "connect",
+    "feedback": "Once the concern was clear, you moved into the work without telling the customer that you would take care of it or how, and tentative phrases such as 'let's see' or 'I'll try' made the next steps sound uncertain. Customers who call with a problem want to know early that someone is taking responsibility for it. Without that, they may stay anxious, question each step, or doubt that the call will lead anywhere. Moving forward, follow your acknowledgement with a confident commitment to what you will do and a brief preview of how, without promising an outcome you cannot guarantee.",
+    "impact": "Weak assurance often comes from uncertainty about the outcome, which leads to hedged language meant to avoid overpromising. The intent is reasonable, but the customer hears doubt rather than caution. Without a clear commitment, customers are more likely to ask for a supervisor, call back to check whether anything was done, or resist the steps you recommend, which can lengthen the call and increase repeat contacts.",
+    "plan": "During the next {duration}, you will give a clear assurance statement right after acknowledging each concern, stating that you will take care of it and naming the first step you will take. Replace tentative phrases such as 'I'll try' and 'let's see' with direct commitments to actions you control, such as 'I'm going to review the account' or 'I'll walk you through the next steps.' Keep assurance focused on your actions rather than guaranteed results. We will review {calls} applicable calls within {followup}, targeting a confident assurance statement early in all {calls} calls and no tentative ownership language.",
+    "followup": "In our session, we will roleplay three common call types, and for each one you will practice replacing a hesitant line with a confident assurance statement. I will review {calls} of your calls within {followup} and flag any moments where the wording sounded uncertain. Midweek, bring one assurance statement from your own calls that felt natural to say, and we will review the full set of calls together at the end of the {durationAdj} period.",
+    "example": [
+      { "label": "Billing concern", "say": "I'm going to take care of this for you. First, I'll check the recent charges on your account so we can see exactly what changed, and then I'll explain your options." },
+      { "label": "Technical concern", "say": "I'll stay with you on this until we know what's causing it. I'm going to run a few checks on your equipment first, and I'll tell you what I find at each step." }
+    ],
+    "questions": [
+      "At what point in the call could you have told the customer that you would take care of the concern?",
+      "How do you think phrases like 'let's see' or 'I'll try' sounded to the customer?",
+      "How can you sound confident about your next steps without promising an outcome you cannot control?"
+    ],
+    "strengths": ["s-empathy", "s-acknowledgement", "s-troubleshooting", "s-resolution"],
+    "b": {
+      "obs": "started on the issue without clearly stating that you would take care of it, relying on tentative wording instead of a confident commitment",
+      "focus": "confident assurance",
+      "commit": "follow each acknowledgement with a confident statement that you will take care of the concern and a brief preview of the first step",
+      "m": "a confident assurance statement and first step shared early in the call",
+      "coach": "a roleplay that swaps hesitant wording for confident assurance statements"
+    }
+  },
+  {
+    "id": "com-lack-rapport",
+    "cat": "com",
+    "title": "Lack of Rapport",
+    "desc": "A transactional conversation with little warmth, where natural openings the customer offers for a genuine connection are passed over.",
+    "kw": ["rapport", "no rapport", "build rapport", "transactional", "robotic", "cold", "warmth", "friendly", "personal connection", "small talk", "connection", "missed opportunity", "personable", "conversational", "engagement", "customer connection"],
+    "tags": ["Soft Skills", "Customer Connection", "Rapport"],
+    "kpi": ["QA"],
+    "theme": "connect",
+    "feedback": "During the interaction, you kept the conversation focused on the task from start to finish, and the natural openings the customer offered, like a personal comment or a light remark about their day, went by without a response. Rapport does not require long small talk, but a brief, genuine reply to what the customer shares makes the call feel like a conversation between people rather than a transaction. When those moments are missed, the customer may feel processed instead of helped, even when the result is correct. On future calls, listen for personal details the customer brings up and respond to them briefly and sincerely before returning to the task.",
+    "impact": "A lack of rapport usually comes from concentrating so closely on the steps that the conversation itself gets less attention. Customers tend to be more patient, more open to recommendations, and more forgiving of delays when they feel a genuine connection with the person helping them. Without it, the call can feel mechanical, which may lower satisfaction and quality results and make the customer less receptive to anything you suggest later in the call.",
+    "plan": "Over the next {duration}, you will listen for at least one natural opening on each call, such as a comment about the customer's day, their home, or how they use the service, and respond with a brief, sincere remark before returning to the task. Keep a warm, conversational tone during verification and research rather than reading through steps, and use the customer's own details, such as the devices or plans they mentioned, when you explain next steps. Keep these moments short and relevant to what the customer offered. We will review {calls} applicable calls within {followup}, targeting at least one genuine moment of connection beyond the task in all {calls} calls.",
+    "followup": "In our session, we will listen to a call example with strong rapport and mark the moments where a short personal response changed the tone of the conversation. Then we will replay part of your call and find the openings the customer offered. I will review {calls} of your calls within {followup} for genuine moments of connection, we will talk midweek about what felt natural, and we will look at the overall results at the end of the {durationAdj} plan.",
+    "example": [
+      { "label": "Responding to an opening", "say": "Congratulations on the new place. Moving is a lot of work, so let's make sure your internet is one less thing to worry about this week." },
+      { "label": "Using the customer's details", "say": "It sounds like you have a busy house with everyone streaming at the same time, so I want to make sure your connection keeps up with all of it." }
+    ],
+    "questions": [
+      "What personal details did the customer mention that you could have responded to?",
+      "How do you think the customer would describe their conversation with you afterward?",
+      "How can you build a genuine connection without adding much time to the call?"
+    ],
+    "strengths": ["s-verification", "s-tools", "s-probing", "s-resolution"],
+    "b": {
+      "obs": "kept the conversation strictly transactional and passed over the natural openings the customer offered for a more personal connection",
+      "focus": "building rapport",
+      "commit": "respond briefly and sincerely to the natural openings the customer offers and keep a warm, conversational tone between steps",
+      "m": "at least one genuine moment of connection beyond the task itself",
+      "coach": "a review of a strong rapport call example to spot natural openings"
+    },
+    "note": "Rapport should fit the call. On a serious or time-pressed call, a warm tone and use of the customer's own details count as rapport even without small talk."
+  },
+  {
+    "id": "com-flat-tone",
+    "cat": "com",
+    "title": "Flat / Sleepy / Low-Energy Tone",
+    "desc": "A flat, low-energy, or monotone delivery that can sound disengaged or uncertain, even when the help being provided is accurate.",
+    "kw": ["sleepy", "sleepy tone", "monotone", "flat", "flat tone", "energy", "low energy", "no energy", "bored", "boring", "tired", "disengaged", "uninterested", "lifeless", "dull", "vocal variety", "enthusiasm", "engagement", "voice tone", "unenthusiastic"],
+    "tags": ["Soft Skills", "Tone", "Engagement"],
+    "kpi": ["QA"],
+    "theme": "delivery",
+    "feedback": "Throughout the call, your voice stayed flat and low in energy, with little change in pitch, emphasis, or pace, even when you were sharing important details. On the phone, customers judge engagement by how you sound, so a monotone delivery can come across as boredom or uncertainty, no matter how well you know the solution. That can make the customer doubt their concern matters to you. Going forward, bring steady energy to your voice, stress the key words in each explanation, and vary your pitch and pace so you sound present and confident. In serious moments, such as a long outage or a financial hardship, aim for a calm, attentive tone that still sounds engaged rather than upbeat.",
+    "impact": "A flat delivery often comes from fatigue late in a shift, handling the same type of call many times in a row, or focusing so heavily on the screen that the voice loses expression. Because the customer cannot see you, low vocal energy can sound like disinterest or a lack of confidence in the answer. That may reduce the customer's trust in the information, make explanations harder to follow, and lower satisfaction even when the issue is resolved.",
+    "plan": "Each day for the next {duration}, you will take a moment before your first call, and again after breaks, to check your energy and posture and reset your voice. On every call, stress the key words when you explain next steps, vary your pitch rather than holding one level, and keep a steady, engaged pace. Match your delivery to the moment by bringing warmth and energy to routine calls and a calm, attentive tone to serious situations such as outages or hardship. We will review {calls} applicable calls within {followup}, targeting an engaged, varied delivery that fits the situation in all {calls} calls.",
+    "followup": "In our session, we will listen to a short segment of this call together, and you will practice delivering the same explanation twice, once as it sounded on the call and once with more emphasis and pitch variation, so you can hear the difference. You will also rate your own energy on {calls} of your calls within {followup} using a short checklist, and I will review the same calls so we can compare. We will talk midweek and decide at the end of the {duration} whether more support is needed.",
+    "example": [
+      { "label": "Routine call", "say": "Good news, I found what's causing the slowdown. There are two quick changes we can make, and I'll walk you through both of them right now." },
+      { "label": "Serious situation", "say": "I'm sorry you've been without service through all of this. I'm right here with you, and I'm going to explain exactly what I'm seeing and what we can do next." }
+    ],
+    "questions": [
+      "When you listen back to this call, how do you think your energy sounded to the customer?",
+      "Where in the call could more emphasis or variety in your voice have helped the customer stay engaged?",
+      "How would you adjust your tone for a customer dealing with an outage compared with a routine request?"
+    ],
+    "strengths": ["s-itg", "s-troubleshooting", "s-clarity", "s-resolution"],
+    "b": {
+      "obs": "spoke with a flat, low-energy tone and little variation in pitch or emphasis, which made you sound disengaged from the concern",
+      "focus": "vocal energy",
+      "commit": "bring steady energy to your voice, emphasize key words, and vary your pitch and pace while matching the seriousness of the situation",
+      "m": "engaged, varied vocal delivery that fits the seriousness of each situation",
+      "coach": "a recording review comparing flat delivery with engaged pitch and emphasis"
+    },
+    "note": "Assess energy by listening to the recording, not from notes. A calm, measured tone is appropriate for outages, hardship, or bereavement and should not be coached as low energy. Demonstrate the examples aloud, since energy is easier to hear than to read."
+  },
+  {
+    "id": "com-tone-pace",
+    "cat": "com",
+    "title": "Inappropriate Tone or Pace",
+    "desc": "Speaking too fast, too slow, or with an impatient, sharp, or condescending tone that does not fit the customer or the situation.",
+    "kw": ["tone", "pace", "rushed", "rushing", "too fast", "talking fast", "too slow", "impatient", "sharp", "short with customer", "condescending", "rude", "attitude", "abrupt", "speed", "speaking rate", "harsh tone", "dismissive", "frustrated tone"],
+    "tags": ["Soft Skills", "Tone", "Pace"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "delivery",
+    "feedback": "At several points in the call, your pace and tone did not fit what the customer needed. Key details were delivered quickly, and at moments when the customer needed more time or asked a question, your replies came across as short. The way you sound shapes how the customer interprets your words, so a rushed, sharp, or impatient delivery can feel dismissive even when the information is correct, and the customer may miss steps they need to remember. Instead, slow down for key details, pause to let the customer catch up, and keep a patient, respectful tone, especially when you are asked to repeat or clarify something.",
+    "impact": "An inappropriate tone or pace usually comes from time pressure, a busy queue, or moving through a familiar process faster than a customer hearing it for the first time can follow. A rushed or sharp delivery can make the customer feel like an interruption, which may cause them to stop asking questions, miss important steps, or become defensive. That can lead to errors, repeat contacts, escalation requests, and lower quality results.",
+    "plan": "For the next {duration}, you will slow your pace whenever you give instructions, dates, or next steps, and pause after each key point so the customer has a chance to respond. When a customer asks you to repeat or clarify something, answer with the same patience you showed at the start of the call, and rephrase it rather than repeating it word for word. Avoid phrases that can sound condescending, such as 'like I said' or 'as I already explained.' Adjust to the customer on the line, slowing down for someone who is confused or under stress and staying direct and efficient for someone short on time. We will review {calls} applicable calls within {followup}, targeting a patient, respectful tone and a pace that fits the customer in all {calls} calls.",
+    "followup": "During our session, we will listen side by side to the parts of this call where the pace picked up or the tone became short, and you will practice delivering the same information at a steadier pace. I will review {calls} of your calls within {followup}, paying close attention to the moments when the customer asked questions. We will discuss what you noticed at a midweek check-in and complete the review together at the end of the {durationAdj} plan.",
+    "example": [
+      { "label": "Slowing down for key details", "say": "I'm going to go through this one step at a time. The first thing I'll need you to do is find the device we talked about. Take your time, and let me know when you're ready." },
+      { "label": "When asked to repeat", "say": "Of course. Let me explain that a different way, because it's an important step and I want it to be clear." }
+    ],
+    "questions": [
+      "How do you think the customer felt when the key details were delivered quickly?",
+      "What signals from the customer could tell you that your pace or tone needs to change?",
+      "When a customer asks you to repeat something, how do you want your response to sound?"
+    ],
+    "strengths": ["s-ownership", "s-tools", "s-diagnosis", "s-resolution"],
+    "b": {
+      "obs": "used a pace or tone that did not fit the situation, such as rushing through key details or sounding short when the customer asked questions",
+      "focus": "pace and tone",
+      "commit": "slow down for key details, pause after important points, and keep a patient, respectful tone when the customer asks questions",
+      "m": "a patient, respectful tone and a pace that fits each customer",
+      "coach": "a side-by-side listen to the moments where the pace sped up or the tone turned short"
+    },
+    "note": "If the main issue is low energy rather than speed or sharpness, the Flat / Sleepy / Low-Energy Tone entry may be a better fit."
+  },
+  {
+    "id": "com-active-listening",
+    "cat": "com",
+    "title": "Poor Active Listening",
+    "desc": "Missing details the customer shared, responding to a different point than the one raised, or not confirming understanding through paraphrasing.",
+    "kw": ["active listening", "listening", "not listening", "poor listening", "did not listen", "missed details", "missed information", "wrong issue", "wrong point", "paraphrase", "paraphrasing", "verbal confirmation", "misunderstood", "attentive", "distracted", "listening skills", "focus"],
+    "tags": ["Soft Skills", "Listening", "Accuracy"],
+    "kpi": ["QA", "aiCR", "Transfer"],
+    "theme": "listen",
+    "feedback": "While the customer was explaining the problem, a few key details did not make it into your response, and you addressed a different point than the one they raised. Active listening lets you work on the right problem the first time. When details are missed, the customer often has to correct you or explain the issue again, which adds effort and can shake their confidence that you understand the situation. Going forward, give the customer your full attention while they speak, note key details as you hear them, and paraphrase before responding, for example, 'So the picture freezes mostly in the evening, and only on the upstairs TV,' so the customer can confirm it.",
+    "impact": "Poor active listening often happens when you begin forming a response, or start navigating the account, before the customer has finished explaining. Details missed early can send troubleshooting or account changes in the wrong direction, which may lead to an incorrect resolution, an avoidable transfer, or a repeat contact. It also raises customer effort, because the customer has to repeat or correct information to get the call back on track.",
+    "plan": "During the next {duration}, you will keep your attention on the customer while they explain the concern and note the key details, such as when the problem started, which devices or services are affected, and what has changed recently. Before you respond or recommend a step, paraphrase those details back and confirm them with the customer. If the customer adds new information later in the call, acknowledge it and explain how it changes the next step. We will review {calls} applicable calls within {followup}, targeting key details paraphrased and confirmed before each recommendation in all {calls} calls, with every response addressing the point the customer actually raised.",
+    "followup": "In our session, I will read three short customer explanations aloud, and you will paraphrase the key details of each one before suggesting a next step. I will then review {calls} of your calls within {followup}, comparing what the customer said with how you responded. We will check in briefly midweek, and at the end of the {duration} we will listen to one of your calls together to see how the paraphrasing is working on live calls.",
+    "example": [
+      { "label": "Paraphrasing the details", "say": "I want to be sure I caught everything. The picture freezes mostly in the evening, it's only the TV upstairs, and it started after the storm last week. Did I miss anything?" },
+      { "label": "When new details come up", "say": "That's helpful to know. If your phone also loses its connection on Wi-Fi, this may be affecting the whole home network, so I'll check that first." }
+    ],
+    "questions": [
+      "Which details from the customer's explanation would have changed the way you responded?",
+      "Where was your attention while the customer was explaining the problem?",
+      "How could paraphrasing the details back to the customer have changed the direction of the call?"
+    ],
+    "strengths": ["s-tone", "s-ownership", "s-tools", "s-itg"],
+    "b": {
+      "obs": "missed key details in the explanation and responded to a different point than the one raised, without paraphrasing to confirm your understanding",
+      "focus": "active listening",
+      "commit": "note the key details as the customer speaks and paraphrase them back for confirmation before responding or recommending a step",
+      "m": "key details paraphrased and confirmed before each recommendation",
+      "coach": "a paraphrasing drill using short customer explanations read aloud"
+    },
+    "note": "Compare the customer's own words on the recording with the response that followed to pinpoint which details were missed."
+  },
+  {
+    "id": "com-interrupting",
+    "cat": "com",
+    "title": "Interrupting the Customer",
+    "desc": "Talking over the customer or cutting in before they finish speaking, instead of letting them complete their thought or interjecting respectfully when needed.",
+    "kw": ["interrupting", "interrupt", "interrupted", "talking over", "talked over", "speaking over", "cutting off", "cut off customer", "overlapping", "overtalk", "jumping in", "interjecting", "let customer finish", "not letting customer speak", "rude", "impatient"],
+    "tags": ["Soft Skills", "Listening", "Courtesy"],
+    "kpi": ["QA"],
+    "theme": "listen",
+    "feedback": "Several times during the call, you started speaking before the customer had finished, and at points the two of you were talking over each other. Even when you already know where the customer is going, cutting in can make them feel rushed and unimportant, and you may miss a detail that changes the solution. Customers who are interrupted often repeat themselves more forcefully, which can make the call longer and more tense. From here, let the customer finish each thought and pause briefly before responding. If you do need to step in, ask permission and give a reason, such as needing one quick detail to narrow down the issue, then hand the conversation back.",
+    "impact": "Interrupting usually comes from wanting to keep the call moving or from recognizing the issue before the customer has finished describing it. From the customer's side, being cut off can feel dismissive, and important details may never be shared. That can lead to the wrong solution, a longer call as the customer works harder to be heard, and lower satisfaction and quality results.",
+    "plan": "Starting with your next call and continuing for {duration}, you will let the customer finish speaking before you respond, and allow a brief pause after they stop to be sure they are done. If you need to interject, for example to keep a long explanation on track, ask permission first, give a short reason, and return the conversation to the customer afterward. If you and the customer start speaking at the same time, stop and invite them to continue. We will review {calls} applicable calls within {followup}, targeting zero instances of talking over the customer in all {calls} calls.",
+    "followup": "We will roleplay a call in our session where I play a customer who gives long, detailed explanations, so you can practice waiting for natural pauses and interjecting politely when it is needed. I will listen to {calls} of your calls within {followup} and mark any moments of overlap, and we will review those moments together midweek. At the end of the {durationAdj} plan, we will decide whether further practice is needed.",
+    "example": [
+      { "label": "Interjecting respectfully", "say": "I'm sorry to cut in. May I ask one quick question so I can make sure I'm looking at the right service? Then I'd like to hear the rest." },
+      { "label": "After talking over the customer", "say": "I'm sorry, I spoke over you there. Please go ahead and finish." }
+    ],
+    "questions": [
+      "What was happening for you in the moments when you started speaking before the customer had finished?",
+      "What details might the customer have shared if they had been able to finish?",
+      "When you need to redirect a customer who is talking at length, how could you do it respectfully?"
+    ],
+    "strengths": ["s-assurance", "s-ownership", "s-troubleshooting", "s-tools"],
+    "b": {
+      "obs": "jumped in before they had finished and talked over them at several points, leaving some of their details unheard",
+      "focus": "letting the customer finish",
+      "commit": "let the customer finish each thought before responding, and ask permission with a brief reason when you need to interject",
+      "m": "zero instances of talking over the customer",
+      "coach": "a roleplay practicing patient listening and respectful ways to interject"
+    },
+    "note": "Before documenting, confirm on the recording that the overlap was an interruption and not line delay or a brief verbal nod such as 'okay' while the customer was speaking."
+  },
+  {
+    "id": "com-repeating-questions",
+    "cat": "com",
+    "title": "Repeating Questions / Increasing Customer Effort",
+    "desc": "Asking for information the customer already provided or that is already available on the account, which adds unnecessary steps and effort for the customer.",
+    "kw": ["repeating questions", "repeat questions", "asked again", "asking twice", "same question", "customer repeating", "repeat information", "made customer repeat", "redundant questions", "already provided", "already on account", "customer effort", "high effort", "low effort", "unnecessary steps", "account history", "notes"],
+    "tags": ["Customer Effort", "Listening", "Efficiency"],
+    "kpi": ["QA"],
+    "theme": "listen",
+    "feedback": "During the call, you asked the customer for details they had already given earlier in the conversation, along with information that was already available on the account. Each repeated question adds effort and can suggest that what the customer said was not heard or recorded. Customers asked to repeat themselves often grow impatient, and the call can start to feel like it is going in circles. Next time, keep brief notes as the customer speaks and review the account before asking a question. When you need to check a detail you already have, confirm it rather than asking for it from scratch.",
+    "impact": "Repeated questions usually come from not capturing details the first time, or from following a set sequence of questions without checking what is already known. Every unnecessary question or step raises customer effort, lengthens the call, and can make the customer feel their time is not being respected. High-effort calls are more likely to end with lower satisfaction and quality results, even when the concern is resolved.",
+    "plan": "For the next {duration}, you will note key details as the customer shares them and review the account, recent notes, and contact history before asking a question. When you need a detail you already have, confirm it instead of asking for it again, and do not ask the customer to repeat a step they have told you is already done unless you explain why it is needed. Verification required by the applicable process still applies. We will review {calls} applicable calls within {followup}, targeting no requests for information the customer had already provided or that was available on the account in all {calls} calls.",
+    "followup": "During our session, we will walk through the account tools together and identify where details such as equipment, recent changes, and earlier contact notes can be found before you ask the customer. You will also build a short personal checklist of what to review before asking. I will review {calls} of your calls within {followup}, tracking any repeated questions, and we will compare results midweek and again at the end of the {duration}.",
+    "example": [
+      { "label": "Confirming instead of asking again", "say": "You mentioned earlier that you already restarted the modem this morning, so we can skip that step. I can also see your equipment on the account, so you won't need to look anything up for me." },
+      { "label": "Building on what was shared", "say": "Earlier you said the problem started Sunday evening, so I'll use that as our starting point when I check the connection history." }
+    ],
+    "questions": [
+      "Which of the questions you asked had the customer already answered, or could you have found on the account?",
+      "How do you think the customer felt when they were asked for the same information again?",
+      "What could you review or note during the call so the details are ready when you need them?"
+    ],
+    "strengths": ["s-empathy", "s-tone", "s-troubleshooting", "s-resolution"],
+    "b": {
+      "obs": "asked again for details already given or already available on the account, which made the customer repeat information unnecessarily",
+      "focus": "reducing customer effort",
+      "commit": "review the account and the details already shared before asking a question, and confirm known information instead of requesting it again",
+      "m": "no requests for information already provided or available on the account",
+      "coach": "a tools walkthrough of where known customer details can be found before asking"
+    },
+    "note": "Verification questions required by the applicable process are not repeat questions. Before the session, confirm which details were visible on the account at the time of the call."
+  },
+  {
+    "id": "com-deescalation",
+    "cat": "com",
+    "title": "Poor De-escalation",
+    "desc": "Responding to an upset or angry customer in a way that adds tension, such as becoming defensive, leading with policy, or matching the customer's intensity.",
+    "kw": ["de-escalation", "deescalation", "de-escalate", "customer angry", "angry", "irate", "yelling", "upset", "escalation", "escalated", "calm", "supervisor request", "asked for supervisor", "frustration", "defensive", "argumentative", "policy first", "heated", "hostile", "complaint"],
+    "tags": ["Soft Skills", "De-escalation", "Escalation Risk"],
+    "kpi": ["QA", "aiCR", "Transfer"],
+    "theme": "connect",
+    "feedback": "When the customer became upset, you responded with policy and explanations before they had finished expressing their frustration, and your tone grew more defensive as the conversation went on. An angry customer usually needs to feel heard before they can listen to a solution, and responding with policy first or matching their intensity often raises the tension instead of lowering it. That can lead to a supervisor request or the customer disengaging from the steps you need them to take. Going forward, let the customer finish, acknowledge the specific reason for their frustration, keep your voice calm and steady, and explain what you can do before discussing what you cannot.",
+    "impact": "Poor de-escalation often comes from feeling personally targeted by the customer's anger, or from reaching for policy as a way to regain control of the call. A defensive or rule-first response tells the customer they are not being heard, which tends to raise their intensity. That can lead to supervisor requests, transfers, complaints, or cancellation threats, and the customer may call back hoping to reach someone who will listen.",
+    "plan": "Over the next {duration}, you will let an upset customer finish speaking without interrupting, then acknowledge the specific cause of their frustration before offering any explanation. Keep your voice calm, steady, and a little slower than the customer's, avoid phrases that sound defensive, and lead with what you can do before explaining any limitation. If the customer asks for a supervisor, acknowledge the request calmly, explain what you can do to help right now, and follow the program's supervisor request process without arguing. We will review {calls} applicable calls within {followup}, and every reviewed call with an upset customer should show these steps.",
+    "followup": "In our session, we will roleplay an escalating call in which I play an upset customer who eventually asks for a supervisor, and you will practice staying calm, acknowledging, and redirecting toward a solution. We will also review the supervisor request process together. I will review {calls} of your calls within {followup}, focusing on calls with upset customers, and we will discuss them midweek. At the end of the {durationAdj} plan, we will review the results and agree on next steps.",
+    "example": [
+      { "label": "When the customer is angry", "say": "You've called about this more than once and it still isn't fixed, so I can see why you're upset. I'm going to look at everything that has happened so far, and I'll tell you exactly what I can do today." },
+      { "label": "Supervisor request", "say": "I hear you, and I'll take care of that request. Before I do, may I take one more look at the account? There may be something I can resolve for you right now." }
+    ],
+    "questions": [
+      "At what point in the call did the customer's frustration start to rise, and what was happening then?",
+      "What did the customer need to hear from you before they would be ready to listen to the policy?",
+      "How will you keep your own tone steady when a customer raises their voice or asks for a supervisor?"
+    ],
+    "strengths": ["s-verification", "s-billing", "s-diagnosis", "s-resolution"],
+    "b": {
+      "obs": "met the customer's frustration with policy before they had finished speaking and grew defensive as the tension rose",
+      "focus": "calm de-escalation",
+      "commit": "let an upset customer finish, acknowledge the specific frustration, keep your voice calm and steady, and lead with what you can do",
+      "mx": "Every reviewed call with an upset or angry customer during the next {duration} shows the customer allowed to finish, a specific acknowledgement, and a calm, solution-first response.",
+      "coach": "a roleplay with an escalating customer that includes a supervisor request"
+    },
+    "note": "Confirm the program's current supervisor request and escalation process before the session, so the roleplay matches what the agent is expected to do."
+  },
+  {
+    "id": "com-emotional-ownership",
+    "cat": "com",
+    "title": "Lack of Emotional Ownership",
+    "desc": "Distancing language that places responsibility on another department, the system, or others, instead of owning the customer's experience with 'I' and 'we' statements.",
+    "kw": ["emotional ownership", "ownership language", "blaming", "blame", "another department", "not my department", "the system did it", "they did it", "distancing", "deflecting", "excuses", "i and we", "we language", "accountability", "pointing fingers", "passing the blame"],
+    "tags": ["Soft Skills", "Ownership", "Customer Connection"],
+    "kpi": ["QA", "Transfer"],
+    "theme": "connect",
+    "feedback": "As you explained what had gone wrong, you described the problem as something another department or the system had caused, with phrases such as 'that's a different department' and 'they set it up wrong.' Even when another team was involved, the customer sees one company, and distancing language can sound like you are stepping away from their problem rather than taking it on. That may leave the customer feeling passed between people with no one in charge, which can quickly turn frustration into distrust. The better approach is to talk about the issue as yours to help solve, use 'I' and 'we' instead of 'they', and focus on what you will do next.",
+    "impact": "A lack of emotional ownership often comes from wanting to make it clear that you did not cause the problem, or from repeating how other teams describe an issue. The customer is not looking for someone to blame, but for someone to take charge. Distancing language can make them feel handed off before any transfer happens, which may increase supervisor requests, avoidable transfers, and doubts that the issue will be handled.",
+    "plan": "Throughout the next {duration}, you will describe every concern and next step using 'I' and 'we' language, such as 'I'm going to take care of this' or 'let's get this corrected together.' When another team needs to be involved, explain what you are doing to connect the customer with them and how you will pass along what they have already told you, instead of describing it as someone else's problem. Avoid blaming the system, other departments, or the customer. We will review {calls} applicable calls within {followup}, targeting ownership language and no blame placed on others in all {calls} calls.",
+    "followup": "During our session, we will complete a language swap exercise in which you take a list of common distancing phrases and rewrite each one as an ownership statement you would be comfortable using. I will review {calls} of your calls within {followup} and note each place where ownership language was used or missed. We will talk through examples at a midweek check-in and complete a final review at the end of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "Instead of blaming another team", "say": "I can see the order wasn't completed the way it should have been, and I'm going to take care of it for you. I'll make the correction now and walk you through what happens next." },
+      { "label": "When another team must help", "say": "This part needs a specialist team, so I'm going to set that up for you and pass along everything you've told me so they have the full picture." }
+    ],
+    "questions": [
+      "When you described what went wrong, how do you think the customer heard the word 'they'?",
+      "How can you be honest that another team is involved while still showing that you own the customer's experience?",
+      "Which ownership phrases feel natural to you that you could use on your next call?"
+    ],
+    "strengths": ["s-tone", "s-probing", "s-billing", "s-troubleshooting"],
+    "b": {
+      "obs": "described the problem as something another department or the system had caused, using distancing language instead of owning the customer's experience",
+      "focus": "ownership language",
+      "commit": "use 'I' and 'we' language when describing the concern and next steps, and avoid placing blame on other teams, systems, or the customer",
+      "m": "ownership language throughout, with no blame placed on other teams or systems",
+      "coach": "a language swap exercise that rewrites distancing phrases as ownership statements"
+    },
+    "note": "Accurately explaining that another team handles part of a request is not distancing. Coach the wording and the sense of ownership, not the routing itself."
+  },
+  {
+    "id": "com-clarity",
+    "cat": "com",
+    "title": "Confusing Explanations / Communication Clarity",
+    "desc": "Explanations that are long-winded, disorganized, or full of internal terms, making it hard for the customer to follow the main point or the next step.",
+    "kw": ["clarity", "unclear", "confusing", "confused customer", "long-winded", "rambling", "too much information", "over explaining", "hard to follow", "jargon", "internal terms", "acronyms", "plain language", "simple explanation", "concise", "explanation", "communication"],
+    "tags": ["Communication", "Clarity", "Customer Education"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "delivery",
+    "feedback": "When you explained what would happen next, the information came out in a long stream with no clear order, and some of it relied on internal terms the customer was unlikely to know. The main point was buried in extra detail, so the customer had to work to understand what to expect. The customer will act on what you tell them, and a confusing explanation can lead to missed steps, wrong assumptions, or a second call to have it explained again. Next time, lead with the main point, break the rest into short steps in everyday words, and pause to check that the customer is following.",
+    "impact": "Unclear explanations often come from knowing a process so well that the steps feel obvious, or from trying to share everything at once to be thorough. When the customer cannot follow, they may agree without understanding, act on the wrong information, or call back to ask again, which can drive repeat contacts and longer calls. Internal terms can also make the customer feel shut out of their own account.",
+    "plan": "During the next {duration}, you will organize each explanation by stating the main point first, then giving the supporting details in short, ordered steps. Replace internal terms, abbreviations, and system names with everyday words, and when a specific term is necessary, explain it in a few words. After any explanation with more than one step, ask the customer to tell you what they will do next or check that it makes sense to them. We will review {calls} applicable calls within {followup}, targeting explanations that lead with the main point and use plain language in all {calls} calls.",
+    "followup": "In our session, we will take one explanation from this call and rewrite it together so the main point comes first and the internal terms are gone, then you will practice saying it aloud as if to a customer hearing it for the first time. I will review {calls} of your calls within {followup} with a focus on how easy your explanations are to follow, and we will hold a short midweek check-in. We will complete the review at the end of the {durationAdj} plan.",
+    "example": [
+      { "label": "Main point first", "say": "Here's the short version. Your bill went up because a promotional rate ended this month. I'll walk you through the two changes on the bill, and then we can look at your options." },
+      { "label": "Replacing internal terms", "say": "To put it simply, your account still lists your old modem, so the new one isn't recognized yet. I'm going to update that now, and then we'll check that everything connects." }
+    ],
+    "questions": [
+      "If the customer had to repeat your explanation back to you, what do you think they would have said?",
+      "Which terms in your explanation might be familiar to you but new to the customer?",
+      "How would you shorten that explanation so the main point comes through in the first sentence?"
+    ],
+    "strengths": ["s-empathy", "s-ownership", "s-diagnosis", "s-tools"],
+    "b": {
+      "obs": "gave explanations that were long, out of order, or full of internal terms, which made it hard for the customer to follow the main point",
+      "focus": "clear explanations",
+      "commit": "lead with the main point, explain the details in short steps using everyday words, and check that the customer is following",
+      "m": "explanations that lead with the main point and use plain, everyday language",
+      "coach": "an exercise rewriting one explanation from the call with the main point first"
+    },
+    "note": "For explanations of technical concepts specifically, the Unclear Technical Explanations entry in the Technical Support category may be a better fit."
+  },
+  {
+    "id": "com-opening",
+    "cat": "com",
+    "title": "Weak Call Opening",
+    "desc": "A rushed or incomplete greeting and introduction, or a slow start in engaging the reason for the call, leaving the conversation without a clear direction.",
+    "kw": ["call opening", "opening", "greeting", "no greeting", "introduction", "no introduction", "intro", "rushed greeting", "branded greeting", "first impression", "start of call", "slow start", "reason for call", "call direction", "set the agenda", "opening statement"],
+    "tags": ["Call Structure", "First Impression", "Professionalism"],
+    "kpi": ["QA"],
+    "theme": "structure",
+    "feedback": "At the start of the call, your greeting was rushed, the introduction was incomplete, and the conversation took a while to reach the reason the customer was calling. The opening is the customer's first impression of you and the company, and it sets the tone for the rest of the call. A hurried or unclear start can leave the customer unsure who they are speaking with, and a slow move to the concern can make the call feel long before any work begins. Moving forward, open with a clear, unhurried greeting and introduction, invite the customer to share the reason for the call, and tell them how you will proceed.",
+    "impact": "A weak opening often comes from treating the greeting as a formality to get through quickly, especially on a busy queue or right after a difficult call. The first few seconds shape how confident the customer feels in you, and a rushed or unclear start can make them guarded or unsure they reached the right team. A slow move to the concern can also add handle time without adding value.",
+    "plan": "Beginning with your next shift and continuing for {duration}, you will open every call with the program's standard greeting at a calm, clear pace, including your name, and invite the customer to share the reason for the call. Once they explain, respond with a short acknowledgement and tell the customer how you will proceed, such as verifying the account and then reviewing the concern together. Have your tools ready before the call connects so your attention is on the customer from the first word. We will review {calls} applicable calls within {followup}, targeting a complete, unhurried greeting and a clear direction set early in all {calls} calls.",
+    "followup": "During our session, we will listen to the first minute of this call and then practice the full opening together, from greeting through setting direction, until it feels natural at a steady pace. You will also complete a short self-assessment of the opening on {calls} of your calls within {followup}, and I will review the same calls. We will compare notes midweek and confirm the results together at the end of the {durationAdj} plan.",
+    "example": [
+      { "label": "Greeting", "say": "Thank you for calling, and thanks for waiting. I'm happy to help you today. What can I take care of for you?" },
+      { "label": "Setting direction", "say": "I can help with your bill. First, I'll verify the account, and then we'll go through the changes together so you know exactly what happened." }
+    ],
+    "questions": [
+      "How do you think the customer felt in the first few seconds of this call?",
+      "What would help you start each call at a steady, unhurried pace, even on a busy queue?",
+      "After the customer explains why they called, how could you set a clear direction for the rest of the call?"
+    ],
+    "strengths": ["s-empathy", "s-troubleshooting", "s-resolution", "s-closing"],
+    "b": {
+      "obs": "rushed through the greeting and introduction and took longer than needed to engage the customer's reason for calling",
+      "focus": "clear call openings",
+      "commit": "open with a clear, unhurried greeting and introduction, invite the reason for the call, and tell the customer how you will proceed",
+      "m": "a complete, unhurried greeting and a clear direction set early in the call",
+      "coach": "a practice run of the full call opening, from greeting to setting direction"
+    },
+    "note": "Confirm the program's current greeting and branding standard before the session. The example greeting leaves out the agent's name and the brand, so pair it with the standard wording."
+  },
+  {
+    "id": "com-call-flow",
+    "cat": "com",
+    "title": "Poor Call Flow",
+    "desc": "A disorganized call sequence that jumps between topics, backtracks to earlier steps, and moves on without transitions, leaving the customer unsure what is happening.",
+    "kw": ["call flow", "flow", "disorganized", "jumping around", "jumping between topics", "backtracking", "out of order", "transitions", "no transitions", "signposting", "sequence", "structure", "organized", "scattered", "all over the place", "roadmap", "agenda"],
+    "tags": ["Call Structure", "Organization", "Clarity"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "structure",
+    "feedback": "Over the course of the call, the conversation moved between topics without a clear order. You started on one concern, switched to another before finishing, and later returned to steps that had already been covered, often without telling the customer why. When a call follows no visible structure, the customer cannot tell what has been handled and what is still open, and the conversation can feel scattered and longer than necessary. From here, outline a short plan once you understand the concerns, finish one topic before starting the next, and use brief transitions such as 'Now that the bill is sorted, let's look at your internet' so the customer always knows where you are.",
+    "impact": "Poor call flow usually comes from reacting to each item as it comes up instead of planning the order of the call, or from switching tasks while waiting on a system. Without a clear sequence, steps can be missed or repeated, the customer may lose track of what was resolved, and handle time can grow. A scattered call can also lower the customer's confidence that every concern was addressed, increasing the chance they call back to check.",
+    "plan": "For the next {duration}, you will tell the customer how the call will proceed once you understand the concerns, for example, 'First we'll take care of the billing question, and then we'll look at the internet speed.' Handle one topic at a time and close it out before moving on, and use a short transition sentence whenever you change topics. If you need to go back to an earlier step, explain why before doing so. We will review {calls} applicable calls within {followup}, targeting a stated plan and a clear transition at each change of topic in all {calls} calls.",
+    "followup": "In our session, we will map out the sequence of this call together, mark the points where the topic changed without a transition, and then reorder it into the flow it could have followed. I will review {calls} of your calls within {followup} using the same mapping approach, and we will talk through one of them at a midweek check-in. At the end of the {duration}, we will review all the calls together and agree on any next steps.",
+    "example": [
+      { "label": "Setting the plan", "say": "You've mentioned two things, the higher bill and the slow internet. Let's start with the bill so you have answers there, and then we'll test your connection." },
+      { "label": "Transitioning between topics", "say": "That takes care of the billing question. Now let's move on to your internet speed." }
+    ],
+    "questions": [
+      "Looking back at the call, where did the conversation change direction, and what prompted each change?",
+      "What would have helped the customer know which part of the call they were in at each point?",
+      "How could you plan the order of a call with several concerns before you start working on them?"
+    ],
+    "strengths": ["s-empathy", "s-rapport", "s-opening", "s-resolution"],
+    "b": {
+      "obs": "moved between topics without a clear order or transitions and returned to steps already covered, which made the call hard to follow",
+      "focus": "organized call flow",
+      "commit": "share a short plan for the call, finish one topic before starting the next, and use a brief transition each time you move on",
+      "m": "a stated plan for the call and a clear transition at each change of topic",
+      "coach": "a call mapping exercise that reorders this call into a clear sequence"
+    },
+    "note": "For steering long tangents and regaining control of the conversation, the Poor Call Control entry in the Hold, Mute & Call Control category may be a better fit."
+  },
+  {
+    "id": "com-closing",
+    "cat": "com",
+    "title": "Weak Call Closing / No Recap",
+    "desc": "Ending the call without recapping what was done and what happens next, checking for other needs, or closing in a professional, branded way.",
+    "kw": ["call closing", "closing", "no closing", "closing statement", "no recap", "recap", "summary", "summarize", "final summary", "next steps", "abrupt ending", "abrupt close", "ended call abruptly", "anything else", "branded closing", "wrap up", "end of call"],
+    "tags": ["Call Structure", "Next Steps", "Professionalism"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "structure",
+    "feedback": "Before the call ended, you moved from the final step straight to goodbye without summarizing what was done or what the customer should expect next, and the close itself felt abrupt. The end of the call is often what the customer remembers most, and a recap is the last chance to confirm you both agree on what happened. Without it, they may leave unsure what was changed, what to watch for, or what to do if the issue returns. Going forward, close each call with a brief recap of the actions taken and the next steps, ask whether there is anything else you can help with, and end with the program's standard branded closing.",
+    "impact": "A weak closing often happens when the main issue is resolved and attention shifts to wrapping up quickly or getting ready for the next call. Without a recap, the customer may not remember what changed, what to expect, or what to do if the issue returns, which can lead to repeat contacts and confusion when a bill, appointment, or follow-up arrives. An abrupt close can also undo the goodwill built earlier in the call.",
+    "plan": "Over the next {duration}, you will end every call with a recap that covers what you did, what the customer can expect next, and any action or timeframe the customer needs to remember, based on the applicable process. After the recap, ask whether there is anything else you can help with, and give the customer a moment to answer. Close with the program's standard branded closing, at the same unhurried pace you used at the start. We will review {calls} applicable calls within {followup}, targeting a complete recap, a check for other needs, and a branded close in all {calls} calls.",
+    "followup": "During our session, we will build a short closing checklist together covering the recap, next steps, the check for other needs, and the branded close, and then roleplay two closings using it. I will review the final minutes of {calls} of your calls within {followup}, and we will look at one of them together at a midweek check-in. At the end of the {durationAdj} coaching period, we will review the full results and decide on next steps.",
+    "example": [
+      { "label": "Recap and next steps", "say": "Before we wrap up, here's a quick recap. We restarted your equipment, confirmed the connection is stable on your laptop and phone, and I noted everything on your account. If the drops come back, give us a call and we can pick up from where we left off today." },
+      { "label": "Closing", "say": "Is there anything else I can help you with today? Thank you for calling, and enjoy the rest of your evening." }
+    ],
+    "questions": [
+      "If the customer had to explain to a family member what happened on this call, what would they say?",
+      "What does the customer need to remember after the call ends, and how could your recap cover it?",
+      "What would help you slow down at the end of a call instead of rushing to finish?"
+    ],
+    "strengths": ["s-opening", "s-empathy", "s-troubleshooting", "s-diagnosis"],
+    "b": {
+      "obs": "wrapped up without recapping what was done or what happens next, and closed without checking for other needs or giving a branded close",
+      "focus": "complete call closings",
+      "commit": "recap what was done and what happens next, check for any other needs, and end with the program's standard branded closing",
+      "m": "a recap of actions and next steps, a check for other needs, and a branded close",
+      "coach": "a closing checklist exercise followed by a roleplay of a complete call closing"
+    },
+    "note": "Confirm the program's current closing and branding standard before the session, including any required closing statements."
+  }
+]

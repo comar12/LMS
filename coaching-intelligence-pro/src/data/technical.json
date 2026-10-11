@@ -1,0 +1,472 @@
+[
+  {
+    "id": "tech-knowledge-gap",
+    "cat": "tech",
+    "title": "Technical Knowledge Gap",
+    "desc": "Hesitating or sharing incorrect technical information because a product or technology concept was not fully understood.",
+    "kw": ["knowledge gap", "product knowledge", "technical knowledge", "wrong information", "incorrect information", "misinformation", "hesitation", "hesitant", "unsure", "guessing", "did not know", "how it works", "wi-fi", "gateway", "training", "knowledge check", "approved resources", "study"],
+    "tags": ["Product Knowledge", "Technical Accuracy", "Learning"],
+    "kpi": ["QA", "aiCR", "Transfer"],
+    "theme": "tech",
+    "feedback": "When the customer asked a technical question about how the service or equipment works, you hesitated and gave an explanation that was not fully accurate. Questions like this are a chance to build the customer's confidence, and an answer that sounds unsure or turns out to be wrong can make them doubt your other recommendations. The customer may act on that information, try steps that cannot help, or contact us again when the answer does not hold up. Moving forward, when a concept is unclear, take a moment to confirm it in an approved resource before you answer, and keep building your knowledge of the products you support most often.",
+    "impact": "A knowledge gap like this usually comes from limited exposure to a product or technology, combined with pressure to answer quickly instead of pausing to confirm. When the customer receives inaccurate technical information, they may make decisions based on it, spend time on steps that will not help, or lose confidence in the support they received. This can lead to repeat contacts, avoidable transfers, longer handle time, and lower quality results.",
+    "plan": "Over the next {duration}, you will complete a focused review of the approved resources that cover the product or technology concept from this call, along with any related topics you identify as uncertain. Within {followup}, you will complete a knowledge check with me on those concepts and spend time in side-by-side learning with a peer who handles these questions confidently. On every call, when a technical detail is unclear, you will confirm it in an approved resource before sharing it rather than answering from assumption. We will review {calls} calls that include technical questions, targeting accurate information and no unverified answers in all {calls} calls.",
+    "followup": "During our session, we will identify the exact concept behind the hesitation and find it together in the approved resources, so you know where to look the next time it comes up. I will run a short knowledge check within {followup} and arrange a side-by-side session with an experienced peer. I will also review {calls} calls with technical questions during the plan, and at the end of the {durationAdj} period we will decide whether any other topics need attention.",
+    "example": [
+      { "label": "Before answering", "say": "I want to make sure I give you the right answer on that, so let me confirm how it works in our reference material. It will take about a minute." },
+      { "label": "After confirming", "say": "Thanks for waiting. Wi-Fi speeds can be lower than the speed coming into your home, because walls and distance weaken the signal. That's why devices closer to the gateway usually get faster speeds." }
+    ],
+    "questions": [
+      "Which part of the customer's question were you unsure about, and where in the approved resources could you have confirmed it?",
+      "How might the customer use the information you shared if it turned out to be inaccurate?",
+      "Which products or topics would you like to study first to feel more confident on these calls?"
+    ],
+    "strengths": ["s-empathy", "s-ownership", "s-hold", "s-verification"],
+    "b": {
+      "obs": "hesitated and gave inaccurate information about how the service or equipment works, instead of confirming the concept in an approved resource first",
+      "focus": "product and technical knowledge",
+      "commit": "confirm any technical concept you are unsure of in an approved resource before answering, and complete targeted study of the products you support most",
+      "m": "accurate technical information, with any uncertain detail confirmed in an approved resource before it is shared",
+      "coach": "a quick knowledge check on the product concepts behind this call"
+    },
+    "note": "Before the session, identify the specific product or technology concept behind the gap and the approved resource that covers it. Confirm which learning paths or knowledge checks are currently available to the agent."
+  },
+  {
+    "id": "tech-itg-incorrect",
+    "cat": "tech",
+    "title": "Incorrect / Incomplete ITG Usage",
+    "desc": "Using the ITG but skipping steps, following a flow that does not match the issue, or stopping before the flow is complete.",
+    "kw": ["itg", "troubleshooting guide", "skipped steps", "incomplete itg", "wrong flow", "wrong itg", "missed steps", "steps out of order", "partial troubleshooting", "itg compliance", "process adherence", "did not finish", "incomplete troubleshooting", "itg flow"],
+    "tags": ["ITG", "Process", "Troubleshooting"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "You opened the ITG during this call, but some steps in the flow were skipped, and the troubleshooting moved to a resolution before the flow was complete. The ITG is built to rule out possible causes in a set order, so when steps are skipped or the selected flow does not match the reported symptom, the real cause can be missed. The customer may leave believing the issue is fixed, only to have it return and need to troubleshoot again on another call. Next time, confirm that the flow you select matches the symptom the customer described, and complete each step in order before recommending a fix or next step.",
+    "impact": "Incomplete ITG usage often comes from familiarity with common issues, which makes it tempting to jump ahead to the step that usually works, or from choosing a flow based on the first symptom mentioned. When steps are skipped, the actual cause may go untested, so the fix may not hold and the customer may need to call again and repeat steps they already completed. This can affect quality results and repeat contact rates.",
+    "plan": "For the next {duration}, you will confirm the reported symptom before selecting an ITG flow and check that the flow you choose matches it. You will complete every step in the order the flow presents it, and if a step cannot be completed, you will document why according to the current process before moving on. Before offering a resolution, you will confirm that the flow has reached its conclusion. Within {followup}, we will review {calls} technical calls, and the target is the correct flow with every applicable step completed in all {calls} calls.",
+    "followup": "In our session, we will walk through the ITG flow that applied to this call step by step, marking the steps that were skipped and what each one would have ruled out. I will review {calls} of your technical calls within {followup} and compare each one against the applicable flow. We will meet midweek to talk through any steps that feel unclear, and we will review the results together at the end of the {durationAdj} plan.",
+    "example": [
+      { "say": "We're almost through the troubleshooting for this issue, and there are two more checks I want to complete before we decide on the next step. That way, we know we haven't skipped anything that could be causing the connection to drop. The next check takes about a minute, and I'll tell you what it shows." }
+    ],
+    "questions": [
+      "Which steps in the flow did you move past, and what was each of those steps designed to rule out?",
+      "How did you decide which ITG flow to use, and how well did it match what the customer described?",
+      "What would help you stay with the flow when you feel confident you already know the fix?"
+    ],
+    "strengths": ["s-acknowledgement", "s-ownership", "s-research-updates", "s-verification"],
+    "b": {
+      "obs": "used the ITG but skipped steps or followed a flow that did not match the reported symptom, and moved to a resolution before the flow was complete",
+      "focus": "full ITG adherence",
+      "commit": "select the ITG flow that matches the reported symptom and complete each step in order before recommending a resolution",
+      "m": "the correct ITG flow for the symptom, with every step completed in order before a resolution is offered",
+      "coach": "a step-by-step walkthrough of the ITG flow that applied to this call, marking each skipped step"
+    },
+    "note": "Confirm the current ITG version and the flow that applied to the reported symptom before the session. Mark on the recording where steps were skipped or the flow changed, so the walkthrough covers the exact steps involved."
+  },
+  {
+    "id": "tech-itg-missing",
+    "cat": "tech",
+    "title": "Missing ITG",
+    "desc": "Troubleshooting from memory without opening the ITG when the issue called for it, leaving required steps and checks out.",
+    "kw": ["missing itg", "no itg", "itg not used", "did not use itg", "itg", "troubleshooting guide", "from memory", "freelancing", "winging it", "own steps", "process not followed", "guide not used", "no process", "itg flow"],
+    "tags": ["ITG", "Process", "Compliance"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "Throughout the troubleshooting, you worked from memory instead of opening the applicable ITG flow, even though the concern required it. Experience with common issues is valuable, but the ITG keeps troubleshooting consistent and makes sure checks that are easy to forget, such as confirming scope or equipment status, are not left out. Without it, the customer may go through steps that do not apply, miss the step that could resolve the issue, or hear a different approach from the next person they speak with. Instead, open the applicable flow as soon as the technical concern is clear and let it guide each step, even on issues you see often.",
+    "impact": "Skipping the ITG usually happens when an issue feels familiar and working from memory seems faster. Memory makes it easy to drop less common checks and does not reflect recent updates to the guide, so the fix may not address the actual cause. This can lead to repeat contacts, unnecessary technician visits, inconsistent experiences from one contact to the next, and process findings on the quality evaluation.",
+    "plan": "Starting with your next call and continuing for {duration}, you will open the applicable ITG flow as soon as a technical concern is identified, before giving any troubleshooting instruction. You will follow the flow from its first step, even when the issue seems familiar, and use it to decide each next action rather than relying on steps you remember. If you cannot locate the correct flow, you will ask for support through the approved channel instead of continuing from memory. We will review {calls} calls with technical concerns within {followup}, targeting the applicable flow opened and followed in all {calls} calls.",
+    "followup": "We will start with a practice run in which you open and follow the applicable ITG flow for a common connection concern while I play the customer. I will then review {calls} of your technical calls within {followup} to confirm the flow was used from the first step, and we will check in midweek on any flows that are hard to find. At the end of the {duration}, we will review whether opening the ITG has become part of how you start every technical call.",
+    "example": [
+      { "say": "Let me bring up the troubleshooting steps for this exact issue, so we go through everything in the right order and don't miss anything. The first step is a quick check of your equipment status, and I'll walk you through each step as we go." }
+    ],
+    "questions": [
+      "What led you to troubleshoot from memory on this call instead of opening the ITG flow?",
+      "Which checks in the applicable flow might have changed the outcome for this customer?",
+      "What could you do at the start of each technical call to make opening the ITG automatic?"
+    ],
+    "strengths": ["s-empathy", "s-tone", "s-rapport", "s-ownership"],
+    "b": {
+      "obs": "troubleshot from memory without opening the applicable ITG flow, even though the concern required it",
+      "focus": "consistent ITG use",
+      "commit": "open the applicable ITG flow as soon as a technical concern is identified and follow it from the first step, even on familiar issues",
+      "m": "the applicable ITG flow opened and followed for every concern that requires troubleshooting",
+      "coach": "a practice run that opens and follows the applicable ITG flow for a common connection concern"
+    },
+    "note": "Confirm which ITG flow applied to this call and when the program requires ITG use. Verify from the recording or account notes that the flow was not used at all; if it was used but steps were skipped, Incorrect / Incomplete ITG Usage is the better fit."
+  },
+  {
+    "id": "tech-tools-navigation",
+    "cat": "tech",
+    "title": "Poor Tools Navigation",
+    "desc": "Slow or inefficient movement through systems and tools, such as searching in the wrong places or opening unneeded screens, creating silence and longer calls.",
+    "kw": ["tools", "navigation", "systems", "slow navigation", "screens", "clicking around", "searching", "cannot find", "tool proficiency", "too many screens", "efficiency", "handle time", "aht", "long call", "dead air", "lost in tools", "system knowledge"],
+    "tags": ["Tools", "Efficiency", "Handle Time"],
+    "kpi": ["QA"],
+    "theme": "tech",
+    "feedback": "While you were looking for account and equipment details, you moved through several screens and searched in areas that did not hold the information you needed. Finding information quickly matters because each extra screen can add silence to the call, and the customer cannot see the work happening on your side. Long gaps can make the customer wonder whether the issue is being handled and can turn a straightforward concern into a longer call. On future calls, go directly to the screens each call type requires, use a short navigation reference for the tasks you handle most, and tell the customer what you are pulling up while the systems load.",
+    "impact": "Most navigation delays come from limited practice with where information lives in the tools, or from searching instead of following a known path. Each extra screen adds time and silence, which can increase handle time, prompt the customer to ask whether you are still there, and reduce their confidence in the support. Across many calls, the added time can also reduce availability for other customers who are waiting.",
+    "plan": "Each day for the next {duration}, you will spend a few minutes practicing the navigation path for the call types you handle most often, using a short reference we build together that lists the screens each one requires. On live calls, you will go directly to those screens instead of searching, and when a system is slow to load, you will tell the customer what you are opening. You will also note any screen that took longer to find than expected and bring it to our midweek check-in. Success means direct navigation and no extended silences caused by searching across all {calls} calls we review within {followup}.",
+    "followup": "Today, we will complete a timed tools navigation practice for the call types from this interaction, so we can see exactly where the delays come from. I will listen to {calls} of your calls within {followup}, focusing on the stretches where you are navigating, and we will repeat the timed practice at the end of the {durationAdj} plan to compare.",
+    "example": [
+      { "label": "While the tools load", "say": "I'm opening your equipment details now, and the page can take a few seconds to load. While it does, can you tell me whether the slowdown happens on every device or only one?" },
+      { "label": "Once the details load", "say": "Okay, I have your equipment status in front of me. Next, I'm checking the connection history so we can see when the problem started." }
+    ],
+    "questions": [
+      "Which screens did you open on this call that did not have the information you needed?",
+      "If you mapped the path for this call type, which screens would be on it and in what order?",
+      "Which tasks take you the longest to find in the tools, and what would help you reach them faster?"
+    ],
+    "strengths": ["s-itg", "s-diagnosis", "s-empathy", "s-resolution"],
+    "b": {
+      "obs": "moved through several screens and searched in the wrong areas of the tools to find needed details, which created silence and lengthened the call",
+      "focus": "efficient tools navigation",
+      "commit": "go directly to the screens each call type requires, using a short navigation reference, and tell the customer what you are opening while systems load",
+      "m": "direct navigation to the needed information with no extended silence caused by searching",
+      "coach": "a timed tools navigation practice for the call types you handle most often"
+    },
+    "note": "Confirm the current systems and screens used for this call type before the session, so practice reflects the tools as they are today. On the recording, separate navigation delays from system slowness before documenting this behavior."
+  },
+  {
+    "id": "tech-root-cause",
+    "cat": "tech",
+    "title": "Incorrect Root Cause Identification",
+    "desc": "Concluding the wrong cause of a technical issue, such as treating Wi-Fi coverage as an outage or a device issue as a network issue, which leads to the wrong fix.",
+    "kw": ["root cause", "wrong diagnosis", "misdiagnosis", "diagnosis", "wrong fix", "wrong cause", "wi-fi coverage", "wifi", "assumed outage", "device issue", "network issue", "wrong conclusion", "symptoms", "signal", "incorrect troubleshooting"],
+    "tags": ["Diagnosis", "Troubleshooting", "Technical Accuracy"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "Once the customer described the symptoms, you settled on a cause the evidence did not support, and the fix you recommended targeted a different problem. The right fix depends on the right cause, and similar symptoms can have different sources: weak Wi-Fi in one room usually points to coverage, not an outage, and one device that will not connect often points to the device, not the network. With the wrong cause, the customer may complete steps that cannot help and still have the issue. From here, compare the customer's description with your check results, rule out other likely causes, and confirm the root cause before recommending a fix.",
+    "impact": "Settling on the wrong cause often comes from anchoring on the first explanation that fits, especially when a symptom resembles a common issue. A fix aimed at the wrong cause can use up the customer's time, lead to unnecessary steps, visits, or equipment changes, and leave the real issue in place, which increases the likelihood of a repeat contact and makes the next recommendation harder to trust.",
+    "plan": "During the next {duration}, you will confirm the likely root cause with the results of your checks before recommending any fix, including at least one check that rules out the most common alternative cause. Using the applicable ITG flow, you will separate Wi-Fi coverage, single-device, equipment, and outage causes before deciding on a next step. When the results do not clearly point to one cause, you will continue troubleshooting or follow the applicable escalation path instead of choosing the closest fit. We will review {calls} technical calls within {followup}, targeting a root cause that is supported by completed checks and explained to the customer in all {calls} calls.",
+    "followup": "We will listen to this call side by side and pause at the point where the cause was decided, so we can trace which checks would have pointed to the actual root cause. I will review {calls} technical calls within {followup}, noting the evidence behind each conclusion you reach, and we will check in midweek on any symptoms that were difficult to separate. We will close the plan with a review at the end of the {durationAdj} period.",
+    "example": [
+      { "say": "Since the connection is strong when you're near the gateway but drops in the back bedroom, this looks like a Wi-Fi coverage issue rather than a service problem. Let me confirm there's no outage in your area first, and then we'll look at where the gateway is placed and what can help the signal reach that room." }
+    ],
+    "questions": [
+      "What did the customer describe that pointed you toward the cause you chose?",
+      "Which check could have confirmed or ruled out that cause before you recommended the fix?",
+      "When two causes seem possible, how will you decide which one the evidence supports?"
+    ],
+    "strengths": ["s-acknowledgement", "s-empathy", "s-ownership", "s-research-updates"],
+    "b": {
+      "obs": "settled on a root cause the available evidence did not support, which led to a fix aimed at a different problem than the one the customer had",
+      "focus": "root cause accuracy",
+      "commit": "confirm the root cause with check results that rule out other likely causes, such as Wi-Fi coverage, a single device, or an outage, before recommending a fix",
+      "m": "a root cause supported by completed checks before any fix is recommended",
+      "coach": "a side-by-side review of this call that traces which checks would have revealed the root cause"
+    },
+    "note": "Confirm the applicable ITG guidance for separating Wi-Fi coverage, device, equipment, and outage causes before the session. Identify on the recording the moment the cause was decided and what evidence was available at that point."
+  },
+  {
+    "id": "tech-diagnostics",
+    "cat": "tech",
+    "title": "Insufficient Technical Diagnostics",
+    "desc": "Concluding the cause or recommending a fix before running enough checks on symptoms, scope, equipment status, signal, and outages.",
+    "kw": ["diagnostics", "diagnosis", "not enough checks", "insufficient troubleshooting", "signal", "signal check", "equipment status", "outage check", "scope", "symptoms", "jumped to fix", "quick fix", "rushed troubleshooting", "assumption", "incomplete diagnostics", "troubleshooting"],
+    "tags": ["Troubleshooting", "Diagnostics", "Technical Accuracy"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "Before recommending a fix, you ran only a few checks, so the recommendation rested on limited information about what was happening with the service. Checks such as confirming the symptoms and when they started, how many devices are affected, the equipment status, the signal, and whether there is an outage are what turn an assumption into an informed decision. Without them, the customer may be asked to restart, reset, or replace things that were never the problem, while the actual issue remains. The expectation is to complete the relevant checks in the applicable flow and share what each result shows before you recommend the next step.",
+    "impact": "Insufficient diagnostics usually happen when the first symptom suggests a familiar fix, or when there is pressure to move the call along quickly. Skipping checks saves a little time in the moment but can lead to a fix that misses the cause, unnecessary equipment changes or technician visits, and a repeat contact when the issue returns. It can also leave little in the account notes for the next person who helps the customer.",
+    "plan": "Over the next {duration}, you will complete the diagnostic checks in the applicable ITG flow before recommending any fix, including the symptoms and when they started, scope across devices and services, equipment status, signal, and outage status. You will briefly tell the customer what each check shows, so your recommendation is clearly connected to the results. When a check cannot be run, such as when the customer is away from the equipment, you will note it and plan how it will be completed. The target for the {calls} technical calls we review within {followup} is a complete set of relevant checks before the first fix is recommended on every call.",
+    "followup": "To start, you will complete a short self-assessment of this call against a diagnostic checklist built from the applicable ITG flow, and we will compare which checks were completed and which were missed. Within {followup}, I will review {calls} technical calls using the same checklist, and we will discuss the results midweek. At the end of the {durationAdj} plan, we will decide whether you still need the checklist or whether the checks have become routine.",
+    "example": [
+      { "say": "Before I recommend anything, I'd like to run a few checks so we're working from the full picture. I'm going to confirm there's no outage in your area, look at the signal reaching your gateway, and see how your devices are connecting. Then I'll walk you through what we found and the best next step." }
+    ],
+    "questions": [
+      "Which checks did you complete before recommending the fix, and which ones did you skip?",
+      "What could the remaining checks have told you about the cause?",
+      "How can you keep the call moving while still completing the checks the flow requires?"
+    ],
+    "strengths": ["s-empathy", "s-rapport", "s-ownership", "s-verification"],
+    "b": {
+      "obs": "recommended a fix before running enough checks to confirm the symptoms, scope, equipment status, signal, and outage status",
+      "focus": "thorough diagnostics",
+      "commit": "complete the diagnostic checks in the applicable flow, including symptoms, scope, equipment, signal, and outage status, before concluding the cause or recommending any fix",
+      "m": "symptom, scope, equipment, signal, and outage checks completed before a fix is recommended",
+      "coach": "a self-assessment of this call against a diagnostic checklist built from the applicable ITG flow"
+    },
+    "note": "Confirm the diagnostic checks the current ITG flow requires for this issue type before the session, so the checklist reflects current steps. If the checks were completed but the conclusion was wrong, Incorrect Root Cause Identification may be the better fit."
+  },
+  {
+    "id": "tech-equipment-replacement",
+    "cat": "tech",
+    "title": "Inappropriate Equipment Replacement",
+    "desc": "Replacing or swapping equipment without diagnostic evidence that the device is the cause, or before troubleshooting is complete under the applicable criteria.",
+    "kw": ["equipment swap", "replacement", "equipment replacement", "swap", "new modem", "new gateway", "replace router", "unnecessary swap", "device exchange", "no fault found", "equipment", "tv box", "remote", "replacement criteria", "premature replacement"],
+    "tags": ["Equipment", "Process", "Cost Awareness"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "In this interaction, you offered to replace the equipment before troubleshooting was complete and without results showing that the device was causing the issue. A replacement can feel like the fastest answer, but if the equipment is not the cause, the customer may go through the effort of exchanging it and still have the same problem. That can mean another round of troubleshooting, more time without reliable service, and less confidence in the next recommendation. Going forward, complete the applicable troubleshooting first, review the results against the current replacement criteria, and recommend a replacement only when the evidence points to the equipment.",
+    "impact": "Unnecessary replacements often come from wanting to give the customer a definite solution, or from treating a swap as a shortcut when troubleshooting feels slow. When the equipment is not the cause, the replacement adds effort and waiting for the customer, leaves the issue unresolved, and creates avoidable equipment and handling costs, while also increasing the likelihood of a repeat contact.",
+    "plan": "For the next {duration}, you will complete the applicable ITG troubleshooting before discussing a replacement, including signal, connection, and equipment status checks. Before offering a swap, you will compare the results with the current replacement criteria and explain to the customer which result points to the equipment. If the criteria are not met, you will continue with the next step in the flow or the applicable escalation path instead. We will review {calls} calls within {followup}, including every call where a replacement was discussed, targeting zero replacements offered before troubleshooting is complete.",
+    "followup": "We will review the current equipment replacement criteria together and apply them to the troubleshooting results from this call, so you can see where the decision should have been made. I will audit every replacement you offer over the {duration}, along with {calls} other technical calls within {followup}, and we will meet at the midpoint to discuss any borderline cases. At the end of the plan, we will confirm that each replacement met the criteria.",
+    "example": [
+      { "say": "I know a new gateway sounds like the quickest fix, and if the equipment turns out to be the problem, we'll look at replacing it. First, let me run a couple of checks on the signal and the connection, so a replacement is only recommended if the results point to the equipment and you don't go through an exchange that leaves the same issue in place." }
+    ],
+    "questions": [
+      "What results did you have that pointed to the equipment before you offered the replacement?",
+      "Which troubleshooting steps were still open when the replacement came up?",
+      "How could you respond when a customer asks for new equipment before the checks are complete?"
+    ],
+    "strengths": ["s-empathy", "s-ownership", "s-verification", "s-tone"],
+    "b": {
+      "obs": "offered to replace the equipment before troubleshooting was complete and without diagnostic results showing the device was the cause",
+      "focus": "evidence-based equipment decisions",
+      "commit": "complete the applicable troubleshooting and confirm the results meet the current replacement criteria before offering to replace or swap any equipment",
+      "mx": "Every equipment replacement offered during the next {duration} follows completed troubleshooting and is supported by results that meet the applicable replacement criteria.",
+      "coach": "a review of the current equipment replacement criteria applied to the results from this call"
+    },
+    "note": "Confirm the current equipment replacement criteria and the diagnostic results required before a swap ahead of the session. Do not quote replacement fees, shipping methods, or timeframes in the coaching unless they are confirmed in the current process."
+  },
+  {
+    "id": "tech-scheduling",
+    "cat": "tech",
+    "title": "Incorrect Technician Scheduling",
+    "desc": "Scheduling a technician visit that was not needed, the wrong type of visit, or a visit before the required troubleshooting was complete.",
+    "kw": ["truck roll", "dispatch", "technician", "tech visit", "unnecessary visit", "wrong visit type", "scheduling", "service call", "appointment", "premature dispatch", "dispatch criteria", "avoidable dispatch", "repeat visit", "cost", "field tech"],
+    "tags": ["Dispatch", "Process", "Cost Awareness"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "During the interaction, you scheduled a technician visit before the required troubleshooting was complete, without confirming that a visit, or that type of visit, matched what the issue needed. A visit asks a lot of the customer, who may need to arrange time at home, and if the issue could have been resolved on the call or needed a different kind of visit, that time may be spent without fixing the problem. This can lead to a second appointment and a repeat contact. Going forward, finish the troubleshooting the flow requires, confirm the applicable dispatch criteria and visit type, and schedule only when the results support it.",
+    "impact": "Unneeded or mismatched visits are often booked when a visit feels like the safest option, or when troubleshooting is taking longer than expected. A visit that was not needed can cost the customer time at home, delay the actual fix, and create avoidable operational cost, and an issue that remains after the visit raises the chance of another appointment and a repeat contact.",
+    "plan": "Starting today and continuing for {duration}, you will complete the troubleshooting the applicable ITG flow requires before discussing a technician visit. Before scheduling, you will confirm that the results meet the current dispatch criteria and that the visit type matches the issue, and you will document the reason for the visit according to the current process. When the results do not support a visit, you will explain the next troubleshooting step or escalation path to the customer instead. Our review of {calls} calls within {followup} will include every visit you schedule, with a target of zero visits booked before the required troubleshooting is complete.",
+    "followup": "Together, we will walk through the applicable dispatch criteria using the troubleshooting from this call, and you will decide at each step whether the results supported a visit at that point. Within {followup}, I will review {calls} of your calls, along with every visit scheduled during that time, to confirm the criteria and visit type were met. At the end of the {durationAdj} plan, we will look at the visits you scheduled and whether any could have been avoided.",
+    "example": [
+      { "say": "I want to make sure a technician visit is the right next step, so let's finish two more checks first. If the results show the issue is with the signal coming into your home or the wiring, I'll schedule the right type of visit and explain exactly what to expect. If not, we may be able to fix this today without you having to wait at home for a visit." }
+    ],
+    "questions": [
+      "What results did you have when you decided to schedule the visit, and did they meet the dispatch criteria?",
+      "Which remaining steps in the flow might have resolved the issue without a visit?",
+      "How would you explain to a customer why you want to finish troubleshooting before booking a visit?"
+    ],
+    "strengths": ["s-acknowledgement", "s-empathy", "s-verification", "s-closing"],
+    "b": {
+      "obs": "scheduled a technician visit before the required troubleshooting was complete and without confirming the visit was needed or the visit type matched the issue",
+      "focus": "accurate dispatch decisions",
+      "commit": "finish the required troubleshooting and confirm the applicable dispatch criteria and visit type before scheduling any technician visit",
+      "mx": "Every technician visit scheduled during the next {duration} follows completed troubleshooting and matches the applicable dispatch criteria and visit type.",
+      "coach": "a walkthrough of the applicable dispatch criteria using the troubleshooting results from this call"
+    },
+    "note": "Confirm the current dispatch criteria, available visit types, and the troubleshooting required before scheduling, ahead of the session. Check whether the visit on this call met those criteria, and do not quote visit fees unless they are confirmed in the current process."
+  },
+  {
+    "id": "tech-appointment-expectations",
+    "cat": "tech",
+    "title": "Incorrect Appointment Expectations",
+    "desc": "Giving wrong or incomplete information about a technician appointment, such as the window, the visit purpose, who must be present, preparation, or rescheduling.",
+    "kw": ["appointment", "appointment window", "arrival window", "technician", "tech visit", "expectations", "who must be home", "preparation", "reschedule", "cancel appointment", "missed appointment", "no show", "visit details", "what to expect", "appointment confirmation"],
+    "tags": ["Expectations", "Dispatch", "Customer Education"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "After setting up the technician appointment, you gave the customer incomplete or inaccurate details about what to expect from the visit. Customers plan their day around an appointment, so the window, the purpose of the visit, who needs to be present, and how to prepare all shape whether the visit goes smoothly. Without those details, the customer may miss part of the window, leave the equipment hard to reach, or call back to confirm information that belonged on this call. Next time, before closing, confirm the window, what the technician will focus on, who should be present, any preparation, and how to reschedule, using only details from the current process.",
+    "impact": "When the focus is on getting the visit booked, the appointment details are often the part of the close that gets rushed. A customer who does not know the window, the purpose of the visit, or how to prepare and reschedule is more likely to miss the appointment or have an unproductive visit, which can delay the repair, lead to a second appointment, and create a repeat contact to clarify details.",
+    "plan": "Throughout the next {duration}, whenever you set a technician appointment, you will confirm the appointment window, what the technician will focus on, who should be present, how to prepare the area around the equipment, and how to reschedule if plans change. You will share only details confirmed in the current process and avoid estimating anything the process does not support. Before closing, you will check that the customer has noted the window and any preparation steps. We will review {calls} calls within {followup}, including every appointment you set in that period, targeting a complete appointment confirmation on each one.",
+    "followup": "We will roleplay an appointment confirmation from the moment the visit is booked to the end of the call, covering each detail the customer needs. I will review {calls} of your calls within {followup}, including every technician appointment you set, and check each one against a short appointment checklist. We will discuss what the checklist shows midweek and again at the end of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "Confirming the visit", "say": "Your appointment is booked for the window we confirmed together. The technician will look at the connection issue we worked on today, including the signal coming into your home." },
+      { "label": "Preparing the customer", "say": "Please have someone there for the whole window who can let the technician in and answer questions about the service, and keep the area around your equipment clear. If your plans change, contact us before the appointment so we can reschedule it." }
+    ],
+    "questions": [
+      "Which appointment details did the customer leave the call without?",
+      "How might the visit go if the customer is not ready when the technician arrives?",
+      "What short checklist could you use before closing to cover every appointment detail?"
+    ],
+    "strengths": ["s-troubleshooting", "s-diagnosis", "s-itg", "s-empathy"],
+    "b": {
+      "obs": "gave incomplete or inaccurate details about the technician appointment, such as the window, the purpose of the visit, preparation, or how to reschedule",
+      "focus": "appointment expectation setting",
+      "commit": "confirm the appointment window, the purpose of the visit, who should be present, how to prepare, and how to reschedule before closing the call",
+      "mx": "Every technician appointment set during the next {duration} includes the window, visit purpose, who should be present, preparation, and how to reschedule.",
+      "coach": "a roleplay of a full appointment confirmation, from booking the visit to closing the call"
+    },
+    "note": "Confirm the current appointment window options, who must be present, preparation guidance, and the reschedule and cancel steps before the session. Do not quote fees or timeframes that are not in the current process."
+  },
+  {
+    "id": "tech-outage-expectations",
+    "cat": "tech",
+    "title": "Incorrect Outage Expectations",
+    "desc": "Not checking for an outage, stating an outage that is not confirmed, or promising restoration times the available information does not support.",
+    "kw": ["outage", "outage check", "service down", "area outage", "restoration time", "eta", "estimated restoration", "outage updates", "no outage check", "wrong outage", "promised time", "service interruption", "network issue", "outage notification", "expectations"],
+    "tags": ["Outage", "Expectations", "Technical Accuracy"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "When the customer reported that the service was down, you set expectations about the cause or when service would return without first confirming the outage status through the available information. Outage details shape the customer's next decision, whether that is troubleshooting, waiting, or making other plans for work or school. If the information turns out to be wrong, or a restoration time passes without service returning, the customer may lose trust and contact us again. Instead, check for an outage on every service concern, share only what is confirmed, be clear when no restoration time is available, and explain how the customer can get updates.",
+    "impact": "Outage errors often start with an assumption, such as expecting an outage because similar calls are coming in, or with the urge to give a worried customer a definite time. An unconfirmed outage can stop troubleshooting that could have found an issue in the home, and a missed restoration time can turn one call into several, increasing repeat contacts, escalation risk, and frustration.",
+    "plan": "Over the next {duration}, you will check for an outage at the start of every connectivity or service concern, following the current process. When an outage is confirmed, you will share only the details available, including a restoration estimate only if one is provided, and explain how the customer can receive updates. When no outage is found, you will continue troubleshooting the home connection instead of assuming one. Within {followup}, we will review {calls} service-related calls, targeting an outage check on every call and zero unsupported restoration times.",
+    "followup": "First, we will review the current outage process together, including where outage status is checked and how customers receive updates, and then roleplay a call where no restoration time is available yet. Within {followup}, I will listen to {calls} of your service-related calls to confirm the outage check and the expectations you set, and we will go over the full set of calls at the end of the {duration}.",
+    "example": [
+      { "say": "I checked, and there is a confirmed outage affecting service in your area. I don't have a confirmed restoration time to share yet, and I don't want to give you a time I can't stand behind. You can check for updates in the Xfinity app, and if your service isn't back once the outage is resolved, please reach out so we can look at your equipment." }
+    ],
+    "questions": [
+      "What information did you have about an outage before you described the situation to the customer?",
+      "How might the customer plan their day around the restoration time you gave?",
+      "How would you explain an outage to a customer when no restoration time is available yet?"
+    ],
+    "strengths": ["s-acknowledgement", "s-empathy", "s-deescalation", "s-verification"],
+    "b": {
+      "obs": "shared outage status or restoration timing that was not confirmed, or moved into troubleshooting without first checking for an outage",
+      "focus": "accurate outage communication",
+      "commit": "check for an outage on every service concern and share only confirmed outage details, including how the customer can get updates",
+      "m": "an outage check on every service concern and no restoration times beyond confirmed information",
+      "coach": "a roleplay of an outage call where no restoration time is available yet"
+    },
+    "note": "Confirm how outages are checked and how customers receive outage updates under the current process before the session. Restoration estimates should be shared only when they come from approved sources."
+  },
+  {
+    "id": "tech-verification",
+    "cat": "tech",
+    "title": "Missing Account Verification",
+    "desc": "Discussing, reviewing, or changing account information before completing the required verification, which creates privacy and security risk.",
+    "kw": ["verification", "verify", "account verification", "not verified", "skipped verification", "security", "privacy", "security risk", "authentication", "authorized user", "unverified caller", "account security", "data privacy", "compliance", "caller identity", "fraud"],
+    "tags": ["Security", "Compliance", "Privacy"],
+    "kpi": ["QA"],
+    "theme": "tech",
+    "feedback": "At the start of the call, you began discussing account details before completing the required verification. Verification protects the customer's personal and account information, and it confirms that the person on the line is authorized to hear details or request changes. When it is skipped, information may be shared with someone who should not have it, or a change may be made without the account holder's consent, which can put the customer at real risk and create compliance concerns. On every call, complete the required verification before you review, discuss, or change anything on the account, even when the caller seems to know the details.",
+    "impact": "Verification is most often missed when the caller sounds confident, already knows account details, or when the concern feels urgent and the call moves straight to the issue. Sharing or changing information without verification can expose the customer to privacy violations, unauthorized changes, or fraud, and it creates compliance risk that can affect quality results no matter how well the rest of the call goes.",
+    "plan": "Beginning with your next call and continuing for {duration}, you will complete the required verification before discussing, reviewing, or changing any account information, even when the caller already knows account details or the concern feels urgent. If a caller cannot complete verification, you will explain what can and cannot be discussed and offer the options the current process allows. You will introduce verification with a brief reason, such as protecting the account, so the step feels natural to the customer. We will review {calls} calls within {followup}, targeting required verification completed before any account information is discussed in all {calls} calls.",
+    "followup": "Before anything else, we will go over the current verification steps and practice the first minute of the call in a short roleplay, including how to respond when a caller pushes back on verification. I will review {calls} of your calls within {followup}, paying close attention to the point where account details are first discussed. Because this is a security behavior, I will continue spot-checking your calls through the end of the {duration}.",
+    "example": [
+      { "label": "Before reviewing the account", "say": "Before I go into the account, I need to complete a quick verification. It protects your information, and it only takes a moment." },
+      { "label": "If the caller is in a hurry", "say": "I know you want to get this fixed quickly. Verification keeps anyone else from accessing or changing your account, so let's take care of it first, and then I'll go straight to the issue." }
+    ],
+    "questions": [
+      "At what point in the call did you first discuss account details, and had verification been completed by then?",
+      "What risks could follow if the caller had not been the account holder?",
+      "What will you say to a caller who is in a hurry and wants to skip verification?"
+    ],
+    "strengths": ["s-empathy", "s-troubleshooting", "s-resolution", "s-tone"],
+    "b": {
+      "obs": "discussed account details before completing the required verification, which put the customer's privacy and account security at risk",
+      "focus": "account verification",
+      "commit": "complete the required verification before discussing, reviewing, or changing any account information, even when the caller already knows the details",
+      "m": "required verification completed before any account information is discussed or changed",
+      "coach": "a short roleplay of completing verification before the account is discussed"
+    },
+    "note": "Confirm the program's current verification requirements, including what counts as completed verification, before the session. Identify on the recording the first point where account details were discussed or changed."
+  },
+  {
+    "id": "tech-account-access",
+    "cat": "tech",
+    "title": "Incorrect Account-Linking / Account-Access Troubleshooting",
+    "desc": "Handling login, ID, password reset, app access, or account-linking concerns with the wrong steps or without the required verification.",
+    "kw": ["login", "log in", "password", "password reset", "sign in", "username", "login id", "account access", "locked out", "app access", "xfinity app", "account linking", "link accounts", "verification", "security", "cannot sign in"],
+    "tags": ["Account Access", "Security", "Process"],
+    "kpi": ["QA", "aiCR", "Transfer"],
+    "theme": "tech",
+    "feedback": "The customer needed help signing in to or linking their account, and the steps you used did not follow the applicable process for that type of access issue. Access problems have both a technical and a security side: the wrong steps can lock the customer out further, and steps taken before verification is complete can expose the account. The customer may end the call still without access, need to call again, or be transferred unnecessarily. The expectation is to verify the customer first, follow the applicable access steps in order, and stay with the customer until they confirm access is working.",
+    "impact": "Account-access errors often come from treating every sign-in problem the same way, or from moving into a reset before confirming what the customer is trying to access and whether they are verified. Wrong steps can extend a lockout, create a new access problem, or expose account information, which can lead to repeat contacts, avoidable transfers, and security concerns for the customer.",
+    "plan": "During the next {duration}, you will start every login, password, app access, or account-linking concern by completing the required verification and confirming exactly what the customer is trying to access and what happens when they try. You will then follow the applicable steps for that specific issue in order, rather than defaulting to a password reset. Before closing, you will stay on the line, when possible, while the customer signs in or confirms the link works. Across the {calls} account-access calls we review within {followup}, the target is verification first, the correct steps, and confirmed access on every call.",
+    "followup": "We will walk through the applicable login, password reset, and account-linking steps together, and you will explain which path fits the issue from this call and why. I will review {calls} account-access calls within {followup}, checking that verification came first and that each call ended with confirmed access. We will meet midweek to cover any scenarios that felt unclear and review the results at the end of the {durationAdj} plan.",
+    "example": [
+      { "say": "Let's get you signed back in. First, I'll verify a few details to protect your account. Then I'd like to know exactly what happens when you try to sign in, so we use the right fix instead of resetting something that isn't the problem. Once we're done, I'll stay with you while you sign in to the Xfinity app to make sure it works." }
+    ],
+    "questions": [
+      "What was the customer trying to access, and how did that shape the steps you chose?",
+      "Where in the call was verification completed compared with when you started the access steps?",
+      "How can you confirm the customer can sign in before the call ends?"
+    ],
+    "strengths": ["s-empathy", "s-ownership", "s-research-updates", "s-tone"],
+    "b": {
+      "obs": "handled the login or account-linking concern with steps that did not match the applicable process, or started those steps before verification was complete",
+      "focus": "account access troubleshooting",
+      "commit": "verify the customer first, identify exactly what they cannot access, and follow the applicable login, reset, or linking steps until access is confirmed",
+      "mx": "Every account-access call reviewed during the next {duration} shows verification first, the applicable steps in order, and confirmed access before the call ends.",
+      "coach": "a walkthrough of the applicable login, password reset, and account-linking steps for common scenarios"
+    },
+    "note": "Confirm the current login, password reset, app access, and account-linking procedures, and the verification required for each, before the session. If the main gap was verification alone, Missing Account Verification may be the better fit."
+  },
+  {
+    "id": "tech-porting",
+    "cat": "tech",
+    "title": "Incorrect Mobile Porting Process",
+    "desc": "Number transfer errors, such as not confirming the current carrier account number and transfer PIN, setting wrong timing expectations, or not checking transfer status.",
+    "kw": ["porting", "port in", "port", "number transfer", "transfer pin", "port pin", "carrier account number", "keep my number", "port status", "port delay", "failed port", "xfinity mobile", "mobile", "new line", "activation", "switching carriers"],
+    "tags": ["Xfinity Mobile", "Porting", "Process"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "As you handled the number transfer, you moved ahead without confirming the account number and transfer PIN from the current carrier, and described timing that the current process does not support. A port only completes when the details match the other carrier's records, so a missing detail can delay or stop it, and a promised time may not hold. The customer may cancel their old service too early, wait on a transfer that cannot complete, or need to call back. Going forward, confirm the required carrier details before submitting, check status when a customer calls about a pending transfer, and describe timing only as the process allows.",
+    "impact": "Porting errors usually come from treating the transfer as a quick final step of activation, or from not knowing exactly which details the other carrier requires. When information does not match or timing is overpromised, the transfer can be delayed or rejected, the customer may be left without working service on the new line, and repeat contacts become likely as they try to find out what went wrong.",
+    "plan": "For every number transfer you handle over the next {duration}, you will confirm the account number and transfer PIN from the customer's current carrier, along with any other details the current porting process requires, before submitting. You will describe timing only as the process allows, without promising when the number will move, and remind the customer to keep their current service active until the transfer is complete if the process calls for it. When a customer calls about a pending transfer, you will check its status before giving an update. We will review {calls} porting-related calls within {followup}, targeting complete carrier details, accurate status updates, and zero unsupported timing promises.",
+    "followup": "Our session will cover the current porting requirements, followed by a roleplay of collecting carrier details and explaining what happens next, including a customer who asks exactly when the number will move. Within {followup}, I will review {calls} of your porting-related calls, and if you handle fewer than that, I will review each one you complete during the {duration}. We will compare transfer outcomes and status updates in a final review at the end of the plan.",
+    "example": [
+      { "label": "Collecting carrier details", "say": "To bring your number over, I'll need your account number with your current carrier and a transfer PIN, which they can provide. These need to match their records exactly, so let's double-check them together." },
+      { "label": "Setting expectations", "say": "The timing can vary, so rather than give you a time I can't confirm, I'll explain what happens next and how to confirm the transfer is complete. Please keep your current service active until then." }
+    ],
+    "questions": [
+      "What information from the current carrier did you confirm before submitting the transfer?",
+      "How might the customer act on the timing you shared if the transfer took longer?",
+      "What will you say when a customer asks exactly when their number will be active on the new line?"
+    ],
+    "strengths": ["s-rapport", "s-verification", "s-ownership", "s-tone"],
+    "b": {
+      "obs": "set up the number transfer without confirming the carrier account number and transfer PIN, and gave timing expectations the current porting process does not support",
+      "focus": "number transfer accuracy",
+      "commit": "confirm the carrier account number and transfer PIN before submitting a number transfer, check status on pending transfers, and avoid promising timing",
+      "mx": "Every number transfer handled during the next {duration} includes confirmed carrier details, accurate status guidance, and zero unsupported timing promises.",
+      "coach": "a roleplay of collecting carrier details for a number transfer under the current porting process"
+    },
+    "note": "Confirm the current porting requirements, the carrier information needed, and how transfer status is checked before the session. Do not quote porting timelines or fees unless they are confirmed in the current process."
+  },
+  {
+    "id": "tech-explanations",
+    "cat": "tech",
+    "title": "Unclear Technical Explanations",
+    "desc": "Explaining technical steps or results with jargon and no plain-language comparisons, leaving the customer unsure what was done or what to do next.",
+    "kw": ["jargon", "technical terms", "too technical", "confusing", "unclear explanation", "plain language", "customer confused", "acronyms", "analogy", "simple terms", "tech talk", "explain steps", "customer education", "understanding", "over their head"],
+    "tags": ["Customer Education", "Technical Accuracy", "Clarity"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "As you walked the customer through the troubleshooting, you used technical terms and acronyms without explaining them in everyday language. Accurate steps only help when the customer understands them, because they are the ones who need to follow the instructions, notice if the issue returns, and know what to try next. When the explanation is hard to follow, the customer may agree without understanding, struggle with steps on their own, or call back with questions about what was done. On your next technical call, explain each step and result in plain language, use a simple comparison when a concept is abstract, and check that the customer understands before moving on.",
+    "impact": "Terms used every day on the job can start to feel like common language, which is usually why jargon slips into explanations. A customer who does not understand what was done or why is less able to follow instructions, recognize when the issue returns, or describe it accurately next time, which can increase repeat contacts and lower confidence in the resolution.",
+    "plan": "Within the next {duration}, you will build a short phrase bank of plain-language explanations and everyday comparisons for the technical terms you use most, such as signal, Wi-Fi range, and restarting equipment. On live calls, you will explain each troubleshooting step before the customer performs it and summarize the result in plain language afterward. You will end each technical explanation by checking understanding with an open question. In the {calls} technical calls we review within {followup}, the target is jargon-free explanations, an everyday comparison where a concept is abstract, and a check for understanding on every call.",
+    "followup": "Using the recording of this call, we will rewrite two or three of your explanations in plain language and add them to your phrase bank. I will review {calls} technical calls within {followup}, listening for any term the customer may not know, and we will check in midweek to add phrases that worked well. At the end of the {durationAdj} plan, we will listen to one of your recent calls together and compare it with this one.",
+    "example": [
+      { "say": "Restarting the gateway is a lot like restarting your phone when an app freezes. It clears out temporary glitches and lets the gateway reconnect to our network from a fresh start. If the connection drops again, that's a good first step to try, and if it keeps happening, let us know so we can look deeper. What questions do you have about what we did today?" }
+    ],
+    "questions": [
+      "Which terms in this call do you think the customer may not have understood?",
+      "How could you have explained the main step using a comparison from everyday life?",
+      "What question could you ask to confirm the customer understood what was done and what to do next?"
+    ],
+    "strengths": ["s-troubleshooting", "s-diagnosis", "s-itg", "s-resolution"],
+    "b": {
+      "obs": "explained the technical steps and results using jargon and acronyms, without plain-language comparisons the customer could easily follow",
+      "focus": "plain-language technical explanations",
+      "commit": "explain each technical step and result in plain language, use an everyday comparison for abstract concepts, and check that the customer understands",
+      "m": "plain-language technical explanations with an everyday comparison where needed and a check for understanding",
+      "coach": "a phrase bank exercise that turns the technical terms from this call into everyday comparisons"
+    },
+    "note": "Before the session, list the technical terms from the recording that the customer may not have understood, and confirm whether approved customer-facing explanations exist for common concepts. For general clarity issues outside troubleshooting, the Communication entry may fit better."
+  },
+  {
+    "id": "tech-repeat-issues",
+    "cat": "tech",
+    "title": "Failure to Identify Repeat Technical Issues",
+    "desc": "Missing a pattern of prior contacts, tickets, or visits for the same technical issue and repeating basic troubleshooting instead of taking the applicable advanced or escalation path.",
+    "kw": ["repeat issue", "repeat caller", "repeat contact", "aicr", "prior contacts", "contact history", "same issue", "called before", "multiple calls", "previous tickets", "repeat visit", "chronic issue", "escalation", "advanced troubleshooting", "basic troubleshooting", "ticket history"],
+    "tags": ["Repeat Contacts", "Troubleshooting", "Escalation"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "tech",
+    "feedback": "Although the account history showed earlier contacts for the same technical issue, you began basic troubleshooting from the start rather than reviewing what had already been tried. When an issue keeps coming back, steps that did not hold before are unlikely to hold now, and repeating them tells the customer their history went unnoticed. A customer who has already called about the same problem may become more frustrated, lose confidence in the service, and call again if nothing changes. Moving forward, review prior contacts, tickets, and visits before troubleshooting, acknowledge the history with the customer, and take the applicable advanced or escalation path when the pattern shows a repeat issue.",
+    "impact": "Missed repeat issues usually happen when the contact history is not reviewed before troubleshooting begins, or when each call is treated as a new issue. Repeating steps that have already failed adds effort for the customer, delays the advanced troubleshooting or escalation the issue may need, and keeps the cycle of contacts going, which can drive repeat contact rates (aiCR) and increase cancellation risk.",
+    "plan": "On every technical call during the next {duration}, you will review the recent contacts, tickets, and visits on the account before starting troubleshooting. When the history shows the same issue, you will acknowledge it with the customer, confirm what was already tried and what happened afterward, and avoid repeating basic steps that did not hold unless the applicable flow requires them. You will then take the applicable advanced troubleshooting or escalation path and explain it to the customer. We will review {calls} calls within {followup}, including every repeat-issue call in that period, targeting the history reviewed first and the correct path taken on each one.",
+    "followup": "We will look at the contact history from this call together and map the pattern of earlier contacts, so you can see where the repeat issue was visible before troubleshooting began. I will audit {calls} of your calls within {followup}, focusing on how you used the history, and we will talk midweek about any cases where the right path was unclear. At the end of the {duration}, we will confirm whether each repeat issue you handled went to the applicable advanced or escalation path.",
+    "example": [
+      { "say": "I can see you've contacted us about the connection dropping a few times recently, and I don't want you to repeat steps that haven't fixed it. Let me review what was already done. Since this keeps coming back, I'm going to take it to the next level of troubleshooting available for repeat issues and explain each step as we go." }
+    ],
+    "questions": [
+      "What did the contact history show before you started troubleshooting, and when did you first notice it?",
+      "How do you think the customer felt hearing the same basic steps again?",
+      "Which advanced or escalation path applies when the same issue keeps returning, and when would you use it?"
+    ],
+    "strengths": ["s-empathy", "s-tone", "s-research-updates", "s-verification"],
+    "b": {
+      "obs": "missed the pattern of prior contacts for the same technical issue and repeated basic troubleshooting instead of taking the applicable advanced or escalation path",
+      "focus": "repeat issue recognition",
+      "commit": "review prior contacts, tickets, and visits before troubleshooting and take the applicable advanced or escalation path when the same issue keeps returning",
+      "mx": "Every reviewed call involving a repeat technical issue during the next {duration} shows the contact history reviewed first and the applicable advanced or escalation path taken.",
+      "coach": "a contact history review from this call that maps the repeat pattern to the correct path"
+    },
+    "note": "Confirm the current criteria for treating an issue as a repeat and the applicable advanced troubleshooting or escalation path before the session. Check what contact, ticket, and visit history was visible to the agent during this call."
+  }
+]

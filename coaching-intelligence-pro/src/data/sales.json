@@ -1,0 +1,442 @@
+[
+  {
+    "id": "sales-plant-seed",
+    "cat": "sales",
+    "title": "Missing Plant the Seed",
+    "desc": "Ending the call after the concern is resolved without a brief, no-pressure mention of a relevant service the customer could consider later.",
+    "kw": ["plant the seed", "seed", "planting seed", "no seed", "mention for later", "future need", "soft mention", "no pressure", "missed opportunity", "after resolution", "sales flow", "sales", "offer", "cross sell", "upsell", "xm", "mobile", "upgrade"],
+    "tags": ["Sales", "Plant the Seed", "Call Flow"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "Once the customer's concern was resolved and confirmed, you went straight to the closing without planting a seed for later. In the sales flow, the moment after confirmation calls for a light mention tied to something they shared, such as several people online at home or phone lines with another carrier. A seed is not a pitch; it is a sentence or two that lets the customer know an option exists, with no decision needed. Without it, the customer may leave unaware of a service that fits their household. Next time, after confirming the resolution, connect one detail they shared to a relevant service and leave the choice with them.",
+    "impact": "A missed seed usually happens when the call is treated as finished the moment the issue is fixed, or when sales feels separate from service. Without a brief mention, the customer may never connect their needs to an option that could help, and a conversation that might have started today or on a future contact does not happen. This can also lower QA results for the sales portion of the call.",
+    "plan": "Starting with your next call and continuing for {duration}, you will follow every confirmed resolution with a brief plant-the-seed statement before moving into your close. Choose one detail the customer shared, such as how many devices are online at home, how the household streams, or phones on another carrier, and connect it to a relevant service in one or two sentences. Keep the tone light and do not ask for a decision at this stage; if the customer responds with interest, that becomes your opening for a relevant offer. We will review {calls} calls with a resolved concern within {followup}, targeting a relevant seed statement on every reviewed call where the concern was resolved and confirmed.",
+    "followup": "During our session, we will build a short phrase bank of seed statements for the call types you handle most, such as connectivity, billing, and mobile questions, and practice saying them in a relaxed, conversational way. I will listen to {calls} of your resolved calls within {followup}, checking that each one includes a relevant seed after the resolution is confirmed. At the end of the {durationAdj} plan, we will decide together which statements sounded most natural and keep those in your phrase bank.",
+    "example": [
+      { "label": "After confirming the fix", "say": "I'm glad everything is loading normally again. Since you mentioned the whole family is usually online in the evenings, there are internet options designed for busier homes that you might find useful down the road. There's no need to decide anything today, but I'm happy to share more whenever you'd like." }
+    ],
+    "questions": [
+      "What did the customer share during this call that could have supported a light mention of something for later?",
+      "How would you describe the difference between planting a seed and making a full offer?",
+      "Where in your closing could a seed statement fit so that it sounds natural rather than rushed?"
+    ],
+    "strengths": ["s-resolution", "s-troubleshooting", "s-empathy", "s-tone"],
+    "b": {
+      "obs": "went from the confirmed resolution directly to the close without planting a seed for a relevant service the customer could consider later",
+      "focus": "planting the seed",
+      "commit": "follow each confirmed resolution with a brief, no-pressure mention of a relevant service tied to something the customer shared",
+      "mx": "Every reviewed call where the concern is resolved and confirmed includes a brief, relevant plant-the-seed statement before the close.",
+      "coach": "a phrase-bank exercise to draft seed statements for your most common call types"
+    },
+    "note": "Confirm which call types the program treats as sales-eligible and any guidance on when a plant-the-seed statement is expected."
+  },
+  {
+    "id": "sales-pitch-before-resolve",
+    "cat": "sales",
+    "title": "Pitching Before Resolving the Concern",
+    "desc": "Introducing an offer before the customer's reason for calling has been resolved and confirmed, which breaks the expected order of the sales flow.",
+    "kw": ["pitch before resolve", "early pitch", "pitching early", "premature offer", "offer too soon", "resolve first", "unresolved issue", "wrong order", "timing", "sales flow", "sales", "pitch", "offer", "customer frustrated", "upsell", "cross sell"],
+    "tags": ["Sales", "Call Flow", "Offer Timing"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "sales",
+    "feedback": "While the customer's concern was still open, you introduced an offer before the issue was resolved and the customer had confirmed the outcome. The sales flow places the offer after Resolve and Confirm because, until the customer feels their problem is handled, most of their attention stays on that problem. An offer at that point can sound as if selling matters more than helping, and it may leave the customer doubting that the original issue will be fixed. On future calls, resolve the concern first, confirm with the customer that it is working or answered, and only then plant the seed or present a relevant offer.",
+    "impact": "Early pitching often comes from worry that the sales opportunity will be lost if the offer waits until the end of the call. In practice, a customer with an open issue is rarely ready to hear an offer, so the pitch can add frustration, weaken trust in the resolution, and lower the chance of acceptance. If the concern is rushed or left partly open to make room for the offer, it can also lead to a repeat contact.",
+    "plan": "Over the next {duration}, you will hold every offer until the customer's concern is resolved and the customer has confirmed the outcome, for example by testing the service together or checking that the billing question is fully answered. If an offer idea comes up earlier, such as when the customer mentions a new device, make a quick note and return to it after the confirmation step. Follow the order Resolve, Confirm, Plant the Seed, then Relevant Offer on every call with a sales opportunity. Within {followup}, we will review {calls} calls, and the target is zero offers made before the concern was resolved and confirmed.",
+    "followup": "In our session, we will listen to the recording side by side and mark two moments: when the concern was actually confirmed and when the offer was first raised. We will then map the call against the sales flow and practice where the offer would fit best. I will apply the same timing check to {calls} of your calls within {followup}, and we will meet at the end of the {duration} to review whether the sequence is holding across your calls.",
+    "example": [
+      { "label": "Confirming first", "say": "Just to confirm, does that fully explain the change on this month's bill, or is there anything about it you'd like me to go over again?" },
+      { "label": "Then the offer", "say": "Thanks for confirming. Earlier you mentioned someone at home is getting their first phone soon. Now that your bill question is taken care of, would you be open to a quick look at how an Xfinity Mobile line could work for them?" }
+    ],
+    "questions": [
+      "At what point in this call did you feel the customer's concern was fully resolved and confirmed?",
+      "How might the offer have sounded to the customer while their issue was still open?",
+      "What could you do with an offer idea that comes up early so you can return to it at the right time?"
+    ],
+    "strengths": ["s-relevant-offer", "s-value", "s-acknowledgement", "s-tone"],
+    "b": {
+      "obs": "introduced an offer while the customer's concern was still open, before the resolution had been confirmed",
+      "focus": "offer timing",
+      "commit": "hold every offer until the customer's concern is resolved and the customer has confirmed the outcome",
+      "m": "no offer introduced before the customer's concern was resolved and confirmed",
+      "coach": "a side-by-side review marking when the concern was confirmed and when the offer began"
+    },
+    "note": "On the recording, note when the customer confirmed the resolution and when the offer was first mentioned; comparing the two makes the sequence easy to discuss."
+  },
+  {
+    "id": "sales-irrelevant-pitch",
+    "cat": "sales",
+    "title": "Irrelevant Sales Pitch",
+    "desc": "Presenting an offer that does not connect to anything the customer shared about their household, usage, or needs during the call.",
+    "kw": ["irrelevant pitch", "irrelevant offer", "wrong offer", "generic pitch", "scripted pitch", "random offer", "mismatched offer", "not relevant", "one size fits all", "customer needs", "sales", "pitch", "offer", "xm", "mobile", "upgrade", "tv package", "cross sell", "upsell"],
+    "tags": ["Sales", "Offer Relevance", "Customer Needs"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "In this interaction, the offer you presented did not connect to anything the customer had shared about their household or usage. Suggesting a TV package change to someone who mainly streams, or a faster internet tier to someone with light usage, gives the customer no reason to listen. An offer with no link to the conversation sounds scripted, and customers often decline before hearing the details. Instead, match the offer type to what you learned, such as an Xfinity Mobile line or device for mobile needs, a speed or equipment upgrade for heavy use, or a TV package change for viewing habits, and tell the customer why you chose it.",
+    "impact": "An irrelevant pitch is often the result of leading with the offer that is most familiar or top of mind rather than the one the conversation points to. When the offer does not fit, the customer may feel unheard and start to see the call as a sales script, which can reduce trust and make them less open to a relevant offer later in the call or on a future contact.",
+    "plan": "During the next {duration}, you will base every offer on at least one specific detail the customer shared, such as who is in the household, streaming or TV viewing habits, phones with another carrier, or working from home. Before presenting, decide which offer type that detail supports: an Xfinity Mobile line or device, a service upgrade, a TV package change, or, for a customer considering cancellation, the applicable retention options. If nothing the customer shared supports an offer, plant a seed instead, and when you do present, say the connection out loud. We will review {calls} calls that include an offer within {followup}, targeting a clear link between every offer and a need the customer expressed.",
+    "followup": "We will start with a quick matching exercise: I will describe several customer situations, and you will choose the offer type that fits each one or decide that no offer fits yet. We will then listen to this call and pick out the details that could have pointed to a better match. Within {followup}, I will review {calls} of your calls that include an offer, and in our final review after the {duration}, we will look at how closely each offer matched what the customer shared.",
+    "example": [
+      { "say": "You mentioned you work from home and your video calls get choppy when the rest of the house is online, so the option I'd point you to is an internet speed upgrade. It's designed for homes with several people connected at once, which can help your calls hold up when the house is busy." }
+    ],
+    "questions": [
+      "Which details from the conversation could have pointed you toward a different offer type?",
+      "How do you decide whether a mobile, internet, or TV offer is the right fit for a customer?",
+      "What would you say instead when nothing in the conversation supports an offer yet?"
+    ],
+    "strengths": ["s-resolution", "s-pricing", "s-tone", "s-empathy"],
+    "b": {
+      "obs": "presented an offer that did not connect to anything the customer had shared about their household, usage, or needs",
+      "focus": "matching offers to needs",
+      "commit": "match each offer type to a specific detail the customer shared and explain that connection when you present it",
+      "mx": "Every offer presented during the next {duration} is tied to a detail the customer shared, and that connection is stated to the customer.",
+      "coach": "a matching exercise pairing customer situations with the right offer type"
+    },
+    "note": "Confirm the current offers and eligibility rules for the agent's line of business before the session, so the matching exercise uses only offers the agent can present."
+  },
+  {
+    "id": "sales-missing-discovery",
+    "cat": "sales",
+    "title": "Missing Sales Discovery",
+    "desc": "Recommending a product or service without first asking about the customer's household, devices, streaming, mobile lines, or work-from-home needs.",
+    "kw": ["sales discovery", "discovery", "needs analysis", "no questions", "usage questions", "household", "devices", "streaming", "mobile lines", "carrier", "work from home", "assumed needs", "probing", "recommendation", "sales", "offer", "upsell", "cross sell", "xm"],
+    "tags": ["Sales", "Discovery", "Customer Needs"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "sales",
+    "feedback": "Before recommending the offer, you did not ask how the customer uses their services. Discovery is what turns a generic suggestion into a real recommendation, and questions about who lives in the home, how many devices connect, what they stream, whether anyone works from home, and which carrier they use for mobile lines show you what would actually help. Without those answers, the recommendation rests on assumptions, and the customer may feel it has little to do with them. Moving forward, ask two or three usage questions before you recommend anything, listen for what matters most to the customer, and build your recommendation around their answers.",
+    "impact": "Skipped discovery often comes from assuming what the customer needs based on the account or the reason for the call. Recommendations built on assumptions are more likely to miss, which can lead the customer to decline, or to accept something that does not fit their household and call back later to change or remove it. Discovery questions also show genuine interest in the customer's situation, so leaving them out can make the conversation feel transactional.",
+    "plan": "Each day for the next {duration}, you will ask at least two discovery questions before making any recommendation, choosing from household size, the number and type of connected devices, streaming and TV viewing, mobile lines and current carrier, and working or studying from home. Ask them where they fit naturally, either during the Probe step when they also help with the concern or after the resolution is confirmed. Refer back to the customer's answers when you recommend so the connection is clear. Success means at least two relevant discovery questions before every recommendation across the {calls} calls we review within {followup}.",
+    "followup": "Together we will build a short discovery question list covering household, devices, streaming, mobile lines and carrier, and working from home, and then roleplay a call where you use it before recommending. Within {followup}, I will go through {calls} of your calls that include a recommendation and note the discovery questions asked before each one. When the {durationAdj} plan is complete, we will compare which questions gave you the most useful information.",
+    "example": [
+      { "label": "Before recommending", "say": "Before I suggest anything, can I ask a couple of quick questions so I recommend what actually fits? How many people and devices are usually online at home, and does anyone work from home? And for your cell phones, how many lines do you have, and which carrier are they with right now?" }
+    ],
+    "questions": [
+      "What did you know about this customer's household and usage before you made the recommendation?",
+      "Which discovery questions would have helped you decide what to recommend on this call?",
+      "How can you ask about usage so it feels like a conversation rather than a checklist?"
+    ],
+    "strengths": ["s-resolution", "s-empathy", "s-pricing", "s-tone"],
+    "b": {
+      "obs": "recommended a product without first asking about the customer's household, devices, streaming, mobile lines, or work-from-home needs",
+      "focus": "sales discovery",
+      "commit": "ask at least two questions about household, devices, streaming, mobile lines, or working from home before recommending a product",
+      "mx": "Every recommendation in the reviewed calls is preceded by at least two discovery questions about the customer's usage and needs.",
+      "coach": "a roleplay using a short discovery question list before making a recommendation"
+    },
+    "note": "Discovery questions can be asked during the Probe step when they also help with the concern; that is not pitching before resolving. Confirm any program guidance on discovery for sales-eligible calls."
+  },
+  {
+    "id": "sales-weak-transition",
+    "cat": "sales",
+    "title": "Weak Sales Transition",
+    "desc": "Moving abruptly from the resolution into a sales offer without a bridge statement that connects the offer to the conversation.",
+    "kw": ["transition", "weak transition", "abrupt transition", "sales transition", "bridge", "bridge statement", "segue", "sudden pitch", "awkward pitch", "out of nowhere", "permission", "call flow", "sales", "pitch", "offer", "upsell", "cross sell"],
+    "tags": ["Sales", "Call Flow", "Transitions"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "Right after the concern was resolved, you moved into the offer with no bridge between the two parts of the call. One moment the customer was confirming the fix, and the next they were hearing about a product, which made the offer feel sudden and disconnected. A short transition that refers back to something the customer said, such as the devices everyone uses at home or a comment about their bill, tells them why you are bringing it up and gives them a moment to shift focus. From here, use one bridge sentence that links the resolution or a shared detail to the offer, and ask permission before continuing.",
+    "impact": "Abrupt transitions tend to happen when the offer is treated as a separate script rather than part of the same conversation. Without a bridge, the customer may not see why the offer matters to them, can feel caught off guard, and is more likely to decline before hearing the details. The sudden change in direction can also undo some of the goodwill built during the resolution and shape how the customer remembers the call.",
+    "plan": "For the next {duration}, you will introduce every offer with a bridge statement that refers to the resolution or to a specific detail the customer mentioned, followed by a permission question such as asking whether they would like to hear about an option. Prepare bridge statements for the call types you handle most so the wording comes easily in the moment. Keep each bridge short, conversational, and tied to the customer's words rather than a scripted line. We will review {calls} calls that include an offer within {followup}, targeting a bridge statement and a permission question before every offer presented.",
+    "followup": "In our session, we will write bridge statements together for technical, billing, and mobile calls, then roleplay the moment right after a resolution so you can practice moving into the offer smoothly. I will listen to {calls} of your calls with offers within {followup}, paying close attention to the first sentence of each offer. In a final review when the {durationAdj} plan wraps up, we will choose the bridges that sounded most natural to keep using.",
+    "example": [
+      { "say": "Now that your internet is back up, there's one more thing I wanted to mention. You said earlier that the Wi-Fi is weak in the back bedroom where you work, and that's something I may be able to help with too. Would it be okay if I took a minute to share an option that could fit how you use the service?" }
+    ],
+    "questions": [
+      "What was the customer focused on in the moment right before you introduced the offer?",
+      "Which detail from earlier in the call could you have used to connect the resolution to the offer?",
+      "How might asking permission before the offer change the way the customer receives it?"
+    ],
+    "strengths": ["s-resolution", "s-relevant-offer", "s-value", "s-tone"],
+    "b": {
+      "obs": "jumped from the resolution into the offer without a bridge statement linking it to anything discussed earlier in the call",
+      "focus": "sales transitions",
+      "commit": "introduce each offer with a bridge statement that refers to the customer's own words, followed by a permission question",
+      "mx": "Every offer in the reviewed calls opens with a bridge statement tied to the conversation and a permission question before any details are shared.",
+      "coach": "a roleplay of the moment between resolution and offer using prepared bridge statements"
+    },
+    "note": "The bridge, or its absence, is usually in the first sentence after the customer confirms the resolution; cue the recording to that point for the session."
+  },
+  {
+    "id": "sales-missing-offer",
+    "cat": "sales",
+    "title": "Missing Relevant Offer",
+    "desc": "Identifying a customer need during the call but ending the interaction without presenting a relevant offer, or treating payment help as the offer.",
+    "kw": ["missing offer", "no offer", "relevant offer", "need identified", "missed opportunity", "missed sale", "sales opportunity", "payment link", "payment assistance", "not a sales offer", "sales", "offer", "upsell", "cross sell", "xm", "mobile", "upgrade", "tv package"],
+    "tags": ["Sales", "Offer Relevance", "Missed Opportunity"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "You learned about a customer need during the call, but no relevant offer followed. Once a need is identified, the next step in the sales flow is an offer that fits it, such as an Xfinity Mobile line for a customer paying another carrier, a speed or equipment upgrade for a busy household, or a TV package change for new viewing habits. A payment link or payment assistance can be the right service step, but it is not a sales offer. Without the offer, the customer may never learn a better fit was available. Going forward, once the concern is confirmed, present the offer that matches the need you uncovered.",
+    "impact": "A missing offer often comes from hesitation about sounding pushy, uncertainty about eligibility, or the belief that helping with a payment already covered the sales step. When a known need goes unanswered, the customer may keep looking elsewhere for a solution, such as staying with another mobile carrier, and the call can score lower on the sales portion of the QA evaluation.",
+    "plan": "Over the coming {duration}, you will present a relevant offer on every call where discovery identifies a need, once the concern is resolved and confirmed. Match the offer type to the need: an Xfinity Mobile line or device for mobile needs, a service upgrade such as internet speed or equipment for connection demands, or a TV package change when viewing habits have changed. Payment links and payment arrangements do not count as offers. Check eligibility with the approved resources before presenting, and if the customer is not eligible, plant the seed for a future conversation instead. We will review {calls} calls within {followup}, targeting a relevant offer on every reviewed call where discovery identified a need.",
+    "followup": "We will walk through the approved offer and eligibility resources together so you feel confident checking options during a call, and we will listen to a strong call example where a need leads naturally to an offer. I will review {calls} of your calls within {followup}, noting each need the customer raised and whether a matching offer followed. At the end of the {durationAdj} period, we will talk through any needs that still went without an offer and what got in the way.",
+    "example": [
+      { "label": "Connecting the need to an offer", "say": "You mentioned you're paying another carrier for three phone lines and the bill keeps going up. That's something I may be able to help with through Xfinity Mobile. Would you like me to walk you through how it could work for your household?" }
+    ],
+    "questions": [
+      "Which need came up on this call that could have led to an offer?",
+      "How is helping a customer with a payment different from presenting a sales offer?",
+      "What holds you back from presenting an offer once you have identified a need?"
+    ],
+    "strengths": ["s-sales-discovery", "s-payment-options", "s-resolution", "s-empathy"],
+    "b": {
+      "obs": "identified a customer need but ended the interaction without presenting an offer that matched it",
+      "focus": "presenting relevant offers",
+      "commit": "present an offer that matches each need identified during discovery, remembering that payment help is not a sales offer",
+      "mx": "Every reviewed call where discovery identified a need includes a matching offer, and payment links or payment assistance are not counted as offers.",
+      "coach": "a walkthrough of the approved offer and eligibility resources"
+    },
+    "note": "A payment link or payment assistance is not a sales offer. Confirm the agent's current offer eligibility tools and which offer types apply to their line of business before the session."
+  },
+  {
+    "id": "sales-weak-objection",
+    "cat": "sales",
+    "title": "Weak Objection Handling",
+    "desc": "Accepting the customer's first objection without exploring it, or arguing with it, instead of acknowledging, clarifying, and responding with relevant value.",
+    "kw": ["objection", "objection handling", "weak objection", "first objection", "too expensive", "price objection", "think about it", "not right now", "hesitation", "customer hesitant", "rebuttal", "gave up", "argued", "pushback", "acknowledge clarify respond", "sales", "offer"],
+    "tags": ["Sales", "Objection Handling", "Soft Skills"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "When the customer raised an objection to the offer, you accepted it immediately and moved on without finding out what was behind it. A first objection, like concern about the monthly cost or wanting to think it over, is often a request for more information rather than a final answer. Leaving it unexplored means the customer decides without details that might matter to them, while arguing the point would only make them feel unheard. The better approach is to acknowledge the concern, ask one clarifying question to understand it, and respond with value that speaks to that specific concern. If they still decline, respect the decision and close warmly.",
+    "impact": "Weak objection handling often comes from discomfort with hearing no, or from treating any hesitation as a final answer. When the concern behind an objection is never explored, the customer decides without the information that matters to them, and an offer that may have fit their needs is lost. Arguing has the opposite effect, since it can make the customer defensive and damage the rapport built during the call.",
+    "plan": "Each time a customer pushes back on an offer during the next {duration}, you will respond in three steps: acknowledge the concern in your own words, ask one clarifying question to understand what is behind it, and respond with value tied to that specific concern. Prepare responses for the objections you hear most, such as price, timing, and being happy with current service, and practice them until they sound natural. If the customer still declines after your response, respect the decision and move to a warm close. In the {calls} calls with objections that we review within {followup}, the target is all three steps on every objection, with no arguing and no first objection accepted unexplored.",
+    "followup": "During our session, we will roleplay the objections you hear most often, with me playing a customer who hesitates over price or timing, so you can practice acknowledging, clarifying, and responding without pressure. Within {followup}, I will pull {calls} of your calls where a customer pushed back on an offer and share the moments that worked well. We will meet at the close of the {durationAdj} plan to review how your objection responses are coming across to customers.",
+    "example": [
+      { "label": "Acknowledge and clarify", "say": "That makes sense, nobody wants their bill to go up. Can I ask, is it the monthly amount that concerns you, or not being sure you'd use the extra speed?" },
+      { "label": "Respond with value", "say": "Thanks for telling me. You mentioned the internet slows down every evening when everyone is home, and that's the problem this upgrade is meant to help with. Would it help if I walked you through the full pricing so you can decide?" }
+    ],
+    "questions": [
+      "What do you think was behind the customer's hesitation when they first pushed back on the offer?",
+      "What clarifying question could you have asked before accepting the objection?",
+      "How can you respond to a price concern without it sounding like an argument?"
+    ],
+    "strengths": ["s-relevant-offer", "s-sales-discovery", "s-rapport", "s-resolution"],
+    "b": {
+      "obs": "accepted the customer's first objection without asking what was behind it, so the concern was never explored or answered with value",
+      "focus": "objection handling",
+      "commit": "acknowledge each objection, ask one clarifying question about it, and respond with value tied to that specific concern",
+      "mx": "Every objection in the reviewed calls is acknowledged, clarified with a question, and answered with relevant value, with no arguing.",
+      "coach": "a roleplay of common price and timing objections using the acknowledge, clarify, respond steps"
+    },
+    "note": "An objection such as a price concern invites clarification, while a clear no should be respected and is covered by Continuing to Pitch After Rejection. Confirm the program's objection handling guidance before the session."
+  },
+  {
+    "id": "sales-pitch-after-rejection",
+    "cat": "sales",
+    "title": "Continuing to Pitch After Rejection",
+    "desc": "Continuing to push an offer after the customer has clearly declined, instead of respecting the decision and closing the call warmly.",
+    "kw": ["pitch after rejection", "no thanks", "not interested", "customer said no", "kept pitching", "repeated offer", "pushy", "pressure", "high pressure", "hard sell", "rejection", "respect decision", "customer annoyed", "sales", "pitch", "offer", "upsell"],
+    "tags": ["Sales", "Customer Respect", "Soft Skills"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "After the customer clearly declined the offer, you continued to present it, returning to the benefits and asking again in different ways. A clear no is the customer's decision to make, and pressing past it turns a helpful conversation into pressure. Customers who feel pushed often become guarded, may question whether the earlier help was genuine, and can end the call with a poor impression even when their concern was handled well. Going forward, accept a clear no the first time it is given. If the customer's reason suggests a misunderstanding, one respectful clarification is appropriate; after that, thank them, recap what you resolved, and close the call warmly.",
+    "impact": "Pitching past a rejection usually comes from pressure to reach sales goals, or from treating every no as an objection to overcome. Once a customer has clearly declined, further attempts tend to feel like pressure, which can damage trust, undo the goodwill from the resolution, prompt complaints about sales behavior, and lower QA results. Customers who feel their decision was respected are more likely to stay open to future conversations.",
+    "plan": "Beginning today and continuing for {duration}, you will accept every clear no without repeating the offer. If the customer's decline is based on a misunderstanding, such as an incorrect assumption about what is included, you may offer one respectful clarification and then accept the answer either way. After a clear no, thank the customer, recap what you resolved, and move to a warm close. The measure for this plan is zero further pitch attempts after a clear no, and no more than one clarification on any call, across {calls} calls with a declined offer reviewed within {followup}.",
+    "followup": "We will listen to this call together and pinpoint the moment the customer gave a clear no, then talk through how the rest of the call could have sounded. Within {followup}, you will complete a short self-assessment on {calls} of your calls with a declined offer, and I will review the same calls so we can compare notes. We will close out the plan with a final review after the {duration}.",
+    "example": [
+      { "label": "After a clear no", "say": "That's completely fine, and thank you for hearing me out. Your service is back up and running, and everything we covered today is all set. Is there anything else I can help you with before we finish?" }
+    ],
+    "questions": [
+      "What did the customer say that told you their answer was a clear no?",
+      "How do you think the customer felt when the offer came up again after they had declined?",
+      "When would a single clarification be appropriate, and how would you phrase it respectfully?"
+    ],
+    "strengths": ["s-relevant-offer", "s-value", "s-pricing", "s-resolution"],
+    "b": {
+      "obs": "kept presenting the offer after the customer clearly declined, rather than respecting the decision and closing the call warmly",
+      "focus": "respecting a clear no",
+      "commit": "accept a clear no without repeating the offer, using at most one respectful clarification before closing the call warmly",
+      "mx": "Every declined offer in the reviewed calls is followed by no further pitch attempts, with at most one respectful clarification.",
+      "coach": "a recording review that pinpoints the clear no and rehearses a warm close after it"
+    },
+    "note": "Confirm the program's current guidance on handling a declined offer, including whether one clarification is permitted before moving on."
+  },
+  {
+    "id": "sales-buying-signals",
+    "cat": "sales",
+    "title": "Failure to Identify Customer Buying Signals",
+    "desc": "Missing cues that the customer is open to an offer, such as questions about price or what is included, or mentions of new household needs.",
+    "kw": ["buying signals", "buying signal", "missed cue", "missed signal", "customer interested", "asked about price", "what is included", "contract ending", "other provider", "new household member", "more devices", "missed opportunity", "listening", "sales", "offer", "upsell", "cross sell", "xm", "upgrade"],
+    "tags": ["Sales", "Buying Signals", "Active Listening"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "At one point in the call, the customer gave a clear signal of interest, and you moved on without exploring it. Buying signals include questions about price or what a package includes, a contract with another provider ending, a new person joining the household, or more devices being added. Each one shows the customer is already thinking about a change, so letting it pass can leave them without an option they were starting to look for. When you hear a signal like this again, acknowledge it, ask a follow-up question about it, and if a need is confirmed, present a relevant offer once the concern is resolved.",
+    "impact": "Buying signals tend to slip by when attention stays on finishing the current task rather than on what the customer is hinting at. When a signal goes unanswered, the customer may conclude that nothing fits their needs, decide on their own without the details you could have provided, or start looking at another provider. A sales conversation the customer was ready to have may then never take place.",
+    "plan": "During the next {duration}, you will listen for buying signals on every call, including questions about price or what is included, a contract with another provider ending, a new household member, more devices, or a change in how the home uses its services. When you hear one, acknowledge it and ask a follow-up question, such as what prompted the question or what the customer would want from a change. If the answer confirms a need, present a relevant offer after the concern is resolved and confirmed. Within {followup}, we will review {calls} calls, targeting a follow-up question on every buying signal the customer gives.",
+    "followup": "We will listen to a strong call example together and pause each time the customer gives a buying signal, so you can name it and suggest a follow-up question, and then we will do the same with this call. I will review {calls} of your calls within {followup}, listing every signal I hear and how you responded, and we will compare lists at a short midpoint check-in. A final review will take place at the close of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "When the customer asks about a plan", "say": "That's a good question. Before I go through what's included, can I ask what got you thinking about it? Is it more people at home, or are things slowing down when everyone is online?" },
+      { "label": "When a contract is ending", "say": "You mentioned your contract with your current mobile carrier ends soon. Would it help if I showed you how Xfinity Mobile could work for you before you decide what to do next?" }
+    ],
+    "questions": [
+      "Which comments or questions from the customer suggested they were open to a change in their services?",
+      "How could you have responded when the customer raised that point so the conversation stayed open?",
+      "How can you keep part of your attention on buying signals while you are working on the concern?"
+    ],
+    "strengths": ["s-resolution", "s-billing", "s-clarity", "s-tone"],
+    "b": {
+      "obs": "moved past a buying signal, such as a question about price or what is included, without exploring it with the customer",
+      "focus": "recognizing buying signals",
+      "commit": "pause on every buying signal, ask a follow-up question about it, and present a relevant offer once a need is confirmed",
+      "mx": "Every buying signal in the reviewed calls receives a follow-up question, and each confirmed need leads to a relevant offer after the resolution.",
+      "coach": "a signal-spotting exercise on a strong call example and on this recording"
+    },
+    "note": "Buying signals can appear early in the call. The follow-up question can come at that point, but the offer itself should still wait until the concern is resolved and confirmed."
+  },
+  {
+    "id": "sales-offer-value",
+    "cat": "sales",
+    "title": "Failure to Explain Offer Value",
+    "desc": "Presenting an offer without explaining why it matters to this customer or how it addresses a need they shared during the call.",
+    "kw": ["offer value", "value", "value statement", "why it matters", "no value", "price only", "led with price", "flat offer", "benefits", "relevance", "customer needs", "sales", "offer", "pitch", "upsell", "tv package", "xm", "upgrade"],
+    "tags": ["Sales", "Value Building", "Customer Needs"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "When you presented the offer, you described what it was and moved toward the price without explaining why it would matter to the customer. Value is the reason a customer says yes: how the offer addresses something they told you, what would change for them, and how it compares with what they have today. Without that link, the customer is left weighing a price against nothing, and the decision tends to come down to cost alone. Before quoting a price on your next offer, restate the need the customer shared, explain how the offer addresses it, and describe the difference it can make in their day-to-day use.",
+    "impact": "Missing value statements often come from assuming the customer already sees how the offer helps, or from rushing toward the price to keep the call moving. Without a clear reason to consider it, the customer is likely to judge the offer on cost alone, which makes a decline more likely and can make the offer sound like a generic sales line rather than a recommendation made for them.",
+    "plan": "Over the next {duration}, you will build a short value statement into every offer before discussing pricing. Each statement will name the need the customer shared, explain how the offer addresses it, and describe what would be different for them compared with their current setup. Prepare value statements in advance for the needs you hear most, such as more devices at home, a family's phones on another carrier, and changing TV habits. The target, measured across {calls} calls with an offer reviewed within {followup}, is a value statement linked to the customer's own words on every offer, delivered before price is discussed.",
+    "followup": "In our session, you will write value statements for three common needs, and we will check each one against a short checklist that asks whether it names the customer's need, explains how the offer helps, and describes what changes for them. I will use the same checklist when I review the offers in {calls} of your calls within {followup}. When the {durationAdj} plan ends, we will pick out your strongest statements and discuss any offers where the value still felt thin.",
+    "example": [
+      { "say": "You mentioned your family mostly watches sports and a few local channels, and the premium channels rarely get used. That's why I'm suggesting a TV package change. It would focus your lineup on what your family actually watches, and before you decide anything, I'll walk you through exactly how the pricing compares with what you have now." }
+    ],
+    "questions": [
+      "How would you explain, in one sentence, why this offer mattered for this particular customer?",
+      "Which part of the customer's situation could you have connected to the offer before mentioning the price?",
+      "How might the customer's decision have changed if they had heard the value before the price?"
+    ],
+    "strengths": ["s-relevant-offer", "s-sales-discovery", "s-pricing", "s-tone"],
+    "b": {
+      "obs": "presented the offer and moved toward the price without explaining why it mattered to the customer or which need it addressed",
+      "focus": "offer value",
+      "commit": "explain how each offer addresses a need the customer shared and what would change for them before discussing price",
+      "mx": "Every offer in the reviewed calls includes a value statement tied to a need the customer expressed, delivered before pricing is discussed.",
+      "coach": "a value statement exercise checked against a short three-part checklist"
+    },
+    "note": "Value statements should describe likely benefits tied to the customer's need, not promised savings or results. Confirm current offer details from approved resources before building examples with the agent."
+  },
+  {
+    "id": "sales-pricing-disclosure",
+    "cat": "sales",
+    "title": "Incorrect Sales Pricing / Disclosure",
+    "desc": "Presenting a sales offer with incorrect or incomplete pricing, such as missing the promotional term, the standard rate afterward, equipment charges, taxes and fees, or requirements.",
+    "kw": ["pricing", "disclosure", "price disclosure", "incorrect pricing", "wrong price", "misquote", "promotional price", "promo", "promotional term", "standard rate", "taxes and fees", "equipment charges", "first bill", "offer requirements", "contract terms", "bill shock", "full disclosure", "sales", "offer"],
+    "tags": ["Sales", "Pricing Accuracy", "Disclosure"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "sales",
+    "feedback": "As you explained the offer's pricing, parts of the disclosure were incorrect or missing, such as how long the promotional price lasts, the standard rate afterward, equipment charges, taxes and fees, or the requirements to qualify. Explain Pricing is the step that turns interest into an informed decision, and customers often compare what they heard with their first bills. When part of the picture is missing, a customer who agreed in good faith may see charges they did not expect. For every offer, use the approved offer details to cover each of those elements accurately, then confirm the customer understands what they will pay now and later.",
+    "impact": "Pricing errors in a sales offer usually come from quoting from memory, focusing on the promotional price alone, or rushing the disclosure once the customer agrees. When the first bills do not match what the customer heard, they may feel misled, which can lead to billing disputes, repeat contacts, requests to remove the service, or cancellation, and can undo the trust built during the sale.",
+    "plan": "Beginning with your next offer and continuing for {duration}, you will quote pricing only from the approved offer resources, never from memory. For every offer, you will cover the promotional price and how long it lasts, the standard rate afterward, any equipment charges, taxes and fees, the requirements or terms that apply, and how the first bill may look different. Close each explanation by inviting questions about the price today and after the promotional term. Your first {calls} calls with an offer will be reviewed within {followup}, with a target of complete, accurate disclosure on every offer and zero pricing errors.",
+    "followup": "We will review the current disclosure requirements and approved pricing resources together, then do a quick knowledge check where you explain a sample offer's pricing structure to me as you would to a customer. I will audit every offer in {calls} of your calls within {followup} against a disclosure checklist, and we will have a short midweek conversation about anything that was missed. The full results will be reviewed at the end of the {durationAdj} plan.",
+    "example": [
+      { "label": "Explaining the structure", "say": "Here's exactly how the pricing works. You'd pay the promotional price for the length of the promotional term, and after that it moves to the standard rate. Taxes and fees are additional, and because this offer includes equipment, there's a separate equipment charge as well." },
+      { "label": "Before the decision", "say": "Your first bill may look a little higher because it can include a partial month. Before you decide, what questions do you have about what you'll pay now and after the promotion ends?" }
+    ],
+    "questions": [
+      "Which parts of the pricing did the customer hear on this call, and which were missing or unclear?",
+      "Where do you find the pricing details for an offer, and how do you confirm them before quoting?",
+      "What might the customer think if their first bill looked different from what they were told on the call?"
+    ],
+    "strengths": ["s-relevant-offer", "s-value", "s-sales-discovery", "s-rapport"],
+    "b": {
+      "obs": "quoted offer pricing that was incorrect or incomplete, leaving out details such as the promotional term, standard rate, equipment, or taxes and fees",
+      "focus": "accurate pricing disclosure",
+      "commit": "quote offer pricing only from approved resources and disclose the promotional term, standard rate, equipment, taxes and fees, and requirements",
+      "mx": "Every offer in the reviewed calls includes accurate pricing, with the promotional term, standard rate afterward, equipment, taxes and fees, and requirements disclosed.",
+      "coach": "a disclosure walkthrough with a quick knowledge check on a sample offer"
+    },
+    "note": "Confirm the current sales disclosure requirements and approved pricing sources for the agent's line of business before the session. Disclosure during billing changes is covered under the Billing category."
+  },
+  {
+    "id": "sales-retention",
+    "cat": "sales",
+    "title": "Not Recognizing Retention Opportunities",
+    "desc": "Letting signs of dissatisfaction or a request to cancel or downgrade pass without exploring the reason or presenting the applicable retention options.",
+    "kw": ["retention", "save", "save attempt", "no save attempt", "cancel", "cancellation", "downgrade", "disconnect", "leaving", "switching providers", "competitor", "dissatisfied", "retention offer", "customer wants to cancel", "churn", "too expensive", "sales", "offer"],
+    "tags": ["Sales", "Retention", "Customer Loyalty"],
+    "kpi": ["QA", "aiCR", "Transfer"],
+    "theme": "sales",
+    "feedback": "As soon as the customer mentioned canceling or downgrading, you moved toward processing the request without asking what was behind it or presenting the retention options that apply. A request like this usually has a reason, such as a recent price change, an unresolved service issue, or an offer from another provider, and many can be addressed. Without that conversation, the customer may leave over something that could have been fixed, never hearing the options available to them. The expectation is to acknowledge the request, ask what is prompting it, address the underlying concern where possible, and present the applicable retention options per process, while respecting the customer's final decision.",
+    "impact": "Missed retention conversations often come from treating a cancellation request as a task to complete rather than a concern to understand, or from uncertainty about which retention options apply. When the reason is never explored, a fixable issue can turn into a lost customer, the customer may be transferred when the concern could have been handled on the call, and a customer who downgrades instead may call back because the original problem continues.",
+    "plan": "Whenever a customer raises canceling or downgrading during the next {duration}, or shows clear signs of dissatisfaction, you will respond by acknowledging it and asking at least one question about what is prompting it. When the reason is something you can address, such as a service issue or a billing concern, work on it first. Then follow the current retention process, presenting the retention options that apply or using the correct path when another team handles them, and respect the customer's final decision without pressure. We will review {calls} calls that include a cancellation, downgrade, or dissatisfaction signal within {followup}, targeting a reason question and the applicable retention options on every one.",
+    "followup": "We will review the current retention process documentation together, including which options you can present and when another team handles the request, and then roleplay a customer who wants to cancel after a price increase. I will then select {calls} of your calls involving a cancellation or downgrade request and review them within {followup}. We will check in briefly at the midpoint and complete a full review when the {durationAdj} coaching period ends.",
+    "example": [
+      { "label": "Exploring the reason", "say": "I'm sorry to hear you're thinking about leaving, and I'd like to understand what's going on before we do anything. Can you tell me what's prompting the decision? Is it the price, the service itself, or something else?" },
+      { "label": "After hearing the reason", "say": "Thank you for explaining that. Since the main concern is the bill going up after your promotion ended, let me check the options available on your account. Whatever you decide, I'll make sure it's handled the right way." }
+    ],
+    "questions": [
+      "What was the customer's real reason for wanting to cancel, and when did it first come up in the call?",
+      "What would you want to know about the customer's reason before starting to process a cancellation?",
+      "How can you present retention options while still making the customer feel their decision is respected?"
+    ],
+    "strengths": ["s-empathy", "s-acknowledgement", "s-verification", "s-tone"],
+    "b": {
+      "obs": "moved toward processing a cancellation or downgrade request without exploring the reason or presenting the applicable retention options",
+      "focus": "retention conversations",
+      "commit": "ask what is prompting every cancellation or downgrade request, address the reason where possible, and present the applicable retention options per process",
+      "mx": "Every cancellation or downgrade request in the reviewed calls includes a question about the reason and the applicable retention options presented per process.",
+      "coach": "a retention process review followed by a roleplay of a price-driven cancellation request"
+    },
+    "note": "Confirm the current retention process for the agent's line of business before the session, including which retention offers the agent can present, eligibility, and when another team handles the request. Cancellation risk on billing calls is covered under Billing."
+  },
+  {
+    "id": "sales-features-benefits",
+    "cat": "sales",
+    "title": "Pitching Features Rather Than Customer Benefits",
+    "desc": "Describing an offer through speeds, specifications, and technical features instead of explaining what those features mean for the customer's daily use.",
+    "kw": ["features", "benefits", "features vs benefits", "specs", "speeds", "specifications", "technical jargon", "too technical", "spec sheet", "mbps", "what it means", "benefit selling", "value", "sales", "offer", "pitch", "upgrade", "xm", "mobile", "tv package"],
+    "tags": ["Sales", "Benefit Selling", "Communication"],
+    "kpi": ["QA"],
+    "theme": "sales",
+    "feedback": "Your description of the offer focused on features such as speed numbers, equipment specifications, and technical terms, without explaining what they would mean for the customer. Most customers do not think about their service in megabits; they think about whether video calls freeze, whether the Wi-Fi reaches every room, or whether everyone can stream at once. When features are not translated into benefits, the offer can sound technical and hard to compare, and the customer may decline because they cannot see the difference. On your next offer, follow each feature with what it means for this customer, using details from their own situation.",
+    "impact": "Feature-heavy pitches often start with strong product knowledge that has not yet been connected to the customer's situation, or with repeating offers the way they appear in reference material. Specifications alone rarely help a customer decide, so the offer can feel confusing or irrelevant, may be declined because the difference is unclear, or may be accepted with expectations that do not match how the service performs in their home.",
+    "plan": "Throughout the next {duration}, you will pair every feature you mention in an offer with a benefit tied to something the customer shared, using a simple link such as 'which means' or 'so that'. Limit technical details to what helps the customer decide, and explain any term you use in plain language. Before each offer, choose the one or two benefits that matter most to this customer based on discovery, and lead with those. Across the {calls} offer calls we review within {followup}, the target is a customer-specific benefit for every feature mentioned and no unexplained technical terms.",
+    "followup": "During our session, we will do a translation exercise: I will read features from a common offer, and you will turn each one into a benefit for a specific household, such as a family streaming in several rooms or someone who works from home. We will then roleplay the offer from this call with benefits first. Within {followup}, I will listen to {calls} of your offer calls and note each feature you mention and the benefit that followed it, and we will look at the results together after the {duration}.",
+    "example": [
+      { "label": "Instead of listing speeds", "say": "With this upgrade, you'd have more speed to share across the house, which means the shows you stream in the evening are less likely to stop and buffer while someone else is gaming. It also leaves room for the smart home devices you're adding, so connecting them is less likely to slow everyone else down." }
+    ],
+    "questions": [
+      "Which features did you describe on this call, and what would each one mean for this customer's household?",
+      "How could you explain a speed or equipment feature without using technical terms?",
+      "Where in the conversation did the customer give you a detail that could have turned a feature into a benefit?"
+    ],
+    "strengths": ["s-relevant-offer", "s-sales-discovery", "s-troubleshooting", "s-pricing"],
+    "b": {
+      "obs": "described the offer mainly through speeds, specifications, and technical terms instead of what those features would mean for the customer",
+      "focus": "benefit-focused selling",
+      "commit": "follow every feature you mention with a plain-language benefit tied to the customer's own household or usage",
+      "mx": "Every feature mentioned in the reviewed offers is paired with a customer-specific benefit, with no unexplained technical terms.",
+      "coach": "a feature-to-benefit translation exercise followed by a roleplay of the offer"
+    },
+    "note": "Benefit statements should describe likely improvements, not guaranteed results, because speeds and Wi-Fi coverage vary by device and home setup. Confirm current product details from approved resources."
+  },
+  {
+    "id": "sales-closing",
+    "cat": "sales",
+    "title": "Poor Closing / No Confirmation",
+    "desc": "Ending a sales conversation without asking for the customer's decision or confirming the order details, pricing, next steps, and the customer's agreement.",
+    "kw": ["close", "closing", "sales close", "ask for the sale", "no close", "decision", "confirmation", "order recap", "order details", "next steps", "agreement", "verbal agreement", "confirm understanding", "didn't ask", "pricing", "sales", "offer"],
+    "tags": ["Sales", "Closing", "Confirmation"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "sales",
+    "feedback": "Toward the end of the sales conversation, you moved on without asking the customer for a decision or confirming what they were agreeing to. Without a clear ask, the customer may not realize the offer is waiting on their answer, and without a recap, they may hang up unsure of what was ordered, what it will cost, or what happens next. That uncertainty can lead to billing surprises and follow-up calls, which is why Confirm Understanding is the final step of the sales flow. Going forward, ask for the decision directly and respectfully, and when the customer agrees, recap the order details, pricing, and next steps, then confirm their agreement.",
+    "impact": "An unclear close usually comes from hesitation about asking directly, or from assuming the customer's interest means the decision is made. When the decision and details are not confirmed, the customer may be unsure whether anything was ordered, may be surprised by charges or equipment they did not expect, and may call back to clarify or reverse the order, which can drive repeat contacts and weaken trust in the sale.",
+    "plan": "In every sales conversation during the next {duration}, you will finish with a clear, respectful ask for the customer's decision. When the customer agrees, you will recap what was ordered, the pricing including the promotional term and the standard rate afterward, and the next steps such as equipment delivery or installation, then ask the customer to confirm their agreement. When the customer declines or wants time to think, you will acknowledge it and close warmly without pressure. We will review {calls} calls with a sales conversation within {followup}, targeting a decision ask on every offer and a complete recap and confirmation on every accepted order.",
+    "followup": "We will roleplay the final minutes of a sales call twice, once where the customer accepts and once where they want to think it over, so you can practice the decision ask, the recap, and a warm close for both outcomes. You will also build a short closing checklist to keep handy during calls. Within {followup}, I will score {calls} of your sales calls against that checklist, and we will go over the results together once the {durationAdj} coaching period is complete.",
+    "example": [
+      { "label": "Asking for the decision", "say": "Based on everything you've told me, the mobile line looks like a good fit for your family. Would you like me to set it up for you today?" },
+      { "label": "Confirming the order", "say": "Let me recap so everything is clear. We're adding one Xfinity Mobile line at the promotional price for the promotional term, then the standard rate after that, plus taxes and fees. Next, I'll walk you through what to expect for activation. Is that what you'd like to go ahead with?" }
+    ],
+    "questions": [
+      "At what point in this call could you have asked the customer for their decision?",
+      "What would the customer need to hear before ending the call to feel confident about the order?",
+      "How might the customer's first bill or next contact be affected if the recap is left out?"
+    ],
+    "strengths": ["s-relevant-offer", "s-value", "s-sales-discovery", "s-objection"],
+    "b": {
+      "obs": "closed without asking for the customer's decision or confirming the order details, pricing, next steps, and the customer's agreement",
+      "focus": "closing and confirmation",
+      "commit": "ask for the customer's decision clearly, then recap the order details, pricing, and next steps and confirm the customer's agreement",
+      "mx": "Every offer in the reviewed calls ends with a clear decision ask, and every accepted order includes a recap and the customer's confirmed agreement.",
+      "coach": "a closing roleplay for accepted and declined offers, paired with a personal closing checklist"
+    },
+    "note": "Confirm the program's order confirmation and disclosure requirements, including any required recap language or agreement steps, before the session."
+  }
+]

@@ -1,0 +1,64 @@
+[
+  {
+    "id": "hold-dead-air",
+    "cat": "hold",
+    "title": "Excessive Dead Air",
+    "desc": "Extended silence while researching or navigating tools, without telling the customer what is happening or how long it will take.",
+    "kw": ["dead air", "silence", "silent", "quiet", "no response", "long pause", "pauses", "research time", "are you there", "hello", "mute", "waiting", "typing", "system lag", "excessive silence"],
+    "tags": ["Call Control", "Research", "Customer Effort"],
+    "kpi": ["QA"],
+    "theme": "control",
+    "feedback": "During the interaction, there were extended periods of silence while you were completing research. Although troubleshooting can take time, the customer was not consistently informed about what you were doing or how long it would take. This can make the customer uncertain whether you are still connected or actively working on the concern. Going forward, explain the reason for the research, provide an estimated timeframe, request permission before placing the customer on hold, and return with updates when additional time is needed.",
+    "impact": "Extended dead air usually happens when attention shifts fully to the system and the customer is left out of the process. From the customer's side of the line, silence sounds the same whether you are working hard or have disconnected, so it can quickly erode confidence, prompt repeated check-ins, and make the call feel longer than it is. Over time, this can lower satisfaction and quality results even when the final resolution is correct.",
+    "plan": "For the next {duration}, you will use the appropriate hold process whenever research requires an extended period. Before placing the customer on hold, explain what you are checking and provide an estimated timeframe. Return within the committed timeframe or provide an update if further research is required. For shorter research, briefly narrate what you are doing so the customer is never left in silence. We will review {calls} applicable calls within the next {followup}, targeting correct hold management and zero unexplained extended dead-air periods in all {calls} calls.",
+    "followup": "We will complete a short roleplay demonstrating proper hold transitions and research narration. I will then review {calls} relevant calls within {followup}, and we will have a brief midweek check-in to discuss any recurring gaps. Progress will be reassessed at the end of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "Before the research", "say": "I'm going to check the signal history on your equipment to see what is causing the drops. That will take about two minutes. Would it be okay if I place you on a brief hold while I review it?" },
+      { "label": "When you return", "say": "Thank you for holding. I found that the connection has been dropping several times a day, and there are a couple of steps we can take right now to fix it." }
+    ],
+    "questions": [
+      "What was happening on your screen during the longest silences in this call?",
+      "How do you think the customer experienced those moments without any updates?",
+      "When research is going to take more than a few moments, what will you say before you start?"
+    ],
+    "strengths": ["s-troubleshooting", "s-itg", "s-ownership", "s-tone"],
+    "b": {
+      "obs": "left extended periods of silence while completing research, without telling the customer what you were doing or how long it would take",
+      "focus": "dead-air management",
+      "commit": "explain what you are checking and how long it will take before extended research, and use the hold process instead of leaving the line silent",
+      "m": "no unexplained extended dead-air periods",
+      "coach": "a short roleplay of hold transitions and research narration"
+    },
+    "note": "Confirm your program's dead-air and hold standards before the session. Zero recorded hold time does not prove the customer was left on mute; confirm with the recording before documenting mute usage."
+  },
+  {
+    "id": "com-missing-empathy",
+    "cat": "com",
+    "title": "Missing Empathy",
+    "desc": "Moving straight into the task without recognizing how the situation is affecting the customer.",
+    "kw": ["empathy", "empathize", "empathetic", "sympathy", "feelings", "frustration", "frustrated", "upset", "angry", "customer angry", "cold", "robotic", "uncaring", "soft skills", "no empathy"],
+    "tags": ["Soft Skills", "Customer Connection"],
+    "kpi": ["QA"],
+    "theme": "connect",
+    "feedback": "When the customer explained the issue, you moved directly into troubleshooting without acknowledging how the situation was affecting them. The customer had shared their frustration, and responding to that before starting the work is what tells them you understand why the call matters. Without that moment, even accurate troubleshooting can feel cold, and a frustrated customer may be less patient with the steps that follow. Next time, acknowledge the concern, express empathy that reflects their specific situation, and explain how you will help before beginning the investigation.",
+    "impact": "Missing empathy usually happens when the focus shifts to solving the problem as quickly as possible. That instinct is a good one, but it skips the step that makes the customer feel understood. Customers who feel their frustration was not recognized often stay guarded, repeat their concerns, or push back on troubleshooting steps. This can lengthen the call, increase the chance of an escalation request, and lower satisfaction, even when the issue is resolved correctly.",
+    "plan": "Over the next {duration}, you will respond to every concern with a brief acknowledgement and an empathy statement that reflects what the customer actually shared, such as the impact on their work, family, or schedule, before beginning troubleshooting. Avoid relying on general phrases on their own, and connect your empathy to a clear next step. We will review {calls} applicable calls within {followup}, targeting a personalized empathy statement before troubleshooting begins in all {calls} calls.",
+    "followup": "During our session, we will listen to the opening of this call together and practice two or three empathy statements that would have fit the customer's situation. I will review {calls} of your applicable calls within {followup}, and we will have a short midweek check-in to discuss what is working. At the end of the {durationAdj} coaching period, we will review the results together and decide whether the plan is complete or needs more time.",
+    "example": [
+      { "say": "I'm really sorry your internet has been dropping all week, especially while you're working from home. That is a lot to deal with, and I'm going to get this sorted out for you. Let me start by checking the connection on your equipment." }
+    ],
+    "questions": [
+      "What did you notice about how the customer was feeling when they first explained the issue?",
+      "What could you have said before beginning troubleshooting to show you understood the impact on them?",
+      "How do you think the rest of the call would have changed if the customer felt heard at the start?"
+    ],
+    "strengths": ["s-troubleshooting", "s-ownership", "s-tone", "s-resolution"],
+    "b": {
+      "obs": "moved into troubleshooting without first acknowledging how the situation was affecting the customer",
+      "focus": "personalized empathy",
+      "commit": "respond to every concern with an acknowledgement and a personalized empathy statement before beginning troubleshooting",
+      "m": "an acknowledgement and personalized empathy statement before troubleshooting begins",
+      "coach": "a side-by-side review of the call opening with empathy statement practice"
+    }
+  }
+]

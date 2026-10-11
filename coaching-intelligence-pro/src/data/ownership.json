@@ -1,0 +1,446 @@
+[
+  {
+    "id": "own-lack-ownership",
+    "cat": "own",
+    "title": "Lack of Ownership",
+    "desc": "Deflecting the concern elsewhere or using passive language instead of taking personal responsibility for moving the issue toward resolution.",
+    "kw": ["ownership", "lack of ownership", "no ownership", "deflecting", "deflection", "passing the buck", "not my department", "you'll need to call", "call another number", "passive language", "blaming the system", "blame", "accountability", "not taking responsibility", "excuses", "redirecting the customer", "go to a store", "pushed off"],
+    "tags": ["Ownership", "Accountability", "Customer Effort"],
+    "kpi": ["QA", "aiCR", "Transfer"],
+    "theme": "own",
+    "feedback": "During the interaction, you told the customer they would need to contact another department on their own, and you described the problem in passive terms, such as \"it wasn't set up correctly,\" rather than saying what you would do about it. When responsibility sounds like it belongs to someone else, the customer hears that nobody is driving their concern. That can leave them doing the work of finding the right person and repeating their story, often on another call. Going forward, use clear ownership language like \"I'm going to take care of this for you,\" complete every action within your scope, and tell the customer what you are doing next.",
+    "impact": "A lack of ownership usually comes from uncertainty about what you are allowed to handle, or from a habit of describing the process instead of acting on it. When the concern is handed back to the customer, they carry the effort of finding the right team and explaining everything again. This can increase repeat contacts and transfers, lower quality results, and reduce the customer's confidence that the company will follow through.",
+    "plan": "For the next {duration}, you will respond to every concern with first-person ownership language, such as \"I will take care of this,\" and describe problems in terms of the action you will take rather than what a system or another team did. You will complete every action within your scope before mentioning any other team. When another department is genuinely required, you will explain why and connect the customer yourself according to the applicable process instead of asking them to call. We will review {calls} calls within {followup}, and the target is ownership language and a next step you drive on all {calls} calls, with zero customers sent to contact another team on their own.",
+    "followup": "During our session, we will listen to the moment in this call where the concern was redirected and rewrite your response together using ownership language. Within {followup}, I will listen to {calls} of your calls for how you take responsibility when a request is complex or unfamiliar. We will check in midweek, and at the end of the {durationAdj} plan we will decide together whether more support is needed.",
+    "example": [
+      { "label": "Taking the lead", "say": "That's something I can take care of for you right now. I'm going to update the setting on your account, and I'll stay on the line while we make sure it's working." },
+      { "label": "When another team is needed", "say": "The last part needs a team with specialized tools, so instead of having you call back, I'll connect you myself and share everything we've covered so you won't have to repeat it." }
+    ],
+    "questions": [
+      "What made it feel like this concern belonged to another department at that point in the call?",
+      "Which parts of the request could you have completed yourself before involving anyone else?",
+      "How could you word your next step so the customer knows you personally own the outcome?"
+    ],
+    "strengths": ["s-acknowledgement", "s-tone", "s-verification", "s-probing"],
+    "b": {
+      "obs": "directed the customer to contact another team on their own and described the issue in passive terms instead of taking the next step yourself",
+      "focus": "personal ownership",
+      "commit": "use first-person ownership language and complete every action within your scope before involving another team",
+      "m": "ownership language and a next step that you drive, with no customer sent to contact another team on their own",
+      "coach": "a side-by-side review of the deflection moment with an ownership language rewrite"
+    },
+    "note": "Confirm which requests are within the agent's scope for this program before the session, so the coaching separates true deflection from a correct referral."
+  },
+  {
+    "id": "own-incomplete-resolution",
+    "cat": "own",
+    "title": "Incorrect / Incomplete Resolution",
+    "desc": "Providing a fix that was incorrect or only partial, leaving part of the concern or a required process step unaddressed.",
+    "kw": ["incomplete resolution", "incorrect resolution", "wrong fix", "partial fix", "half fixed", "missed step", "skipped step", "required step", "not resolved", "still not working", "wrong solution", "only fixed one issue", "multiple issues", "resolution accuracy", "fcr", "first call resolution", "unresolved"],
+    "tags": ["Resolution", "Accuracy", "Repeat Contacts"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "Once the issue was identified, the resolution you provided did not fully match what the customer needed, and part of the concern, or a required step in the applicable process, was left unaddressed. A resolution only holds when every part of the concern is handled correctly, and a missed piece often goes unnoticed until the problem comes back. The customer may leave believing everything was fixed and then have to call again. Next time, note each part of the concern as the customer describes it, confirm the correct action against approved resources, and complete every required step before treating the issue as resolved.",
+    "impact": "Incomplete resolutions often come from working from memory instead of approved resources, or from finishing the first part of a request and losing track of the rest. Because the customer usually cannot tell that a step was skipped, the gap tends to surface after the call, when the problem returns. This can drive repeat contacts, add troubleshooting time to the next call, and lower quality results, and it can weaken the customer's trust in the fix they were given.",
+    "plan": "Over the next {duration}, you will note each part of the customer's concern as it is shared and read the list back before you begin working. For every action, you will confirm the correct steps in approved resources or the applicable ITG flow instead of relying on memory, and you will complete each required step before moving to the next item. Before closing, you will check your notes to confirm that every item was addressed or has a documented next step. Within {followup}, we will review {calls} of your calls, looking for every part of the concern addressed and every required step completed on each one.",
+    "followup": "We will walk through the applicable process for this type of concern together and mark the step that was missed, so the full sequence is clear. I will audit {calls} of your calls within {followup} against that process and compare the concern you documented with what was actually resolved. A short midpoint conversation will cover any steps that still feel unclear, and we will close out the plan at the end of the {durationAdj} period.",
+    "example": [
+      { "label": "Capturing every part", "say": "To make sure I have everything, your internet has been dropping in the evenings, and you also noticed a charge you don't recognize. I'll fix the connection first, and then we'll go through that charge together before we finish." },
+      { "label": "Before moving on", "say": "Your connection is stable again, and I've completed the last required step on the equipment so the fix holds. Now let's look at that charge." }
+    ],
+    "questions": [
+      "Which part of the customer's concern was still open when the call moved on, and what led to it being missed?",
+      "Where in the applicable process could you have confirmed the step that was skipped?",
+      "What habit would help you keep track of every part of a multi-part concern until it is handled?"
+    ],
+    "strengths": ["s-empathy", "s-probing", "s-ownership", "s-tone", "s-tools"],
+    "b": {
+      "obs": "provided a resolution that was incorrect or incomplete, leaving part of the concern or a required process step unaddressed",
+      "focus": "complete and accurate resolution",
+      "commit": "track each part of the concern and confirm every required step in approved resources before treating the issue as resolved",
+      "m": "every part of the concern addressed and every required process step completed",
+      "coach": "a step-by-step walkthrough of the applicable process for this concern type"
+    },
+    "note": "Before the session, identify on the recording which part of the concern or which required step was missed, and confirm the current process for it, so the coaching points to a concrete gap."
+  },
+  {
+    "id": "own-premature-resolution",
+    "cat": "own",
+    "title": "Prematurely Claiming Resolution",
+    "desc": "Telling the customer an issue is fixed before the solution has been tested or the result has been confirmed.",
+    "kw": ["premature resolution", "claimed fixed", "said it was fixed", "should be all set", "you are all set", "should be good", "no testing", "not tested", "not verified", "no verification", "assumed resolved", "false resolution", "test the service", "confirm the fix", "still broken", "rushed close"],
+    "tags": ["Resolution", "Verification", "Customer Trust"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "After completing the troubleshooting steps, you told the customer they should be all set before the service was tested or the result was confirmed together. Until the result is tested, there is no way to know whether the fix took effect, and some changes need a few minutes or a restart before they show up on the customer's side. When the customer hangs up believing the problem is solved and later finds it is not, the earlier reassurance can feel misleading. Instead, test the result with the customer while they are still on the line, describe what you are both seeing, and only then confirm that the issue is resolved.",
+    "impact": "Premature resolution usually happens when a step that normally works is treated as proof that it worked this time, often under pressure to close the call. If the issue is still present after the call, the customer may lose trust in what they were told, and the next contact is likely to start with frustration and repeated troubleshooting. This can increase repeat contacts and affect quality results, even when the troubleshooting itself was correct.",
+    "plan": "Starting with your next call and continuing for {duration}, you will test the outcome of every fix with the customer before describing the issue as resolved, for example by having them load a web page, place a test call, or check the affected device. You will replace phrases like \"you should be all set\" with a short statement of what was tested and what the result showed. When the result cannot be confirmed during the call, you will say so clearly and explain how the customer can check it and what to do if it is not working. Success means a completed test before any claim of resolution on all {calls} calls reviewed within {followup}.",
+    "followup": "In our session, we will roleplay the final minutes of a troubleshooting call, practicing how to guide the customer through a quick test and describe the result before confirming resolution. Over the next {followup}, I will pull {calls} of your calls and go straight to the moment you tell the customer the issue is fixed, checking what was tested first. We will meet briefly midweek and decide at the close of the {durationAdj} plan whether more practice is needed.",
+    "example": [
+      { "label": "Before confirming", "say": "The reset is complete. Before I tell you it's fixed, let's make sure. Could you open a website or start a video for a moment and tell me what you see?" },
+      { "label": "After the test", "say": "That page loaded quickly and the video is playing without buffering, so the connection is working the way it should now." }
+    ],
+    "questions": [
+      "At the moment you told the customer they were all set, what had actually been confirmed?",
+      "What quick test could the customer have done while still on the line?",
+      "How would you explain the next step to a customer when the result cannot be checked until later?"
+    ],
+    "strengths": ["s-acknowledgement", "s-ownership", "s-troubleshooting", "s-tone", "s-diagnosis"],
+    "b": {
+      "obs": "told the customer the issue was resolved before the fix had been tested or the result confirmed together",
+      "focus": "verified resolution",
+      "commit": "test every fix with the customer and describe what was verified before telling them the issue is resolved",
+      "m": "a completed test of the fix before any statement that the issue is resolved",
+      "coach": "a roleplay of guiding the customer through a test before confirming resolution"
+    },
+    "note": "On the recording, check what was tested, if anything, between the last troubleshooting step and the statement that the issue was fixed."
+  },
+  {
+    "id": "own-unnecessary-transfer",
+    "cat": "own",
+    "title": "Unnecessary Transfer",
+    "desc": "Transferring a concern that was within scope instead of using available resources and the applicable support channel first.",
+    "kw": ["unnecessary transfer", "avoidable transfer", "transferred", "transfer", "transfer rate", "in scope", "within scope", "could have handled", "passed the call", "transfer out", "transfer avoidance", "should not transfer", "knowledge base", "help line", "ask a lead", "support channel", "resources"],
+    "tags": ["Transfers", "Ownership", "Resources"],
+    "kpi": ["QA", "Transfer"],
+    "theme": "own",
+    "feedback": "When the customer explained the concern, you transferred the call even though the request was within your scope and could have been handled with the resources available to you. Each transfer adds wait time, often means the customer has to repeat the details, and creates another point where the call could drop. The customer reached out to you for help and may leave feeling passed along rather than supported. Before transferring, the expectation is to check the knowledge base and approved resources, reach out to your lead or the applicable help line per process, and transfer only when the concern clearly falls outside what you can resolve.",
+    "impact": "Unnecessary transfers often come from uncertainty about a less familiar request, or from not knowing which resource to check first. Sending the call elsewhere can feel faster in the moment, but it usually extends the total time to resolution. Avoidable transfers can raise the transfer rate, increase handle time across departments, and leave the customer feeling that no one wants to own the issue, which may lead to repeat contacts.",
+    "plan": "For the next {duration}, before any transfer you will confirm whether the request is within your scope and search the knowledge base and approved resources for the answer. If you are still unsure, you will reach out to your lead or the applicable support channel per the program's process while keeping the customer informed. You will transfer only when the concern clearly falls outside your scope or the process requires it. We will review {calls} calls within {followup}, along with every transfer you complete during the period, with a target of zero transfers of concerns that were within your scope.",
+    "followup": "During the session, we will practice finding the answer to the request that was transferred, using the knowledge base and approved resources, so you know where to look next time. Within {followup}, I will compare {calls} of your calls with your transfer activity, and we will talk through any transfer that may have been avoidable. A midweek conversation will cover request types that still feel uncertain, and we will review the results at the end of {duration}.",
+    "example": [
+      { "label": "Keeping the call", "say": "This is something I can help you with. Let me check the right steps so I get it right the first time. It'll take about a minute, and I'll walk you through what I find." },
+      { "label": "Checking with support", "say": "I want to get this handled without sending you to another department. May I place you on a short hold while I check with my support team? I'll be back with an update in about two minutes." }
+    ],
+    "questions": [
+      "What made you decide this request needed to go to another department?",
+      "Which resource or support channel could you have checked before transferring the call?",
+      "How do you think the customer felt about being transferred for something you could have handled?"
+    ],
+    "strengths": ["s-acknowledgement", "s-empathy", "s-verification", "s-tone"],
+    "b": {
+      "obs": "transferred a concern within your scope without first using the knowledge base or the applicable support channel",
+      "focus": "using available resources",
+      "commit": "use the knowledge base and the applicable support channel first and reserve transfers for concerns outside your scope",
+      "mx": "During the next {duration}, every transfer in the reviewed calls involves a concern outside your scope, with zero avoidable transfers.",
+      "coach": "a knowledge base and resource navigation exercise for the transferred request type"
+    },
+    "note": "Confirm which request types are in scope for the agent's line of business and the program's current support channels, such as a lead or help line, before the session. Pull the agent's transfer activity for the review period if it is available."
+  },
+  {
+    "id": "own-transfer-process",
+    "cat": "own",
+    "title": "Failure to Follow Correct Transfer Process",
+    "desc": "Completing a needed transfer without explaining it, routing it correctly, briefing the receiving team, or documenting it per the applicable process.",
+    "kw": ["transfer process", "cold transfer", "blind transfer", "warm transfer", "warm handoff", "no handoff", "handoff", "wrong department", "wrong queue", "misrouted", "misroute", "transfer explanation", "no context", "transfer notes", "documentation", "customer repeated information", "transfer steps"],
+    "tags": ["Transfers", "Process", "Documentation"],
+    "kpi": ["QA", "Transfer", "aiCR"],
+    "theme": "own",
+    "feedback": "When a transfer became necessary, you moved the call without telling the customer why or where it was going, and the receiving team was not given the context of the concern. A transfer that is explained and prepared lets the next person continue the work instead of starting over. Without that handoff, the customer may have to repeat their information, and a call sent to the wrong team can lead to another transfer. Going forward, confirm the correct destination, explain the reason and what happens next, complete a warm transfer where the program's process calls for one, and document the account before the call leaves you.",
+    "impact": "Transfer process gaps usually come from treating the transfer as the end of your part of the call rather than a handoff you are responsible for. When the customer does not know why they are moving, or the next team lacks context, the call can be misrouted, dropped, or restarted from the beginning. This often increases customer effort and handle time and can drive additional transfers and repeat contacts, affecting both the transfer rate and quality results.",
+    "plan": "During the next {duration}, every transfer you complete will follow the same sequence: confirm the correct destination using approved resources, tell the customer why you are transferring and who they will be speaking with, and complete a warm transfer with a brief summary of the concern wherever the program's process calls for one. Before releasing the call, you will document the account with what was done and why the transfer was needed. Within {followup}, we will review {calls} calls and every transfer in them, expecting correct routing, a customer explanation, a proper handoff, and documented notes on each transfer.",
+    "followup": "We will review the applicable transfer process together, then roleplay a complete transfer, from explaining it to the customer through the warm handoff summary. I will check {calls} of your calls within {followup}, listening to each transfer and reading the related account notes. We will hold a short midweek discussion on any transfer that felt unclear, and at the end of the {durationAdj} coaching period we will confirm each step of the process is in place.",
+    "example": [
+      { "label": "Explaining the transfer", "say": "This change needs our specialized team, because they have the tools to make it on your account. I'm going to stay on the line, introduce you, and share what we've done so far, so you won't need to start over." },
+      { "label": "Warm handoff", "say": "Hi, I have a customer whose internet drops every evening. We've restarted the equipment and confirmed there's no outage, and they need help with a signal issue on the line." }
+    ],
+    "questions": [
+      "What did the customer know about where they were going, and why, when the transfer happened?",
+      "What would the receiving team need to hear to continue without asking the customer to start over?",
+      "How did you confirm this was the correct destination before you transferred the call?"
+    ],
+    "strengths": ["s-probing", "s-empathy", "s-verification", "s-tone", "s-diagnosis"],
+    "b": {
+      "obs": "transferred the call without confirming the destination, explaining the reason to the customer, or giving the receiving team context",
+      "focus": "warm transfer process",
+      "commit": "explain each needed transfer to the customer and complete a warm, documented handoff to the correct destination per the program's process",
+      "mx": "Every transfer in the reviewed calls during the next {duration} is correctly routed, explained to the customer, warm where the process requires it, and documented.",
+      "coach": "a roleplay of a full warm transfer from customer explanation to handoff summary"
+    },
+    "note": "Confirm the program's current transfer process before the session, including when a warm transfer is required and what must be documented, and check the destination used on this call against approved routing resources."
+  },
+  {
+    "id": "own-primary-concern",
+    "cat": "own",
+    "title": "Not Resolving the Primary Concern",
+    "desc": "Leaving the customer's main reason for calling unresolved while call time went to secondary requests or side topics.",
+    "kw": ["primary concern", "main concern", "main issue", "reason for call", "original issue", "side issues", "secondary issues", "sidetracked", "distracted", "off track", "lost focus", "main issue not fixed", "prioritization", "wrong priority", "unresolved main issue"],
+    "tags": ["Resolution", "Prioritization", "Call Focus"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "In this interaction, the customer's main reason for calling was identified early, but most of the call went to secondary items, and the original concern was still unresolved when the call ended. Side requests matter, yet the customer judges the call by whether the problem they called about was fixed. When that issue stays open, the customer may feel the call did not help, even after getting useful answers on other topics. On future calls, resolve the primary concern first, let the customer know you will come back to any side requests, and confirm the main issue is resolved or has a clear next step before turning to anything else.",
+    "impact": "This often happens when a customer raises several topics and the easiest or most recent one gets attention first, or when a side conversation takes over the call. Leaving the primary concern unresolved means the reason for the contact still exists after the call, which makes a repeat contact likely and can lower quality results. It can also leave the customer feeling that their time was spent on the wrong things.",
+    "plan": "Over the next {duration}, you will restate the primary concern within the first minute of hearing it and tell the customer it will be your first priority. When side requests come up, you will acknowledge each one and note it to handle after the main issue, unless it directly affects the fix. Before addressing any secondary item, you will confirm that the primary concern is resolved or has a documented next step. The target, measured across {calls} calls reviewed within {followup}, is a resolved primary concern, or a documented next step, before any secondary item is handled.",
+    "followup": "We will map the timeline of this call together, marking when the main concern was identified and where the conversation shifted to other topics. I will apply the same timeline approach to {calls} more of your calls within {followup}, so you can see where your call time goes. We will discuss the patterns at a midweek check-in and hold a final review once the {durationAdj} plan is complete.",
+    "example": [
+      { "label": "Setting the priority", "say": "So the main thing today is that your TV keeps freezing, and you also mentioned a question about your bill. Let's get the TV working first, and then I'll come right back to that bill question before we finish." }
+    ],
+    "questions": [
+      "At what point did the conversation move away from the main reason the customer called?",
+      "How could you have acknowledged the side requests while keeping the primary concern first?",
+      "If someone asked the customer whether their problem was solved, what do you think they would say?"
+    ],
+    "strengths": ["s-acknowledgement", "s-probing", "s-rapport", "s-tone", "s-empathy"],
+    "b": {
+      "obs": "spent most of the call on secondary items and left the primary concern unresolved even though it had been clearly identified",
+      "focus": "primary concern resolution",
+      "commit": "resolve the primary concern or set a documented next step before turning to secondary requests",
+      "m": "the primary concern resolved or a documented next step set before secondary items are handled",
+      "coach": "a call timeline review marking where the conversation moved away from the main concern"
+    },
+    "note": "Confirm on the recording that the main concern was clearly identified. If it was not, the Discovery entry for not identifying the main concern is the better fit."
+  },
+  {
+    "id": "own-missing-followup",
+    "cat": "own",
+    "title": "Missing Follow-Up / Callback Commitment",
+    "desc": "Ending a call that required follow-up without setting, explaining, and documenting a clear follow-up commitment per the applicable process.",
+    "kw": ["follow-up", "follow up", "callback", "call back", "no follow-up", "no callback", "pending ticket", "open ticket", "work order", "credit review", "pending request", "follow-up commitment", "documentation", "status update", "left hanging", "next steps", "pending case"],
+    "tags": ["Follow-Up", "Ownership", "Documentation"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "Because the resolution depended on a pending action, such as an open ticket or a credit review, the customer needed to know what would happen after the call. You ended the call without setting a follow-up commitment, explaining how the customer would hear back, or noting what was pending on the account. Pending work needs a clear owner and a clear next step, and the customer needs to know both. Without that, the customer is left guessing and may call back only to check the status. Moving forward, whenever a request remains open, explain what happens next, set the follow-up the applicable process provides, and document it clearly.",
+    "impact": "Missing follow-up commitments usually happen when the work done during the call feels complete, even though part of the outcome depends on another team or a later action. If the customer does not know how or when they will hear back, uncertainty fills the gap. This often leads to status calls that add to repeat contacts, and if the pending item is not documented, it can be missed entirely, increasing the risk of escalation.",
+    "plan": "During the next {duration}, every call that ends with a pending action, such as an open ticket, a work order, or a credit review, will include a clear follow-up commitment before you close. You will explain what is pending, how the customer will hear back or check the status, and what to do if they do not, using only the timeframes and follow-up options the applicable process supports. You will also document the commitment in the account notes before the call ends. We will review {calls} calls within {followup}, focusing on those with pending actions, and the goal is a follow-up commitment that is both explained and documented on each one.",
+    "followup": "Together, we will review the follow-up options in the applicable process and build a short checklist for any request that stays open: what is pending, how follow-up happens, and what the customer should do if it does not. I will select {calls} of your calls with pending actions from the next {followup} and compare what you told the customer with what was documented. We will discuss progress midweek and look at the full results at the end of {duration}.",
+    "example": [
+      { "label": "Setting the follow-up", "say": "Your credit request has been submitted for review, and that review happens after our call. I've documented the details on your account, so anyone you speak with will see what was requested. If the credit is approved, you'll see it on your account within the timeframe I mentioned. If you haven't seen an update by then, call us and mention this request so we can check the status right away." }
+    ],
+    "questions": [
+      "What part of the customer's request was still pending when the call ended?",
+      "How would the customer know what to expect next, and what to do if nothing happens?",
+      "What would someone reading your account notes understand about the follow-up from this call?"
+    ],
+    "strengths": ["s-empathy", "s-probing", "s-troubleshooting", "s-tools", "s-clarity"],
+    "b": {
+      "obs": "ended the call with an action still pending but without a clear follow-up commitment that was explained and documented",
+      "focus": "follow-up commitments",
+      "commit": "set a clear follow-up commitment per the applicable process and document it before ending any call with an open action",
+      "mx": "Every call with a pending action during the next {duration} ends with a follow-up commitment that is explained to the customer and documented per the applicable process.",
+      "coach": "a review of the follow-up options in the applicable process with a pending-action checklist"
+    },
+    "note": "Confirm the program's current follow-up and callback options before the session, including which requests allow an agent callback and what must be documented. For callbacks after a dropped call, use the Hold entry instead."
+  },
+  {
+    "id": "own-repeat-contacts",
+    "cat": "own",
+    "title": "Failure to Take Ownership of Repeat Contacts",
+    "desc": "Treating a repeat contact as a new issue, without acknowledging prior attempts or changing the approach from what already failed.",
+    "kw": ["repeat contact", "repeat caller", "called before", "called again", "multiple calls", "second call", "third call", "same issue", "aicr", "repeat rate", "contact history", "prior attempts", "same steps again", "repeated troubleshooting", "not acknowledged", "frustrated repeat caller", "ownership"],
+    "tags": ["Repeat Contacts", "Ownership", "Contact History"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "Although this was not the customer's first contact about the issue, the call was handled as if it were new. You did not acknowledge the earlier attempts or review the contact history, and you repeated steps the customer had already completed. A customer calling back about an unresolved issue is often already doubting that it can be fixed, and hearing the same steps again can deepen that doubt. When a customer has called before, acknowledge it directly, review the history and notes, and take ownership of a different approach, escalating through the correct path when needed, so the customer hears a new plan rather than a repeat of the last one.",
+    "impact": "Repeat contacts are often handled as new when the standard flow is started from the beginning without checking what happened on earlier contacts, or when the cues that the customer has called before are missed. A repeat contact handled like a first call increases the chance of yet another one, which can raise the aiCR repeat rate. It can also turn a patient customer into a frustrated one and increase the risk of escalations, complaints, and cancellation.",
+    "plan": "For the next {duration}, whenever a customer says they have called before, or the account shows a recent contact about the same issue, you will acknowledge the earlier attempts within the first minute and review the contact history and notes before recommending any step. You will avoid repeating completed steps unless there is a specific reason, which you will explain to the customer. If the earlier approach did not work, you will choose a different resolution path or escalate through the correct path per the applicable process. In the {calls} calls we review within {followup}, every repeat contact should show an acknowledgement, a history review, and a changed or escalated approach.",
+    "followup": "We will listen to the first few minutes of this call side by side to identify the cues that it was a repeat contact, then practice an opening that acknowledges the history and sets a new plan. I will review {calls} of your calls within {followup}, giving extra attention to any repeat contacts, and we will look at the contact history together for one of them. After a midweek check-in, we will meet at the end of the {durationAdj} coaching period to review how each repeat contact was handled.",
+    "example": [
+      { "label": "Acknowledging the history", "say": "I can see you've already called about this, and you've restarted the equipment more than once. I'm sorry it's still happening. I won't ask you to repeat what's already been done. I'm going to look at what was tried last time and take a different approach today." },
+      { "label": "Changing the approach", "say": "Since the restart didn't hold last time, I'm going to check the signal on the line itself, and if it points to something we can't fix by phone, I'll set up the right next step before we finish." }
+    ],
+    "questions": [
+      "What signs in the call or on the account showed that the customer had contacted us before?",
+      "How might the customer have felt hearing the same steps they had already tried?",
+      "What would you do differently from the previous contact to give this customer a better chance of resolution?"
+    ],
+    "strengths": ["s-empathy", "s-tone", "s-verification", "s-clarity", "s-tools"],
+    "b": {
+      "obs": "handled a repeat contact as a new issue without acknowledging earlier attempts and repeated steps the customer had already completed",
+      "focus": "repeat contact ownership",
+      "commit": "acknowledge earlier contacts on a repeat issue and change or escalate the approach instead of repeating steps that did not work",
+      "mx": "Every repeat contact in the reviewed calls during the next {duration} includes an acknowledgement of earlier attempts, a contact history review, and a different or escalated approach.",
+      "coach": "a side-by-side listen to the call opening to spot repeat contact cues"
+    },
+    "note": "Review the account's contact history for this issue before the session so the coaching can reference what was tried on earlier contacts, and confirm the program's current process for escalating repeat or unresolved issues."
+  },
+  {
+    "id": "own-incomplete-education",
+    "cat": "own",
+    "title": "Incomplete Customer Education",
+    "desc": "Closing without explaining what was done, why, what to expect next, how to prevent the issue, and which self-service options can help.",
+    "kw": ["customer education", "education", "educate", "explain what was done", "self-service", "self service", "app", "prevent recurrence", "how to prevent", "teach the customer", "what to expect", "no explanation", "did not explain", "why it happened", "tips", "prevention"],
+    "tags": ["Customer Education", "Resolution", "Prevention"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "After the issue was resolved, you moved toward closing without explaining what you had changed, why it worked, or what the customer could do if it happened again. A short explanation is what helps a fix last beyond the call, because it gives the customer the context to recognize and handle a recurrence. Without it, a minor repeat of the problem may feel like the original issue all over again, and the customer is likely to call rather than try a quick self-service step. Going forward, explain what you did and why, what to expect next, how to prevent a recurrence, and which approved self-service options fit.",
+    "impact": "Incomplete education often comes from treating the fix as the finish line, especially when the call has already run long. Customers who do not understand what was changed or how to handle a recurrence are more likely to call back about issues they could have resolved on their own. This can add to repeat contacts and handle time, and it misses a chance to build the customer's confidence in managing their services.",
+    "plan": "Beginning today and continuing for {duration}, before closing any call where you made a change or resolved an issue, you will explain in plain language what you did, why it worked, and what the customer should expect next. You will share at least one practical tip for preventing or handling a recurrence and, when it fits the concern, point the customer to an approved self-service option and how to use it. You will invite questions to confirm the customer understood before you close. We will measure this across {calls} calls reviewed within {followup}, looking for an explanation of the fix, clear expectations, and a prevention or self-service tip on each.",
+    "followup": "In our session, we will build a short education checklist together, covering what was done, why it worked, what to expect, and how to prevent a recurrence, and then practice it on two common issues. I will then score {calls} of your calls against that checklist within {followup}, and we will discuss your examples at a midweek check-in. We will review the full plan, including your checklist results, at the end of {duration}.",
+    "example": [
+      { "label": "Explaining the fix", "say": "Here's what happened. Your gateway was holding onto an old setting, so the restart cleared it and reconnected you to the network. That's why everything is working again." },
+      { "label": "Preventing a repeat", "say": "If the connection slows down again, restarting the gateway is a quick first step, and you can do that from the app. If that doesn't help, give us a call and mention today's fix so we can pick up where we left off." }
+    ],
+    "questions": [
+      "What did the customer understand about the cause and the fix by the time the call ended?",
+      "Which self-service option would have helped this customer most, and how could you have introduced it?",
+      "How could a short explanation at the end of the call reduce the chance of another contact?"
+    ],
+    "strengths": ["s-resolution", "s-troubleshooting", "s-ownership", "s-tone", "s-diagnosis"],
+    "b": {
+      "obs": "resolved the issue without explaining what was done or how the customer could prevent and handle a recurrence on their own",
+      "focus": "customer education",
+      "commit": "explain what you did and how the customer can prevent or handle a recurrence, including any relevant self-service option",
+      "m": "an explanation of what was done and why, what to expect, and a prevention or self-service tip",
+      "coach": "an education checklist exercise practiced on two common issue types"
+    },
+    "note": "Confirm which self-service options are approved for the agent's program and line of business before recommending them in the session. For billing-specific education, use the Billing entry instead."
+  },
+  {
+    "id": "own-unsupported-guarantees",
+    "cat": "own",
+    "title": "Unsupported Guarantees",
+    "desc": "Promising outcomes that cannot be controlled or confirmed on the call, such as a guaranteed fix, an approved credit, or an exact arrival time.",
+    "kw": ["guarantee", "guaranteed", "promised", "promise", "overpromise", "overpromising", "definitely fix", "for sure", "will definitely", "credit promise", "technician arrival time", "exact time", "false promise", "unrealistic promise", "certainty", "misleading"],
+    "tags": ["Expectations", "Accuracy", "Customer Trust"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "While explaining the next steps, you promised an outcome that was not within your control, such as telling the customer the fix would definitely work or that a credit would be approved. Promises like these are usually meant to reassure, but they turn a possibility into a commitment. If the result turns out differently, the customer may feel misled and can carry that mistrust into future contacts. The expectation is to describe outcomes accurately, with language such as \"this is the step most likely to fix it\" or \"I've submitted the request for review,\" and to explain what happens if the result is not what the customer hoped for.",
+    "impact": "Unsupported guarantees often come from a genuine wish to calm a frustrated customer or end the call on a positive note. When the promised outcome does not happen, the customer measures the company against what they were told, not what was realistic. This can lead to repeat contacts, escalations, and complaints, and it may put pressure on the next representative to honor a commitment that was never available.",
+    "plan": "Throughout the next {duration}, you will describe any outcome that depends on a system, a review, a technician, or another team as an expected result rather than a promise. You will replace words like \"definitely,\" \"guaranteed,\" and \"for sure\" with accurate language about what you have done and what is likely to happen next. When a customer asks for certainty you cannot give, you will explain what you can commit to, such as the action you completed, and what the next step will be if the outcome changes. The standard is zero unsupported guarantees across {calls} calls reviewed within {followup}.",
+    "followup": "We will start by building a personal phrase bank of accurate alternatives to guarantee language, covering fixes, credits, and appointments. Over the next {followup}, I will listen to {calls} of your calls for any statement that promises an outcome, and we will compare what was said with a more accurate version. We will check in midweek, and the plan will close with a review of your calls at the end of {duration}.",
+    "example": [
+      { "label": "Instead of a guarantee", "say": "Based on what we're seeing, replacing the equipment is the step most likely to fix this. I can't promise it will solve everything, but if it doesn't, the next step would be a closer look at the line, and today's notes will be on your account so you won't start over." },
+      { "label": "For a credit request", "say": "I've submitted your credit request with all the details from today. I'm not able to approve it myself, but the review will have everything it needs to make a decision." }
+    ],
+    "questions": [
+      "What were you hoping the customer would feel when you said the outcome was certain?",
+      "Which parts of that outcome were actually within your control at that moment?",
+      "How could you reassure the customer next time while still describing the result accurately?"
+    ],
+    "strengths": ["s-empathy", "s-ownership", "s-rapport", "s-troubleshooting"],
+    "b": {
+      "obs": "guaranteed outcomes that were outside your control rather than describing the expected result accurately",
+      "focus": "accurate commitments",
+      "commit": "describe uncertain outcomes as expected results and commit only to the actions within your control",
+      "mx": "Zero unsupported guarantees appear in the reviewed calls during the next {duration}, and every uncertain outcome is described with accurate, conditional language.",
+      "coach": "a phrase bank exercise replacing guarantee language with accurate alternatives"
+    },
+    "note": "Confirm what agents are permitted to commit to for credits, appointments, and equipment under the program's current process, so the coaching separates real commitments from unsupported promises."
+  },
+  {
+    "id": "own-expectation-setting",
+    "cat": "own",
+    "title": "Weak Expectation Setting",
+    "desc": "Leaving expectations vague or incomplete about timeframes, next steps, and what the customer should do if the issue continues.",
+    "kw": ["expectations", "expectation setting", "set expectations", "weak expectations", "vague", "timeframe", "time frame", "next steps", "what to expect", "unclear next steps", "if it doesn't work", "how long", "no timeline", "customer confused", "managing expectations", "backup plan"],
+    "tags": ["Expectations", "Next Steps", "Call Closing"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "As the call wrapped up, you described what would happen next in general terms, such as \"it should update soon,\" without a timeframe or a plan if the issue continued. Clear expectations give the customer something concrete to follow and check against. When the timing, the next step, and the backup plan are left open, the customer has to guess, and that uncertainty often turns into frustration or an early call to ask for a status. Next time, give the timeframe from approved resources, describe exactly what will happen next, and tell the customer what to do if the result is not what you both expect.",
+    "impact": "Weak expectation setting usually happens when the next steps feel obvious to you or the exact timeframe is not known, so the explanation stays general. Customers fill that gap with their own assumptions, which are often shorter or more optimistic than the real timeline. When those assumptions are not met, the result can be status calls, repeat contacts, and lower satisfaction, even when the work itself was handled correctly.",
+    "plan": "Over the next {duration}, you will end each call by stating three things clearly: the timeframe for any change or pending action, taken from approved resources, the specific next step and who completes it, and what the customer should do if the issue continues or the timeframe passes. When an exact timeframe is not available, you will say so and explain how the customer can check progress rather than offering a guess. You will confirm the customer understands the plan before ending the call. We will review {calls} calls within {followup}, and each one should include a stated timeframe, a defined next step, and a backup plan.",
+    "followup": "During our session, we will practice turning vague statements into specific expectations using three common scenarios from your line of business, and you will complete a self-assessment of this call against the timeframe, next step, and backup plan standard. I will review {calls} of your calls within {followup}, and we will meet midweek to discuss one example from those calls. At the close of the {durationAdj} plan, we will go through your expectation statements from the reviewed calls together.",
+    "example": [
+      { "label": "Setting clear expectations", "say": "Here's what to expect. Your box is restarting now, and that usually takes about five minutes. Once it finishes, your channels should be back. If they're still missing after that, unplug the box for about thirty seconds and plug it back in. If that doesn't work, call us and mention today's restart so we can go straight to the next step." }
+    ],
+    "questions": [
+      "If the customer repeated your next steps back to you, what would they have said?",
+      "Which timeframe or next step could you have confirmed in approved resources before closing?",
+      "What should the customer do if the issue continues, and how could you have told them?"
+    ],
+    "strengths": ["s-ownership", "s-empathy", "s-troubleshooting", "s-diagnosis", "s-tone"],
+    "b": {
+      "obs": "described the next steps in general terms without a clear timeframe or guidance on what to do if the issue continued",
+      "focus": "clear expectation setting",
+      "commit": "give a specific timeframe and next step before closing and explain what to do if the issue continues",
+      "m": "a specific timeframe, a defined next step, and a clear plan if the issue continues",
+      "coach": "a self-assessment of this call against the timeframe, next step, and backup plan standard"
+    },
+    "note": "Confirm the current timeframes in approved resources for the changes this agent commonly handles, so the coaching references accurate expectations rather than estimates."
+  },
+  {
+    "id": "own-escalation-path",
+    "cat": "own",
+    "title": "Incorrect Escalation Path",
+    "desc": "Escalating to the wrong team or channel, escalating when it was not needed, or not escalating when the situation required it.",
+    "kw": ["escalation", "escalate", "escalated", "wrong escalation", "escalation path", "unnecessary escalation", "missed escalation", "should have escalated", "wrong team", "tier 2", "higher level support", "escalation criteria", "escalation process", "supervisor request", "sup call", "manager request"],
+    "tags": ["Escalation", "Process", "Ownership"],
+    "kpi": ["QA", "Transfer", "aiCR"],
+    "theme": "own",
+    "feedback": "When the concern reached the point of a possible escalation, your decision about whether and where to escalate did not match the situation. Escalation criteria exist so each issue reaches the team that can resolve it when it is needed. Escalating too early or to the wrong place adds handoffs, and holding on to an issue that meets the criteria delays the help it needs. Either way, the customer may wait longer, repeat their story, and lose confidence that the issue is moving. Going forward, check the situation against the escalation criteria in approved resources, use the correct path when they apply, and explain to the customer what happens next.",
+    "impact": "Escalation errors often come from uncertainty about the criteria for each path. Some issues are escalated quickly because the call feels difficult, while others stay with the first contact too long out of a wish to solve everything personally. A misdirected or missed escalation can add transfers and handle time, delay the resolution, and lead the customer to call back for an update, while unnecessary escalations add load to teams that should be handling more complex issues.",
+    "plan": "During the next {duration}, before any escalation you will review the escalation criteria in approved resources, confirm the issue meets them, and identify the correct path for the situation. When the issue is within your scope, you will resolve it using your own resources and support channel, and when the criteria are met, you will escalate promptly rather than continuing on your own. Every escalation will include a clear explanation to the customer and documented notes per the applicable process. Within {followup}, we will review {calls} calls, including each escalation and each concern that may have needed one, with the target of a correct decision and path every time.",
+    "followup": "We will walk through the escalation criteria and paths in the process documentation together, then complete a quick knowledge check with four short scenarios where you decide whether to escalate and where. I will review {calls} of your calls within {followup}, focusing on any call where an escalation was made or could have been. We will talk through the results midweek and confirm readiness at the end of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "Escalating correctly", "say": "I've checked everything I can from here, and this needs a team with specialized access to your line. I'm escalating it through the correct process now and documenting what we've already tried, so no one asks you to repeat it." },
+      { "label": "Resolving within scope", "say": "This is something I can take care of myself, so there's no need to send it anywhere else. I'll make the change now, and we'll confirm it together." }
+    ],
+    "questions": [
+      "What told you this concern did or did not need to be escalated at that point?",
+      "Where in approved resources could you have confirmed the correct escalation path?",
+      "How might the customer's experience have changed if the right team had been involved at the right time?"
+    ],
+    "strengths": ["s-ownership", "s-empathy", "s-probing", "s-verification", "s-tone"],
+    "b": {
+      "obs": "made an escalation decision that did not match the criteria, either in whether to escalate or where to send the concern",
+      "focus": "correct escalation decisions",
+      "commit": "check the escalation criteria in approved resources and escalate through the correct path whenever they apply",
+      "mx": "Every escalation decision in the reviewed calls during the next {duration} matches the escalation criteria, uses the correct path, and is explained to the customer.",
+      "coach": "a scenario-based knowledge check on escalation criteria and the correct path for each"
+    },
+    "note": "Confirm the program's current escalation criteria and paths before the session. Note from the recording whether the gap was the wrong destination, an unnecessary escalation, or a missed one, so the coaching targets the right decision."
+  },
+  {
+    "id": "own-objections",
+    "cat": "own",
+    "title": "Not Addressing Customer Objections or Concerns",
+    "desc": "Moving past the customer's doubts or concerns about cost, time, a recommended step, or a past experience without addressing them.",
+    "kw": ["objections", "customer concerns", "concerns", "doubts", "hesitation", "pushback", "brushed off", "ignored concern", "dismissive", "customer worried", "cost concern", "time concern", "skeptical", "past bad experience", "won't work", "reassurance", "not addressing concerns"],
+    "tags": ["Customer Concerns", "Customer Trust", "Soft Skills"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "After the customer expressed doubt about the recommended step, such as questioning whether it would work after a past bad experience or worrying about the time or cost involved, you continued with the process without responding to it. An unanswered concern does not go away; it stays with the customer and shapes how they hear everything that follows. A customer who still has doubts may hesitate, skip the step after the call, or decline a solution that would have helped. Moving forward, pause when a concern comes up, acknowledge it, ask a question to understand it, and answer it honestly before continuing.",
+    "impact": "Concerns tend to get passed over when the focus is on completing the process and a question sounds like an interruption rather than part of the conversation. Left unanswered, a doubt often resurfaces later as resistance, a declined solution, or a step the customer never completes. That can extend the call, lead to repeat contacts when the issue is not fully resolved, and leave the customer feeling that their input did not matter.",
+    "plan": "Starting with your next call and continuing for {duration}, you will treat every concern or doubt the customer raises as part of the resolution rather than an interruption. You will acknowledge the concern in your own words, ask one clarifying question to understand what is behind it, and respond with accurate information, such as why the step is needed, what it involves, or what will be different from a past experience. You will then check whether the customer is comfortable continuing before moving to the next step. Across the {calls} calls we review within {followup}, the target is a direct, accurate response to every concern the customer raises.",
+    "followup": "In our session, we will roleplay three concerns customers often raise on service calls, such as doubt that a step will work, worry about the time involved, and frustration from a past experience, practicing an acknowledge, clarify, and respond sequence for each. As I review {calls} of your calls within {followup}, I will note each concern the customer raised and how it was answered. We will check progress midweek and wrap up with a full review when the {durationAdj} plan ends.",
+    "example": [
+      { "label": "Responding to a doubt", "say": "That's a fair concern, especially if a restart didn't help last time. Can I ask what happened after that one? This time I'm also updating the settings on your equipment first, which is a different step, and we'll check the result together before we finish." }
+    ],
+    "questions": [
+      "What concern did the customer raise, and what do you think was behind it?",
+      "How might the customer have felt when the call continued without a response to their concern?",
+      "What question could you have asked to understand the concern before answering it?"
+    ],
+    "strengths": ["s-troubleshooting", "s-ownership", "s-verification", "s-tone", "s-itg"],
+    "b": {
+      "obs": "continued with the process after the customer raised a doubt or concern without acknowledging or answering it",
+      "focus": "addressing customer concerns",
+      "commit": "acknowledge and answer every concern the customer raises before moving on to the next step",
+      "mx": "Every concern or doubt the customer raises in the reviewed calls during the next {duration} is acknowledged, clarified, and answered before the call moves on.",
+      "coach": "a roleplay of common service concerns using an acknowledge, clarify, and respond sequence"
+    },
+    "note": "This entry covers concerns raised in a service context. For objections to an offer or a sale, use the Sales entry for objection handling instead."
+  },
+  {
+    "id": "own-confirm-resolution",
+    "cat": "own",
+    "title": "Not Confirming Resolution Before Closing",
+    "desc": "Ending the call without confirming with the customer that the issue is resolved, services are working, and nothing else is needed.",
+    "kw": ["confirm resolution", "confirmation", "no confirmation", "did not confirm", "closing", "call closing", "anything else", "is it working", "services working", "check services", "abrupt ending", "ended call", "no final check", "resolution check", "verify with customer", "rushed ending"],
+    "tags": ["Resolution", "Call Closing", "Verification"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "own",
+    "feedback": "Before ending the call, you moved straight to the closing without checking with the customer that the issue was resolved from their side, that their other services were working normally, or whether anything else was needed. Your work may have been correct, but the customer is the one who can confirm it. Without that final check, a remaining problem or a second question can go unmentioned until the customer has to call again. Before closing future calls, ask the customer to confirm the issue is resolved, verify that related services are working, and ask whether there is anything else you can help with.",
+    "impact": "Skipping the final confirmation usually happens when the fix looks complete on your screen or when there is pressure to keep handle time down. The customer's experience on their own devices is the real measure of resolution, and a short check often reveals a remaining gap while it is still easy to address. Without it, unresolved issues and unasked questions can turn into repeat contacts and lower quality results.",
+    "plan": "For the next {duration}, before closing every call, you will ask the customer to confirm in their own words that the issue is resolved, check that any related services, such as internet, TV, or mobile, are working normally, and ask whether there is anything else you can help with. If the customer cannot confirm right away, you will explain how they can check and what to do if something is still not working. We will review {calls} calls within {followup}, targeting a customer confirmation of resolution, a related services check, and an offer of further help on all {calls} calls.",
+    "followup": "We will listen together to the closing minutes of a strong call example and note how the resolution was confirmed, then you will practice the same three-part close using this call. Within {followup}, I will review the final minute of {calls} of your calls, and we will discuss what we found at a midweek check-in. At the end of the {durationAdj} coaching period, we will decide whether the three-part close has become part of your routine.",
+    "example": [
+      { "label": "Confirming the fix", "say": "Before we wrap up, could you check the internet on the devices you use most and let me know how it's working? I'd also like to make sure your TV service is still working normally." },
+      { "label": "Before closing", "say": "I'm glad everything is working. Is there anything else I can help you with today?" }
+    ],
+    "questions": [
+      "How did you know the issue was resolved from the customer's side when the call ended?",
+      "What other services could have been affected, and how could you have checked them?",
+      "Which closing question would make sure nothing is left unresolved before the customer hangs up?"
+    ],
+    "strengths": ["s-troubleshooting", "s-ownership", "s-empathy", "s-itg", "s-tone"],
+    "b": {
+      "obs": "closed the call without confirming with the customer that the issue was resolved and that nothing else was needed",
+      "focus": "resolution confirmation",
+      "commit": "confirm with the customer that the issue is resolved and nothing else is needed before closing the call",
+      "m": "a customer confirmation of resolution, a related services check, and an offer of further help before closing",
+      "coach": "a strong call example review focused on confirming resolution before the close"
+    },
+    "note": "Listen to the final minute of the call to confirm whether resolution was checked with the customer. A recap alone does not meet this behavior if the customer was never asked to confirm."
+  }
+]

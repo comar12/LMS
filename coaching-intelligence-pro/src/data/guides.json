@@ -1,0 +1,55 @@
+{
+  "hold": {
+    "title": "Hold, Mute, Dead Air, and Research Time",
+    "intro": "Keep these four situations separate when you review a call. Each one has a different coaching conversation.",
+    "items": [
+      { "term": "Hold", "text": "The customer is placed on hold with the phone system's hold function. They hear hold music or messaging, and the time is recorded as hold time. Correct use: ask permission, explain why, give an estimated time, return on time or check back with an update, and thank the customer." },
+      { "term": "Mute", "text": "The microphone is turned off but the line stays open. The customer hears complete silence, which sounds the same as dead air or a dropped call. Mute is not a substitute for hold during research. Follow your program's guidance on when mute may be used." },
+      { "term": "Dead air", "text": "Any stretch of silence on an open line where the customer is not told what is happening, whatever the cause: mute, reading, typing, or waiting on a system." },
+      { "term": "Research time", "text": "Time spent investigating is expected. It becomes a coaching opportunity when the customer is left uninformed. Brief research can be narrated; longer research belongs on a proper hold." }
+    ],
+    "caution": "Zero recorded hold time does not prove the customer was left on mute. Silence can come from reading, navigating tools, or system delays. Confirm mute usage from the recording before documenting it."
+  },
+  "sales": {
+    "title": "Sales Conversation Flow",
+    "intro": "Sales coaching follows the customer's needs, not the other way around. An offer only belongs in the call after the concern is resolved and confirmed.",
+    "flow": ["Understand", "Empathize", "Assure", "Probe", "Resolve", "Confirm", "Plant the Seed", "Relevant Offer", "Explain Pricing", "Confirm Understanding"],
+    "offers": [
+      { "term": "Xfinity Mobile (XM)", "text": "New lines, devices, or moving a number over. Relevant when discovery reveals a mobile need, such as another carrier's bill, a family member who needs a line, or a device question." },
+      { "term": "Service upgrades", "text": "Changes that improve an existing service, such as faster internet or updated equipment. Relevant when the customer describes slow speeds, many connected devices, or coverage gaps." },
+      { "term": "TV package offers", "text": "Adding, changing, or right-sizing TV packages and channels. Relevant when the customer talks about what they watch, missing channels, or paying for content they do not use." },
+      { "term": "Retention offers", "text": "Options for a customer who is considering cancelling or downgrading, presented through the retention process after understanding the reason they want to leave." }
+    ],
+    "caution": "A payment link, payment arrangement, or other payment assistance helps the customer, but it is not a sales offer. Confirm current offers, eligibility, and disclosure requirements in approved resources before coaching."
+  },
+  "quick": {
+    "steps": [
+      "Review the call and note what happened. Leave out names, IDs, and account details.",
+      "Search or browse for the behavior you observed, then open it.",
+      "Select only the strengths you actually observed. Nothing positive is added to coaching text unless you select it.",
+      "Copy the section you need, or use Copy Full Coaching for the whole entry.",
+      "For several behaviors, add them to the Coaching Builder to generate one cohesive entry with a single SMART plan."
+    ],
+    "conversation": [
+      "Set the purpose: share what you reviewed and why it matters to the customer.",
+      "Start with genuine strengths you observed on the call.",
+      "Describe the specific behavior and its impact, using the coaching text as your guide.",
+      "Ask the coaching questions and listen. Let the agent identify the gap and the fix.",
+      "Agree on the expected behavior and practice it with a short roleplay or demonstration.",
+      "Commit to the SMART plan and confirm the follow-up dates before you finish."
+    ],
+    "rules": [
+      "Never include agent or customer names, BPIDs, HRIDs, Avaya IDs, account numbers, or interaction IDs.",
+      "Only document strengths you observed and progress you verified.",
+      "Describe impact as what a behavior can cause unless you confirmed what actually happened.",
+      "Confirm internal processes (ITG, transfers, credits, porting, verification) before coaching on them."
+    ],
+    "smart": [
+      ["Specific", "Names the exact behavior and when it should happen."],
+      ["Measurable", "States a target you can check on reviewed calls."],
+      ["Achievable", "Realistic for one agent within the plan period."],
+      ["Relevant", "Directly tied to the behavior you coached."],
+      ["Time-bound", "Has a plan length and a first review date."]
+    ]
+  }
+}

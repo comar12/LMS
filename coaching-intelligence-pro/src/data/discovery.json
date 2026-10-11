@@ -1,0 +1,686 @@
+[
+  {
+    "id": "dis-missing-probing",
+    "cat": "dis",
+    "title": "Missing Probing Questions",
+    "desc": "Moving to an assumption or a solution without asking discovery questions to understand what the customer is experiencing.",
+    "kw": [
+      "probing",
+      "no probing",
+      "no questions",
+      "questions",
+      "discovery",
+      "no discovery",
+      "probe",
+      "open-ended",
+      "assumptions",
+      "assumed",
+      "jumped to solution",
+      "guessing",
+      "did not ask",
+      "fact finding",
+      "clarifying questions",
+      "understand the issue",
+      "wrong fix"
+    ],
+    "tags": [
+      "Discovery",
+      "Probing",
+      "Issue Analysis"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR",
+      "Transfer"
+    ],
+    "theme": "discover",
+    "feedback": "When the customer described the issue, you moved straight to a solution without asking any questions to understand what they were experiencing. Discovery turns a general complaint into a clear picture, and without it, the step you offered rested on an assumption rather than on the customer's actual situation. If that assumption is wrong, the customer can end up repeating steps that do not apply, being sent to the wrong team, or calling back with the same problem. Next time, ask at least three open-ended questions about what is happening, when it started, and how it is affecting them, then summarize what you heard before deciding what to do.",
+    "impact": "Skipping discovery usually happens when a concern sounds familiar and the answer seems obvious from the first sentence. Many issues share the same symptoms, though, so acting on that first impression can send the call in the wrong direction. The customer may receive a fix that does not apply, be transferred to a team that cannot help, or call back with the same problem, which can affect quality results, transfer rates, and repeat contacts.",
+    "plan": "For the next {duration}, you will ask at least three open-ended discovery questions before recommending any solution, transfer, or troubleshooting step. Focus the questions on what the customer is experiencing, when it began, and how it affects them, then summarize the concern back in one or two sentences before you act. When an issue sounds familiar, treat that as a reason to confirm the details rather than assume them. We will review {calls} applicable calls within {followup}, targeting at least three open-ended questions and a summary of the concern before any solution in all {calls} calls.",
+    "followup": "In our session, we will listen to the first few minutes of this call together, pause at the moment the solution was offered, and rewrite that moment with the questions that could have come first. I will review {calls} of your calls within {followup} and count the open-ended questions asked before each solution. We will compare those counts at the end of the {durationAdj} plan to decide whether more practice is needed.",
+    "example": [
+      {
+        "label": "Before offering a fix",
+        "say": "Before I suggest a fix, I want to make sure I understand exactly what's happening. Can you walk me through what you see when the problem shows up, and when you first noticed it?"
+      },
+      {
+        "label": "After the answers",
+        "say": "Thank you, that helps. So the picture freezes on every channel, and it started last night. Based on that, here is what I'd like to check first."
+      }
+    ],
+    "questions": [
+      "What made the solution you offered feel right before you had asked the customer any questions?",
+      "Which two or three questions would have given you the clearest picture of what the customer was experiencing?",
+      "How can you tell, early in a call, that you may be acting on an assumption instead of the facts?"
+    ],
+    "strengths": [
+      "s-empathy",
+      "s-tone",
+      "s-ownership",
+      "s-tools"
+    ],
+    "b": {
+      "obs": "moved to a solution without asking any questions about the issue, so the next step rested on an assumption rather than on the facts",
+      "focus": "open-ended discovery questions",
+      "commit": "ask at least three open-ended questions about what the customer is experiencing before offering any solution, transfer, or troubleshooting step",
+      "m": "at least three open-ended questions and a summary of the concern before any solution is offered",
+      "coach": "a listen-back of the call opening, rewriting the moment the solution was offered with stronger questions"
+    },
+    "note": "Use this entry when little or no discovery took place before a solution. If some questions were asked but lacked depth, Insufficient Probing is the better fit."
+  },
+  {
+    "id": "dis-insufficient-probing",
+    "cat": "dis",
+    "title": "Insufficient Probing",
+    "desc": "Asking some discovery questions but stopping too early or relying on yes or no questions, leaving details such as timing, frequency, or recent changes unknown.",
+    "kw": [
+      "insufficient probing",
+      "probing",
+      "not enough questions",
+      "shallow questions",
+      "surface level",
+      "closed questions",
+      "yes or no questions",
+      "open-ended",
+      "follow-up questions",
+      "probe deeper",
+      "depth",
+      "when did it start",
+      "how often",
+      "what changed",
+      "more details",
+      "stopped too early",
+      "incomplete discovery",
+      "discovery"
+    ],
+    "tags": [
+      "Discovery",
+      "Probing",
+      "Question Depth"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR"
+    ],
+    "theme": "discover",
+    "feedback": "You asked a few questions, but most could be answered with a yes or no, and discovery ended before the details that shape the fix came out. Key points, such as when the issue started, how often it happens, which devices or services are affected, and whether anything changed recently, were not fully explored. Those answers are what separate one possible cause from another. Without them, troubleshooting can treat the general symptom and miss the actual cause, which can leave the customer needing to call back. On future calls, build on your first question with open-ended follow-ups on timing, frequency, what is affected, and recent changes before choosing a next step.",
+    "impact": "Shallow probing often comes from wanting to keep the call moving, or from recognizing a common symptom and treating the first answer as enough. Closed questions tend to confirm what you already suspect, but they rarely reveal what you did not think to ask. When discovery stops early, the customer may go through steps that do not fit the real cause, and the issue is more likely to return, which can lead to repeat contacts and lower quality results.",
+    "plan": "Over the next {duration}, you will go beyond your first question on every applicable call by asking open-ended follow-ups about when the issue started, how often it occurs, what is affected, and what changed recently. When a customer gives a short answer, ask one more question to draw out the detail behind it. Before choosing a next step, summarize what you learned in one sentence so the customer can correct anything you missed. Within {followup}, we will review {calls} applicable calls, and the target is for every one of them to show timing, frequency, what is affected, and recent changes explored before a next step.",
+    "followup": "During our session, we will build a short probing checklist covering timing, frequency, what is affected, and recent changes, then roleplay a customer who gives brief, one-word answers so you can practice drawing out more detail. Within {followup}, I will score {calls} of your calls against that checklist, and we will meet briefly midweek to talk through any call where discovery felt rushed. At the end of {duration}, we will review the results and decide whether you still need the checklist as a prompt.",
+    "example": [
+      {
+        "label": "After a short answer",
+        "say": "Okay, so it keeps dropping. When did you first notice that, and does it happen at certain times of day or throughout the day?"
+      },
+      {
+        "label": "Going one level deeper",
+        "say": "Has anything changed recently, like a new device, moving the equipment, or a power outage? Those details help me find the cause instead of guessing."
+      }
+    ],
+    "questions": [
+      "Which of your questions could the customer answer with a single word, and what did that leave you not knowing?",
+      "What details about timing, frequency, or recent changes might have changed the step you chose?",
+      "When a customer gives a short answer, what follow-up could you ask to get the full story?"
+    ],
+    "strengths": [
+      "s-acknowledgement",
+      "s-tone",
+      "s-itg",
+      "s-ownership"
+    ],
+    "b": {
+      "obs": "asked a few questions but relied mostly on yes or no answers and stopped before learning when the issue started, how often it happens, or what changed",
+      "focus": "deeper probing",
+      "commit": "build on your first question with open-ended follow-ups about timing, frequency, what is affected, and recent changes before choosing a next step",
+      "m": "timing, frequency, what is affected, and recent changes explored before a next step is chosen",
+      "coach": "a probing checklist exercise and a roleplay with a customer who gives brief answers"
+    },
+    "note": "If no discovery questions were asked at all, use Missing Probing Questions. On billing calls, adapt the details to the charge, the billing period, and what changed on the account."
+  },
+  {
+    "id": "dis-early-troubleshooting",
+    "cat": "dis",
+    "title": "Starting Troubleshooting Too Early",
+    "desc": "Starting troubleshooting steps before the customer's concern is fully understood, even when a question or two has been asked first.",
+    "kw": [
+      "troubleshooting too early",
+      "jumped into troubleshooting",
+      "started too soon",
+      "premature troubleshooting",
+      "rushed",
+      "sequence",
+      "order of steps",
+      "skipped discovery",
+      "restart first",
+      "reboot right away",
+      "before understanding",
+      "discovery first",
+      "probing",
+      "assumptions",
+      "jumped ahead",
+      "wrong steps"
+    ],
+    "tags": [
+      "Discovery",
+      "Call Flow",
+      "Troubleshooting"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR"
+    ],
+    "theme": "discover",
+    "feedback": "Before the concern was fully understood, you began walking the customer through troubleshooting steps. You asked a question or two, but the first step came before you had enough information to know which steps would actually apply. Troubleshooting works best as a response to a clear picture of the problem, and starting early can send the customer through restarts and checks that have nothing to do with the cause, lengthening the call and testing their patience. Instead, hold the first step until you have confirmed the symptom, when it started, and what it affects, then explain which step you are starting with and why.",
+    "impact": "Starting troubleshooting too early usually comes from a strong desire to fix things quickly, especially when the symptom sounds routine. The order matters, though. Steps chosen before the concern is clear are more likely to miss the cause, repeat work the customer does not need, and add handle time. The customer may also lose confidence in the process, which can lead to pushback on later steps and a higher chance of a repeat contact.",
+    "plan": "Starting with your next call and continuing for {duration}, you will complete discovery before the first troubleshooting step. Before recommending any step, confirm three things: the symptom in the customer's words, when it started, and what it affects. Then tell the customer which step you are starting with and why it fits what they described. Success on this plan means those three points are confirmed before the first step on all {calls} troubleshooting calls reviewed within {followup}.",
+    "followup": "We will listen to this call side by side and mark two moments on the recording: when troubleshooting began and when the concern was actually clear. Then we will practice a short bridge statement that moves from discovery into the first step. I will review {calls} troubleshooting calls within {followup}, checking the gap between those same two moments, and we will review the full picture once the {durationAdj} plan is complete.",
+    "example": [
+      {
+        "label": "Bridging into troubleshooting",
+        "say": "So the internet stopped working on every device this morning, and nothing has changed in your home. Thank you, that tells me a lot. Based on that, I'd like to start by checking the signal to your equipment, because that fits what you're describing."
+      }
+    ],
+    "questions": [
+      "At what point did you feel you understood the concern well enough to start troubleshooting?",
+      "What information were you still missing when you recommended the first step?",
+      "How could you explain to the customer why you are starting with a particular step?"
+    ],
+    "strengths": [
+      "s-empathy",
+      "s-acknowledgement",
+      "s-tools",
+      "s-clarity"
+    ],
+    "b": {
+      "obs": "began troubleshooting steps before the concern was fully understood, so the first step was chosen before the cause was clear",
+      "focus": "discovery before troubleshooting",
+      "commit": "confirm the symptom, when it started, and what it affects before the first troubleshooting step, then explain why that step fits",
+      "m": "the symptom, start time, and impact confirmed before the first troubleshooting step",
+      "coach": "a side-by-side listen marking when troubleshooting began and when the concern became clear"
+    },
+    "note": "Use this when steps started before discovery was complete, even if some questions were asked. If no questions were asked at all, Missing Probing Questions may fit better."
+  },
+  {
+    "id": "dis-main-concern",
+    "cat": "dis",
+    "title": "Not Identifying the Main Concern",
+    "desc": "Missing the customer's actual reason for calling during discovery, so time and effort go to a secondary or assumed issue.",
+    "kw": [
+      "main concern",
+      "primary concern",
+      "reason for call",
+      "reason for calling",
+      "wrong issue",
+      "missed the issue",
+      "secondary issue",
+      "assumed issue",
+      "multiple issues",
+      "real issue",
+      "misunderstood",
+      "what the customer wanted",
+      "restate the concern",
+      "call driver",
+      "off track",
+      "assumptions",
+      "discovery",
+      "questions"
+    ],
+    "tags": [
+      "Discovery",
+      "Issue Identification",
+      "Call Direction"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR",
+      "Transfer"
+    ],
+    "theme": "discover",
+    "feedback": "Early in the call, your questions did not uncover the customer's actual reason for calling, so the work that followed went toward a secondary or assumed issue. Customers often lead with a symptom or a side comment, and the real concern only comes out when you confirm what they most need from the call. Without that confirmation, the customer can leave with something addressed and still not have what they called about, which is frustrating and often leads to another call. Moving forward, restate what you heard, ask which concern matters most today, and confirm it in the customer's words before you begin working.",
+    "impact": "Missing the main concern often comes from anchoring on the first issue mentioned or on the one that is quickest to handle. When several topics come up, the customer's priority can get lost if it is never confirmed. Effort then goes to the wrong problem, the customer may be routed to a department that handles a different issue, and the concern that was never addressed is likely to bring them back. That pattern can show up in quality results, transfers, and repeat contacts.",
+    "plan": "During the next {duration}, you will confirm the main reason for every call before you start working on it. After the customer explains, restate the concern in one sentence and ask whether that is the most important thing to address today. When more than one issue comes up, list them back, agree on the order with the customer, and note the secondary items so none are lost. When we review {calls} applicable calls within {followup}, the target is a main concern stated back and confirmed by the customer before any work begins on every call.",
+    "followup": "We will listen to a strong call example together where the main concern is confirmed early, followed by a roleplay in which the customer raises three different issues in one breath, so you can practice sorting them and confirming the priority. Over the following {followup}, I will listen to {calls} of your calls for the moment the main concern is confirmed, and we will go over the results together at the close of the {durationAdj} plan.",
+    "example": [
+      {
+        "label": "Confirming the priority",
+        "say": "I'm hearing two things today, the higher bill this month and the TV box that keeps freezing. Which one is most important to you, so I can make sure we take care of it first?"
+      },
+      {
+        "label": "Restating the concern",
+        "say": "So the main reason for your call is that your internet drops every evening during your video calls. Did I get that right?"
+      }
+    ],
+    "questions": [
+      "What do you think was the customer's main reason for calling, and when did it first come up?",
+      "What made the issue you worked on seem like the priority at the time?",
+      "How could you confirm the main concern when a customer mentions several problems at once?"
+    ],
+    "strengths": [
+      "s-rapport",
+      "s-tone",
+      "s-troubleshooting",
+      "s-tools"
+    ],
+    "b": {
+      "obs": "did not uncover the customer's main reason for calling, so the effort went toward a secondary or assumed issue",
+      "focus": "identifying the main concern",
+      "commit": "restate the concern, ask which issue matters most today, and confirm the main reason for the call before starting any work",
+      "m": "the main reason for the call confirmed in the customer's words before work begins",
+      "coach": "a roleplay sorting several customer concerns and confirming which one comes first"
+    },
+    "note": "If the main concern was identified but not resolved, use Not Resolving the Primary Concern under Ownership instead. This entry covers discovery that missed the concern."
+  },
+  {
+    "id": "dis-customer-needs",
+    "cat": "dis",
+    "title": "Not Understanding Customer Needs",
+    "desc": "Understanding the issue but not the customer's goals, situation, or constraints, so the solution offered does not fit how they actually use the service.",
+    "kw": [
+      "customer needs",
+      "needs",
+      "goals",
+      "context",
+      "situation",
+      "constraints",
+      "usage",
+      "how they use it",
+      "working from home",
+      "many devices",
+      "budget",
+      "accessibility",
+      "one size fits all",
+      "personalize",
+      "tailor",
+      "solution fit",
+      "lifestyle",
+      "discovery",
+      "questions"
+    ],
+    "tags": [
+      "Discovery",
+      "Customer Needs",
+      "Personalization"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR"
+    ],
+    "theme": "discover",
+    "feedback": "Once the issue was identified, you moved to a solution without learning about the customer's situation, such as how they use the service or what limits they are working within. Your answer may have been accurate, but a solution only helps when it fits the customer's circumstances, whether that means working from home, managing many devices, staying within a budget, or needing an accessible option. When it does not fit, the customer may decline it, struggle to use it, or call back for something different. The expectation is to ask about goals and constraints before recommending a solution and explain how it fits what the customer shared.",
+    "impact": "This gap often comes from treating the issue as the whole story. Two customers with the same problem can need very different solutions depending on their schedule, household, budget, or accessibility needs. When a recommendation does not match those circumstances, the customer is more likely to feel processed rather than helped, to reject or misuse the solution, and to reach out again, which can affect satisfaction, quality results, and repeat rates.",
+    "plan": "On every call over the next {duration} that leads to a recommendation, you will first ask at least one question about the customer's goals or circumstances, such as how they use the service, who relies on it, or any limits on time, budget, or accessibility. Then connect your recommendation to what they told you, in a sentence that names their situation. Across the {calls} applicable calls we review within {followup}, the target is for every recommendation to connect to at least one need the customer shared.",
+    "followup": "We will roleplay three short customer profiles that share the same issue, such as a customer working from home, a household with many devices, and a customer on a tight budget, so you can practice asking about needs and adjusting the recommendation for each. You will complete a brief self-assessment on {calls} applicable calls within {followup}, and I will review the same calls before we discuss them. We will compare your self-assessments with my review at the end of the {durationAdj} period.",
+    "example": [
+      {
+        "label": "Asking about needs",
+        "say": "Before I recommend anything, can you tell me a little about how you use the internet day to day? For example, is anyone working or studying from home, and about how many devices are usually connected?"
+      },
+      {
+        "label": "Connecting the solution",
+        "say": "Since you're on video calls most of the day from your home office, I'd suggest moving the gateway closer to that room. That can give you a stronger connection where you need it most."
+      }
+    ],
+    "questions": [
+      "What did you learn about how the customer uses the service, and what would you have liked to know?",
+      "How might the customer's situation have changed the solution you recommended?",
+      "What question could you ask early in the call to learn what the customer needs the service to do for them?"
+    ],
+    "strengths": [
+      "s-diagnosis",
+      "s-troubleshooting",
+      "s-clarity",
+      "s-acknowledgement"
+    ],
+    "b": {
+      "obs": "understood the issue but not the customer's goals or constraints, so the solution did not reflect how they use the service",
+      "focus": "understanding customer needs",
+      "commit": "ask about the customer's goals, usage, and constraints before recommending a solution, and explain how the recommendation fits their situation",
+      "m": "a recommendation tied to at least one goal or constraint the customer shared",
+      "coach": "a roleplay of three customer profiles that share an issue but need different solutions"
+    },
+    "note": "Check whether the solution matched the situation the customer described. On sales conversations, Missing Sales Discovery covers needs questions before an offer."
+  },
+  {
+    "id": "dis-contact-history",
+    "cat": "dis",
+    "title": "Missing Previous Contact History",
+    "desc": "Not reviewing notes or prior interactions before working the concern, so the customer re-explains the issue or steps that already failed are repeated.",
+    "kw": [
+      "contact history",
+      "history",
+      "notes",
+      "account notes",
+      "review notes",
+      "previous contact",
+      "prior contact",
+      "interaction history",
+      "previous calls",
+      "called before",
+      "already called",
+      "repeat caller",
+      "repeat contact",
+      "re-explain",
+      "explain again",
+      "start over",
+      "aicr",
+      "repeat rate"
+    ],
+    "tags": [
+      "Discovery",
+      "Contact History",
+      "Repeat Contacts"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR"
+    ],
+    "theme": "discover",
+    "feedback": "At the start of the call, you began discovery without reviewing the notes from the customer's previous contacts. As a result, the customer had to explain the history again, and you risked repeating steps that had already been tried. A customer who has called before expects the conversation to pick up where it left off, and starting over can tell them their earlier time did not count. That can turn a solvable issue into a trust problem and add to repeat contacts. Going forward, review recent notes and interactions before or early in discovery, acknowledge the previous contact, and build on what was already done.",
+    "impact": "Contact history is often skipped when the focus is on starting the conversation quickly or when the notes take extra effort to find. The customer, however, remembers every previous call. Repeating the same questions and steps can make them feel they are starting over, increase handle time, and lower their confidence that this call will be different, which can raise the chance of another contact or an escalation request.",
+    "plan": "Over the next {duration}, you will review the account notes and recent interactions at the start of every call, before asking the customer to describe the issue in full. When there is a recent contact about the same concern, acknowledge it, summarize what was already done, and ask what has happened since. Avoid repeating a step the notes show was completed unless there is a clear reason, and explain that reason to the customer. We will review {calls} calls with a recent prior contact within {followup}, targeting a history acknowledgement and no unexplained repeated steps in each one.",
+    "followup": "First, we will walk through where previous notes and interactions can be found in the approved tools and practice turning them into a short summary you can share at the start of the call. I will review {calls} calls with a recent prior contact within {followup}, checking whether the history was acknowledged and built on, and we will look at the results together when the {durationAdj} plan ends.",
+    "example": [
+      {
+        "label": "Opening with the history",
+        "say": "I can see you called a couple of days ago about the connection dropping, and the equipment was restarted then. Thank you for sticking with this. Can you tell me what's happened since that call?"
+      },
+      {
+        "label": "Building on what was done",
+        "say": "Since the restart was already done, I won't ask you to repeat it. Let's look at what else could be causing this."
+      }
+    ],
+    "questions": [
+      "What could the notes from the earlier contact have told you before the customer started explaining?",
+      "How do you think it felt for the customer to describe the history from the beginning again?",
+      "Where in your call opening can you build in a quick review of recent notes and interactions?"
+    ],
+    "strengths": [
+      "s-empathy",
+      "s-deescalation",
+      "s-tone",
+      "s-troubleshooting"
+    ],
+    "b": {
+      "obs": "began working the concern without reviewing notes from previous contacts, so the customer had to explain the history again",
+      "focus": "contact history review",
+      "commit": "review the account notes and recent interactions at the start of each call and acknowledge any prior contact before asking the customer to explain",
+      "mx": "Every reviewed call with a recent prior contact during the next {duration} includes an acknowledgement of that history and no unexplained repeated steps.",
+      "coach": "a tools walkthrough showing where to find previous notes and interactions"
+    },
+    "note": "Confirm where prior notes and interactions are found in your program's approved tools before the session. Choose calls with a recent prior contact so the behavior can be measured."
+  },
+  {
+    "id": "dis-prior-troubleshooting",
+    "cat": "dis",
+    "title": "Not Confirming Troubleshooting Already Completed",
+    "desc": "Not asking what the customer has already tried before recommending steps, leading to repeated restarts and checks the customer already completed.",
+    "kw": [
+      "already tried",
+      "prior troubleshooting",
+      "steps already done",
+      "what have you tried",
+      "repeated steps",
+      "same steps",
+      "redundant steps",
+      "restart again",
+      "reboot again",
+      "already restarted",
+      "previous steps",
+      "self-help",
+      "customer effort",
+      "frustrated",
+      "troubleshooting",
+      "discovery",
+      "questions"
+    ],
+    "tags": [
+      "Discovery",
+      "Troubleshooting",
+      "Customer Effort"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR"
+    ],
+    "theme": "discover",
+    "feedback": "In this interaction, you began recommending steps without asking what the customer had already tried on their own. Many customers restart their equipment, check connections, or follow online help before they call, so asking first saves time and respects the effort they have already made. When a customer is asked to repeat a step they completed shortly before calling, it can feel like they are not being listened to, and that frustration often carries into the rest of the call. Make it a habit to ask what has already been tried, and when, before recommending anything, and if a step does need to be repeated, explain why.",
+    "impact": "This usually happens when the troubleshooting flow is followed from the first step without checking where the customer already is in the process. Repeating steps the customer has completed adds handle time and effort, and it can make them doubt that this call will lead anywhere different. A frustrated customer is less likely to cooperate with the steps that actually matter, and if the issue is not resolved, the customer may need to call again.",
+    "plan": "For the next {duration}, you will ask every customer with a technical concern what they have already tried, and when, before recommending the first step. Acknowledge what they have done, and skip completed steps where the applicable ITG flow allows, explaining the reason whenever a step needs to be repeated. We will review {calls} troubleshooting calls within {followup}, with the target of a question about prior steps before the first recommendation, and a clear reason given for any repeated step, in all {calls} calls.",
+    "followup": "We will create a personal phrase bank of natural ways to ask what the customer has already tried and to explain when a step needs to be repeated. I will then pull {calls} troubleshooting calls from the next {followup} and point out each place where a completed step was handled well or repeated without explanation. We will review the overall results at the {durationAdj} mark.",
+    "example": [
+      {
+        "label": "Before the first step",
+        "say": "Before we start, what have you already tried on your end? For example, have you restarted the equipment or checked the cables, and about when was that?"
+      },
+      {
+        "label": "When a step must be repeated",
+        "say": "I know you restarted it this morning. I'd like to do one more restart while I watch the connection from here, because that shows me something I can't see otherwise."
+      }
+    ],
+    "questions": [
+      "What do you think the customer had tried before calling, and how could you have found out?",
+      "How might a customer react when asked to repeat a step they already completed earlier that day?",
+      "What could you say when a step really does need to be repeated, so the customer understands why?"
+    ],
+    "strengths": [
+      "s-acknowledgement",
+      "s-itg",
+      "s-tools",
+      "s-empathy"
+    ],
+    "b": {
+      "obs": "recommended steps without asking what the customer had already tried, which risked repeating restarts and checks they had completed",
+      "focus": "confirming prior troubleshooting",
+      "commit": "ask what the customer has already tried, and when, before recommending the first step, and explain why whenever a step must be repeated",
+      "mx": "Every troubleshooting call reviewed during the next {duration} includes a question about steps already tried before the first recommendation.",
+      "coach": "a phrase bank exercise for asking about steps the customer already completed"
+    },
+    "note": "This entry covers steps the customer took on their own, which may not appear in any notes. If earlier contacts were not reviewed, use Missing Previous Contact History."
+  },
+  {
+    "id": "dis-issue-scope",
+    "cat": "dis",
+    "title": "Not Isolating the Scope of an Issue",
+    "desc": "Not narrowing down how far the issue reaches, such as one device or all devices, Wi-Fi or wired, one line or the whole account, or constant or intermittent.",
+    "kw": [
+      "scope",
+      "isolate",
+      "isolation",
+      "narrow down",
+      "one device",
+      "all devices",
+      "wifi",
+      "wi-fi",
+      "wired",
+      "ethernet",
+      "one room",
+      "whole home",
+      "one line",
+      "multiple services",
+      "intermittent",
+      "how widespread",
+      "pattern",
+      "root cause",
+      "probing",
+      "discovery"
+    ],
+    "tags": [
+      "Discovery",
+      "Troubleshooting",
+      "Issue Isolation"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR"
+    ],
+    "theme": "discover",
+    "feedback": "After the customer reported the problem, you began working on it without narrowing down how far it reached. You did not establish whether it affected one device or all of them, Wi-Fi or wired connections, one room or the whole home, a single line or the entire account, or whether it was constant or intermittent. Each of those answers points to a different cause, so skipping them can lead to steps aimed at the wrong part of the problem, an unnecessary technician visit, or a fix that does not last. Going forward, ask isolating questions early and use the answers to decide where troubleshooting should start.",
+    "impact": "Scope gaps often come from assuming the problem is exactly what the customer first noticed, without checking where else it shows up. Scope is one of the quickest ways to separate an equipment issue from a device setting, a Wi-Fi coverage gap from a signal problem, or a single-line issue from an account-level one. Without it, troubleshooting can target the wrong area, add handle time, lead to unnecessary equipment swaps or visits, and leave the real cause in place, which makes a repeat contact more likely.",
+    "plan": "Beginning with your next technical call and continuing for {duration}, you will confirm the scope of the issue before the first troubleshooting step. Ask whether the problem affects one device or all devices, Wi-Fi or wired connections, one room or the whole home, one line or service or the whole account, and whether it is constant or comes and goes. Then tell the customer what the scope suggests and where you will start. Within {followup}, {calls} technical calls will be reviewed, and the goal is for every one to show the scope confirmed and explained before troubleshooting begins.",
+    "followup": "We will walk through the isolation steps in the applicable ITG flow together, then complete a quick knowledge check using a few short scenarios, such as one laptop that cannot connect or a mobile line that drops calls only at home. I will review {calls} technical calls within {followup}, and we will check in midweek on any call where the scope was hard to pin down. We will close out the {durationAdj} plan with a review of the results.",
+    "example": [
+      {
+        "label": "Isolating the issue",
+        "say": "That helps. Is this happening on every device in the home, or mainly on one? And if anything is connected with a cable, is that working, or does it drop too?"
+      },
+      {
+        "label": "Explaining the scope",
+        "say": "Since only the laptop is affected and everything else connects fine, the home network looks okay. Let's focus on the laptop's connection first."
+      }
+    ],
+    "questions": [
+      "What did you know about how widespread the issue was when you chose the first step?",
+      "Which isolating question would have told you the most about the cause in this call?",
+      "How would your troubleshooting change if the issue affected one device rather than every device in the home?"
+    ],
+    "strengths": [
+      "s-acknowledgement",
+      "s-empathy",
+      "s-tools",
+      "s-expectations"
+    ],
+    "b": {
+      "obs": "started troubleshooting without isolating the scope of the issue, such as one device or all devices, Wi-Fi or wired, or constant or intermittent",
+      "focus": "isolating issue scope",
+      "commit": "confirm the scope of the issue, including one device or all, Wi-Fi or wired, one line or the whole account, and constant or intermittent, before troubleshooting begins",
+      "m": "the scope of the issue confirmed and explained before the first troubleshooting step",
+      "coach": "a quick knowledge check on isolation questions using short device and coverage scenarios"
+    },
+    "note": "Confirm the isolation steps in the current ITG flow before the session. On Xfinity Mobile calls, scope can mean one line or several, or one location or everywhere."
+  },
+  {
+    "id": "dis-irrelevant-questions",
+    "cat": "dis",
+    "title": "Asking Irrelevant Questions",
+    "desc": "Asking questions that do not relate to the customer's concern, including scripted questions that do not apply, which adds time and signals the customer was not heard.",
+    "kw": [
+      "irrelevant questions",
+      "unnecessary questions",
+      "unrelated questions",
+      "off topic",
+      "scripted questions",
+      "script",
+      "reading from script",
+      "not applicable",
+      "wasting time",
+      "too many questions",
+      "random questions",
+      "not listening",
+      "relevance",
+      "handle time",
+      "customer effort",
+      "discovery",
+      "probing"
+    ],
+    "tags": [
+      "Discovery",
+      "Relevance",
+      "Customer Effort"
+    ],
+    "kpi": [
+      "QA"
+    ],
+    "theme": "discover",
+    "feedback": "Some of the questions you asked did not connect to the concern the customer described, and a few came from the standard flow even though the customer's earlier answers had already made them unnecessary. Every question asks the customer for time and effort, so each one should move the call closer to a solution. When questions seem unrelated, the customer may wonder whether you heard them, grow impatient, and give shorter answers to the questions that do matter. Instead, before each question, think about how the answer will change your next step, and adapt scripted questions that no longer apply, while keeping any the applicable process requires.",
+    "impact": "Irrelevant questions often come from following a script or a habit rather than responding to what the customer has said. Each unnecessary question adds handle time and customer effort, and it can send the message that the conversation is not really about them. Customers who feel unheard may become frustrated, less cooperative, or doubtful that the call is going anywhere, which can lower quality results and make the actual issue harder to resolve.",
+    "plan": "During the next {duration}, you will make sure each discovery question connects to the concern the customer described. Before asking a question, consider what you will do with the answer, and if it will not change your next step, leave it out or reword it to fit the situation. Required verification and process questions still apply, so introduce them with a brief reason when they may seem unrelated. The target for the {calls} calls we review within {followup} is zero unrelated questions, with every required question introduced with a brief reason.",
+    "followup": "As part of this coaching, you will listen back to this call and mark each question you asked as relevant or not, with a short note on why. We will compare notes and reword the questions that did not fit into ones that would have moved the call forward. I will apply the same relevance check to {calls} applicable calls within {followup}, and we will talk through what the results show when the {durationAdj} coaching period closes.",
+    "example": [
+      {
+        "label": "Staying on topic",
+        "say": "You mentioned the charge started after you added the new line, so let me look at what changed on the account that month."
+      },
+      {
+        "label": "Explaining a required question",
+        "say": "I do need to ask one more question for security before I can make that change. It may not seem related, but it helps protect your account."
+      }
+    ],
+    "questions": [
+      "Which of your questions could you have left out without changing how you handled the concern?",
+      "What was the purpose behind the questions that seemed unrelated to what the customer described?",
+      "How can you introduce a required question so the customer understands why you are asking it?"
+    ],
+    "strengths": [
+      "s-tone",
+      "s-rapport",
+      "s-verification",
+      "s-ownership"
+    ],
+    "b": {
+      "obs": "asked questions that did not relate to the concern, including scripted questions that the customer's earlier answers had already made unnecessary",
+      "focus": "relevant questioning",
+      "commit": "ask only questions that connect to the customer's concern, adapting scripted questions that no longer apply while keeping any the process requires",
+      "m": "only questions connected to the concern, and a brief reason given for any required process question",
+      "coach": "a relevance review that marks each question from the recording as relevant or not"
+    },
+    "note": "Required verification and compliance questions are not irrelevant. If the gap is asking for information the customer already gave, Repeating Questions / Increasing Customer Effort may fit better."
+  },
+  {
+    "id": "dis-confirm-understanding",
+    "cat": "dis",
+    "title": "Failing to Confirm Customer Understanding",
+    "desc": "Not checking that the customer understood the explanation, the steps to complete, or the next steps before moving on or ending the call.",
+    "kw": [
+      "confirm understanding",
+      "understanding",
+      "teach back",
+      "teach-back",
+      "check understanding",
+      "does that make sense",
+      "any questions",
+      "next steps",
+      "customer confused",
+      "clarify",
+      "comprehension",
+      "repeat back",
+      "explanation",
+      "instructions",
+      "callback risk",
+      "repeat call",
+      "aicr"
+    ],
+    "tags": [
+      "Discovery",
+      "Customer Education",
+      "Repeat Contacts"
+    ],
+    "kpi": [
+      "QA",
+      "aiCR"
+    ],
+    "theme": "delivery",
+    "feedback": "Near the end of the call, you explained what was done and what the customer needed to do next, but you moved on without checking that the information had landed. A quick \"Does that make sense?\" rarely tells you much, because many customers will say yes even when they are unsure. When a customer leaves without truly understanding the steps, they may not complete them correctly, and the same issue can bring them back. Moving forward, after any explanation or set of instructions, ask the customer to tell you in their own words what they will do next, and fill in anything they miss.",
+    "impact": "The understanding check is easy to skip near the end of the call, when the explanation feels clear from your side and the focus shifts to wrapping up. Customers often hesitate to admit they are lost, especially with technical or billing details. If they leave unsure of what to do, they may skip a step, do it incorrectly, or misread what happens next, which can lead to a repeat contact, a missed appointment, or a complaint that nothing was explained.",
+    "plan": "Throughout the next {duration}, you will confirm understanding after every explanation the customer needs to act on, such as steps to finish after the call, billing changes, or what happens next. Use an open teach-back question, such as asking the customer to walk you through what they will do, rather than asking whether it makes sense. If anything is unclear, explain it again in simpler terms and check once more. We will look at {calls} applicable calls within {followup}, and each one should include a teach-back or open understanding check before the call ends.",
+    "followup": "We will roleplay two short explanations, one technical and one billing, and practice closing each with a teach-back question instead of a yes or no check. I will review {calls} applicable calls within {followup}, listening for whether the customer could describe the next steps in their own words. Our final review will take place at the end of {duration}, and we will look at where the teach-back fit naturally and where it still felt forced.",
+    "example": [
+      {
+        "label": "Teach-back",
+        "say": "I covered quite a bit there, so I want to make sure I explained it clearly. Can you walk me through what you'll do when you get home tonight, so I know we're on the same page?"
+      },
+      {
+        "label": "If something is missed",
+        "say": "That's right on the first two steps. For the last one, once the light turns solid, test the connection on your phone so you know it's working."
+      }
+    ],
+    "questions": [
+      "How did you know whether the customer understood the steps they needed to complete after the call?",
+      "What could you ask instead of a yes or no question to check the customer's understanding?",
+      "Which part of your explanation was most likely to be misunderstood, and how could you check it?"
+    ],
+    "strengths": [
+      "s-probing",
+      "s-resolution",
+      "s-tone",
+      "s-troubleshooting"
+    ],
+    "b": {
+      "obs": "explained what the customer needed to do but did not check that they understood the steps before moving on or ending the call",
+      "focus": "confirming customer understanding",
+      "commit": "close every explanation the customer needs to act on with a teach-back question and clarify anything they miss before ending the call",
+      "m": "a teach-back or open understanding check after each explanation the customer needs to act on",
+      "coach": "a teach-back roleplay using one technical and one billing explanation"
+    },
+    "note": "Look for an open check, such as a teach-back, rather than a closed yes or no question. A recap with no check of the customer's understanding still counts as this gap."
+  }
+]

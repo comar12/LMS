@@ -1,0 +1,386 @@
+[
+  {
+    "id": "bill-incomplete-explanation",
+    "cat": "bill",
+    "title": "Incomplete Billing Explanation",
+    "desc": "Explaining only part of a bill change and leaving out factors such as prorated charges, one-time charges, expired promotions, equipment charges, or taxes and fees.",
+    "kw": ["bill", "billing", "bill increase", "bill went up", "higher bill", "bill change", "charges", "proration", "prorated", "partial month", "one-time charge", "promo expired", "promotion ended", "taxes and fees", "equipment charge", "incomplete explanation", "bill breakdown", "unexplained charges"],
+    "tags": ["Billing Accuracy", "Bill Changes", "Repeat Contacts"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "When the customer asked why the bill went up, you explained one reason, but other parts of the change, such as a prorated charge, a one-time charge, or an expired promotion, were not covered. A bill increase often has more than one cause, and when only part of it is explained, the new total does not add up. That gap can leave the customer feeling something is being hidden, and the unexplained part is likely to bring them back with the same question. Next time, compare the current and previous bills, identify every line that changed, and walk the customer through each difference before confirming the total makes sense.",
+    "impact": "An incomplete explanation usually happens when the most visible change on the bill, such as an expired promotion, is treated as the whole answer. Bill changes often combine several factors, so explaining only one can leave the customer unable to reconcile the total. When the numbers do not add up, the customer may doubt the accuracy of the bill, dispute charges that are actually correct, or call back for the rest of the explanation, which can increase repeat contacts and weaken confidence in future billing conversations.",
+    "plan": "For the next {duration}, you will begin every bill-change conversation by comparing the current bill with the previous one and noting each line that changed, including prorated or partial-month charges, one-time charges, promotion expirations, equipment charges, and taxes and fees. You will explain each change in plain language, connect it to the reason it appeared, and ask the customer whether the new total makes sense before moving on. The review will cover {calls} calls with bill-change questions within {followup}, and the target is every changed charge explained, with the customer's understanding checked, on each of them.",
+    "followup": "During our session, we will lay two sample bills side by side, and you will explain every difference between them out loud, including the less obvious items such as partial-month charges and changes in taxes and fees. Within {followup}, I will audit {calls} of your bill-change calls to see which changed charges were covered, and we will use a midweek check-in to practice any charge types that feel harder to explain. At the end of the {durationAdj} plan, we will decide together whether more practice is needed.",
+    "example": [
+      { "label": "Covering every change", "say": "I can see a few things that changed on this bill. Your promotional rate ended, there is a partial-month charge from when the new equipment was added, and there is a change in taxes and fees. Let me go through each one so the full amount makes sense." },
+      { "label": "Before moving on", "say": "Now that we've gone through each change, does the new total line up with what you expected, or is there any part you'd like me to go over again?" }
+    ],
+    "questions": [
+      "Looking at this bill next to the previous one, which changes do you see, and which of them did the customer hear about?",
+      "How might the customer have felt when the explanation did not account for the full difference in the total?",
+      "How will you make sure every changed line is covered the next time a customer asks why their bill went up?"
+    ],
+    "strengths": ["s-acknowledgement", "s-empathy", "s-verification", "s-payment-options"],
+    "b": {
+      "obs": "explained one reason for the bill change but left out other factors, such as prorated, one-time, or equipment charges",
+      "focus": "complete bill explanations",
+      "commit": "compare the current and previous bills and explain every charge that changed before confirming the new total makes sense",
+      "m": "every charge that changed on the bill identified and explained in plain language",
+      "coach": "a side-by-side comparison of two sample bills with practice explaining each difference"
+    },
+    "note": "Before the session, compare the bills on the reviewed account so you can name which changed charges were explained and which were missed. Use a sample or training bill for the practice exercise rather than a customer's account."
+  },
+  {
+    "id": "bill-payment-options",
+    "cat": "bill",
+    "title": "Failure to Explain Payment Options",
+    "desc": "Not presenting the payment methods or arrangements that fit the customer's situation and eligibility, or offering only one option when others may apply.",
+    "kw": ["payment", "payments", "payment options", "payment arrangement", "payment plan", "pay bill", "can't pay", "cannot pay in full", "past due", "balance due", "autopay", "pay online", "payment methods", "one option only", "due date", "hardship"],
+    "tags": ["Payments", "Customer Options", "Billing Process"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "After the customer brought up the balance, you offered a single way to pay and did not explore whether another method or a payment arrangement would better fit their situation. Customers often call about a payment because the usual approach is not working for them, whether the issue is timing, method, or amount. Hearing only one option can leave the customer feeling there is no flexibility, and they may end the call without a plan they can keep. Moving forward, ask what the customer can manage and when, check what the account is eligible for, and walk through the available payment options so they can choose the one that fits.",
+    "impact": "This gap often comes from defaulting to the payment method that is quickest to process rather than the one that fits the customer's circumstances. When the customer does not hear the options that match their situation, a balance they could have managed may go unpaid, which can put the account at risk of suspension and lead to another call that might have been avoided. It can also leave the customer feeling that the company is not willing to work with them.",
+    "plan": "Over the next {duration}, you will ask at least one question about what the customer can manage, such as the amount or the timing, whenever a payment or balance comes up. Before recommending anything, you will check the account's eligibility in approved resources and present the available payment options that fit, including any applicable arrangement, rather than a single method. You will then confirm the option the customer chose and explain what happens next per the applicable process. Within {followup}, I will review {calls} calls that include a payment discussion, and the target is that every one presents the options that fit the customer's situation.",
+    "followup": "In our session, we will review the payment options and arrangement eligibility guidance in approved resources, then roleplay two scenarios: a customer who wants to change how they pay and a customer who cannot pay the full balance today. I will review {calls} of your payment-related calls within {followup}, and we will meet midweek to work through any eligibility questions that came up. We will close out the plan at the {durationAdj} mark with a final review of your payment calls.",
+    "example": [
+      { "label": "Understanding the situation", "say": "Before we pick a payment option, can I ask what amount feels manageable for you right now, and when you'd be able to take care of the rest?" },
+      { "label": "Presenting the options", "say": "Thanks for sharing that. Based on your account, there are a few ways we can handle this. Let me walk you through each one, and you can tell me which works best for you." }
+    ],
+    "questions": [
+      "What did the customer share about their situation that could have pointed you toward a different payment option?",
+      "How do you think the customer felt when they heard only one way to handle the balance?",
+      "When a customer raises a balance, how will you find out what they can realistically manage before suggesting an option?"
+    ],
+    "strengths": ["s-billing", "s-empathy", "s-tone", "s-verification"],
+    "b": {
+      "obs": "offered a single way to pay without exploring the payment methods or arrangements that fit the customer's situation and eligibility",
+      "focus": "payment options guidance",
+      "commit": "ask what the customer can manage, check eligibility, and present the available payment options that fit before recommending one",
+      "mx": "Every reviewed call with a payment or past-due discussion presents the available payment options that fit the customer's situation and eligibility.",
+      "coach": "a roleplay of a customer who cannot pay the full balance today"
+    },
+    "note": "Confirm the current payment methods, payment arrangement eligibility rules, and any limits in approved resources before the session. Coach the agent to present only the options the account actually qualifies for."
+  },
+  {
+    "id": "bill-credit-expectations",
+    "cat": "bill",
+    "title": "Incorrect Credit Expectations",
+    "desc": "Implying a credit is guaranteed or approved before it is, or stating an incorrect amount or timing for when the credit will appear on the bill.",
+    "kw": ["credit", "credits", "bill credit", "account credit", "outage credit", "promised credit", "credit not applied", "credit amount", "credit timing", "pending credit", "guaranteed credit", "credit request", "wrong credit", "missing credit", "adjustment", "approval"],
+    "tags": ["Credits", "Expectation Setting", "Billing Accuracy"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "In this interaction, you described the credit as already approved and mentioned when it would appear, before the request had been reviewed or the timing confirmed. Customers hold on to exactly what they are told about money, so the status, amount, and timing of a credit need to match what the account shows. If the credit is denied, differs in amount, or posts later than expected, the customer is likely to feel the promise was broken and call back to find out why. Instead, describe the credit by its current status, explain what still needs to happen, and share an amount or timing only once approved resources confirm it.",
+    "impact": "Credit expectations are usually set too early with good intentions, as a way to calm an upset customer or end the call on a positive note. When the credit does not appear as described, that goodwill can quickly turn into mistrust, and the customer may call back, dispute the bill, or ask for a supervisor. Each follow-up contact about a credit that was presented as certain can add to repeat contacts and handle time, and it can undo an otherwise strong interaction.",
+    "plan": "During the next {duration}, you will check the status of any credit on the account before discussing it and use plain status language, such as requested, pending, or posted, when you explain it. You will share a credit amount or posting timeframe only when it is confirmed in the account or approved resources, and you will let the customer know what to expect if a request is not approved. Across {calls} credit-related calls reviewed within {followup}, the target is zero credits described as guaranteed before approval, with every amount and timeframe matching what was confirmed.",
+    "followup": "We will start by building a short phrase bank together, with accurate wording for each stage of a credit, from a new request through to a credit that has posted. Within {followup}, I will listen to {calls} calls where a credit came up and check that each description matched the account at that moment, and we will talk midweek about any credit situations that felt unclear. We will review the results at the end of the {duration} and decide on next steps together.",
+    "example": [
+      { "label": "When a credit is requested", "say": "I've submitted a credit request for the service issue you had. It still needs to be reviewed, so I don't want to promise an amount yet. I've noted everything we discussed, and I'll explain what happens next and how you'll see the result." },
+      { "label": "When a credit is approved", "say": "The credit has been approved, and I can see when it is scheduled to post. Let me show you where it will appear on your bill so you know exactly what to look for." }
+    ],
+    "questions": [
+      "What did the account show about the credit's status at the moment you described it to the customer?",
+      "If the credit never appears or posts at a different amount, what do you expect the customer's next step would be?",
+      "What wording could keep the customer reassured while staying accurate about a credit that has only been requested?"
+    ],
+    "strengths": ["s-acknowledgement", "s-empathy", "s-ownership", "s-deescalation"],
+    "b": {
+      "obs": "described a credit as approved, or gave an amount and timing for it, before any of those details had been confirmed on the account",
+      "focus": "realistic credit expectations",
+      "commit": "describe every credit by its confirmed status and share an amount or timing only when the account or approved resources support it",
+      "mx": "Zero credits are presented as guaranteed before approval, and every credit discussed in the reviewed calls is described by its actual status.",
+      "coach": "a phrase bank exercise for describing requested, pending, and posted credits"
+    },
+    "note": "Confirm the current credit request, approval, and posting process, including who can approve credits and how status appears, before the session. Check the account notes to see what the credit's status was at the time of the call."
+  },
+  {
+    "id": "bill-refund-expectations",
+    "cat": "bill",
+    "title": "Incorrect Refund Expectations",
+    "desc": "Giving inaccurate information about whether a refund applies, how it will be issued, or when the customer can expect to receive it.",
+    "kw": ["refund", "refunds", "refund timing", "refund eligibility", "refund method", "refund promise", "overpayment", "double payment", "paid twice", "money back", "credit balance", "final bill", "closed account", "wrong refund info"],
+    "tags": ["Refunds", "Expectation Setting", "Billing Process"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "When the customer asked about getting money back, you told them a refund was on the way, but the eligibility, method, and timing you described had not been confirmed. A refund is different from a credit on the bill, and customers often plan around money they expect to receive. If the refund is not approved, arrives in a different way, or takes longer than you described, the customer may feel misled and is likely to call back, sometimes more upset than before. Going forward, confirm eligibility, method, and the applicable timeframe in approved resources before explaining a refund, and be clear about anything that still depends on review.",
+    "impact": "Refund misinformation tends to start with treating a refund like a bill credit, or with repeating details that applied to a different situation. Because a refund means money returning to the customer, they tend to track it closely and may plan around the date they were given. When eligibility, method, or timing turns out to be different, the customer is likely to call back, may escalate, and can lose confidence in everything else that was explained on the call.",
+    "plan": "Starting with your next call and continuing for {duration}, you will confirm three things in approved resources before discussing any refund: whether the situation qualifies, how the refund would be issued, and the applicable timeframe. When the customer is unsure whether they are asking for a refund or a credit on the bill, you will explain the difference so they know which one applies. You will describe any step that still requires review as pending rather than certain. Within {followup}, we will review {calls} calls that involved a refund question, aiming for accurate eligibility, method, and timing in every refund explanation and zero unconfirmed refund promises.",
+    "followup": "We will open with a quick knowledge check on where refund eligibility, method, and timing are confirmed in approved resources, and then you will explain a sample refund scenario to me as if I were the customer. I will review {calls} refund-related calls within {followup}, and we will reconnect midweek to answer any refund process questions. Before the {durationAdj} plan closes, we will compare the reviewed calls with the knowledge check and agree on whether more support is needed.",
+    "example": [
+      { "label": "Before confirming", "say": "Let me check whether this payment qualifies for a refund and how it would be returned to you, so I can give you accurate information instead of a guess." },
+      { "label": "Explaining the result", "say": "Thanks for waiting. This does qualify for a refund. I'll explain exactly how it will be issued and how long that process usually takes, so you know what to expect and when to look for it." }
+    ],
+    "questions": [
+      "What information did you rely on when you told the customer how and when the refund would arrive?",
+      "How would you explain the difference between a refund and a credit on the bill to a customer who is unsure which applies?",
+      "If refund eligibility is unclear during the call, what will you say to the customer while you confirm it?"
+    ],
+    "strengths": ["s-acknowledgement", "s-ownership", "s-verification", "s-tone"],
+    "b": {
+      "obs": "told the customer how and when a refund would be issued before confirming eligibility, method, and timing in approved resources",
+      "focus": "accurate refund information",
+      "commit": "base every refund explanation on eligibility, method, and timing confirmed in approved resources, describing anything still under review as pending",
+      "mx": "Each refund explanation in the reviewed calls reflects eligibility, method, and timing confirmed in approved resources, with zero unconfirmed refund promises.",
+      "coach": "a quick knowledge check on confirming refund eligibility, method, and timing"
+    },
+    "note": "Confirm the current refund eligibility rules, refund methods, and processing timeframes before the session. Refund handling may depend on the account situation, so verify which process applied to the reviewed call."
+  },
+  {
+    "id": "bill-previous-commitments",
+    "cat": "bill",
+    "title": "Not Reviewing Previous Billing Commitments",
+    "desc": "Not checking account notes for credits, adjustments, or promises made on earlier contacts, so the customer hears something different from what they were previously told.",
+    "kw": ["notes", "account notes", "previous call", "prior contact", "promised", "previous promise", "last agent said", "told me before", "earlier credit", "adjustment", "commitment", "repeat caller", "repeat contact", "aicr", "contact history", "not reading notes", "conflicting information", "billing history"],
+    "tags": ["Account History", "Commitments", "Repeat Contacts"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "Before explaining the bill, you did not review the notes from the customer's earlier contacts, so a credit, adjustment, or promise made on a previous call was left out of the conversation. When a customer has already been told something about their bill and then hears a different answer, it suggests no one is keeping track, and it puts them in the position of proving what was said. That can quickly erode trust and often leads to another call to sort it out. On future calls, check recent notes and adjustments first, acknowledge any earlier commitment, and confirm whether it was completed or explain its current status and next step.",
+    "impact": "A missed notes review usually happens when the current question seems simple or the call feels rushed, so the account history does not seem relevant. Billing commitments made on earlier contacts are exactly what the customer remembers, and an answer that contradicts them can make the company seem disorganized. Conflicting information often drives repeat contacts, which can affect aiCR results, and it may lead the customer to ask for a supervisor or dispute the bill.",
+    "plan": "For the next {duration}, before explaining any charges, you will review the account notes and recent billing adjustments, looking specifically for credits requested, adjustments made, and promises given on earlier contacts. When you find a prior commitment, you will mention it to the customer, confirm whether it was completed, and explain its status or next step per the applicable process. You will also document what you confirmed so the next person who helps the customer sees an accurate record. When I review {calls} of your billing calls within {followup}, the target is a notes review before the explanation in all {calls} calls and every earlier commitment addressed.",
+    "followup": "During our session, you will walk me through how you locate account notes, prior adjustments, and open billing commitments, narrating what you look for as you go. I will then review {calls} of your billing calls within {followup} to see whether earlier commitments were found and addressed. We will have a brief midweek check-in on the notes review, and at the end of the {durationAdj} period we will look at the full set of calls together.",
+    "example": [
+      { "label": "Acknowledging the history", "say": "Before we go through this bill, I can see you spoke with us recently about a credit for this charge. Let me check where that stands so we're working from the same information." },
+      { "label": "Confirming the status", "say": "I found it. The credit you were told about is still pending, and here is what needs to happen next. I'm adding a note so anyone you speak with will see the same update." }
+    ],
+    "questions": [
+      "What did the notes from the customer's earlier contact show, and at what point in the call did you look at them?",
+      "How do you think it felt for the customer to hear something different from what they were told on an earlier call?",
+      "What will you check in the account history before explaining a bill, and how will you bring it into the conversation?"
+    ],
+    "strengths": ["s-clarity", "s-empathy", "s-verification", "s-payment-options"],
+    "b": {
+      "obs": "explained the current charges without first checking the notes for credits, adjustments, or promises made on earlier contacts",
+      "focus": "prior commitment review",
+      "commit": "check account notes and recent adjustments for earlier billing commitments before explaining the bill, and address each one with its current status",
+      "m": "a notes review before the bill explanation and every earlier billing commitment acknowledged with its status",
+      "coach": "a tools walkthrough of locating account notes, prior adjustments, and open billing commitments"
+    },
+    "note": "Check the account notes and adjustment history for the reviewed call before the session so you know exactly what had been promised. If screen recording is available, use it to confirm whether notes were opened before the explanation began."
+  },
+  {
+    "id": "bill-promotion-eligibility",
+    "cat": "bill",
+    "title": "Promotion Eligibility Miscommunication",
+    "desc": "Telling the customer they qualify for, or are currently on, a promotion without first confirming eligibility, the promotional term, and the conditions that apply.",
+    "kw": ["promo", "promotion", "promotions", "promo eligibility", "qualify", "eligible", "not eligible", "promo ended", "promo expired", "promotional rate", "promotional term", "advertised price", "saw online", "new customer offer", "promo promise", "wrong promo", "discount"],
+    "tags": ["Promotions", "Eligibility", "Billing Accuracy"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "The customer asked about a promotion, and you told them it applied before confirming their eligibility or the terms attached. Promotions usually depend on specific conditions, and a customer hears 'you qualify' as a commitment about what they will pay. If the promotion cannot be applied, has ended, or carries terms they did not hear about, the customer may feel the offer was taken away when the bill arrives, which can lead to a dispute or a conversation about leaving. Going forward, confirm eligibility and terms in approved resources before speaking to any promotion, and if the customer does not qualify, say so clearly and share what is available instead.",
+    "impact": "Promotion miscommunication is often driven by the wish to give the customer good news quickly, or by assuming an advertised offer applies to every account. When eligibility and terms are not confirmed first, the customer may make decisions based on a price they will not actually receive. The mismatch is likely to surface on the next bill, where it can lead to disputes, repeat contacts, requests for a supervisor, and in some cases a decision to cancel.",
+    "plan": "Over the next {duration}, you will confirm eligibility in approved resources before telling any customer that a promotion applies, and you will check whether a current promotion is active, and when its term ends, before describing it. When a customer qualifies, you will explain the promotional term and the key conditions; when they do not, you will say so plainly and explain what is available instead. The target, across {calls} calls with a promotion question reviewed within {followup}, is zero eligibility statements made before confirmation.",
+    "followup": "We will walk through where promotion eligibility and terms are confirmed in approved resources, then roleplay a customer who saw an offer online and wants to know whether they can get it, including a version where they do not qualify. Within {followup}, I will listen to {calls} of your calls that include a promotion question, and we will use a midweek check-in to clear up any eligibility questions. Once the {durationAdj} plan is complete, we will review the results together and agree on next steps.",
+    "example": [
+      { "label": "Before checking eligibility", "say": "That offer may be available, and I want to make sure it actually applies to your account before I say yes. Let me check the eligibility and the terms for you now." },
+      { "label": "When the customer does not qualify", "say": "I checked, and your account doesn't qualify for that one. I don't want you expecting a price you won't see on your bill, so let me show you what is available for your account." }
+    ],
+    "questions": [
+      "What did you check on the account before telling the customer the promotion applied to them?",
+      "What will the customer likely think when the next bill arrives without the promotion they were told about?",
+      "If a customer does not qualify for an offer they saw advertised, how would you explain that while keeping the conversation positive?"
+    ],
+    "strengths": ["s-acknowledgement", "s-rapport", "s-tone", "s-verification"],
+    "b": {
+      "obs": "told the customer a promotion applied to the account before confirming eligibility, the promotional term, or the conditions attached",
+      "focus": "promotion eligibility checks",
+      "commit": "verify eligibility and terms in approved resources before telling a customer a promotion applies, and say clearly when it does not",
+      "mx": "No promotion is presented as applying to the account until eligibility and terms are confirmed, across all promotion questions in the reviewed calls.",
+      "coach": "a roleplay of a customer asking whether they qualify for an advertised promotion"
+    },
+    "note": "Confirm the current promotions, eligibility rules, and promotional terms in approved resources before the session. Avoid naming specific promotions or prices in the coaching documentation."
+  },
+  {
+    "id": "bill-pricing-disclosure",
+    "cat": "bill",
+    "title": "Incomplete Pricing Disclosure",
+    "desc": "In a billing or service-change conversation, not disclosing the full monthly price, promotional term, rate afterward, equipment charges, taxes and fees, and next-bill effect.",
+    "kw": ["pricing", "price", "disclosure", "full disclosure", "monthly price", "taxes and fees", "equipment fee", "equipment charge", "promo term", "after promo", "price after promotion", "standard rate", "next bill", "service change", "downgrade", "plan change", "price surprise", "hidden fees"],
+    "tags": ["Pricing", "Disclosure", "Service Changes"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "Once the customer decided to change their service, you shared the new monthly rate but did not cover the promotional term, the price afterward, equipment charges, or taxes and fees. Customers check the first bill after a change against what they were told, and anything left out tends to appear there as a surprise. Even when every charge is correct, that surprise can feel like a hidden fee and lead to a dispute or a request to undo the change. Before the customer agrees, cover the full monthly price, the promotional term and the rate afterward, equipment charges, and taxes and fees, then explain how the next bill will look.",
+    "impact": "Incomplete disclosure typically starts with the number the customer asked about, usually the new monthly rate, on the assumption that the rest is understood. When the promotional term, the rate afterward, equipment charges, or taxes and fees are not explained, the next bill can look higher than what the customer agreed to. The result can be disputes, repeat contacts, requests to reverse the change, and less trust in future pricing conversations.",
+    "plan": "During the next {duration}, you will give a complete price disclosure before the customer agrees to any service or plan change, covering the full monthly price, the promotional term, the standard rate after the promotion, equipment charges, taxes and fees, and the expected effect on the next bill, including any partial-month charges. You will then ask the customer to confirm what they expect to pay now and after the promotion ends. Within {followup}, I will review {calls} calls that included a service change, looking for every disclosure element covered and the customer's understanding confirmed on each change.",
+    "followup": "Together we will build a short disclosure checklist from approved resources and use it during a roleplay of a customer changing their service to lower the bill. Using that same checklist, I will score {calls} of your service-change calls within {followup}, and we will talk through the results at a midweek check-in. We will decide at the {durationAdj} review whether the checklist is still needed.",
+    "example": [
+      { "label": "Before the customer agrees", "say": "Before you decide, I want to give you the full picture. I'll cover the monthly price with the promotion, how long that pricing lasts, what it changes to afterward, any equipment charges, and the taxes and fees. Then I'll show you what your next bill should look like, since it may include a partial-month charge." },
+      { "label": "Confirming understanding", "say": "To make sure we're on the same page, can you tell me what you expect to see on your next bill, and after the promotion ends?" }
+    ],
+    "questions": [
+      "Which parts of the price did the customer hear before agreeing to the change, and which parts were left out?",
+      "When the customer opens the first bill after this change, what do you think will surprise them most?",
+      "What order will you follow next time so the full price is covered before the customer makes a decision?"
+    ],
+    "strengths": ["s-probing", "s-rapport", "s-tone", "s-tools"],
+    "b": {
+      "obs": "shared the new monthly rate but left out the promotional term, the rate afterward, equipment charges, or taxes and fees",
+      "focus": "complete pricing disclosure",
+      "commit": "disclose the full monthly price, promotional term, standard rate afterward, equipment charges, taxes and fees, and the next-bill effect before the customer agrees to a service change",
+      "mx": "Every service change in the reviewed calls includes a complete price disclosure and a check of the customer's understanding before they agree.",
+      "coach": "a service-change roleplay using a pricing disclosure checklist"
+    },
+    "note": "Confirm the program's current disclosure requirements for service changes before the session. Do not quote prices or fees in the coaching documentation; refer to which disclosure elements were or were not covered."
+  },
+  {
+    "id": "bill-customer-education",
+    "cat": "bill",
+    "title": "Weak Customer Education",
+    "desc": "Missing chances to teach billing basics, such as reading the bill, the billing cycle, autopay and paperless options, or viewing and paying in the Xfinity app or online account.",
+    "kw": ["education", "customer education", "billing education", "how to read bill", "read the bill", "billing cycle", "due date", "autopay", "auto pay", "paperless", "paperless billing", "xfinity app", "online account", "pay online", "self-service", "view bill", "statement", "bill confusion", "teach customer"],
+    "tags": ["Customer Education", "Self-Service", "Billing Basics"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "After answering the customer's billing question, you moved to close the call without showing them how to find that information themselves. Many billing calls come from customers who are unsure how to read the statement, when their billing cycle runs, or where to view and pay. A minute of education puts the customer in control, and without it, the next unfamiliar line on the bill is likely to bring them back. From here, add an education point tied to their question, such as where a charge appears, how autopay or paperless billing works, or how to use the Xfinity app or online account, and confirm they feel comfortable with it.",
+    "impact": "Weak billing education is common when the customer's question is treated as the whole task, especially once the call has already run long. Customers who do not know how to read the bill, when charges appear in the cycle, or how to view and pay on their own tend to call back for answers they could have found themselves. That can increase repeat contacts and handle time, and it may lead to missed payments that autopay could have helped prevent.",
+    "plan": "Starting with your next call and continuing for {duration}, you will share at least one billing education point connected to the customer's question before closing, such as how to read the relevant section of the bill, when the billing cycle runs, how autopay and paperless billing work, or how to view and pay in the Xfinity app or online account. You will keep each point brief, show the customer where to find the information, and ask whether they feel comfortable doing it on their own. We will review {calls} billing calls within {followup}, targeting a relevant education point and an understanding check in all {calls} calls.",
+    "followup": "Using approved training materials, we will walk through the bill layout and the Xfinity app or online account from the customer's point of view, and you will explain each area to me in plain language. Over the following {followup}, I will listen to {calls} of your billing calls for education points that connect to the customer's question. We will check in midweek on which points feel most natural, and we will finish with a review at the end of the {durationAdj} plan.",
+    "example": [
+      { "label": "Teaching the bill", "say": "While we have your bill open, let me show you where the monthly charges and any one-time charges appear, so the next time something looks different you'll know exactly where to check." },
+      { "label": "Offering self-service", "say": "You can also view your bill and make payments in the Xfinity app. Would it help if I showed you where to find that, and we can talk about whether autopay would make things easier for you?" }
+    ],
+    "questions": [
+      "What part of the bill seemed to confuse the customer most, and what could you have shown them about it?",
+      "How could showing the customer the app or online account change whether they need to call again?",
+      "Which billing education points fit naturally into the calls you take most often, and when will you share them?"
+    ],
+    "strengths": ["s-billing", "s-clarity", "s-resolution", "s-tone"],
+    "b": {
+      "obs": "answered the billing question without teaching the customer how to read the bill, use autopay or paperless billing, or view and pay online",
+      "focus": "billing self-service education",
+      "commit": "share a billing education point tied to the customer's question, such as reading the bill or paying in the Xfinity app, before closing",
+      "m": "a billing education point connected to the customer's question and a check that they can use it",
+      "coach": "a walkthrough of the bill layout and the Xfinity app using approved training materials"
+    },
+    "note": "Use approved training materials or a sample bill for the walkthrough rather than a customer account. Confirm which self-service features and enrollment options are currently available before the session."
+  },
+  {
+    "id": "bill-subscription",
+    "cat": "bill",
+    "title": "Incorrect Subscription Explanation",
+    "desc": "Inaccurately explaining what a subscription, add-on, or service includes, how it is billed, or when a change or cancellation takes effect.",
+    "kw": ["subscription", "subscriptions", "add-on", "add on", "premium channel", "streaming", "what's included", "service included", "billed monthly", "billing date", "cancel add-on", "remove service", "effective date", "when it ends", "still charged", "charged after cancel"],
+    "tags": ["Subscriptions", "Add-Ons", "Billing Accuracy"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "While explaining a subscription, you described what it included and when the requested change would take effect in a way that did not match the account. Customers decide whether to keep, add, or remove a service based on what they hear about its features and when billing starts or stops. If an expected feature is missing, or a charge continues after the customer believes the service ended, they may doubt everything else they heard and call back to dispute it. The expectation is to check the account and approved resources for what the service includes, how it is billed, and the effective date of any change before you explain it.",
+    "impact": "Subscription errors usually happen when an explanation is based on general product knowledge, or on how a similar service worked elsewhere, rather than on what this account shows. Because each subscription or add-on can have its own billing and effective-date rules, a wrong description can lead to unexpected charges, disputes about canceled services, and repeat contacts. It may also make the customer hesitant to trust future explanations or to add services later.",
+    "plan": "Over the next {duration}, before explaining any subscription, add-on, or service, you will check the account and approved resources for what it includes, how it is billed, and when a change or cancellation takes effect. You will state the effective date clearly and explain whether any charge for the service will still appear on the next bill. In {calls} calls involving a subscription or service change, reviewed within {followup}, the target is accurate inclusions, billing, and effective dates in every explanation.",
+    "followup": "We will review the product and billing documentation for the subscriptions you handle most often, then complete a short knowledge check on what each one includes and how effective dates work. Within {followup}, I will review {calls} of your calls involving subscriptions or service changes, and we will discuss any open questions about add-on billing at a midweek check-in. We will complete a final review together when the {durationAdj} plan ends.",
+    "example": [
+      { "label": "Confirming the details", "say": "Let me pull up exactly what this add-on includes and how it is billed on your account, so you have the right information before you decide." },
+      { "label": "Setting the effective date", "say": "If you remove it today, the change takes effect on the date shown here, and I'll walk you through whether any charge for it will still appear on your next bill." }
+    ],
+    "questions": [
+      "Where did the information you shared about the subscription come from, and how could you have confirmed it on the account?",
+      "Based on your explanation, what would the customer expect to see on the next bill, and how does that compare with what will appear?",
+      "How will you explain an effective date so the customer knows exactly when billing for a service starts or stops?"
+    ],
+    "strengths": ["s-acknowledgement", "s-rapport", "s-tone", "s-probing"],
+    "b": {
+      "obs": "explained what a subscription or add-on included, how it was billed, or when a change took effect in a way that did not match the account",
+      "focus": "accurate subscription explanations",
+      "commit": "confirm what each subscription or add-on includes, how it is billed, and its effective dates before explaining a change",
+      "mx": "Subscription and add-on explanations in the reviewed calls accurately cover inclusions, billing, and the effective date of any change or cancellation.",
+      "coach": "a knowledge check on subscription inclusions, billing, and effective dates"
+    },
+    "note": "Confirm the current billing and effective-date rules for the subscriptions and add-ons involved before the session, since they can differ by product. Check the account to verify what was accurate at the time of the call."
+  },
+  {
+    "id": "bill-frustration",
+    "cat": "bill",
+    "title": "Failure to Address Billing Frustration",
+    "desc": "Going straight into explaining charges when the customer is upset about the bill, without first acknowledging the frustration or how the bill affects them.",
+    "kw": ["frustrated customer", "frustration", "upset", "angry", "customer angry", "bill shock", "high bill", "bill increase", "unexpected charges", "overcharged", "upset about bill", "no empathy", "no acknowledgement", "jumped to explanation", "defensive", "escalation", "supervisor request", "irate"],
+    "tags": ["Soft Skills", "Empathy", "Billing Concerns"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "As soon as the customer said the bill was higher than expected, you began walking through the charges without acknowledging how upsetting that was. A surprise on a bill feels personal because it affects the customer's budget and sense of fairness, and most people need to feel heard before they can take in an explanation. When the breakdown comes first, even accurate information can sound like a defense of the charge, and the customer may push back, repeat the complaint, or ask for a supervisor. Next time, acknowledge the frustration and what the bill means for them, assure them you will go through it together, and then explain the charges.",
+    "impact": "Skipping the acknowledgement often comes from wanting to fix the bill quickly, on the belief that a clear explanation will settle the customer down. With billing concerns, though, an explanation that arrives before any acknowledgement can feel dismissive, and the customer may stay focused on being heard rather than on the information. That can lengthen the call, raise the chance of an escalation request, and lead the customer to call back hoping for a different answer, even when the charges are correct.",
+    "plan": "During the next {duration}, whenever a customer expresses frustration about the bill, you will respond first with an acknowledgement that names their specific concern, such as an unexpected increase or a charge they did not recognize, before explaining anything. You will follow it with a short assurance that you will review the bill together, and you will check in on how they feel once the explanation is complete. We will review {calls} calls with frustrated billing customers within {followup}, aiming for an acknowledgement before the explanation on every one.",
+    "followup": "During the session, I will play a customer who is upset about a higher bill, and you will practice responding to the frustration before explaining a single charge. Within {followup}, I will review {calls} calls where a customer was upset about billing and note how each response began. We will hold a short midweek check-in on what is working, then review all of the calls together at the end of the {durationAdj} plan.",
+    "example": [
+      { "label": "Before the explanation", "say": "I can hear how frustrating it is to open your bill and see it higher than you expected, especially when you're trying to stick to a budget. Let's go through it together, line by line, so you know exactly what changed and why." },
+      { "label": "After the explanation", "say": "Now that we've gone through it, how are you feeling about the bill? If anything still doesn't seem right, I want to look at it with you." }
+    ],
+    "questions": [
+      "What did the customer say or do that showed you how they were feeling about the bill?",
+      "How do you think the customer heard your explanation of the charges when their frustration had not yet been acknowledged?",
+      "What could you say in the first moments of a billing complaint so the customer feels heard before you explain anything?"
+    ],
+    "strengths": ["s-billing", "s-clarity", "s-tools", "s-resolution"],
+    "b": {
+      "obs": "moved straight into explaining the charges without first acknowledging the customer's frustration about the bill",
+      "focus": "acknowledging billing frustration",
+      "commit": "acknowledge the customer's frustration about the bill and what it means for them before explaining any charges",
+      "mx": "Every reviewed call where the customer is upset about the bill includes an acknowledgement of that frustration before any charge is explained.",
+      "coach": "a roleplay with an upset billing customer focused on the first response"
+    },
+    "note": "When reviewing the recording, note the point where the customer first expressed frustration and what came next. If the same gap appears on non-billing calls, pair this entry with the communication entries for empathy or de-escalation."
+  },
+  {
+    "id": "bill-cancellation-risk",
+    "cat": "bill",
+    "title": "Failure to Recognize Cancellation Risk",
+    "desc": "Missing or moving past a customer's signals about leaving, such as switching providers or a cheaper competitor, without exploring the reason or following the retention process.",
+    "kw": ["cancel", "cancellation", "cancel service", "switching", "switch providers", "competitor", "competitor cheaper", "cheaper elsewhere", "leaving", "thinking about leaving", "disconnect", "churn", "retention", "save", "retention process", "missed signal", "too expensive", "can't afford"],
+    "tags": ["Retention", "Customer Signals", "Churn Risk"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "Partway through the billing explanation, the customer mentioned they were thinking about switching to another provider, and you continued with the charges without addressing that comment. On a billing call, a remark like that is often the most important thing the customer says, because it signals the bill has become a reason to leave. When it goes unanswered, the customer may conclude their concern does not matter and follow through, possibly on their very next call. Going forward, pause when you hear a switching or cancellation signal, acknowledge it, ask what is behind it, and handle it per the retention process before returning to the bill.",
+    "impact": "Cancellation signals are easy to miss when the focus is on getting the billing explanation right, especially when they come up as a passing comment rather than a direct request. A customer who mentions a competitor or switching is often testing whether the company wants to keep them. When that moment passes without a response, the customer may disconnect, call back only to cancel, or share a negative experience, and the chance to address the underlying concern can be lost.",
+    "plan": "For the next {duration}, you will listen for cancellation signals on every billing call, including comments about switching providers, a competitor's price, or the bill becoming unaffordable. When you hear one, you will acknowledge it right away, ask at least one question to understand what is driving it, and then address it or route it per the retention process, explaining the next step to the customer. Within {followup}, we will review {calls} calls that include a switching or cancellation comment, with the target that every signal is acknowledged, explored, and handled per the retention process.",
+    "followup": "We will listen together to a strong call example in which a switching comment was recognized and explored, and then you will practice responding to three different signals, from a direct cancellation request to a passing remark about a competitor. I will pull {calls} calls containing cancellation signals within {followup}, and we will check in midweek on how each one was handled. At the {durationAdj} review, we will look at whether each signal was caught and handled correctly.",
+    "example": [
+      { "label": "Recognizing the signal", "say": "You mentioned you've been thinking about switching, and I don't want to skip past that. Can you tell me what's making you consider it? Is it mainly the price, or is something else not working for you?" },
+      { "label": "Next step", "say": "Thanks for being honest with me about that. Let me make sure we look at this properly before you make a decision, and I'll explain exactly what the next step is." }
+    ],
+    "questions": [
+      "At what point in the call did the customer mention switching, and what was happening in the conversation at that moment?",
+      "What do you think the customer was hoping to hear when they mentioned they might leave?",
+      "What question will you ask the next time a customer mentions leaving, and what will you do with their answer?"
+    ],
+    "strengths": ["s-billing", "s-clarity", "s-tone", "s-verification"],
+    "b": {
+      "obs": "continued explaining the bill after the customer mentioned switching or canceling, without exploring the reason or following the retention process",
+      "focus": "recognizing cancellation signals",
+      "commit": "pause on every switching or cancellation signal, ask what is driving it, and handle it per the retention process before returning to the bill",
+      "mx": "Every switching or cancellation signal in the reviewed calls is acknowledged, explored with at least one question, and handled per the retention process.",
+      "coach": "a review of a strong call example where a switching comment was explored"
+    },
+    "note": "Confirm the program's current retention routing and save process before the session, including when a transfer is required. Keep retention offers out of this coaching, since those belong with the Sales and Retention entries."
+  },
+  {
+    "id": "bill-restoration-expectations",
+    "cat": "bill",
+    "title": "Misleading Payment or Restoration Expectations",
+    "desc": "When service is suspended or at risk for non-payment, giving inaccurate restoration timing or implying that a payment or arrangement guarantees service will be restored.",
+    "kw": ["suspended", "suspension", "service off", "disconnect", "disconnected", "non-payment", "nonpayment", "restoration", "restore service", "reconnect", "reconnection", "service back on", "payment made", "arrangement", "when service returns", "guarantee", "past due", "collections"],
+    "tags": ["Payments", "Service Restoration", "Expectation Setting"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "billing",
+    "feedback": "After the customer paid toward the suspended account, you told them service would come back as soon as the payment went through, without confirming the restoration requirements or timeframe. A customer without service often depends on it for work, school, or staying in touch, so the timing you give becomes the plan they make. If restoration takes longer, or the payment or arrangement does not meet what is required, the customer may feel they paid on a promise that did not hold and is likely to call back. Going forward, confirm the requirements and timeframe in approved resources and explain any remaining step before describing when service will return.",
+    "impact": "Restoration expectations are often overstated in an effort to reassure a customer who is under pressure without service. When a payment or arrangement is treated as a guarantee, or timing is given without checking the applicable process, the customer may plan around a restoration that does not happen as described. Missed expectations at this stage are likely to produce repeat contacts and escalation requests, and they can damage trust at a moment when the customer is already stressed about the account.",
+    "plan": "Each time you handle a suspended or at-risk account over the next {duration}, you will confirm in approved resources what is required to restore service and the applicable timeframe before discussing either with the customer. You will explain any remaining step, avoid wording that suggests a payment or arrangement guarantees restoration, and tell the customer what to do if service does not return as expected, per the applicable process. Success on this plan means zero restoration guarantees and accurate timing on every one of the {calls} suspension or restoration calls reviewed within {followup}.",
+    "followup": "We will review the restoration process documentation together and talk through how payments, arrangements, and restoration connect, then roleplay a call with a customer whose service is suspended and who needs it back for work. Within {followup}, I will select {calls} of your calls involving a suspended account and check the restoration expectations you set, with a midweek conversation to go over any process questions. We will finish with a review of all the calls when the {durationAdj} plan is complete.",
+    "example": [
+      { "label": "After the payment", "say": "Your payment has gone through, thank you. Before I tell you when service will be back, let me check whether anything else is needed on the account, so the timeframe I give you is one you can count on." },
+      { "label": "Setting the expectation", "say": "Here is what happens next and how long restoration usually takes, based on what I see on your account. If your service isn't back within that time, this is exactly what to do so you're not left waiting." }
+    ],
+    "questions": [
+      "Which restoration requirements and timeframes did you confirm before telling the customer when service would be back?",
+      "What would it mean for this customer if they paid expecting service right away and it did not come back as described?",
+      "How can you reassure a customer who needs service urgently without promising a restoration time you have not confirmed?"
+    ],
+    "strengths": ["s-payment-options", "s-empathy", "s-verification", "s-ownership"],
+    "b": {
+      "obs": "suggested that a payment or arrangement guaranteed restoration, or gave a restoration time without confirming the applicable process",
+      "focus": "restoration expectation setting",
+      "commit": "explain restoration requirements and timing only as confirmed in approved resources, without implying a payment or arrangement guarantees service will return",
+      "mx": "Restoration requirements and timing are confirmed in approved resources on every suspended or at-risk account reviewed, with zero restoration guarantees.",
+      "coach": "a roleplay of a suspended-account call focused on restoration expectations"
+    },
+    "note": "Confirm the current restoration requirements, payment arrangement rules, and restoration timeframes in approved resources before the session. Verify on the account what was required for restoration at the time of the call."
+  }
+]

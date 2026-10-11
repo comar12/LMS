@@ -1,0 +1,387 @@
+[
+  {
+    "id": "hold-dead-air",
+    "cat": "hold",
+    "title": "Excessive Dead Air",
+    "desc": "Extended silence while researching or navigating tools, without telling the customer what is happening or how long it will take.",
+    "kw": ["dead air", "silence", "silent", "quiet", "no response", "long pause", "pauses", "research time", "are you there", "hello", "mute", "waiting", "typing", "system lag", "excessive silence"],
+    "tags": ["Call Control", "Research", "Customer Effort"],
+    "kpi": ["QA"],
+    "theme": "control",
+    "feedback": "During the interaction, there were extended periods of silence while you were completing research. Although troubleshooting can take time, the customer was not consistently informed about what you were doing or how long it would take. This can make the customer uncertain whether you are still connected or actively working on the concern. Going forward, explain the reason for the research, provide an estimated timeframe, request permission before placing the customer on hold, and return with updates when additional time is needed.",
+    "impact": "Extended dead air usually happens when attention shifts fully to the system and the customer is left out of the process. From the customer's side of the line, silence sounds the same whether you are working hard or have disconnected, so it can quickly erode confidence, prompt repeated check-ins, and make the call feel longer than it is. Over time, this can lower satisfaction and quality results even when the final resolution is correct.",
+    "plan": "For the next {duration}, you will use the appropriate hold process whenever research requires an extended period. Before placing the customer on hold, explain what you are checking and provide an estimated timeframe. Return within the committed timeframe or provide an update if further research is required. For shorter research, briefly narrate what you are doing so the customer is never left in silence. We will review {calls} applicable calls within the next {followup}, targeting correct hold management and zero unexplained extended dead-air periods in all {calls} calls.",
+    "followup": "We will complete a short roleplay demonstrating proper hold transitions and research narration. I will then review {calls} relevant calls within {followup}, and we will have a brief midweek check-in to discuss any recurring gaps. Progress will be reassessed at the end of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "Before the research", "say": "I'm going to check the signal history on your equipment to see what is causing the drops. That will take about two minutes. Would it be okay if I place you on a brief hold while I review it?" },
+      { "label": "When you return", "say": "Thank you for holding. I found that the connection has been dropping several times a day, and there are a couple of steps we can take right now to fix it." }
+    ],
+    "questions": [
+      "What was happening on your screen during the longest silences in this call?",
+      "How do you think the customer experienced those moments without any updates?",
+      "When research is going to take more than a few moments, what will you say before you start?"
+    ],
+    "strengths": ["s-troubleshooting", "s-itg", "s-ownership", "s-tone"],
+    "b": {
+      "obs": "left extended periods of silence while completing research, without telling the customer what you were doing or how long it would take",
+      "focus": "dead-air management",
+      "commit": "explain what you are checking and how long it will take before extended research, and use the hold process instead of leaving the line silent",
+      "m": "no unexplained extended dead-air periods",
+      "coach": "a short roleplay of hold transitions and research narration"
+    },
+    "note": "Confirm your program's dead-air and hold standards before the session. Zero recorded hold time does not prove the customer was left on mute; confirm with the recording before documenting mute usage."
+  },
+  {
+    "id": "hold-mute-usage",
+    "cat": "hold",
+    "title": "Incorrect Mute Usage",
+    "desc": "Using mute in place of hold during research, leaving the line open and silent, forgetting to unmute, or muting while the customer is still speaking.",
+    "kw": ["mute", "muted", "on mute", "mute button", "mute instead of hold", "forgot to unmute", "unmute", "still muted", "silent", "silent line", "open line", "line went quiet", "are you still there", "thought call dropped", "silence", "dead air", "no hold music", "muted while customer talking", "mute policy", "hold vs mute"],
+    "tags": ["Mute & Hold", "Call Control", "Customer Experience"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "control",
+    "feedback": "While you were researching the concern, you muted the line instead of placing the customer on hold. On a muted line the customer hears no hold music, no messaging, and no voice, so from their side it sounds the same as a dropped call. That uncertainty often leads to repeated check-ins asking whether you are still there, and some customers may hang up and call back. On future calls, use the hold process for research that needs your full attention, after asking permission and giving a timeframe. Keep any mute use brief and within the program's policy, unmute before you speak, and avoid muting while the customer is talking.",
+    "impact": "Using mute during research often comes from wanting to stay ready to jump back in, or from treating mute as a faster alternative to hold. The customer cannot tell a muted line from an empty one, so the silence can feel like the call has ended. This may lead to repeated interruptions, a customer who disconnects and has to call back, and a lower quality result, even when the research was handled well. Speaking before you unmute adds to the problem, because the customer misses your answer and has to ask again.",
+    "plan": "Starting with your next call and continuing for {duration}, you will use the hold function, not mute, whenever research or a system check will keep you from speaking with the customer. Before each hold, you will ask permission and give an estimated timeframe, and when you return, you will thank the customer and share what you found. If you use mute for a brief reason the program allows, you will unmute before you speak and you will not mute while the customer is talking. The measure of success is zero research periods spent on mute, no replies spoken while still muted, and no muting while the customer is talking, across {calls} applicable calls reviewed within {followup}.",
+    "followup": "During our session, we will listen to the muted stretch of this call together so you can hear the silence the way the customer heard it, then practice moving between hold and the active line on the phone system. I will review {calls} of your calls within {followup}, listening specifically for open-line silence during research and for any reply spoken before unmuting. We will have a short midweek check-in and review the results at the end of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "Before research", "say": "I'd like to review your account history to see what changed. That should take about two minutes. Is it okay if I place you on a brief hold while I look?" },
+      { "label": "For a quick check", "say": "I'm pulling up your equipment details now, so you may hear me typing. I'm still right here with you." }
+    ],
+    "questions": [
+      "What did the customer hear on their end while your line was muted during the research?",
+      "What usually leads you to choose mute over hold when you need a moment to look something up?",
+      "How will you remind yourself to unmute before you start speaking again?"
+    ],
+    "strengths": ["s-acknowledgement", "s-troubleshooting", "s-itg", "s-ownership"],
+    "b": {
+      "obs": "muted the line during research instead of using hold, leaving the customer on an open, silent line with no sign you were still there",
+      "focus": "correct mute usage",
+      "commit": "use the hold process rather than mute for research, unmute before speaking, and avoid muting while the customer is talking",
+      "m": "no research periods spent on mute, no replies spoken while still muted, and no muting while the customer talks",
+      "coach": "a side-by-side review of the muted stretch of the call, heard from the customer's side"
+    },
+    "note": "Confirm mute usage on the recording before documenting this behavior. Zero recorded hold time alone does not prove mute was used, since silence can also come from reading, typing, or system delays. Confirm the program's current mute policy before the session."
+  },
+  {
+    "id": "hold-excessive-hold",
+    "cat": "hold",
+    "title": "Excessive Hold Time",
+    "desc": "Holds that run longer or occur more often than the call requires, usually because details were not gathered or prepared before the first hold.",
+    "kw": ["hold", "on hold", "hold time", "long hold", "excessive hold", "too many holds", "multiple holds", "repeated holds", "lengthy hold", "hold duration", "hold standard", "back to back holds", "handle time", "aht", "prepare before hold", "callback option", "research"],
+    "tags": ["Hold Process", "Call Control", "Handle Time"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "control",
+    "feedback": "In this interaction, you placed the customer on hold more often or for longer than the concern required, beyond what the program's hold standard supports. Every hold pauses the conversation for the customer, and coming back only to place them on hold again can make the issue feel stalled. Long or repeated holds also wear down the patience of a customer who may already be frustrated. Moving forward, gather every detail you need before the first hold, open the tools you expect to use, and check back at regular intervals. When research will clearly be lengthy, offer the applicable callback option instead of an extended hold.",
+    "impact": "Excessive hold time usually comes from starting research before all the needed details are collected, or from searching for information in tools that were not opened in advance. Each extra hold adds waiting time and interrupts the conversation, which can increase handle time and raise the chance that the customer disconnects before the issue is resolved. A customer who hangs up during a hold is likely to call back, creating a repeat contact and a less patient start to the next call.",
+    "plan": "Over the next {duration}, you will prepare before every hold by confirming the details you need from the customer and opening the tools you expect to use, so that one hold covers the research whenever possible. You will keep each hold within the program's hold standard, check back with the customer at the intervals the standard sets, and offer the applicable callback option when research will clearly run long. We will review {calls} applicable calls within {followup}, targeting holds that stay within the standard and no repeat holds for details that could have been gathered first in all {calls} calls.",
+    "followup": "Together, we will map each hold in this call on a simple timeline and identify which ones could have been combined or avoided with better preparation. You will then build a short pre-hold checklist of the details and tools you need for your most common call types. I will select {calls} of your calls with holds from the next {followup} and compare the number and length of the holds against the standard. We will go over the results together when the {durationAdj} plan closes.",
+    "example": [
+      { "label": "Gathering details first", "say": "Before I start checking, let me confirm a couple of details so I can look at everything in one go. When did you first notice the issue, and has it affected every device in the home?" },
+      { "label": "When research will run long", "say": "This is going to take longer to look into than I expected. Rather than keep you on hold, I can arrange a callback once I have the answer. Would that work better for you?" }
+    ],
+    "questions": [
+      "Looking back at the holds in this call, which ones could have been combined if you had gathered more details first?",
+      "What information or tools do you usually find yourself looking for once the customer is already on hold?",
+      "At what point in a long research task would you offer the customer a callback instead of another hold?"
+    ],
+    "strengths": ["s-ownership", "s-diagnosis", "s-resolution", "s-tone"],
+    "b": {
+      "obs": "relied on more frequent or longer holds than the concern required, when gathering details first could have reduced them",
+      "focus": "efficient hold use",
+      "commit": "gather the needed details and open your tools before placing a hold, so one hold covers the research whenever possible",
+      "m": "every hold within the program's hold standard and no repeat holds for details that could have been gathered first",
+      "coach": "a hold timeline review of this call and a pre-hold preparation checklist"
+    },
+    "note": "Confirm the program's hold standard, including any limits on hold length or number of holds, and whether a callback option is available for lengthy research, before the session."
+  },
+  {
+    "id": "hold-no-permission",
+    "cat": "hold",
+    "title": "No Permission Before Hold",
+    "desc": "Placing the customer on hold without first asking for permission and waiting for the customer to agree.",
+    "kw": ["permission", "hold permission", "no permission", "ask permission", "ask before hold", "hold without asking", "placed on hold", "on hold", "hold", "abrupt hold", "sudden hold", "consent", "customer agreement", "hold request", "hold etiquette", "did not wait"],
+    "tags": ["Hold Process", "Hold Etiquette", "Courtesy"],
+    "kpi": ["QA"],
+    "theme": "control",
+    "feedback": "When it was time to look something up, you placed the customer on hold without asking for permission and waiting for their answer. Even a brief hold interrupts the conversation, and asking first gives the customer a moment to agree, finish a thought, or mention something they still need to share. Being put on hold without warning can feel abrupt and dismissive, especially if the customer was mid-sentence. Next time, explain why you need the hold, ask whether it is all right, and wait for a clear yes before pressing hold. If they would rather stay on the line, talk them through what you are checking instead.",
+    "impact": "Skipping the permission step usually happens when holds start to feel routine, or when the focus is on getting to the research quickly. To the customer, an unannounced hold can feel like being cut off, and a customer who was about to share an important detail may not get the chance until you return. This can create irritation, reduce trust in how the call is being handled, and lower quality results for hold handling.",
+    "plan": "Each day for the next {duration}, you will follow the same sequence before every hold, telling the customer what you need to check, asking whether it is all right to place them on hold, and waiting for a clear answer before you press hold. If the customer would rather not hold, you will stay with them and talk them through what you are doing instead. Within {followup}, we will review {calls} calls that each include at least one hold, targeting a permission request and the customer's agreement before every hold in all {calls} calls.",
+    "followup": "We will roleplay the moment before a hold, with me playing a customer who has one more detail to share right as you ask, so you can practice pausing for the answer. Within {followup}, I will review {calls} of your calls that include a hold and note whether permission was asked and agreement received each time. At the end of the {durationAdj} coaching period, we will go through those notes together.",
+    "example": [
+      { "label": "Asking first", "say": "I need to check the order details to see where the delay is coming from. Would it be all right if I place you on hold for about two minutes while I do that?" },
+      { "label": "If the customer says no", "say": "That's no problem. I'll stay on the line with you and talk you through what I'm checking as I go." }
+    ],
+    "questions": [
+      "What was the customer doing or saying at the moment you placed them on hold?",
+      "How might the customer have felt being placed on hold without being asked first?",
+      "What words will you use to ask for a hold, and how will you make sure you hear the answer?"
+    ],
+    "strengths": ["s-acknowledgement", "s-troubleshooting", "s-ownership", "s-resolution"],
+    "b": {
+      "obs": "placed the customer on hold without asking for permission and waiting for their agreement first",
+      "focus": "hold permission",
+      "commit": "ask permission before every hold and wait for the customer's clear agreement before pressing hold",
+      "m": "a permission request and the customer's agreement before every hold",
+      "coach": "a roleplay of the hold request with a customer who has one more detail to share"
+    },
+    "note": "Confirm the program's hold standard and any required hold language before the session."
+  },
+  {
+    "id": "hold-no-estimate",
+    "cat": "hold",
+    "title": "No Estimated Hold Time",
+    "desc": "Placing the customer on hold without telling them how long the hold is expected to last.",
+    "kw": ["estimate", "hold estimate", "estimated time", "no estimate", "timeframe", "time frame", "no timeframe", "how long", "how long it takes", "hold time", "on hold", "hold", "set expectations", "hold length", "minutes"],
+    "tags": ["Hold Process", "Expectation Setting", "Call Control"],
+    "kpi": ["QA"],
+    "theme": "control",
+    "feedback": "Before placing the customer on hold, you explained that you needed to check something, but you did not say how long it would take. Without an estimate, the customer cannot tell whether the wait will be short or long, so every minute on hold feels longer and their patience is likely to run out sooner. A realistic timeframe also gives you a natural point to check back. Instead, share a specific estimate before every hold, such as about two minutes, based on what you are checking. When you are unsure, give your best estimate and let the customer know you will check back by then.",
+    "impact": "Leaving out the estimate often happens when you are not sure how long the research will take and prefer not to commit to a number. Without a timeframe, the customer has nothing to measure the wait against, which can make a short hold feel long and a long hold feel like abandonment. This may lead to frustration when you return, a customer who disconnects during the hold, and lower satisfaction with how the call was handled.",
+    "plan": "During the next {duration}, you will give the customer an estimated timeframe every time you ask to place them on hold, based on what you are about to check and stated in minutes. When you cannot predict the length, you will give your best estimate along with a time when you will check back, rather than leaving it open. You will also keep a short list of the research tasks you handle most and how long each usually takes, so your estimates stay realistic. The goal is a stated timeframe before every hold in all {calls} calls I review within {followup}.",
+    "followup": "We will use part of our session to build a short reference of the research tasks you handle most often, with a realistic time estimate for each, and practice stating them in a hold request. After that, I will listen to {calls} of your calls within {followup} to check that each hold included a timeframe and that it was close to the actual hold length. We will discuss what you notice at a midweek check-in and review the full results after {duration}.",
+    "example": [
+      { "label": "Before the hold", "say": "I'm going to check whether there's an outage in your area. That usually takes about three minutes. May I place you on hold while I look?" },
+      { "label": "When the time is uncertain", "say": "This one may take a few extra minutes, so I'll check back with you in about three minutes either way, even if I'm still working on it." }
+    ],
+    "questions": [
+      "What did the customer know about the length of the hold before you placed them on it?",
+      "When you are not sure how long research will take, how could you still give a useful estimate?",
+      "How does giving a timeframe change what the customer expects when you return?"
+    ],
+    "strengths": ["s-empathy", "s-probing", "s-ownership", "s-resolution"],
+    "b": {
+      "obs": "gave the customer no estimate of how long each hold would last",
+      "focus": "hold time estimates",
+      "commit": "give a realistic timeframe before every hold, and set a check-back time when the length is uncertain",
+      "m": "a stated timeframe before every hold",
+      "coach": "a reference list of common research tasks with realistic time estimates"
+    },
+    "note": "Confirm the program's hold standard and expected check-back interval so the estimates the agent practices fit what the program expects."
+  },
+  {
+    "id": "hold-no-updates",
+    "cat": "hold",
+    "title": "Failure to Return With Updates",
+    "desc": "Keeping the customer on hold past the stated timeframe, or for long stretches, without returning to give an update and a new estimate.",
+    "kw": ["updates", "update", "check back", "check in", "no check back", "return from hold", "back from hold", "long hold", "on hold", "hold", "past the timeframe", "over the estimate", "left on hold", "forgot customer on hold", "new estimate", "hold check in", "still researching", "hold time"],
+    "tags": ["Hold Process", "Expectation Setting", "Customer Effort"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "control",
+    "feedback": "After placing the customer on hold, you let the hold run past the timeframe you had given, without returning to share an update. Once the promised time passes, the customer starts to wonder whether the call was forgotten, and the estimate you gave loses its value. Even a quick return, with a short update and a new estimate, tells the customer the concern is still being worked on. From here, return by the time you committed to, whether or not the research is finished, and check back regularly during long research. Share what you have found so far, give a new estimate, and confirm the customer is comfortable holding longer.",
+    "impact": "Missed check-backs usually happen when the research becomes more involved than expected and your attention stays on finding the answer rather than on the time. For the customer, a hold that runs past its estimate can quickly turn patience into frustration, and the longer it goes without an update, the more likely they are to disconnect and call back. A missed return can also undo the trust built earlier in the call before you have even shared the result.",
+    "plan": "Beginning with your next call and continuing for {duration}, you will note the time each hold starts and return to the customer by the time you committed to, even if the research is not finished. Whenever you return before the research is complete, you will share what you have found so far, give a new estimate, and confirm the customer is comfortable continuing to hold. During longer research, you will check back at the intervals set by the program's hold standard. We will review {calls} applicable calls within {followup}, targeting a return by the stated time and an update with a new estimate on every extended hold in all {calls} calls.",
+    "followup": "We will start by comparing the length of the hold in this call with the estimate you gave, then agree on a simple way for you to track hold time, such as noting the start time or using a timer. Over the next {followup}, I will review {calls} of your calls that include holds, listening for on-time returns and the quality of each update. We will talk through the results at a midweek check-in and again at the end of the {durationAdj} plan.",
+    "example": [
+      { "label": "Checking back on time", "say": "Thank you for holding. I'm still working on this, and so far I've confirmed your payment was received. I need about three more minutes to find where it was applied. Are you okay to hold a little longer?" },
+      { "label": "During a longer hold", "say": "I wanted to check in so you're not left wondering. I'm about halfway through, and I should have an answer in about two minutes." }
+    ],
+    "questions": [
+      "How long was the customer on hold compared with the time you told them it would take?",
+      "What made it hard to step away from the research and come back to the customer?",
+      "What could you share with a customer when you return on time but do not have the answer yet?"
+    ],
+    "strengths": ["s-acknowledgement", "s-troubleshooting", "s-diagnosis", "s-resolution"],
+    "b": {
+      "obs": "let the hold run past the timeframe you had given, without returning to share an update or a new estimate",
+      "focus": "on-time hold returns",
+      "commit": "return to the customer by the time you committed to, with an update and a new estimate if more time is needed",
+      "m": "a return by the stated time and an update with a new estimate on every extended hold",
+      "coach": "a review of this call's hold length against the estimate you gave"
+    },
+    "note": "Confirm the program's hold standard, including how often a check-back is expected during a long hold, before the session."
+  },
+  {
+    "id": "hold-delayed-responses",
+    "cat": "hold",
+    "title": "Delayed Responses to the Customer",
+    "desc": "Slow replies to the customer's questions or statements on an open line, with long gaps before answering or responses that suggest divided attention.",
+    "kw": ["slow response", "slow responses", "delayed response", "lag", "response time", "late reply", "no response", "slow to answer", "slow to respond", "distracted", "not responding", "unresponsive", "multitasking", "delay", "customer waiting", "silence after question", "quiet", "not engaged"],
+    "tags": ["Responsiveness", "Call Control", "Customer Effort"],
+    "kpi": ["QA"],
+    "theme": "control",
+    "feedback": "When the customer asked a question or shared new information, there was often a noticeable delay before you responded, and at times it sounded as though your attention was on the screen rather than the conversation. On a live call, the customer expects a reply within moments, so a long lag can feel like they were not heard or that their question did not matter. Customers often repeat themselves or ask if you are still there when this happens. The expectation is to respond promptly, even if only to acknowledge what was said and let the customer know what you will check, and then follow up with the full answer.",
+    "impact": "Delayed responses usually come from trying to finish a task on the screen before turning back to the customer, or from reading and typing while the customer is still talking. Each lag forces the customer to wait for an answer to something they asked directly, which can make you sound distracted and the customer feel unimportant. Over a full call, this can lead to repeated questions, rising frustration, and longer handle time.",
+    "plan": "For the next {duration}, you will respond to every customer question or statement within a moment of the customer finishing, even when the full answer needs research. When you need time, you will acknowledge what the customer said, tell them what you are going to check, and then give the complete answer. When a question comes in while you are working on the screen, you will stop and respond before returning to the task. To measure this, I will listen to {calls} applicable calls within {followup}, with the goal of prompt replies and no unexplained lag after customer questions in all {calls} calls.",
+    "followup": "To start, I will play back the customer's questions from this call so we can hear how long each one waited for a reply, and then we will build a few short acknowledgement phrases you can use while you find the answer. Then, across {calls} of your calls within {followup}, I will listen closely to response timing, and we will have a brief midweek conversation about what you are noticing. We will look at the results together after {duration}.",
+    "example": [
+      { "label": "Acknowledging right away", "say": "Yes, I can check that for you. I'm pulling up the plan details now so I can give you the exact answer." },
+      { "label": "When the customer adds a detail", "say": "Thanks for mentioning that the issue gets worse in the evening. That helps, and I'm noting it now before we move on." }
+    ],
+    "questions": [
+      "What were you focused on in the moments after the customer asked a question?",
+      "How do you think the customer interpreted the gaps before your replies?",
+      "What short phrase could you use to acknowledge a question while you look for the answer?"
+    ],
+    "strengths": ["s-empathy", "s-clarity", "s-troubleshooting", "s-resolution"],
+    "b": {
+      "obs": "took noticeably long to respond to the customer's questions and comments, at times sounding focused on the screen rather than the conversation",
+      "focus": "prompt responses",
+      "commit": "reply promptly to every customer question, acknowledging it right away and saying what you will check when the answer needs research",
+      "m": "prompt replies with no unexplained lag after customer questions",
+      "coach": "a timed playback of the customer's questions with acknowledgement phrase practice"
+    },
+    "note": "Listen for gaps after the customer's direct questions or statements. Long silences during research are better coached as Excessive Dead Air, and short pauses at transitions as Avoidable or Unexplained Silence."
+  },
+  {
+    "id": "hold-research-communication",
+    "cat": "hold",
+    "title": "Poor Research Communication",
+    "desc": "Researching without explaining what is being checked and why, or sharing the findings afterward in vague or technical terms the customer cannot follow.",
+    "kw": ["research", "researching", "narrate", "narration", "explain research", "what i'm checking", "let me check", "what was found", "findings", "explain results", "plain language", "jargon", "system terms", "looking into it", "research updates", "explain why", "keep customer informed"],
+    "tags": ["Research", "Communication", "Customer Education"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "control",
+    "feedback": "Throughout the research portion of the call, you said you would look into the concern but did not explain what you were checking or why. Once the research was complete, you shared the result briefly and in system terms, leaving the customer without a clear picture of what you found or what it meant for them. Customers are more patient with research when they understand its purpose, and they trust the outcome more when it is explained clearly. Going forward, say what you are about to check and why before you begin, then explain what you found in plain language and how it connects to the next step.",
+    "impact": "Unclear research communication often comes from knowing the systems so well that the purpose of each check feels obvious, or from moving straight to the next step once the answer is found. A customer who does not know what is being checked has less reason to stay patient with the wait, and one who does not understand the findings may question the result, ask the same thing again, or call back for a clearer explanation.",
+    "plan": "Over the next {duration}, you will open every research step with a one-sentence explanation of what you are checking and why it matters to the customer's concern. When the research is complete, you will summarize what you found in plain language, avoiding system names and internal codes, and connect it to the next step. You will then ask whether the explanation makes sense before moving on. We will review {calls} applicable calls within {followup}, targeting a stated purpose before research and a plain-language summary of the findings in all {calls} calls.",
+    "followup": "We will take the explanation of the findings from this call and rewrite it together in plain language, then practice a before-and-after explanation for a few research tasks you handle often. When I review {calls} of your calls within {followup}, I will listen for both parts, the purpose before research and the summary after it. We will check in briefly midweek, and I will share the full review at the end of the {durationAdj} period.",
+    "example": [
+      { "label": "Before checking", "say": "I'm going to compare this bill with last month's line by line, so we can see exactly where the increase came from." },
+      { "label": "After checking", "say": "Here's what I found. The increase comes from a promotional discount that ended this month, so your services are now at the standard rate. Nothing new was added to your account." }
+    ],
+    "questions": [
+      "What did the customer know about what you were checking while the research was underway?",
+      "How would you explain what you found in this call to someone who has never seen our systems?",
+      "What could you say before starting research so the customer understands why the wait is worth it?"
+    ],
+    "strengths": ["s-troubleshooting", "s-diagnosis", "s-itg", "s-ownership", "s-tone"],
+    "b": {
+      "obs": "researched without explaining what you were checking or why, and shared the findings in terms the customer could not easily follow",
+      "focus": "research explanations",
+      "commit": "explain what you are checking and why before research begins, and summarize the findings in plain language afterward",
+      "m": "a stated purpose before research and a plain-language summary of the findings",
+      "coach": "a plain-language rewrite of the findings explanation from this call"
+    },
+    "note": "Coach the content of the explanation here. If the main gap was the length of the silence rather than what was said, Excessive Dead Air is the better fit."
+  },
+  {
+    "id": "hold-time-constraints",
+    "cat": "hold",
+    "title": "Not Acknowledging Customer Time Constraints",
+    "desc": "Continuing the call as usual after the customer mentions limited time, without acknowledging it, prioritizing, or offering a callback or follow-up option.",
+    "kw": ["time constraint", "time constraints", "busy", "in a hurry", "hurry", "short on time", "limited time", "on a break", "lunch break", "driving", "at work", "leaving soon", "has to go", "need to leave", "callback option", "prioritize", "quick call", "rushed customer"],
+    "tags": ["Customer Needs", "Call Control", "Expectation Setting"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "control",
+    "feedback": "After the customer mentioned they had only a few minutes, you continued the call as if time were not a concern, without acknowledging it or adjusting the plan. A customer on a break, driving, or about to leave is listening for whether you heard that, and every unexpected step adds pressure. If they run out of time partway through, the issue may stay open with no plan for what happens next. When a customer mentions a time limit, acknowledge it immediately, focus on what matters most, and tell them how long each step will take. If the full fix will not fit, offer the applicable callback or follow-up option.",
+    "impact": "Missing a time constraint usually happens when the focus is on following the full process in order, and the customer's comment about their schedule gets treated as small talk. When the call does not adapt, the customer may feel unheard, hurry through steps, or drop off before the issue is resolved. That can leave the concern half finished and lead to a repeat contact, along with frustration that carries into the next conversation.",
+    "plan": "During the next {duration}, you will listen for any mention of limited time, such as a work break, driving, or an upcoming appointment, and acknowledge it as soon as the customer says it. You will then prioritize the most important part of the concern, tell the customer how long each step is likely to take, and check whether that fits their schedule. When it will not fit, you will offer the applicable callback or follow-up option and confirm the details before the call ends. Across {calls} applicable calls reviewed within {followup}, the target is an acknowledgement and an adjusted plan on every call where the customer mentions a time limit.",
+    "followup": "As part of our session, I will play a customer who mentions early in the call that they are on a short lunch break, and you will practice acknowledging it, choosing what to handle first, and offering a follow-up option. I will then audit {calls} of your calls within {followup}, noting every mention of limited time and how you responded. We will meet briefly midweek and decide together after {duration} whether the plan is complete.",
+    "example": [
+      { "label": "Acknowledging the time limit", "say": "Thanks for letting me know you're on your lunch break. Let's start with the connection issue, since that's the most urgent, and that part should take about ten minutes. If we need more time after that, I can set up a follow-up so you don't have to stay on the line." },
+      { "label": "If the customer is driving", "say": "I don't want you troubleshooting while you're on the road. Would it be easier if we set up a callback for when you're home?" }
+    ],
+    "questions": [
+      "What did the customer say about their schedule, and when in the call did they say it?",
+      "If you had acknowledged the time limit right away, what would you have handled first?",
+      "What options can you offer when the full resolution will not fit into the time the customer has?"
+    ],
+    "strengths": ["s-acknowledgement", "s-troubleshooting", "s-itg", "s-resolution"],
+    "b": {
+      "obs": "continued the call at the usual pace after the customer mentioned limited time, without acknowledging it or adjusting the plan",
+      "focus": "adapting to time constraints",
+      "commit": "acknowledge any time limit the customer mentions, prioritize the most important step, and offer the applicable callback or follow-up option when needed",
+      "m": "an acknowledgement and adjusted plan whenever the customer mentions limited time",
+      "coach": "a roleplay with a customer on a short lunch break who needs the call prioritized"
+    },
+    "note": "Confirm which callback or follow-up options the program allows when a customer cannot stay on the line, so the agent offers only options that are available."
+  },
+  {
+    "id": "hold-call-control",
+    "cat": "hold",
+    "title": "Poor Call Control",
+    "desc": "Letting the conversation drift into long tangents or repeated loops, or handling several issues without organizing them, instead of guiding the call with a clear agenda.",
+    "kw": ["call control", "control", "lost control", "tangent", "tangents", "off topic", "sidetracked", "rambling", "talkative customer", "going in circles", "circular conversation", "redirect", "redirecting", "agenda", "multiple issues", "long call", "aht", "momentum", "steer the call"],
+    "tags": ["Call Control", "Call Structure", "Handle Time"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "control",
+    "feedback": "Once the main concern was clear, you followed the customer into long side topics, and the conversation circled back to points that had already been covered. Several issues came up along the way, but they were handled as they surfaced rather than organized into a plan. Without that structure, the customer can lose track of what has been solved, and the call can run longer without moving the concern forward. A stronger approach is to set a short agenda once you know the issues, redirect tangents respectfully by tying them back to the goal, and keep momentum by summarizing where things stand before each next step.",
+    "impact": "Weak call control often comes from wanting to stay friendly and responsive, which makes it uncomfortable to interrupt a talkative or upset customer. When the call has no clear direction, issues can be missed or only partly resolved, handle time can grow, and the customer may leave unsure what was actually fixed. That uncertainty can lead to a repeat contact for something that could have been handled on this call.",
+    "plan": "For the next {duration}, once you understand the customer's concerns, you will state a short agenda of what you will handle and in what order, and confirm the customer agrees. When the conversation drifts, you will acknowledge the comment briefly and redirect with a bridge back to the current step. Before moving between issues, you will summarize what has been completed and what comes next. We will measure this on {calls} applicable calls within {followup}, looking for a plan stated early, tangents redirected respectfully, and clear transitions between issues in all {calls} calls.",
+    "followup": "We will listen to the middle of this call together and mark each point where the conversation drifted, then practice bridging phrases that acknowledge the customer and bring the call back on track. I will review {calls} of your calls within {followup}, and we will talk midweek about any calls where redirecting felt difficult. Once the {durationAdj} plan ends, we will review the overall results and agree on next steps.",
+    "example": [
+      { "label": "Setting the agenda", "say": "So we cover everything today, let's start with the internet connection, and then we'll look at the charge on your bill. Does that order work for you?" },
+      { "label": "Redirecting a tangent", "say": "That sounds like a busy week. To keep things moving on your connection, let's go back to the modem for a moment. What color is the light on the front right now?" }
+    ],
+    "questions": [
+      "At what point in this call did you notice the conversation moving away from the main concern?",
+      "How could you redirect a talkative customer while still making them feel heard?",
+      "When a customer raises several issues at once, how will you decide and explain the order to handle them?"
+    ],
+    "strengths": ["s-rapport", "s-empathy", "s-tone", "s-troubleshooting"],
+    "b": {
+      "obs": "followed the customer into long side topics and handled several issues as they surfaced, without a clear plan to keep the call on track",
+      "focus": "call control",
+      "commit": "set a short agenda once the concerns are clear, redirect tangents respectfully, and summarize what is done before moving between issues",
+      "m": "a plan stated early, tangents redirected respectfully, and clear transitions between issues",
+      "coach": "a listen-back of this call to mark where it drifted, with bridging phrase practice"
+    },
+    "note": "Use this when the customer steered the call off course or several issues were not organized. If the gap was the order of the call stages, Poor Call Flow may fit better."
+  },
+  {
+    "id": "hold-dropped-call",
+    "cat": "hold",
+    "title": "Dropped Call / Callback Ownership",
+    "desc": "Not owning the reconnection when a call disconnects, including not confirming a callback number early, not attempting a callback, or not documenting the disconnect.",
+    "kw": ["dropped call", "dropped", "call dropped", "disconnected", "disconnect", "call disconnected", "lost call", "line dropped", "hung up", "call ended", "callback", "call back", "callback number", "no callback", "callback attempt", "reconnect", "document disconnect"],
+    "tags": ["Callback", "Ownership", "Process"],
+    "kpi": ["QA", "aiCR"],
+    "theme": "control",
+    "feedback": "When the call disconnected before the concern was resolved, you did not attempt to call the customer back, and no callback number had been confirmed earlier in the call. That left reconnecting entirely up to the customer. After a dropped call, the customer may have to start over with someone new and explain everything again, which can turn a solvable issue into a frustrating experience. Going forward, confirm a callback number early in every call. If a call drops, attempt a callback according to the applicable process, and document both the disconnect and your attempt so the account shows what happened.",
+    "impact": "Missed callbacks usually happen when a disconnect feels outside your control, so the call is treated as finished once the line drops. The customer, however, can be left with an unresolved issue and no way to reach the same person, which often leads to a repeat contact, repeated explanations, and lower trust that the company will follow through. Without documentation, whoever takes the next call may not know what was already done.",
+    "plan": "Throughout the next {duration}, you will confirm a callback number early in every call, before troubleshooting or account changes begin. If a call disconnects, you will attempt a callback according to the applicable process, and if you cannot reach the customer, you will follow the steps the process sets for an unsuccessful attempt. You will document every disconnect and callback attempt in the account notes as soon as the attempt is complete. We will review {calls} applicable calls, plus any disconnected calls, within {followup}, targeting a confirmed callback number in all {calls} calls and a documented callback attempt for every disconnect.",
+    "followup": "We will walk through the applicable disconnect and callback process together, including where and how to document an attempt, and practice confirming a callback number naturally during the opening. I will review {calls} of your calls within {followup}, along with any disconnects from that period, checking each call for a confirmed number and each disconnect for a callback attempt and documentation. We will review the findings at the end of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "Early in the call", "say": "Before we get started, in case we get disconnected, what's the best number to reach you on?" },
+      { "label": "On the callback", "say": "Hello, I'm calling back because our call was disconnected while we were working on your internet issue. Is now still a good time to finish up?" }
+    ],
+    "questions": [
+      "At what point in this call would it have been natural to confirm a callback number?",
+      "What do you think the customer experienced after the line dropped?",
+      "What steps will you take, and in what order, the next time a call disconnects?"
+    ],
+    "strengths": ["s-acknowledgement", "s-empathy", "s-troubleshooting", "s-verification"],
+    "b": {
+      "obs": "did not attempt a callback after the disconnect, and had not confirmed a callback number early on, leaving the reconnection to the customer",
+      "focus": "callback ownership",
+      "commit": "confirm a callback number early in every call and, if a call drops, attempt a callback and document it according to the applicable process",
+      "mx": "Every disconnected call during the next {duration} receives a callback attempt and documentation according to the applicable process, and every reviewed call shows a callback number confirmed early.",
+      "coach": "a walkthrough of the disconnect and callback process, including documentation"
+    },
+    "note": "Confirm the program's current disconnect and callback process, including when a callback is required, how many attempts are expected, and where attempts are documented, before the session."
+  },
+  {
+    "id": "hold-unexplained-silence",
+    "cat": "hold",
+    "title": "Avoidable or Unexplained Silence",
+    "desc": "Short, unexplained silences at transition points, such as before answering, while reading notes, or while typing, that a brief explanation could have filled.",
+    "kw": ["pause", "pauses", "silence", "silent", "unexplained silence", "awkward silence", "short silence", "quiet", "quiet moments", "typing", "silent typing", "reading notes", "before answering", "no response", "dead air", "signposting", "transition", "gaps in conversation"],
+    "tags": ["Call Control", "Dead Air", "Soft Skills"],
+    "kpi": ["QA"],
+    "theme": "control",
+    "feedback": "At several transition points in this call, such as after the customer finished explaining the issue, while you were reading notes, or while you were typing, the line went quiet without any explanation. None of these pauses were long on their own, but together they left the customer guessing what was happening and made the conversation feel stop-and-start. A short phrase that signals what you are doing keeps the customer with you and makes the call sound confident and organized. Instead of letting those moments pass in silence, tell the customer what you are doing as you do it, such as reading their notes or entering the details.",
+    "impact": "Short silences usually come from habits that feel invisible on your side of the call, such as reading before speaking or typing without narrating, because you know what you are doing even when the customer cannot see it. To the customer, each unexplained pause raises a small question about whether you are still engaged. Repeated across a call, those moments can make you sound uncertain, slow the conversation's rhythm, and lower the customer's confidence in the help they are receiving.",
+    "plan": "Across the next {duration}, you will use a brief signposting phrase at each transition in the call, such as when you start reading account notes, begin typing, or move from one step to the next. You will keep a personal list of these phrases within easy reach until they become natural, and you will acknowledge what the customer said before you start working on it. In {calls} applicable calls reviewed within {followup}, the target is no unexplained pauses at transition points.",
+    "followup": "As a self-assessment, you will listen to this call and mark each pause where the customer could not tell what you were doing, and we will write a signposting phrase for each one to build your personal phrase bank. Within {followup}, I will check {calls} of your calls for quiet transitions, and we will look at the complete results together at the end of the {durationAdj} coaching period.",
+    "example": [
+      { "label": "Reading notes", "say": "Let me read through the notes from your last call so I don't ask you to repeat anything. This will take a few seconds." },
+      { "label": "While typing", "say": "I'm adding what you've told me to your account notes now, so anyone who helps you later will have the full picture." },
+      { "label": "Moving to the next step", "say": "That covers the billing question. Next, let's look at the remote that stopped working." }
+    ],
+    "questions": [
+      "Which moments in this call went quiet while you were reading, typing, or moving to a new step?",
+      "How do you think those short pauses sounded from the customer's side of the line?",
+      "Which signposting phrases feel natural enough that you would use them on every call?"
+    ],
+    "strengths": ["s-hold", "s-probing", "s-troubleshooting", "s-resolution"],
+    "b": {
+      "obs": "went quiet at transition points, such as while reading notes or typing, without letting the customer know what you were doing",
+      "focus": "signposting transitions",
+      "commit": "signpost each transition with a brief phrase, such as noting that you are reading the notes or entering details",
+      "m": "no unexplained pauses at transition points",
+      "coach": "a self-assessment of quiet transitions in this call and a signposting phrase bank"
+    },
+    "note": "Use this for short pauses at transitions. Long silent research stretches fit Excessive Dead Air, and slow replies to direct questions fit Delayed Responses to the Customer."
+  }
+]
