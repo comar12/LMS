@@ -118,6 +118,12 @@ function sync(){
   tries=0; mount();
 }
 load();
-window.addEventListener("hashchange", function(){ tries=0; setTimeout(sync,0); });
+/* The Academy wraps each route change in a view transition (desktop, motion allowed). Mounting inside that same callback lets the gate fade with the rest; otherwise the hashchange fallback mounts it directly. */
+function expectTransition(){ try{ return typeof document.startViewTransition==="function"&&!document.hidden&&window.innerWidth>=768&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){ return false; } }
+(function(){ var list=window.__cfRouteSyncs=window.__cfRouteSyncs||[]; list.push(function(){ tries=0; sync(); });
+  if(typeof document.startViewTransition==="function"&&!document.startViewTransition.__cf){ var orig=document.startViewTransition;
+    var wrapped=function(arg){ var obj=!!(arg&&typeof arg==="object"), cb=obj?arg.update:arg; var run=function(){ var r=typeof cb==="function"?cb():undefined; list.forEach(function(f){ try{ f(); }catch(e){} }); return r; }; return orig.call(document, obj?Object.assign({},arg,{update:run}):run); };
+    wrapped.__cf=true; document.startViewTransition=wrapped; } })();
+window.addEventListener("hashchange", function(){ tries=0; setTimeout(sync, expectTransition()?500:0); });
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(sync,0); }); else setTimeout(sync,0);
 })();

@@ -41,4 +41,29 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 .ms-btn-sm{min-height:2.25rem;padding:.35rem .75rem;font-size:.8125rem}
 .ms-empty{padding:.75rem;font-size:.875rem;color:var(--color-muted)}
 .ms-note-p{max-width:var(--sl-measure,68ch);font-size:.8125rem;color:var(--color-muted);margin-top:.75rem}
+.ms-input.ms-note{letter-spacing:0}.ms-input.ms-search{max-width:20rem}
+.ms-seal{display:inline-grid;place-items:center;width:1.25rem;height:1.25rem;border-radius:999px;border:2px solid var(--sl-done,#159b80);color:var(--color-success-text);background:var(--color-surface);margin-right:.4rem;vertical-align:-.3em;position:relative}
+.ms-seal svg{width:.7rem;height:.7rem}
+.ms-ring:before,.ms-ring:after{content:"";position:absolute;border-radius:999px;pointer-events:none;opacity:0}
+.ms-ring:after{inset:-.25rem;border:2px solid var(--sl-signal,#ff6d10)}
+.ms-bar[data-state="done"] .ms-ring:after{border-color:var(--sl-done,#159b80)}
+.ms-ring:before{inset:-.45rem;box-shadow:0 0 0 .3rem color-mix(in srgb,var(--sl-signal,#ff6d10) 16%,transparent)}
+/* Motion, borrowed from the Academy: sl-coach-in (rise), sl-node-arrive (node), sl-ring (pulse), ca-seal-in (seal). Reduced motion keeps everything still. */
+@media (prefers-reduced-motion:no-preference){
+#my-shift [data-ms-i="0"]{--ms-i:0}#my-shift [data-ms-i="1"]{--ms-i:1}#my-shift [data-ms-i="2"]{--ms-i:2}#my-shift [data-ms-i="3"]{--ms-i:3}#my-shift [data-ms-i="4"]{--ms-i:4}#my-shift [data-ms-i="5"]{--ms-i:5}
+#my-shift.ms-opening [data-ms-i]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) calc(var(--ms-i) * 55ms) backwards}
+#my-shift.ms-opening .sl-gate-node{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out) calc(var(--ms-i) * 55ms + 90ms) backwards}
+#my-shift .sl-chip[aria-pressed="true"]:before{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out)}
+#my-shift .ms-why:not(.ms-hide),#my-shift .sl-chips[data-field="gsrResult"],#my-shift .sl-chips[data-field="gsrWhich"],#my-shift .sl-chips[data-field="xmResult"]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
+#my-shift tr.ms-row[data-new]{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
+#my-shift tr.ms-row[data-new] td{animation:ms-settle .9s ease-out both}
+#my-shift [data-tick]{animation:ms-tick var(--m-disclose,.22s) var(--e-settle,ease-out) backwards}
+.ms-seal{animation:ca-seal-in var(--m-disclose,.22s) var(--e-settle,ease-out) backwards}
+.ms-seal:after{content:"";position:absolute;inset:-.3rem;border-radius:999px;border:2px solid var(--sl-done,#159b80);opacity:0;animation:sl-ring var(--m-segment,.32s) var(--e-out,ease-out) var(--m-press,.12s)}
+.ms-ring[data-pulse]:after{animation:sl-ring var(--m-segment,.32s) var(--e-out,ease-out)}
+.ms-bar[data-state="run"] .ms-ring:before{animation:vxi-ring-glow 4.5s ease-in-out infinite}
+.ms-msg{transition:color var(--m-hover,.18s) var(--e-out,ease-out)}
+@keyframes ms-settle{0%{background-color:var(--color-success-soft)}to{background-color:transparent}}
+@keyframes ms-tick{0%{opacity:.3;transform:translateY(.3rem)}to{opacity:1;transform:none}}
+}
 @media (prefers-reduced-motion:reduce){.ms-ring .fg{transition:none}}
