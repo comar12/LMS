@@ -63,6 +63,10 @@ a CSV download; nothing is sent anywhere.
   account and note; keys 1–6 pick the call type; Enter in the account or note
   box logs the call (Ctrl+Enter from anywhere); the cursor goes back to the
   account box afterwards.
+- **Call backs.** Agents never offer or promise a call back; a call back the
+  customer asks for is fine. Picking "Follow-up" for GSR or XM shows that
+  rule under the reason, and the note box asks for the call back the customer
+  asked for and when.
 
 ### Who is logging
 

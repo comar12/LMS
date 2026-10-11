@@ -24,6 +24,8 @@ html.my-shift-on main#main{display:none}
 .ms-chips{margin-top:.25rem}
 .ms-why{margin-top:.5rem;padding:.5rem .6rem;border-radius:.6rem;background:var(--color-canvas);border:1px dashed var(--color-line-strong)}
 .ms-why .ms-lab{margin-bottom:.3rem}
+.ms-fu-tip{margin:.4rem 0 0;font-size:.8125rem;font-weight:600;color:var(--color-attention-text)}
+.ms-fu-tip[hidden]{display:none}
 .ms-reasons{margin-top:.75rem;border-top:1px solid var(--color-line);padding-top:.5rem;font-size:.8125rem;color:var(--color-body)}
 .ms-reasons p{margin:0}.ms-reasons .ms-rh{margin-top:.4rem;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--color-muted)}
 .ms-gap{display:inline-block;width:.5rem}
