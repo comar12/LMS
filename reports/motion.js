@@ -13,6 +13,7 @@ window.addEventListener('beforeprint', ()=>document.querySelectorAll('.rvl').for
 /* numbers glide from their previous value instead of restarting at zero */
 const NUMPREV={};
 function morphNum(el, to, f, dur){ if (!el) return; let from=parseFloat(el.dataset.v); if (!isFinite(from) && el.id && NUMPREV[el.id]!=null) from=NUMPREV[el.id]; el.dataset.v=String(to); if (el.id) NUMPREV[el.id]=to; if (!isFinite(to)){ el.textContent=f(to); return; } if (window.Charts&&Charts.countUp) Charts.countUp(el, to, {from: isFinite(from)?from:0, duration: dur||650, format:f}); else el.textContent=f(to); }
+function ns(v){ return `${n0(v)} sale${v===1?'':'s'}`; }
 const shortName = s => { const w=String(s||'').trim().split(/\s+/); return w.length>3 ? w.slice(0,3).join(' ') : w.join(' '); };
 
 /* ---- reporting-day strip: a micro stacked column per business day (XM bottom, GSR top), morphs in place on filter changes */
