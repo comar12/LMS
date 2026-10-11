@@ -125,7 +125,7 @@ function renderHome(main) {
     homeTile({ href: '#/builder', iconName: 'clipboard', title: 'Coaching Builder', text: 'Combine behaviors into one ready-to-paste coaching entry', cat: 'own', badge: bc ? String(bc) : null, fk: 'home-t-builder' }),
     homeTile({ href: '#/tracker', iconName: 'calendar', title: 'Follow-Up Tracker', text: 'Log reviews and check-ins; progress is written from your results', cat: 'own', badge: trackerDueCount() ? `${trackerDueCount()} due` : null, fk: 'home-t-tracker' }),
     homeTile({ href: '#/people-toolkit', iconName: 'users', title: 'ABS & Attrition Toolkit', text: 'Attendance talks, stay conversations, warning signs, recognition', cat: 'people', fk: 'home-t-people' }),
-    homeTile({ href: '#/sales-toolkit', iconName: 'tag', title: 'Sales Toolkit', text: 'Sales flow, offer guides, objections, and buying signals', cat: 'sales', fk: 'home-t-sales' }),
+    homeTile({ href: '#/huddle', iconName: 'megaphone', title: 'Team Huddle Builder', text: 'A ready-to-run huddle on your team’s most-missed behavior', cat: 'people', fk: 'home-t-huddle' }),
     homeTile({ href: '#/links', iconName: 'link', title: 'Quick Links', text: state.links.items.length ? `${plural(state.links.items.length, 'dashboard, tool, or form', 'dashboards, tools, and forms')} one click away` : 'Add the dashboards and forms you open every day', cat: 'dis', fk: 'home-t-links' })
   );
 

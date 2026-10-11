@@ -36,6 +36,11 @@ To see it working first, watch the one-minute walkthrough: [`docs-walkthrough.mp
   reviewed call or check-in as Met, Not met, or N/A per behavior. **Copy progress** and **Use in Builder** write
   the "What progress has been made" section only from what you logged, so progress is never assumed. Labels and
   notes are never copied into coaching text.
+- **Team Huddle Builder**: pick one behavior (it suggests the ones most often logged as Not met in the tracker),
+  choose 5, 10, or 15 minutes, and optionally open with a team win. It builds a timed agenda from the library
+  entry (why it matters, what good sounds like, discussion questions, practice in pairs, one commitment), with
+  **Copy plan**, **Copy team chat recap**, and a full-screen **Present** mode with a timer. Individual attendance
+  and wellbeing topics are never offered for a team huddle.
 - **ABS & Attrition**: 14 coaching entries on attendance, punctuality, schedule adherence, engagement, stress,
   confidence, growth, and team connection, plus a toolkit for new team leaders: a step-by-step attendance
   conversation, return-to-work lines, stay conversation questions, early warning signs, and recognition ideas
@@ -102,8 +107,8 @@ tools/
   build.py             builds VXI_Coaching_Intelligence_Pro.html
 tests/
   e2e.cjs              browser tests (Playwright + Chromium): the ten QA scenarios plus copy, storage,
-                       import, Builder, Home, Call Review, ABS & Attrition, Follow-Up Tracker, Sales Toolkit, Quick Links,
-                       and brand color checks
+                       import, Builder, Home, Call Review, ABS & Attrition, Follow-Up Tracker, Team Huddle,
+                       Sales Toolkit, Quick Links, and brand color checks
 ```
 
 ```

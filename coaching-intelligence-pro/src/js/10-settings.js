@@ -21,6 +21,7 @@ function exportPayload() {
       builder: state.builder,
       links: state.links,
       tracker: state.tracker,
+      huddle: state.huddle,
     },
   };
 }
@@ -87,6 +88,7 @@ function parseImport(text) {
       builder: d.builder ? sanitizeBuilder(d.builder) : null,
       links: d.links ? sanitizeLinks(d.links) : null,
       tracker: d.tracker ? sanitizeTracker(d.tracker) : null,
+      huddle: d.huddle ? sanitizeHuddle(d.huddle) : null,
     },
   };
 }
@@ -110,6 +112,7 @@ function applyImport(pack, mode) {
     // Backups made before Quick Links existed have no links; keep the current ones.
     if (pack.links) state.links = pack.links;
     if (pack.tracker) state.tracker = pack.tracker;
+    if (pack.huddle) state.huddle = pack.huddle;
   } else {
     if (pack.tracker) state.tracker = { plans: mergeById(state.tracker.plans, pack.tracker.plans) };
     if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items) };
@@ -196,6 +199,7 @@ async function clearAllData() {
   state.review = defaultReview();
   state.links = initialLinks();
   state.tracker = { plans: [] };
+  state.huddle = defaultHuddle();
   store.remove('brandcss');
   applyTheme();
   applyBrand();

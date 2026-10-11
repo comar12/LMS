@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const STORAGE_PREFIX = 'cip.v1.';
-const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker'];
+const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle'];
 
 const store = (() => {
   let ok = false;
@@ -98,6 +98,9 @@ function defaultPrefs() {
 function defaultReview() {
   return { type: 'tech', byType: {} };
 }
+function defaultHuddle() {
+  return { opp: null, strength: null, minutes: 10, history: [] };
+}
 /** Quick Links start from the preset built into this copy of the app (empty in the shared copy). */
 function initialLinks() {
   return sanitizeLinks({ items: DATA.seedLinks || [] });
@@ -130,6 +133,7 @@ const state = {
   review: defaultReview(),
   links: { items: [] },
   tracker: { plans: [] },
+  huddle: defaultHuddle(),
   ui: { view: 'all', cat: null, query: '', linkQuery: '', openId: null, sVersion: {}, visibleIds: [], returnFocusKey: null },
 };
 
@@ -246,6 +250,18 @@ function sanitizeTracker(o) {
     });
   }
   return { plans };
+}
+
+function sanitizeHuddle(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const out = defaultHuddle();
+  if (isId(src.opp)) out.opp = src.opp;
+  if (isId(src.strength)) out.strength = src.strength;
+  if ([5, 10, 15].includes(src.minutes)) out.minutes = src.minutes;
+  for (const r of Array.isArray(src.history) ? src.history.slice(0, 50) : []) {
+    if (r && isIsoDate(r.date) && isId(r.opp)) out.history.push({ date: r.date, opp: r.opp, minutes: [5, 10, 15].includes(r.minutes) ? r.minutes : 10 });
+  }
+  return out;
 }
 
 function sanitizeLinks(o) {
@@ -484,6 +500,7 @@ function loadSlice(key) {
     case 'combos': state.combos = sanitizeCombos(store.get('combos', [])); break;
     case 'drafts': state.drafts = sanitizeDrafts(store.get('drafts', [])); break;
     case 'review': state.review = sanitizeReview(store.get('review', null)); break;
+    case 'huddle': state.huddle = sanitizeHuddle(store.get('huddle', null)); break;
     case 'tracker': state.tracker = sanitizeTracker(store.get('tracker', null)); break;
     case 'links': {
       const raw = store.get('links', null);

@@ -431,6 +431,10 @@ async function test(name, fn) {
       await page.goto(URL + '#/home');
       await page.waitForSelector('.hero');
       await overflow('home');
+      await page.goto(URL + '#/huddle');
+      await page.locator('.hd-sug').first().click();
+      await page.waitForSelector('.hd-agenda');
+      await overflow('team huddle');
       await page.goto(URL + '#/settings');
       await overflow('settings');
       if (vp.width < 1024) {
@@ -1156,9 +1160,55 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Team Huddle Builder: suggestions from the tracker, timed agenda, copy, present mode, private topics left out', async () => {
+    const { page, context } = await newPage({
+      hash: '#/huddle',
+      init: () => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); const d = new Date(); d.setDate(d.getDate() - 2); const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-h1', label: 'Agent 1', start: day, duration: 14, calls: 5, followup: 7, focus: ['own-confirm-resolution', 'people-no-call-no-show'], logs: [{ id: 'log-h1', kind: 'call', date: day, results: { 'own-confirm-resolution': 'miss' } }, { id: 'log-h2', kind: 'checkin', date: day, results: { 'people-no-call-no-show': 'miss' } }] }] })); } },
+    });
+    await page.waitForSelector('.hd-sug');
+    const sugs = await page.locator('.hd-sug__title').allInnerTexts();
+    assert(sugs.join('|') === 'Not Confirming Resolution Before Closing', 'Suggestions should be the missed call behavior only, never a private attendance topic: ' + sugs.join('|'));
+    await page.fill('#combo-huddle', 'no-call no-show');
+    await page.waitForTimeout(200);
+    assert(!(await page.locator('#combo-huddle-list .combo__opt-title').allInnerTexts()).includes('No-Call, No-Show'), 'Private attendance topics must not be offered for a team huddle');
+    await page.keyboard.press('Escape');
+    await page.locator('.hd-sug').first().click();
+    await page.selectOption('#hd-strength', 's-closing');
+    await page.waitForSelector('.hd-agenda');
+    const o = oppById['own-confirm-resolution'];
+    const mins = (await page.locator('.hd-seg__min').allInnerTexts()).map((t) => parseInt(t, 10));
+    assert(mins.reduce((a, b) => a + b, 0) === 10, 'A 10-minute huddle should add up to 10 minutes: ' + mins.join(','));
+    const plan = await clickCopy(page, 'Copy huddle plan');
+    assertClean(plan, 'huddle plan');
+    assert(plan.startsWith(`Team Huddle: ${o.title} (10 minutes)`), 'Plan heading is wrong');
+    assert(plan.includes(`The goal: ${o.b.commit}.`) && plan.includes(`"${o.example[0].say}"`), 'Plan must come from the library entry');
+    assert(plan.includes('Shout-out to the team for strong call closing.'), 'Team win is missing');
+    assert(!/  /.test(plan), 'Plan has double spaces');
+    const recap = await clickCopy(page, 'Copy team chat recap');
+    assertClean(recap, 'huddle recap');
+    assert(recap.startsWith(`Huddle recap: ${o.b.focus}.`), 'Recap is wrong');
+    await page.getByRole('button', { name: '5 min', exact: true }).click();
+    const five = (await page.locator('.hd-seg__min').allInnerTexts()).map((t) => parseInt(t, 10));
+    assert(five.reduce((a, b) => a + b, 0) === 5 && (await page.locator('.hd-seg').count()) === 4, '5-minute huddle has the wrong parts');
+    // Present mode: arrow keys move between parts, Escape closes.
+    await page.getByRole('button', { name: 'Present' }).click();
+    await page.waitForSelector('.present__title');
+    assert((await page.locator('.present__title').innerText()) === 'Why it matters', 'Present mode should open on the first part');
+    await page.keyboard.press('ArrowRight');
+    assert((await page.locator('.present__title').innerText()) === 'Team win', 'Arrow key did not advance');
+    await page.keyboard.press('Escape');
+    assert((await page.locator('.present').count()) === 0, 'Escape did not close present mode');
+    await page.getByRole('button', { name: 'Mark as held today' }).click();
+    assert((await page.locator('.hd-hist li').count()) === 1, 'Held huddle was not saved');
+    await page.reload();
+    await page.waitForSelector('.hd-agenda');
+    assert((await page.locator('.hd-hero__title').innerText()) === o.title && (await page.locator('.hd-seg').count()) === 4, 'Huddle choices did not persist');
+    await finish(page, context);
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
-    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/links', '#/templates', '#/settings'];
+    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/links', '#/templates', '#/settings'];
     const sweep = async (label) => {
       for (const v of views) {
         await page.goto(URL + v);
@@ -1172,6 +1222,7 @@ async function test(name, fn) {
       localStorage.setItem('cip.v1.links', JSON.stringify({ items: [{ id: 'link-a1', name: 'Dashboard', url: 'example.com', group: 'Daily', pinned: true }] }));
       localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-a1', label: 'Agent 1', start: '2026-01-05', duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }] }));
       localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['hold-dead-air'], strengths: [] }));
+      localStorage.setItem('cip.v1.huddle', JSON.stringify({ opp: 'hold-dead-air', strength: 's-empathy', minutes: 10, history: [{ date: '2026-01-05', opp: 'hold-dead-air', minutes: 10 }] }));
     });
     await page.reload();
     await sweep('with data');
