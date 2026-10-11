@@ -1,4 +1,10 @@
 /* ---------------------------------------------------------------- analytics engine (extends compute()) */
+// Fiscal month = 22nd of a month to the 21st of the next; named after the month it ends in.
+function fiscalStart(d){ const y=+d.slice(0,4), m=+d.slice(5,7), day=+d.slice(8,10); if(day>=22) return d.slice(0,8)+'22'; const pm=new Date(Date.UTC(y,m-2,22)); return pm.toISOString().slice(0,10); }
+function fiscalEnd(fs){ const y=+fs.slice(0,4), m=+fs.slice(5,7); return new Date(Date.UTC(y,m,21)).toISOString().slice(0,10); }
+function fiscalName(fs){ const fe=fiscalEnd(fs); return MO[+fe.slice(5,7)-1]+' '+fe.slice(0,4); }
+function fiscalKey(d){ return fiscalEnd(fiscalStart(d)).slice(0,7); }
+function daysBetween(a,b){ return Math.round((new Date(b+'T00:00:00Z')-new Date(a+'T00:00:00Z'))/86400000); }
 // All helpers take the compute() result C and the global data (rows, roster, DATES, DI, state).
 function weekKey(d){ const dt=new Date(d+'T00:00:00Z'); const day=(dt.getUTCDay()+6)%7; dt.setUTCDate(dt.getUTCDate()-day); return dt.toISOString().slice(0,10); }
 function weeklySeries(rs, i0, i1){ // weekly buckets (Mon-start) covering [i0,i1]
@@ -16,7 +22,7 @@ function extendCompute(C){
   const last30=dy.u.slice(Math.max(0,i1-29),i1+1); const reg=linreg(last30); const cv=last30.length? stdev(last30)/Math.max(1,last30.reduce((a,b)=>a+b,0)/last30.length):0;
   const anomalies=[]; for(let i=Math.max(14,i0);i<=i1;i++){ const w=dy.u.slice(i-14,i); const m=w.reduce((a,b)=>a+b,0)/14, s=stdev(w); if(s>0 && Math.abs(dy.u[i]-m)>2*s) anomalies.push({d:DATES[i], v:dy.u[i], mean:m, z:(dy.u[i]-m)/s}); }
   // --- cumulative vs target for the month of the To date, with projection at the 7-day pace
-  const to=state.to, y=+to.slice(0,4), mo=+to.slice(5,7); const dim=new Date(Date.UTC(y,mo,0)).getUTCDate(); const mStart=to.slice(0,8)+'01'; const ms=DI[mStart]!=null?DI[mStart]:null;
+  const to=state.to; const fs=fiscalStart(to), fe=fiscalEnd(fs); const dim=daysBetween(fs,fe)+1; const mStart=fs; const ms=DI[mStart]!=null?DI[mStart]:(mStart<META.minDate?0:null);
   const cum={labels:[],actual:[],target:[],projection:[]}; if(ms!=null){ let acc=0; const pace=dy.avg7[i1]; for(let k=0;k<dim;k++){ const d=addDays(mStart,k); cum.labels.push(d); cum.target.push(target*(k+1)); const i=DI[d]; if(i!=null && i<=i1){ acc+=dy.u[i]; cum.actual.push(acc); cum.projection.push(null); } else { cum.actual.push(null); cum.projection.push(acc + pace*(k-(i1-ms))); } } if(cum.projection.length) cum.projection[i1-ms]=cum.actual[i1-ms]; }
   // --- waterfall: contribution of each team to the change vs prior period, and last day vs previous day
   const wf = (cur, prv) => { const steps=leaders.map(l=>({label:l.tl, delta:cur(l)-prv(l)})).filter(s=>s.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)); const top=steps.slice(0,8); const rest=steps.slice(8).reduce((s,x)=>s+x.delta,0); if(rest) top.push({label:'Other teams',delta:rest}); const nr = C.nrCur ? 0 : 0; return top; };
@@ -42,7 +48,7 @@ function extendCompute(C){
   const top10Share = totU? [...agents].sort((a,b)=>b.u-a.u).slice(0,10).reduce((s,a)=>s+a.u,0)/totU : 0;
   // --- tenure ramp (period)
   const ramp = TENURES.map(t=>{ const g=agents.filter(a=>a.tenure===t); return {tenure:t, n:g.length, perDayHead: g.length? g.reduce((s,a)=>s+a.perDay,0)/g.length : 0}; });
-  Object.assign(C,{reg, cv, anomalies, cum, dim, wfPeriod, wfDay, nrPeriodDelta, hours, wdn, hw, coaching, perDayVals, gini, top10Share, ramp, weekly: weeklySeries(scoped, Math.max(0,i1-55), i1)});
+  Object.assign(C,{reg, cv, anomalies, cum, dim, fs, fe, fiscal:fiscalName(fs), wfPeriod, wfDay, nrPeriodDelta, hours, wdn, hw, coaching, perDayVals, gini, top10Share, ramp, weekly: weeklySeries(scoped, Math.max(0,i1-55), i1)});
   return C; }
 
 /* ---------------------------------------------------------------- insight engine: evidence-backed rules → {level, sev, title, text, action, impact} */
