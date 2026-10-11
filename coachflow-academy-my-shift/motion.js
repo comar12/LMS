@@ -4,7 +4,7 @@
 var NODE_SEL=".sl-gate-node,.sl-step-node,.sl-guide-step-node,.sl-cf-node";
 var COUNT_SEL=".tabular,.sl-know-count,.sl-know-area-count,.sl-chip-count,.sl-turn-count,.sl-case-log-count";
 var NO_RISE=/^(SPAN|A|B|I|EM|STRONG|SMALL|BR|IMG|INPUT|LABEL|OPTION|SCRIPT|STYLE|TEMPLATE|CODE|SUP|SUB|ABBR|TIME|MARK|U|S|KBD|TR|TD|TH|THEAD|TBODY|SVG|svg|path|circle|g|line|polyline|rect)$/;
-var OVERLAY=/^#\/academy\/(my-shift|sales-integrity-gate)$/;
+var OVERLAY=/^#\/academy\/(my-shift(\/team-board)?|sales-integrity-gate)$/;
 var MAX_BLOCKS=9, MAX_NODES=9, MAX_RISE=12, ARRIVE_MS=1400, RISE_MS=900, SEAL_MS=1000;
 var lastKey=null, lastW=null, lastSig=null, pending=false, arriveT=null, counts=new WeakMap();
 
