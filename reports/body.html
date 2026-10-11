@@ -1,0 +1,140 @@
+<header class="topbar"><div class="topbar-inner">
+  <div class="brand"><span class="brand-mark">VXI | TSX</span><span>Sales performance</span><span class="snapshot" id="snapshotBadge">Snapshot</span><span class="status-pill" id="freshPill"><i></i><span id="freshText"></span></span></div>
+  <div class="top-actions"><label class="primary" style="cursor:pointer">⬆ Load tracker export<input type="file" id="fileTracker" accept=".xlsx" hidden></label><button class="secondary" id="toData">Data &amp; settings</button>
+    <div class="theme-switch" role="group" aria-label="Color theme"><button data-theme-choice="auto">Auto</button><button data-theme-choice="light">Light</button><button data-theme-choice="dark">Dark</button></div></div>
+</div></header>
+
+<main class="workspace">
+  <section class="panel upload-panel" id="uploadPanel">
+    <div class="upload-copy"><h2>Tracker &amp; roster files</h2><span id="fileLine"></span></div>
+    <div class="upload-actions"><label class="primary" style="cursor:pointer">⬆ Upload files<input type="file" id="fileAny" accept=".xlsx" multiple hidden></label><label class="secondary" style="cursor:pointer">👥 Roster<input type="file" id="fileRoster" accept=".xlsx" hidden></label><button class="secondary" id="resetData">Reset to built-in</button></div>
+    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
+  </section>
+
+  <section class="panel hero">
+    <div class="hero-top">
+      <div><span class="eyebrow">VXI | TSX · Cairo Repair · Sales performance</span><h1>Sales Performance</h1><p id="heroSub">Units sold per business day (15:00 Cairo → 07:00 next morning) · attributed to ops managers, team leaders and agents through the roster</p></div>
+      <div class="hero-period"><span class="period-label">Summary period</span><div class="segmented" id="presets"></div><span class="period-label" id="periodLabel"></span></div>
+    </div>
+    <div class="daystrip">
+      <div class="daystrip-label"><b>Reporting day</b><span id="stripRange"></span><small><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:4px"></i>up vs previous day · <i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--bad);margin-right:4px"></i>down</small></div>
+      <div class="days" id="days"></div>
+      <div class="pacing" id="pacing"></div>
+    </div>
+    <div class="hero-body">
+      <div class="hero-gauge"><figure id="gauge"></figure><div class="hero-comparison" id="heroCmp"></div><div class="hero-comparison" id="heroTarget"></div></div>
+      <div class="hero-metrics" id="heroMetrics"></div>
+    </div>
+    <div class="hero-foot"><span id="footScope"></span><span id="footData"></span></div>
+  </section>
+
+  <section class="panel control-panel">
+    <div class="tabrow"><div class="tabs" id="tabs"></div><input class="search" id="agentSearchTop" type="search" placeholder="Find an agent by name or HRID"></div>
+    <div class="filters">
+      <div class="fld"><span class="fl">Operations manager</span><div class="picker" id="pk-om"></div></div>
+      <div class="fld"><span class="fl">Team leader</span><div class="picker" id="pk-tl"></div></div>
+      <div class="fld"><span class="fl">Phase</span><div class="picker" id="pk-phase"></div></div>
+      <div class="fld"><span class="fl">Tenure bucket</span><div class="picker" id="pk-tenure"></div></div>
+      <div class="fld"><span class="fl">Date range</span><div class="picker" id="pk-date"></div></div>
+      <button class="reset-button" id="resetFilters">Reset</button>
+    </div>
+    <div class="scope-line"><span>Current scope · <b id="scopeText"></b></span><span><label style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="exdup" checked> Exclude duplicate submissions</label></span></div>
+  </section>
+
+  <!-- ================= EXECUTIVE -->
+  <section class="view" id="v-exec">
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Executive summary</span><h2 id="execTitle">What a VP needs to know</h2><p id="execSub"></p></div><span class="count-chip" id="attnCount">0 items</span></div><div class="callouts" id="execSummary"></div></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="chart-grid">
+      <div class="panel"><div class="panel-head"><div><h2>Daily units vs target</h2><p>Selected period · current filters · dashed line = target for this scope · rings green at/above target</p></div><button class="text-button" data-tv="c1">Table view</button></div><div class="panel-body"><div class="headline" id="dailyHead"></div><figure id="c1"></figure><div class="legend"><span><i class="k"></i>Daily units</span><span><i class="k" style="border-color:var(--s2)"></i>7-day average</span><span><i class="k dash"></i>Target</span><span><i class="k vol"></i>Submissions</span></div></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Month pacing</h2><p id="cumSub">Cumulative units vs cumulative target · dotted = projection at the current 7-day pace</p></div><button class="text-button" data-tv="c2">Table view</button></div><div class="panel-body"><figure id="c2"></figure><div class="legend"><span><i class="k"></i>Actual</span><span><i class="k dash"></i>Target</span><span><i class="k" style="border-color:var(--muted);border-top-style:dotted"></i>Projection</span></div><div class="chart-foot" id="cumFoot"></div></div></div>
+    </div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Operations managers vs target</h2><p>Units per agent per business day · bar = actual, tick = target</p></div><button class="text-button" data-tv="c3">Table view</button></div><div class="panel-body"><figure id="c3"></figure></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>What drove the change</h2><p id="wfSub">Change in units vs the prior period, by team</p></div><button class="text-button" data-tv="c4">Table view</button></div><div class="panel-body"><figure id="c4"></figure></div></div>
+    </div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><h2>Every business day at a glance</h2><p>Units per day over the whole tracker history · current filters</p></div><button class="text-button" data-tv="c5">Table view</button></div><div class="panel-body"><figure id="c5"></figure></div></div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Weekly mix</h2><p>Units per week by product · last 8 weeks</p></div><button class="text-button" data-tv="c6">Table view</button></div><div class="panel-body"><figure id="c6"></figure><div class="legend" id="mixLegend"></div></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Attach &amp; activation</h2><p>XMC attach % and e-SIM activation % on answered XM-line entries</p></div><button class="text-button" data-tv="c7">Table view</button></div><div class="panel-body"><figure id="c7"></figure><div class="legend"><span><i class="k"></i>XMC attach %</span><span><i class="k" style="border-color:var(--s2)"></i>E-SIM activation %</span><span><i class="k dash"></i>XMC target (if set)</span></div></div></div>
+    </div>
+    <div class="panel"><div class="panel-head"><div><h2>Attention</h2><p id="attnSub"></p></div></div><ul class="attn" id="attn"></ul></div>
+  </section>
+
+  <!-- ================= OPS MANAGERS -->
+  <section class="view" id="v-om">
+    <div class="grid-three" id="omCards"></div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Teams vs target</h2><p>Units per agent per business day · tick = 2 per agent target · Ops manager filter applies</p></div><button class="text-button" data-tv="c8">Table view</button></div><div class="panel-body"><figure id="c8"></figure></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Participation × productivity</h2><p>Each dot is a team · x = share of agents who sold · y = units per selling agent · reference lines = account medians</p></div><button class="text-button" data-tv="c9">Table view</button></div><div class="panel-body"><figure id="c9"></figure></div></div>
+    </div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><h2>Team trajectories</h2><p>Last 14 business days per team · shared scale · dashed = team target</p></div></div><div class="panel-body"><figure id="c10"></figure></div></div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Prior period → this period</h2><p>Units per team · green up, red down</p></div><button class="text-button" data-tv="c11">Table view</button></div><div class="panel-body"><figure id="c11"></figure></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Yesterday's movers</h2><p id="wfDaySub">Change on the last business day vs the day before, by team</p></div><button class="text-button" data-tv="c12">Table view</button></div><div class="panel-body"><figure id="c12"></figure></div></div>
+    </div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><h2>Team leader rankings</h2><p id="leaderSub"></p></div><span class="panel-meta" id="leaderMeta"></span></div><div class="table-wrap" id="leaderTable"></div><div class="table-note" id="leaderNote"></div></div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><h2>Operations manager rankings</h2><p>Same period and filters</p></div></div><div class="table-wrap" id="omTable"></div></div>
+    <div class="panel"><div class="panel-head"><div><h2>Team × day matrix</h2><p>Units per team per business day · darker = more</p></div></div><div class="table-wrap" id="leaderMatrix"></div></div>
+  </section>
+
+  <!-- ================= TEAM LEADERS -->
+  <section class="view" id="v-leader">
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Team leader view</span><h2 id="leaderName">Team</h2><p id="leaderInfo"></p></div><div style="display:flex;gap:8px;align-items:center"><div class="picker" id="pk-leader" style="min-width:240px"></div></div></div>
+      <div class="panel-body"><div class="headline four" id="leaderHead"></div><div class="grid-two" style="margin-bottom:0"><div><figure id="c13"></figure><div class="legend"><span><i class="k"></i>Team units</span><span><i class="k" style="border-color:var(--s2)"></i>7-day average</span><span><i class="k dash"></i>Team target</span></div></div><div><figure id="c14"></figure><div class="legend"><span><i class="k" style="border-color:var(--s3)"></i>Participation % (agents who sold ÷ HC)</span></div></div></div></div></div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Agents vs target</h2><p>Units per business day per agent · tick = target</p></div><button class="text-button" data-tv="c15">Table view</button></div><div class="panel-body"><figure id="c15"></figure></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Coaching priorities</h2><p>Score blends gap to target, days since last sale and position vs team median · Production agents first, Training agents scaled down</p></div></div><div class="table-wrap" id="coachTable"></div></div>
+    </div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>When this team sells</h2><p>Units by weekday and hour of shift (Cairo time) · selected period</p></div><button class="text-button" data-tv="c16">Table view</button></div><div class="panel-body"><figure id="c16"></figure></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Agent productivity spread</h2><p>Distribution of units per day per agent in this team · marker = target</p></div><button class="text-button" data-tv="c17">Table view</button></div><div class="panel-body"><figure id="c17"></figure></div></div>
+    </div>
+    <div class="panel"><div class="panel-head"><div><h2>Agent × day matrix</h2><p>Units per agent per business day</p></div></div><div class="table-wrap table-tall" id="agentMatrix"></div></div>
+  </section>
+
+  <!-- ================= AGENTS -->
+  <section class="view" id="v-agents">
+    <div class="grid-three" id="agentCards" style="grid-template-columns:repeat(4,1fr)"></div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Agent review</span><h2 id="agentName">Agent</h2><p id="agentInfo"></p></div><div style="display:flex;gap:8px;align-items:center"><input class="search" id="agentSel" list="agentList" placeholder="Type an agent name or HRID"><datalist id="agentList"></datalist><button class="text-button" data-tv="c18">Table view</button></div></div>
+      <div class="panel-body"><div class="headline four" id="agentHead"></div><div class="grid-two" style="margin-bottom:0"><div><figure id="c18"></figure><div class="legend"><span><i class="k"></i>Agent units</span><span><i class="k" style="border-color:var(--s2)"></i>Team average per agent</span><span><i class="k dash"></i>Target</span></div></div><div><figure id="c19"></figure><div class="chart-foot" id="agentMixFoot"></div></div></div></div></div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Top 10 agents</h2><p>Selected period &amp; scope</p></div></div><div class="table-wrap" id="top10"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Needs a closer look</h2><p>Production agents with the fewest units · coaching list</p></div></div><div class="table-wrap" id="bottom10"></div></div>
+    </div>
+    <div class="panel"><div class="panel-head"><div><h2>All roster agents in scope</h2><p>Click a column header to sort · Rank (Scope) ranks inside the current filter · ▲▼ = rank movement vs the prior period</p></div></div><div class="toolbar"><input class="search" id="agentSearch" type="search" placeholder="Filter by name, leader, HRID…"><label>Rows <span id="agentRows"></span></label></div><div class="table-wrap table-tall" id="agentTable"></div></div>
+  </section>
+
+  <!-- ================= INSIGHTS -->
+  <section class="view" id="v-insights">
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Top 5 to present</span><h2>If you only show five things</h2><p>Ranked by business impact · follows the filters</p></div></div><div class="callouts" id="top5"></div></div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Ops manager insights</h2><p>One per operation</p></div></div><div class="callouts" id="omIns"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Team leader insights</h2><p>One per team</p></div></div><div class="callouts" id="leaderIns"></div></div>
+    </div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Agent coaching insights</h2><p>Top of the coaching list</p></div></div><div class="callouts" id="agentIns"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Full-history insights</h2><p>Whole account, every business day in the tracker</p></div></div><div class="callouts" id="histIns"></div></div>
+    </div>
+    <div class="panel"><div class="panel-head"><div><h2>Routine for the newly promoted leaders</h2><p>How to run this dashboard day to day</p></div></div><div class="callouts" id="recs"></div></div>
+  </section>
+
+  <!-- ================= DATA & SETTINGS -->
+  <section class="view" id="v-data">
+    <div class="grid-three" id="qTiles"></div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>Targets</h2><p>Nothing is assumed. One rate, set by you, multiplied by headcount in scope.</p></div></div><div class="method-list">
+        <div><strong>Units per agent per business day</strong> <input type="number" id="targetInput" min="0.1" step="0.5" style="width:90px;height:32px;margin-left:8px"> <span class="panel-meta">Account target = rate × roster headcount; team target = rate × team headcount; agent target = the rate.</span></div>
+        <div><strong>Count only Production agents in targets</strong> <input type="checkbox" id="targetProd" style="margin-left:8px;transform:scale(1.2)"> <span class="panel-meta">When on, Training-phase agents are left out of every headcount used for targets (they still appear in the tables).</span></div>
+        <div><strong>XMC attach target</strong> <input type="number" id="xmcTarget" min="0" max="100" step="1" placeholder="none" style="width:90px;height:32px;margin-left:8px"> % of answered XM-line entries · leave empty for no XMC target.</div>
+        <div class="panel-meta" id="targetNote"></div></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Uploaded sources</h2><p>What this page is showing</p></div></div><div class="source-numbers" id="sourceNumbers"></div><div class="method-list" id="sourceList"></div></div>
+    </div>
+    <div class="grid-two">
+      <div class="panel"><div class="panel-head"><div><h2>HRIDs not on the roster</h2><p>Valid-looking 9-digit IDs are probably attrited or transferred agents – add them to a Leavers tab to attribute their sales</p></div></div><div class="table-wrap table-tall" id="unmapped"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Definitions &amp; assumptions</h2></div></div><div class="method-list" id="defs"></div></div>
+    </div>
+  </section>
+  <footer><span>VXI | TSX · Cairo Repair Sales</span><span id="footerMid"></span><span>Business days 15:00 → 07:00 Cairo · equal totals share a rank</span></footer>
+</main>
+<div class="tip" id="tip"></div><div class="toast" id="toast"></div>
