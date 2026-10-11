@@ -61,6 +61,7 @@ def build_data():
         "opps": opps,
         "strengths": strengths,
         "guides": load_json("data/guides.json"),
+        "salesToolkit": load_json("data/sales_toolkit.json"),
     }
 
 

@@ -19,6 +19,7 @@ const meta = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'meta.json'), 'utf8'
 const opps = meta.categories.flatMap((c) => JSON.parse(fs.readFileSync(path.join(DATA_DIR, c.file), 'utf8')));
 const strengths = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'strengths.json'), 'utf8'));
 const oppById = Object.fromEntries(opps.map((o) => [o.id, o]));
+const toolkit = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'sales_toolkit.json'), 'utf8'));
 const strengthById = Object.fromEntries(strengths.map((s) => [s.id, s]));
 
 const results = [];
@@ -403,6 +404,12 @@ async function test(name, fn) {
       await overflow('strengths');
       await page.goto(URL + '#/templates');
       await overflow('templates');
+      for (const tab of ['Call review', 'Sales flow', 'Offer guides', 'Objections', 'Buying signals']) {
+        await page.goto(URL + '#/sales-toolkit');
+        await page.getByRole('tab', { name: tab }).click();
+        await page.waitForTimeout(120);
+        await overflow('sales toolkit: ' + tab);
+      }
       await page.goto(URL + '#/settings');
       await overflow('settings');
       if (vp.width < 1024) {
@@ -777,6 +784,104 @@ async function test(name, fn) {
     await page.waitForTimeout(200);
     const text = await clipboard(page);
     assert(text === [fill(oppById['com-opening'].plan), fill(oppById['com-closing'].plan)].join('\n\n'), 'Unmerged plans copy is wrong');
+    await finish(page, context);
+  });
+
+  await test('Sales Toolkit: call review feeds the Builder; every script copies exactly', async () => {
+    const { page, context } = await newPage({ hash: '#/sales-toolkit' });
+    assert((await page.getByRole('tab').count()) === 5, 'Expected five toolkit tabs');
+    const row = (title) => page.locator('.rv-row', { has: page.locator('.rv-row__title', { hasText: new RegExp('^' + title + '$') }) });
+    await row('Understand').getByRole('button', { name: 'Met' }).click();
+    await row('Probe').getByRole('button', { name: 'Opportunity' }).click();
+    await row('Probe').getByLabel('Missing Sales Discovery').check();
+    await row('Relevant Offer').getByRole('button', { name: 'Opportunity' }).click();
+    await row('Relevant Offer').getByLabel('Missing Relevant Offer').uncheck();
+    await row('Relevant Offer').getByLabel('Irrelevant Sales Pitch').check();
+    await row('Retention').getByRole('button', { name: 'N/A' }).click();
+    const summary = await clickCopy(page, 'Copy review summary');
+    for (const line of ['Understand: Met', 'Probe: Opportunity', 'Relevant Offer: Opportunity', 'Retention: Not applicable']) assert(summary.includes(line), 'Review summary missing: ' + line);
+    assert(!summary.includes('Assure'), 'Unmarked steps should not appear in the summary');
+    await page.reload();
+    await page.waitForSelector('.rv-row');
+    assert((await row('Probe').getByRole('button', { name: 'Opportunity' }).getAttribute('aria-pressed')) === 'true', 'Review marks did not persist');
+    await page.getByRole('button', { name: 'Add opportunities to Builder' }).click();
+    await page.getByRole('button', { name: 'Add met steps as strengths' }).click();
+    const b = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.builder')));
+    assert(JSON.stringify(b.opps) === JSON.stringify(['dis-insufficient-probing', 'sales-missing-discovery', 'sales-irrelevant-pitch']), 'Builder got the wrong opportunities: ' + b.opps.join(','));
+    assert(b.strengths.length === 1 && b.strengths[0].id === 's-acknowledgement', 'Met steps did not become the right strengths');
+    // Keyboard tab switching
+    await page.getByRole('tab', { name: 'Call review' }).focus();
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(120);
+    assert((await page.getByRole('tab', { name: 'Sales flow' }).getAttribute('aria-selected')) === 'true', 'Arrow key did not switch tabs');
+    assert(await page.evaluate(() => document.activeElement && document.activeElement.id === 'tk-tab-flow'), 'Focus did not follow the selected tab');
+    const say = await clickCopy(page, 'Copy example for Understand');
+    assert(say === toolkit.steps[0].say, 'Sales flow example copy mismatch');
+    await page.locator('.tk-step', { hasText: 'Explain Pricing' }).getByRole('button', { name: 'Incorrect Sales Pricing / Disclosure' }).click();
+    await page.waitForSelector('#panelTitle');
+    assert((await page.locator('#panelTitle').innerText()) === 'Incorrect Sales Pricing / Disclosure', 'Coach-with chip opened the wrong entry');
+    await page.keyboard.press('Escape');
+    await page.getByRole('tab', { name: 'Offer guides' }).click();
+    await page.getByRole('button', { name: 'TV packages' }).click();
+    const tv = toolkit.offers.find((o) => o.id === 'tv');
+    assert((await clickCopy(page, 'Copy bridge line')) === tv.bridge, 'Offer bridge copy mismatch');
+    await page.getByRole('tab', { name: 'Objections' }).click();
+    const price = toolkit.objections.find((o) => o.id === 'price');
+    assert((await clickCopy(page, "Copy response to: It's too expensive.")) === [price.acknowledge, price.clarify, price.respond].join(' '), 'Objection response copy mismatch');
+    const noTx = toolkit.objections.find((o) => o.id === 'not-interested');
+    assert((await clickCopy(page, "Copy response to: I'm not interested.")) === [noTx.acknowledge, noTx.close].join(' '), 'A clear no should copy only a warm close');
+    await page.getByRole('tab', { name: 'Buying signals' }).click();
+    assert((await clickCopy(page, 'Copy follow-up for: ' + toolkit.signals[0].signal)) === toolkit.signals[0].next, 'Signal follow-up copy mismatch');
+    await finish(page, context);
+  });
+
+  await test('Brand colors: custom colors apply, persist, stay readable, and reset', async () => {
+    const { page, context } = await newPage({ hash: '#/settings' });
+    const setHex = async (id, v) => {
+      const input = page.locator(`[data-fk="${id}-hex"]`);
+      await input.fill(v);
+      await input.press('Enter');
+      await page.waitForTimeout(120);
+    };
+    await setHex('brand-primary', '#C8102E');
+    await setHex('brand-sidebar', '#1D1D1B');
+    const vars = () => page.evaluate(() => { const cs = getComputedStyle(document.documentElement); return { accent: cs.getPropertyValue('--accent').trim(), ink: cs.getPropertyValue('--accent-ink').trim(), text: cs.getPropertyValue('--accent-text').trim(), side: getComputedStyle(document.getElementById('sidebar')).backgroundColor }; });
+    let v = await vars();
+    assert(v.accent === '#c8102e', 'Primary color not applied: ' + v.accent);
+    assert(v.side === 'rgb(29, 29, 27)', 'Navigation color not applied: ' + v.side);
+    await page.reload();
+    await page.waitForSelector('.card');
+    assert(await page.evaluate(() => !!document.getElementById('brand-style')), 'Brand colors were not applied on load');
+    assert((await vars()).accent === '#c8102e', 'Brand colors did not persist');
+    // A light primary keeps the color but switches button text to dark, and deepens link text.
+    await setHex('brand-primary', '#FFD100');
+    v = await vars();
+    assert(v.accent === '#ffd100' && v.ink === '#0e1726', 'Light primary should use dark button text: ' + JSON.stringify(v));
+    assert(v.text !== '#ffd100', 'Link text should be deepened for contrast on white');
+    // Contrast of themed elements in light and dark
+    for (const theme of ['light', 'dark']) {
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+      await page.waitForTimeout(80);
+      const low = await page.evaluate(() => {
+        const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(',').map(parseFloat); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; };
+        const lum = ({ r, g, b }) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+        const bgOf = (el) => { let n = el; while (n) { const c = parse(getComputedStyle(n).backgroundColor); if (c && c.a >= 1) return c; n = n.parentElement; } return { r: 255, g: 255, b: 255 }; };
+        const bad = [];
+        document.querySelectorAll('.btn--primary, .nav__item, .nav__count, .brand__name, .sidebar__status, a.btn, .badge').forEach((el) => {
+          if (!el.getClientRects().length) return;
+          const fg = parse(getComputedStyle(el).color); const bg = bgOf(el);
+          const L1 = lum(fg), L2 = lum(bg); const r = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+          if (r < 4.5) bad.push(el.className + ' ' + r.toFixed(2));
+        });
+        return bad;
+      });
+      assert(low.length === 0, `Low contrast with brand colors in ${theme}: ${low.join(', ')}`);
+    }
+    await page.evaluate(() => document.documentElement.removeAttribute('data-theme'));
+    await page.getByRole('button', { name: 'Reset to default colors' }).click();
+    await page.waitForTimeout(150);
+    assert(await page.evaluate(() => !document.getElementById('brand-style')), 'Reset did not remove brand colors');
+    assert((await vars()).accent === '#0b7a75', 'Reset did not restore the default primary');
     await finish(page, context);
   });
 

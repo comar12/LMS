@@ -112,6 +112,7 @@ function applyImport(pack, mode) {
   }
   persist(...STATE_KEYS);
   applyTheme();
+  applyBrand();
   rebuildContent();
   refresh();
 }
@@ -181,7 +182,10 @@ async function clearAllData() {
   state.builder = defaultBuilder();
   state.combos = [];
   state.drafts = [];
+  state.review = defaultReview();
+  store.remove('brandcss');
   applyTheme();
+  applyBrand();
   rebuildContent();
   if (state.ui.openId && !getOpp(state.ui.openId)) closePanel();
   refresh();
@@ -284,6 +288,7 @@ function renderSettings(main) {
         ),
         h('p', { class: 'hint' }, icon('info'), 'Animations are reduced automatically when your system asks for reduced motion.'),
       ]),
+      brandCard(),
       card('Data & storage', 'lock', [
         h(
           'div',

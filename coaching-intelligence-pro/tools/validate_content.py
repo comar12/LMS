@@ -499,6 +499,80 @@ def validate_strengths(path, meta, rep):
         rep.err(fname, f"{len(dupes)} duplicate variation(s)")
 
 
+def validate_sales_toolkit(path, meta, rep, opp_ids):
+    fname = os.path.basename(path)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except Exception as exc:  # noqa: BLE001
+        rep.err(fname, f"invalid JSON: {exc}")
+        return
+    strength_ids = {s["id"] for s in meta["strengthCatalog"]}
+
+    def text(where, value, field, optional=False, agent=False):
+        if optional and value == "":
+            return
+        check_text(rep, where, value, "sales-toolkit", field, allow_agent=agent)
+
+    for key in ("intro", "notOffer", "objectionPrinciple"):
+        text(fname, d.get(key), key)
+    steps = d.get("steps", [])
+    if [s.get("title") for s in steps] != ["Understand", "Empathize", "Assure", "Probe", "Resolve", "Confirm", "Plant the Seed",
+                                           "Relevant Offer", "Explain Pricing", "Confirm Understanding"]:
+        rep.err(fname, "steps must be the ten sales flow steps in order")
+    for group in ("steps", "skills"):
+        for s in d.get(group, []):
+            where = f"{fname}:{group}.{s.get('id')}"
+            text(where, s.get("good"), "good")
+            if group == "steps":
+                text(where, s.get("say"), "say")
+            gaps = s.get("gaps") or []
+            if not gaps:
+                rep.err(where, "needs at least one related opportunity")
+            for g in gaps:
+                if g not in opp_ids:
+                    rep.err(where, f"unknown opportunity id '{g}'")
+            if s.get("strength") is not None and s.get("strength") not in strength_ids:
+                rep.err(where, f"unknown strength id '{s.get('strength')}'")
+    offers = d.get("offers", [])
+    if [o.get("id") for o in offers] != ["xm", "upgrade", "tv", "retention"]:
+        rep.err(fname, "offers must be xm, upgrade, tv, retention in that order")
+    for o in offers:
+        where = f"{fname}:offers.{o.get('id')}"
+        for key in ("title", "short", "summary", "seed", "bridge"):
+            text(where, o.get(key), key)
+        text(where, o.get("note"), "note", agent=True)
+        for key, lo in (("fits", 3), ("questions", 3), ("value", 2), ("disclosure", 3)):
+            items = o.get(key) or []
+            if len(items) < lo:
+                rep.err(where, f"'{key}' needs at least {lo} items")
+            for i, item in enumerate(items):
+                text(where, item, f"{key}[{i}]")
+        for i, q in enumerate(o.get("questions") or []):
+            if not q.endswith("?"):
+                rep.err(where, f"questions[{i}] must end with '?'")
+        obj = o.get("objection") or {}
+        for key in ("says", "acknowledge", "clarify", "respond"):
+            text(where, obj.get(key), f"objection.{key}")
+    for ob in d.get("objections", []):
+        where = f"{fname}:objections.{ob.get('id')}"
+        for key in ("says", "acknowledge", "close"):
+            text(where, ob.get(key), key)
+        for key in ("clarify", "respond"):
+            text(where, ob.get(key, ""), key, optional=True)
+        if ob.get("guidance"):
+            text(where, ob["guidance"], "guidance")
+        if not ob.get("respond") and not ob.get("guidance"):
+            rep.err(where, "needs either a response or guidance")
+    signals = d.get("signals", [])
+    if len(signals) < 6:
+        rep.err(fname, "needs at least 6 buying signals")
+    for i, sg in enumerate(signals):
+        where = f"{fname}:signals[{i}]"
+        for key in ("signal", "example", "next"):
+            text(where, sg.get(key), key)
+
+
 def main(argv):
     strict = "--strict" in argv
     files = [a for a in argv if not a.startswith("--")]
@@ -507,14 +581,26 @@ def main(argv):
     if not files:
         files = [os.path.join(DATA, c["file"]) for c in meta["categories"]]
         files.append(os.path.join(DATA, "strengths.json"))
+        files.append(os.path.join(DATA, "sales_toolkit.json"))
         files = [f for f in files if os.path.exists(f)]
     rep = Report()
     all_sentences = defaultdict(list)
     all_fragments = defaultdict(list)
     count = 0
+    opp_ids = set()
+    for c in meta["categories"]:
+        p = os.path.join(DATA, c["file"])
+        if os.path.exists(p):
+            try:
+                with open(p, encoding="utf-8") as fh:
+                    opp_ids.update(e.get("id") for e in json.load(fh) if isinstance(e, dict))
+            except Exception:  # noqa: BLE001
+                pass
     for f in files:
         if os.path.basename(f) == "strengths.json":
             validate_strengths(f, meta, rep)
+        elif os.path.basename(f) == "sales_toolkit.json":
+            validate_sales_toolkit(f, meta, rep, opp_ids)
         else:
             count += len(validate_opps(f, meta, rep, all_sentences, all_fragments))
     for s, where in all_sentences.items():

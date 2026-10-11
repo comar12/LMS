@@ -112,12 +112,12 @@ function logoSvg() {
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
   const rect = document.createElementNS(SVGNS, 'rect');
-  rect.setAttribute('width', '32'); rect.setAttribute('height', '32'); rect.setAttribute('rx', '9'); rect.setAttribute('fill', '#34C3B5');
+  rect.setAttribute('width', '32'); rect.setAttribute('height', '32'); rect.setAttribute('rx', '9'); rect.setAttribute('fill', '#34C3B5'); rect.setAttribute('class', 'logo-bg');
   const path = document.createElementNS(SVGNS, 'path');
   path.setAttribute('d', 'M20.6 11.2a6.6 6.6 0 1 0 0 9.6');
-  path.setAttribute('fill', 'none'); path.setAttribute('stroke', '#0B1630'); path.setAttribute('stroke-width', '3'); path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('fill', 'none'); path.setAttribute('stroke', '#0B1630'); path.setAttribute('stroke-width', '3'); path.setAttribute('stroke-linecap', 'round'); path.setAttribute('class', 'logo-fg');
   const dot = document.createElementNS(SVGNS, 'circle');
-  dot.setAttribute('cx', '23'); dot.setAttribute('cy', '16'); dot.setAttribute('r', '2.1'); dot.setAttribute('fill', '#0B1630');
+  dot.setAttribute('cx', '23'); dot.setAttribute('cy', '16'); dot.setAttribute('r', '2.1'); dot.setAttribute('fill', '#0B1630'); dot.setAttribute('class', 'logo-dot');
   svg.append(rect, path, dot);
   return svg;
 }

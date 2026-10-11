@@ -6,6 +6,8 @@ A self-contained, offline coaching reference library and coaching builder for co
 Download it and double-click it. It opens in any modern browser (Chrome, Edge, Firefox, Safari). It needs no
 internet connection, sign-in, server, or installation.
 
+To see it working first, watch the 55-second walkthrough: [`docs-walkthrough.mp4`](docs-walkthrough.mp4).
+
 ## What it does
 
 - **93 coaching opportunities** across 7 categories (Communication, Discovery, Hold & Mute, Ownership,
@@ -24,6 +26,19 @@ internet connection, sign-in, server, or installation.
 - **KPI links** on each opportunity: QA, Repeat (aiCR), and Transfer, with a filter.
 - **Favorites, custom entries, customized wording, saved combinations, and drafts**, stored in the browser.
 - **Export / Import** of everything as a JSON backup.
+- **Sales Toolkit** for sales and retention calls:
+  - **Call review**: mark each of the ten sales flow steps and five sales skills as Met, Opportunity, or N/A
+    while you listen. Send the opportunities to the Coaching Builder and the met steps as observed strengths.
+  - **Sales flow** with model language for each step (Understand → Empathize → Assure → Probe → Resolve →
+    Confirm → Plant the Seed → Relevant Offer → Explain Pricing → Confirm Understanding).
+  - **Offer guides** for Xfinity Mobile, upgrades, TV packages, and retention, plus **objection handling** and
+    **buying signals**.
+  - A payment link or payment assistance is never treated as a sales offer, and offers, eligibility, and pricing
+    always come from approved resources.
+- **Brand colors** (Settings & Data): set the primary and navigation colors from the official brand guide, or
+  use **Pick from screen** to take them from the logo. Text colors adjust automatically so everything keeps
+  WCAG AA contrast in light and dark mode. The built-in teal and navy are placeholders, not official VXI
+  brand values.
 - Reference cards for **Hold vs. Mute vs. Dead Air vs. Research Time** and the **sales conversation flow**, plus a
   Quick Guide for new team leaders.
 
@@ -31,10 +46,10 @@ internet connection, sign-in, server, or installation.
 
 - The page never connects to the internet. A Content Security Policy blocks all network access, and there is
   no tracking or analytics.
-- Your favorites, templates, drafts, and settings are saved in this browser's local storage. That storage
-  belongs to this browser and profile only. It is not shared with other browsers or computers, it is not
-  available in private windows, and clearing browser data deletes it. Use **Settings & Data → Export backup**
-  regularly.
+- Your favorites, templates, drafts, brand colors, and settings are saved in this browser's local storage.
+  That storage belongs to this browser and profile only. It is not shared with other browsers or computers, it
+  is not available in private windows, and clearing browser data deletes it. Use **Settings & Data → Export
+  backup** regularly.
 - Never type agent or customer names, BPIDs, HRIDs, Avaya IDs, account numbers, or interaction IDs into the
   app. Text fields warn you when something looks like an identifier.
 
@@ -57,16 +72,18 @@ src/
   data/meta.json       categories, themes, strength catalog, required entries, KPI list
   data/*.json          coaching content (one file per category) and strengths.json
   data/guides.json     reference cards and quick guide
+  data/sales_toolkit.json  Sales Toolkit: review steps and skills, offer guides, objections, buying signals
 tools/
   CONTENT_GUIDE.md     writing standard for coaching content
   validate_content.py  content validator (schema, word counts, tone, privacy rules)
   build.py             builds VXI_Coaching_Intelligence_Pro.html
 tests/
-  e2e.cjs              browser tests (Playwright + Chromium)
+  e2e.cjs              browser tests (Playwright + Chromium): the ten QA scenarios plus copy, storage,
+                       import, Builder, Sales Toolkit, and brand color checks
 ```
 
 ```
-python3 tools/validate_content.py          # check all content
+python3 tools/validate_content.py --strict # check all content (warnings count as errors)
 python3 tools/build.py --check             # build the single HTML file and syntax-check the JavaScript
 NODE_PATH=$(npm root -g) node tests/e2e.cjs   # run the browser tests against the built file
 ```

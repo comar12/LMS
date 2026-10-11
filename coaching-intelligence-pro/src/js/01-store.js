@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const STORAGE_PREFIX = 'cip.v1.';
-const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts'];
+const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review'];
 
 const store = (() => {
   let ok = false;
@@ -74,8 +74,25 @@ const store = (() => {
 const DEFAULT_SETTINGS = Object.freeze({ duration: 14, calls: 5, followup: 7 });
 const DEFAULT_FULLCOPY = Object.freeze({ strengths: true, feedback: true, impact: true, plan: true, followup: true, example: true, questions: false });
 
+const SALES_TAB_IDS = ['review', 'flow', 'offers', 'objections', 'signals'];
+const SALES_OFFER_IDS = ['xm', 'upgrade', 'tv', 'retention'];
+
 function defaultPrefs() {
-  return { theme: 'system', layout: 'grid', sort: 'relevance', kpi: '', sGroup: '', fullCopy: { ...DEFAULT_FULLCOPY }, refOpen: { hold: true, sales: true } };
+  return {
+    theme: 'system',
+    layout: 'grid',
+    sort: 'relevance',
+    kpi: '',
+    sGroup: '',
+    fullCopy: { ...DEFAULT_FULLCOPY },
+    refOpen: { hold: true, sales: true },
+    salesTab: 'review',
+    salesOffer: 'xm',
+    brand: null,
+  };
+}
+function defaultReview() {
+  return { marks: {}, picks: {} };
 }
 function emptyEdits() {
   return { progress: null, challenges: null, plan: null, followup: null };
@@ -102,6 +119,7 @@ const state = {
   builder: defaultBuilder(),
   combos: [],
   drafts: [],
+  review: defaultReview(),
   ui: { view: 'all', cat: null, query: '', openId: null, sVersion: {}, visibleIds: [], returnFocusKey: null },
 };
 
@@ -144,7 +162,29 @@ function sanitizePrefs(o) {
   if (src.refOpen && typeof src.refOpen === 'object') {
     for (const k of ['hold', 'sales']) if (typeof src.refOpen[k] === 'boolean') p.refOpen[k] = src.refOpen[k];
   }
+  if (SALES_TAB_IDS.includes(src.salesTab)) p.salesTab = src.salesTab;
+  if (SALES_OFFER_IDS.includes(src.salesOffer)) p.salesOffer = src.salesOffer;
+  if (src.brand && typeof src.brand === 'object') {
+    const hex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
+    const primary = hex(src.brand.primary);
+    const sidebar = hex(src.brand.sidebar);
+    if (primary && sidebar) p.brand = { primary, sidebar };
+  }
   return p;
+}
+
+/** Call review marks: only known steps, only met/gap/na, and coaching picks limited to that step's related entries. */
+function sanitizeReview(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const out = defaultReview();
+  const items = (DATA.salesToolkit.steps || []).concat(DATA.salesToolkit.skills || []);
+  const marks = src.marks && typeof src.marks === 'object' ? src.marks : {};
+  const picks = src.picks && typeof src.picks === 'object' ? src.picks : {};
+  for (const it of items) {
+    if (['met', 'gap', 'na'].includes(marks[it.id])) out.marks[it.id] = marks[it.id];
+    if (Array.isArray(picks[it.id])) out.picks[it.id] = picks[it.id].filter((id) => it.gaps.includes(id));
+  }
+  return out;
 }
 
 function sanitizeExample(v) {
@@ -358,6 +398,7 @@ function loadSlice(key) {
     case 'builder': state.builder = sanitizeBuilder(store.get('builder', null)); break;
     case 'combos': state.combos = sanitizeCombos(store.get('combos', [])); break;
     case 'drafts': state.drafts = sanitizeDrafts(store.get('drafts', [])); break;
+    case 'review': state.review = sanitizeReview(store.get('review', null)); break;
     default: break;
   }
 }

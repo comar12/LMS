@@ -1,0 +1,423 @@
+{
+  "intro": "Everything for coaching sales and retention conversations in one place: a call review that turns gaps into coaching, the sales flow with model language, offer guides, objection handling, and buying signals.",
+  "notOffer": "A payment link, payment arrangement, or other payment assistance helps the customer, but it is not a sales offer. Confirm current offers, eligibility, pricing, and disclosure requirements in approved resources before coaching on them.",
+  "steps": [
+    {
+      "id": "understand",
+      "title": "Understand",
+      "good": "Let the customer explain the reason for the call without interruption, then restate it in one sentence and confirm it is right.",
+      "say": "So your bill went up this month and you'd like to understand why. Did I get that right?",
+      "gaps": [
+        "com-missing-acknowledgement",
+        "com-active-listening",
+        "com-interrupting"
+      ],
+      "strength": "s-acknowledgement"
+    },
+    {
+      "id": "empathize",
+      "title": "Empathize",
+      "good": "Respond to how the situation is affecting the customer, using details they actually shared rather than a general phrase.",
+      "say": "I'm sorry the internet keeps dropping while you're working from home. That makes the whole workday harder.",
+      "gaps": [
+        "com-missing-empathy",
+        "com-generic-empathy"
+      ],
+      "strength": "s-empathy"
+    },
+    {
+      "id": "assure",
+      "title": "Assure",
+      "good": "Tell the customer clearly that you will take care of the concern, and preview the first step.",
+      "say": "I'm going to take care of this with you today. First, I'll check the connection on your equipment.",
+      "gaps": [
+        "com-weak-assurance"
+      ],
+      "strength": "s-assurance"
+    },
+    {
+      "id": "probe",
+      "title": "Probe",
+      "good": "Ask open questions about the concern, and listen for needs that matter later, such as devices, household, or other providers.",
+      "say": "When did you first notice it, and is it happening on every device or just one?",
+      "gaps": [
+        "dis-insufficient-probing",
+        "dis-missing-probing",
+        "sales-missing-discovery"
+      ],
+      "strength": "s-probing"
+    },
+    {
+      "id": "resolve",
+      "title": "Resolve",
+      "good": "Resolve the customer's main concern completely, using the applicable process, before introducing anything else.",
+      "say": "I found what was causing the drops, and I've reset the connection from our side. Let's make sure it's working for you.",
+      "gaps": [
+        "own-incomplete-resolution",
+        "own-primary-concern"
+      ],
+      "strength": "s-resolution"
+    },
+    {
+      "id": "confirm",
+      "title": "Confirm",
+      "good": "Have the customer confirm the issue is resolved on their side before the conversation moves on.",
+      "say": "Can you check on your end that everything is loading normally now?",
+      "gaps": [
+        "own-confirm-resolution",
+        "own-premature-resolution"
+      ],
+      "strength": "s-resolution"
+    },
+    {
+      "id": "seed",
+      "title": "Plant the Seed",
+      "good": "After the resolution is confirmed, mention one relevant idea tied to something the customer shared, with no pressure to decide.",
+      "say": "You mentioned everyone is online in the evenings. Some households like yours find a faster plan helps with that, and I'm happy to share details whenever it's useful.",
+      "gaps": [
+        "sales-plant-seed",
+        "sales-weak-transition"
+      ],
+      "strength": "s-plant-seed"
+    },
+    {
+      "id": "offer",
+      "title": "Relevant Offer",
+      "good": "Present the offer that matches the need you uncovered and say why you chose it. Payment help does not count as an offer.",
+      "say": "Based on what you shared about the phone bill with your current carrier, Xfinity Mobile could be worth a look. Would you like me to show you how it could work for your household?",
+      "gaps": [
+        "sales-missing-offer",
+        "sales-irrelevant-pitch",
+        "sales-pitch-before-resolve"
+      ],
+      "strength": "s-relevant-offer"
+    },
+    {
+      "id": "pricing",
+      "title": "Explain Pricing",
+      "good": "Explain the full price clearly: the promotional price and term, the standard rate afterward, equipment charges, taxes and fees, and any requirements.",
+      "say": "Here's exactly what you'd pay. The promotional price applies for the promotional term, and then the standard rate applies. Taxes and fees are separate, and your first bill may include a partial month.",
+      "gaps": [
+        "sales-pricing-disclosure"
+      ],
+      "strength": "s-pricing"
+    },
+    {
+      "id": "understanding",
+      "title": "Confirm Understanding",
+      "good": "Ask for the decision, then recap what the customer agreed to, what they will pay now and later, and what happens next.",
+      "say": "Before I place the order, let me recap what you're getting, what you'll pay now and after the promotion, and what happens next. Does that all sound right?",
+      "gaps": [
+        "sales-closing",
+        "dis-confirm-understanding"
+      ],
+      "strength": "s-sales-close"
+    }
+  ],
+  "skills": [
+    {
+      "id": "value",
+      "title": "Offer value",
+      "good": "Connect each feature to a benefit tied to the customer's own situation before talking about price.",
+      "gaps": [
+        "sales-offer-value",
+        "sales-features-benefits"
+      ],
+      "strength": "s-value"
+    },
+    {
+      "id": "objections",
+      "title": "Objection handling",
+      "good": "Acknowledge the objection, ask one clarifying question, and respond with value tied to that specific concern.",
+      "gaps": [
+        "sales-weak-objection"
+      ],
+      "strength": "s-objection"
+    },
+    {
+      "id": "respect",
+      "title": "Respecting a clear no",
+      "good": "Accept a clear no the first time, with at most one respectful clarification, and close the call warmly.",
+      "gaps": [
+        "sales-pitch-after-rejection"
+      ],
+      "strength": null
+    },
+    {
+      "id": "signals",
+      "title": "Buying signals",
+      "good": "Notice cues such as a price question or a contract ending elsewhere, and follow up with a question.",
+      "gaps": [
+        "sales-buying-signals"
+      ],
+      "strength": null
+    },
+    {
+      "id": "retention",
+      "title": "Retention",
+      "good": "When the customer mentions canceling or switching, ask what is behind it and present the applicable options per the retention process.",
+      "gaps": [
+        "sales-retention",
+        "bill-cancellation-risk"
+      ],
+      "strength": "s-retention"
+    }
+  ],
+  "offers": [
+    {
+      "id": "xm",
+      "title": "Xfinity Mobile (XM)",
+      "short": "Xfinity Mobile",
+      "summary": "New lines, devices, or moving a number over, for customers whose mobile needs came up in the conversation.",
+      "fits": [
+        "The customer mentions their phone bill or plan with another carrier.",
+        "A family member needs a new line, or someone is getting their first phone.",
+        "The customer asks about a new device or keeping their current number.",
+        "The customer would like fewer separate bills and providers."
+      ],
+      "questions": [
+        "Who in your household uses a mobile phone today, and which carrier are you with?",
+        "How do you mostly use your phones: calls and texts, streaming, or working on the go?",
+        "Are you planning to keep your current phones, or is anyone due for a new device?"
+      ],
+      "seed": "Since you mentioned paying a separate phone bill, it may be worth knowing that we also offer mobile service. I'm happy to walk you through it anytime it's useful.",
+      "bridge": "Now that your internet is working again, can I share one idea about the phone bill you mentioned earlier?",
+      "value": [
+        "Explain how it would work for the lines and devices the customer described, not every feature available.",
+        "Connect the benefit to what they told you, such as managing services in one place or keeping their current number."
+      ],
+      "disclosure": [
+        "Eligibility requirements for the offer",
+        "The monthly price for the lines discussed, any promotional term, and the standard rate afterward",
+        "Device costs, trade-in conditions, or payment terms, if any",
+        "Taxes and fees, and when the first bill arrives",
+        "What happens with the current carrier and the number transfer"
+      ],
+      "objection": {
+        "says": "I'm happy with my current carrier.",
+        "acknowledge": "That's good to hear, and switching isn't something to do without a reason.",
+        "clarify": "Is there anything about your current plan you'd change if you could, such as the price or the data?",
+        "respond": "If cost is the main thing, I can show you how the lines you described would compare, and you can decide whether it's worth a closer look."
+      },
+      "note": "Confirm current Xfinity Mobile offers, eligibility, device programs, and number transfer requirements in approved resources."
+    },
+    {
+      "id": "upgrade",
+      "title": "Service Upgrades",
+      "short": "Upgrades",
+      "summary": "Changes that improve an existing service, such as faster internet or updated equipment, when the household's usage has outgrown the current setup.",
+      "fits": [
+        "Several people stream, game, or work online at the same time.",
+        "Evenings or video calls slow down, and troubleshooting confirms the service itself is working as designed.",
+        "Wi-Fi does not reach every room, or the equipment is older.",
+        "The household added devices, a home office, or a new member."
+      ],
+      "questions": [
+        "How many devices are usually connected at the same time in your home?",
+        "What do people use the internet for most: streaming, gaming, video calls, or working from home?",
+        "Are there rooms where the Wi-Fi is weaker than you'd like?"
+      ],
+      "seed": "With everyone online at once in the evenings, you might find a faster plan helps. There's no need to decide anything today, but I'm glad to go over it whenever you like.",
+      "bridge": "Since you mentioned the video calls freezing when the kids are streaming, can I share an option that's built for busier households like yours?",
+      "value": [
+        "Describe what would feel different for this household, such as smoother video calls while others stream, rather than speed numbers alone.",
+        "Avoid promising specific speeds or coverage, because results vary by device and home setup."
+      ],
+      "disclosure": [
+        "The new monthly price, any promotional term, and the standard rate afterward",
+        "Any equipment change, equipment charge, or installation step",
+        "Taxes and fees, and how the change affects the next bill, including partial months",
+        "When the change takes effect"
+      ],
+      "objection": {
+        "says": "My internet is fine the way it is.",
+        "acknowledge": "That's fair. If it's working for you, there's no reason to change it.",
+        "clarify": "Just so I understand, do the evening slowdowns you mentioned still bother you, or have they settled down?",
+        "respond": "If they still come up, the upgrade is mainly about keeping things smooth when everyone is online. If not, your current plan may be the right fit."
+      },
+      "note": "Resolve technical issues first. Recommend an upgrade only when the household's usage, not a fault, is the reason for the slowdown. Confirm current plans and pricing in approved resources."
+    },
+    {
+      "id": "tv",
+      "title": "TV Package Offers",
+      "short": "TV packages",
+      "summary": "Adding, changing, or right-sizing TV packages and channels, based on what the household actually watches.",
+      "fits": [
+        "The customer asks about a channel, sports, or a program they cannot get.",
+        "The customer says they pay for channels they never watch.",
+        "Viewing habits have changed, such as a new sports season or more streaming.",
+        "The customer has questions about TV boxes in other rooms."
+      ],
+      "questions": [
+        "What do you and your household watch most, and on which TVs?",
+        "Are there channels or sports you're missing right now?",
+        "How much of your viewing happens through streaming apps versus live TV?"
+      ],
+      "seed": "If you ever want to make sure your TV package matches what you actually watch, I'm happy to review it with you. Some customers find a better fit that way.",
+      "bridge": "You mentioned paying for channels you don't watch. Would it help if I looked at whether a different package fits your viewing better?",
+      "value": [
+        "Tie the package to the specific channels, sports, or rooms the customer mentioned.",
+        "When a smaller package fits better, recommending it builds trust and is still a relevant offer."
+      ],
+      "disclosure": [
+        "The package price, any promotional term, and the standard rate afterward",
+        "TV box or equipment charges for each TV",
+        "Taxes, fees, and any other monthly charges that apply to TV service",
+        "When the change takes effect and how the next bill will look"
+      ],
+      "objection": {
+        "says": "I already have streaming services.",
+        "acknowledge": "That makes sense. A lot of households watch mostly through streaming now.",
+        "clarify": "Is there anything you still watch on live TV, like local channels or sports?",
+        "respond": "If there is, I can look at whether a package built around those makes sense alongside your streaming. If not, we can leave things as they are."
+      },
+      "note": "Confirm current packages, equipment, and TV-related charges in approved resources before coaching on TV offers."
+    },
+    {
+      "id": "retention",
+      "title": "Retention Offers",
+      "short": "Retention",
+      "summary": "Options for a customer who is considering canceling or downgrading, presented through the retention process after understanding the reason.",
+      "fits": [
+        "The customer asks to cancel, downgrade, or remove a service.",
+        "The customer mentions a competitor's price or offer.",
+        "The bill has become hard to afford.",
+        "Repeated service problems have frustrated the customer."
+      ],
+      "questions": [
+        "Can you tell me what's prompting you to think about canceling?",
+        "If we could address that, would you want to keep your service?",
+        "What matters most to you in your service right now: price, reliability, or something else?"
+      ],
+      "seed": "Thank you for telling me, and for being with us. Before we go further, I'd like to understand what's behind the decision so I can see what I can do.",
+      "bridge": "I understand price is the main reason. Let me check which options are available on your account, so you can make the best decision for your household.",
+      "value": [
+        "Address the underlying reason first: fix a service issue, review the bill, or explain options that fit the new budget.",
+        "Present only the retention options the process allows, and respect the customer's final decision."
+      ],
+      "disclosure": [
+        "What changes on the account and when",
+        "The new price, any promotional term, and the rate afterward",
+        "Any equipment returns or charges that apply if a service is removed",
+        "The customer's confirmed decision and the next steps"
+      ],
+      "objection": {
+        "says": "Your competitor is cheaper.",
+        "acknowledge": "I appreciate you being upfront about that, and I understand price matters.",
+        "clarify": "Is price the main reason, or is there anything else about the service that hasn't worked for you?",
+        "respond": "Let me check which options are available on your account through our retention process, so you can compare with the full picture before you decide."
+      },
+      "note": "Confirm the current retention process, which options the agent can present, eligibility, and when another team handles the request."
+    }
+  ],
+  "objectionPrinciple": "Acknowledge, clarify, respond. A price concern or a request for time is an invitation to clarify. A clear no is respected the first time, with at most one respectful clarification, and the call closes warmly.",
+  "objections": [
+    {
+      "id": "price",
+      "says": "It's too expensive.",
+      "acknowledge": "I understand. Keeping the monthly bill manageable matters.",
+      "clarify": "Is it the monthly price itself, or the change from what you pay now?",
+      "respond": "Let me make sure you're comparing the full picture, including anything you'd no longer need to pay for elsewhere. If it still doesn't fit your budget, that's completely okay.",
+      "close": "That's completely fine. Thank you for considering it. Is there anything else I can help you with today?"
+    },
+    {
+      "id": "think",
+      "says": "I need to think about it.",
+      "acknowledge": "That's reasonable. It's a decision worth thinking through.",
+      "clarify": "Is there a part you're unsure about, such as the price or how it would work for you, that I can clear up while we're on the phone?",
+      "respond": "If it helps, I can recap the key details so you have them while you think it over.",
+      "close": "Of course. You can reach out whenever you're ready, and we'll pick it up from there."
+    },
+    {
+      "id": "happy",
+      "says": "I'm happy with what I have.",
+      "acknowledge": "I'm glad it's working well for you.",
+      "clarify": "Out of curiosity, is there anything you'd change about your current setup if you could?",
+      "respond": "If something comes to mind, that's where this could help. If not, your current setup may be the right fit.",
+      "close": "Sounds good. Your service is all set from today's call."
+    },
+    {
+      "id": "locked",
+      "says": "I don't want to be locked into anything.",
+      "acknowledge": "That's a fair concern. Nobody wants surprises later.",
+      "clarify": "Is it a commitment period you're worried about, or the possibility of the price changing?",
+      "respond": "Let me check exactly which terms apply to this offer and explain them clearly, so you know what you'd be agreeing to before you decide.",
+      "close": "Understood. Thank you for hearing me out, and let me know if anything changes."
+    },
+    {
+      "id": "together",
+      "says": "I need to talk it over with someone at home first.",
+      "acknowledge": "Of course. It makes sense to decide together.",
+      "clarify": "Is there anything I can explain now that would help when you talk it over?",
+      "respond": "I can recap the details so you have everything you need for that conversation.",
+      "close": "That works. Whenever you're both ready, we can go through it again."
+    },
+    {
+      "id": "nothing-else",
+      "says": "I don't need anything else right now.",
+      "acknowledge": "Understood, and that's completely fine.",
+      "clarify": "Can I ask whether anything has changed recently at home, like more people or devices online?",
+      "respond": "If not, you're all set. If that changes, we can look at options then.",
+      "close": "You're all set. Thank you for your time today."
+    },
+    {
+      "id": "past-problems",
+      "says": "I've had problems with your service before.",
+      "acknowledge": "I'm sorry you've had that experience, and I understand why it makes you hesitant.",
+      "clarify": "Can you tell me what happened, so I can make sure it's addressed?",
+      "respond": "Let's make sure the issue itself is taken care of first. Once it is, I'm happy to revisit options, but only if they would genuinely help.",
+      "close": "That's fair. My priority today is making sure the service works the way it should."
+    },
+    {
+      "id": "not-interested",
+      "says": "I'm not interested.",
+      "acknowledge": "No problem at all, and thank you for letting me know.",
+      "clarify": "",
+      "respond": "",
+      "close": "Your service is all set from today's call. Is there anything else I can help you with?",
+      "guidance": "This is a clear no. Respect it the first time and close warmly, with no further attempt."
+    }
+  ],
+  "signals": [
+    {
+      "signal": "Asks about price",
+      "example": "How much would something like that cost?",
+      "next": "Happy to go through it. So I quote the right option, how would you mainly use it?"
+    },
+    {
+      "signal": "Asks what is included",
+      "example": "Does that come with anything else?",
+      "next": "Good question. Which part matters most to you, so I can focus on that?"
+    },
+    {
+      "signal": "A contract is ending elsewhere",
+      "example": "My phone contract is up next month.",
+      "next": "When does it wrap up? That could be a good time to compare your options."
+    },
+    {
+      "signal": "More people or devices at home",
+      "example": "My son just moved back home.",
+      "next": "How many devices are usually online at the same time now?"
+    },
+    {
+      "signal": "Unhappy with another provider",
+      "example": "My cell phone bill keeps going up.",
+      "next": "What would you most like to change about your current plan?"
+    },
+    {
+      "signal": "A new routine or need",
+      "example": "I'm working from home a few days a week now.",
+      "next": "How are video calls holding up when others are online?"
+    },
+    {
+      "signal": "Moving or a life change",
+      "example": "We're moving in a few weeks.",
+      "next": "Congratulations. Have you set a move date? I can make sure your service is ready at the new address."
+    },
+    {
+      "signal": "Asks for something better",
+      "example": "Is there anything better than what I have?",
+      "next": "Let's find out. Tell me what you'd want to be better, and I'll look at what fits."
+    }
+  ]
+}

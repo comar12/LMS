@@ -39,6 +39,7 @@ function renderSidebar() {
       CATS.map((c) => navItem({ view: 'cat', cat: c.id, label: c.nav, iconName: CAT_ICON[c.id], count: counts[c.id] || 0 })),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Coaching'),
       navItem({ view: 'strengths', label: 'Things Went Well', iconName: 'thumb', count: content.strengths.length }),
+      navItem({ view: 'sales-toolkit', label: 'Sales Toolkit', iconName: 'tag' }),
       navItem({ view: 'favorites', label: 'Favorites', iconName: 'star', count: state.favorites.size }),
       navItem({ view: 'builder', label: 'Coaching Builder', iconName: 'clipboard', badge: bc || null, count: bc ? null : 0 }),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Personal'),
@@ -199,6 +200,11 @@ function refCard(kind) {
     body.appendChild(h('div', { class: 'ref__grid' }, g.items.map((it) => h('div', { class: 'ref__item' }, h('p', { class: 'ref__term' }, it.term), h('p', { class: 'ref__text' }, it.text)))));
   }
   body.appendChild(h('p', { class: 'ref__caution' }, icon('alert'), h('span', null, g.caution)));
+  if (kind === 'sales') {
+    body.appendChild(
+      h('div', { style: 'margin-top:12px' }, h('a', { class: 'btn btn--primary btn--sm', href: '#/sales-toolkit', 'data-fk': 'ref-toolkit' }, icon('tag'), 'Open the Sales Toolkit'))
+    );
+  }
   const toggle = h(
     'button',
     {
@@ -378,6 +384,7 @@ function renderMain() {
     main.append(h('p', { class: 'banner', role: 'note' }, icon('alert'), h('span', null, 'Browser storage is unavailable (for example in some private windows or locked-down browsers). Everything works, but changes are lost when this tab closes. Use Export in Settings & Data to keep a copy.')));
   }
   if (v === 'strengths') renderStrengthsView(main);
+  else if (v === 'sales-toolkit') renderSalesToolkit(main);
   else if (v === 'builder') renderBuilder(main);
   else if (v === 'templates') renderTemplates(main);
   else if (v === 'settings') renderSettings(main);
@@ -388,7 +395,7 @@ function renderMain() {
 function titleForView() {
   const v = state.ui.view;
   if (v === 'cat') return (CAT_MAP[state.ui.cat] || {}).nav || 'Category';
-  return { all: 'All Opportunities', strengths: 'Things Went Well', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
+  return { all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
 }
 
 /** Re-render everything that depends on state, keeping focus and scroll where they were. */

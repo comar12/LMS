@@ -2,7 +2,7 @@
    11-init: hash routing, global events, startup
    ========================================================================== */
 
-const VIEWS = ['all', 'strengths', 'favorites', 'builder', 'templates', 'settings'];
+const VIEWS = ['all', 'strengths', 'sales-toolkit', 'favorites', 'builder', 'templates', 'settings'];
 
 function parseHash() {
   const raw = (window.location.hash || '').replace(/^#/, '');
@@ -216,13 +216,19 @@ function bindEvents() {
       updateTopbar();
     }, 150)
   );
-  window.addEventListener('pagehide', () => persistBuilderSoon.flush());
+  window.addEventListener('pagehide', () => {
+    persistBuilderSoon.flush();
+    persistPrefsSoon.flush();
+  });
   window.addEventListener('storage', (e) => {
     if (!e.key || !e.key.startsWith(STORAGE_PREFIX)) return;
     const key = e.key.slice(STORAGE_PREFIX.length);
     if (!STATE_KEYS.includes(key) || key === 'builder') return;
     loadSlice(key);
-    if (key === 'prefs') applyTheme();
+    if (key === 'prefs') {
+      applyTheme();
+      applyBrand();
+    }
     rebuildContent();
     refresh();
   });
@@ -232,6 +238,7 @@ function init() {
   bindElements();
   loadState();
   applyTheme();
+  applyBrand();
   rebuildContent();
   bindEvents();
   const r = parseHash();
