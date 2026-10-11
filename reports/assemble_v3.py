@@ -35,7 +35,7 @@ wiring = rep(wiring, "document.getElementById('v-overview').classList.add('activ
 data = rep(data, "tab:'overview'", "tab:'exec'")
 charts = open(SP+'charts/charts.js').read()
 engine = open(SP+'engine.js').read()
-render = open(SP+'render_products.js').read() + '\n' + open(SP+'render_v3.js').read()
+render = open(SP+'motion.js').read() + '\n' + open(SP+'render_products.js').read() + '\n' + open(SP+'render_v3.js').read()
 script = "<script>\n" + data + compute + helpers + "\n" + hist + "\n/* ---------------------------------------------------------------- chart library */\n" + charts + "\n" + engine + "\n" + render + "\n" + xlsx + upload + pickers + wiring + "init();\n</script>\n</body>\n</html>\n"
 out = head + body + script
 assert out.count('__DATA__')==1
