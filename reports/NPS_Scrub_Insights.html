@@ -3,140 +3,158 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
-/* Layout: executive analytics console — navy command bar, breadcrumb drill-down (Floor › OM › TL › Agent), headline + KPI band, brief + action plan, then evidence charts in a 12-col grid */
+/* Layout: premium analytics console — glass command bar with searchable scope filters, dark hero band (headline · ring gauge · glass KPIs), focused tabs per level, 12-col evidence grid */
 :root{
-  --bg:#eef2f6; --card:#ffffff; --text:#13273a; --muted:#5f7286; --faint:#8b9bab; --line:#dfe6ed; --soft:#f5f8fa;
-  --teal:#007b86; --teal-soft:#e2f3f3; --good:#15806b; --bad:#bf454e; --warn:#a0680f; --navy:#0b2032; --accent:#e0701f;
+  --bg:#eef1f5; --bg2:#e6ebf1; --card:#ffffff; --text:#111f2e; --muted:#5d7084; --faint:#8a99a8; --line:#e1e7ee; --line2:#cfd8e2; --soft:#f4f7fa;
+  --teal:#007b86; --teal-soft:#e2f3f3; --good:#15806b; --bad:#c0454e; --warn:#a0680f; --navy:#0b2032; --accent:#e8742a;
   --good-bg:#e3f4ee; --bad-bg:#fbe8e9; --warn-bg:#fbf0dc;
   --c-ao:#eb6834; --c-com:#2a78d6; --c-cus:#1baf7a; --c-na:#eda100; --c-vxi:#e87ba4;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
   --seq0:#f3f7fb; --seq1:#cde2fb; --seq2:#9ec5f4; --seq3:#5598e7; --seq4:#256abf; --seq5:#104281;
-  --shadow:0 1px 2px #0b203212,0 6px 20px #0b20330a; --r:18px;
+  --hero-a:#0a1c2c; --hero-b:#12364a; --hero-c:#0f5f69; --on-hero:#f2f7fa; --on-hero-muted:#b9cad6; --glass:#ffffff14; --glass-line:#ffffff26;
+  --shadow:0 1px 2px #0b203210,0 8px 24px #0b203309; --shadow-lg:0 2px 6px #0b203314,0 18px 48px #0b203314; --r:20px; --r-sm:14px;
   --font:"Inter","Segoe UI",Arial,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0b1824; --card:#122737; --text:#e6eef5; --muted:#a2b5c5; --faint:#7b91a3; --line:#253f52; --soft:#172e40;
+  --bg:#0a1620; --bg2:#0d1c28; --card:#122535; --text:#e7eef5; --muted:#a3b6c6; --faint:#7d92a4; --line:#223a4d; --line2:#2f4a60; --soft:#172c3d;
   --teal:#6fd3d4; --teal-soft:#193c47; --good:#74d5b7; --bad:#f39aa3; --warn:#efc277; --navy:#06121c; --accent:#f08a3e;
   --good-bg:#1a3f3a; --bad-bg:#462c38; --warn-bg:#403426;
   --c-ao:#d95926; --c-com:#3987e5; --c-cus:#199e70; --c-na:#c98500; --c-vxi:#d55181;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
   --seq0:#152e47; --seq1:#184f95; --seq2:#1c5cab; --seq3:#2a78d6; --seq4:#5598e7; --seq5:#9ec5f4;
-  --shadow:0 2px 12px #0005; color-scheme:dark}}
+  --hero-a:#07131d; --hero-b:#0e2a3b; --hero-c:#0c4a53; --shadow:0 2px 12px #0005; --shadow-lg:0 10px 40px #0007; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0b1824; --card:#122737; --text:#e6eef5; --muted:#a2b5c5; --faint:#7b91a3; --line:#253f52; --soft:#172e40;
+  --bg:#0a1620; --bg2:#0d1c28; --card:#122535; --text:#e7eef5; --muted:#a3b6c6; --faint:#7d92a4; --line:#223a4d; --line2:#2f4a60; --soft:#172c3d;
   --teal:#6fd3d4; --teal-soft:#193c47; --good:#74d5b7; --bad:#f39aa3; --warn:#efc277; --navy:#06121c; --accent:#f08a3e;
   --good-bg:#1a3f3a; --bad-bg:#462c38; --warn-bg:#403426;
   --c-ao:#d95926; --c-com:#3987e5; --c-cus:#199e70; --c-na:#c98500; --c-vxi:#d55181;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
   --seq0:#152e47; --seq1:#184f95; --seq2:#1c5cab; --seq3:#2a78d6; --seq4:#5598e7; --seq5:#9ec5f4;
-  --shadow:0 2px 12px #0005; color-scheme:dark}
+  --hero-a:#07131d; --hero-b:#0e2a3b; --hero-c:#0c4a53; --shadow:0 2px 12px #0005; --shadow-lg:0 10px 40px #0007; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(1200px 600px at 80% -10%,color-mix(in srgb,var(--teal) 10%,transparent),transparent 60%),var(--bg);color:var(--text);font-family:var(--font);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01"}
 h1,h2,h3,h4,p{margin:0} h1,h2,h3{text-wrap:balance}
 button,input,select{font:inherit;color:inherit} button{cursor:pointer;border:0;background:none;padding:0}
 :focus-visible{outline:3px solid #39b6c7;outline-offset:2px}
 .num{font-variant-numeric:tabular-nums}
-.wrap{max-width:1400px;margin:0 auto;padding-inline:16px} @media (min-width:900px){.wrap{padding-inline:28px}}
-.muted{color:var(--muted)} .small{font-size:13px} .mono{font-family:var(--mono);font-size:12.5px}
+.wrap{max-width:1440px;margin:0 auto;padding-inline:16px} @media (min-width:900px){.wrap{padding-inline:32px}}
+.muted{color:var(--muted)} .small{font-size:12.5px} .mono{font-family:var(--mono);font-size:12.5px}
 
-/* top bar */
-.top{background:linear-gradient(105deg,#091c2c,#143040);color:#eaf2f7;position:sticky;top:env(safe-area-inset-top,0px);z-index:30;box-shadow:0 4px 20px #0b20331c}
-.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;padding-block:11px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
-.mark{font-size:11px;letter-spacing:1.5px;border-radius:6px;color:#fff;background:var(--accent);padding:5px 8px;font-weight:800}
-.brand b{font-size:16px}
-.pill{border:1px solid #47606f;border-radius:20px;padding:4px 12px;font-size:12.5px;color:#bcd0dc;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.btn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border-radius:11px;font-weight:650;font-size:14px;white-space:nowrap;cursor:pointer}
-.btn.orange{background:var(--accent);color:#fff} .btn.ghostd{border:1px solid #4a6576;color:#dce8ef;background:#ffffff0d} .btn.ghost{border:1px solid var(--line);background:var(--card);color:var(--text)}
-.btn.ghost:hover{border-color:var(--teal)}
-
-/* nav / breadcrumb */
-.navbar{background:var(--card);border-bottom:1px solid var(--line)}
-.navbar .wrap{display:flex;flex-direction:column;gap:10px;padding-block:12px}
-.crumbs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px}
-.crumb{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-weight:650;color:var(--muted);background:var(--soft)}
-.crumb:hover{color:var(--text)} .crumb[aria-current="page"]{background:var(--navy);color:#fff}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .crumb[aria-current="page"]{background:var(--teal);color:#062631}}
-:root[data-theme="dark"] .crumb[aria-current="page"]{background:var(--teal);color:#062631}
-.crumb .lvl{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;opacity:.7}
-.sep{color:var(--faint)}
-.navrow{display:flex;gap:14px 22px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.flab{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
-.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 13px 5px 5px;font-size:13.5px;font-weight:600;white-space:nowrap;color:var(--text)}
-.chip.plain{padding:7px 13px}
-.chip:hover{border-color:var(--teal);background:color-mix(in srgb,var(--teal) 6%,var(--card))}
-.chip[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{background:var(--teal);color:#062631;border-color:var(--teal)}}
-:root[data-theme="dark"] .chip[aria-pressed="true"]{background:var(--teal);color:#062631;border-color:var(--teal)}
-.av{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-size:10.5px;font-weight:800;color:#fff;flex:none}
-.av.lg{width:44px;height:44px;font-size:15px}
-.seg{position:relative;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px;isolation:isolate}
-.seg button{position:relative;z-index:1;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:650;color:var(--muted);white-space:nowrap}
+/* ---------- command bar ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--card) 82%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;flex-direction:column;gap:10px;padding-block:10px}
+.row1{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.mark{font-size:10.5px;letter-spacing:1.6px;border-radius:7px;color:#fff;background:linear-gradient(135deg,var(--accent),#c95a14);padding:6px 9px;font-weight:800}
+.brand b{font-size:15.5px;letter-spacing:-.2px} .brand .pill{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:11px;font-weight:650;font-size:13.5px;white-space:nowrap;cursor:pointer;border:1px solid var(--line2);background:var(--card);color:var(--text)}
+.btn:hover{border-color:var(--teal)} .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)} .btn.primary:hover{filter:brightness(1.1)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{background:var(--teal);color:#062631;border-color:var(--teal)}}
+:root[data-theme="dark"] .btn.primary{background:var(--teal);color:#062631;border-color:var(--teal)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rail{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rail .lbl{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--faint);margin-right:2px}
+.rail .spacer{flex:1 1 10px}
+/* dropdown */
+.dd{position:relative;min-width:0}
+.dd>button{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 10px 0 12px;border-radius:11px;border:1px solid var(--line2);background:var(--card);font-size:13.5px;font-weight:600;max-width:280px;white-space:nowrap}
+.dd>button:hover{border-color:var(--teal)} .dd>button .k{color:var(--faint);font-weight:500} .dd>button .v{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.dd>button .chev{width:14px;height:14px;stroke:var(--faint);fill:none;stroke-width:2;flex:none;transition:transform .2s}
+.dd[data-open="true"]>button{border-color:var(--teal);box-shadow:0 0 0 4px color-mix(in srgb,var(--teal) 16%,transparent)} .dd[data-open="true"] .chev{transform:rotate(180deg)}
+.dd.active>button{background:var(--navy);color:#fff;border-color:var(--navy)} .dd.active>button .k,.dd.active>button .chev{color:#c9d7e2;stroke:#c9d7e2}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dd.active>button{background:var(--teal);color:#062631;border-color:var(--teal)}:root:not([data-theme="light"]) .dd.active>button .k,:root:not([data-theme="light"]) .dd.active>button .chev{color:#0a3b43;stroke:#0a3b43}}
+:root[data-theme="dark"] .dd.active>button{background:var(--teal);color:#062631;border-color:var(--teal)} :root[data-theme="dark"] .dd.active>button .k,:root[data-theme="dark"] .dd.active>button .chev{color:#0a3b43;stroke:#0a3b43}
+.pop{position:absolute;top:calc(100% + 6px);left:0;z-index:50;min-width:280px;max-width:min(92vw,420px);background:var(--card);border:1px solid var(--line2);border-radius:14px;box-shadow:var(--shadow-lg);padding:8px;display:flex;flex-direction:column;gap:6px;transform-origin:top left}
+.pop.right{left:auto;right:0;transform-origin:top right}
+.pop .srch{display:flex;align-items:center;gap:8px;height:36px;border:1px solid var(--line);border-radius:10px;padding:0 10px;background:var(--soft)}
+.pop .srch input{border:0;outline:0;background:transparent;width:100%;font-size:13.5px} .pop .srch svg{width:14px;height:14px;stroke:var(--faint);fill:none;stroke-width:2}
+.pop ul{list-style:none;margin:0;padding:0;max-height:min(50vh,380px);overflow-y:auto;scrollbar-width:thin;display:flex;flex-direction:column;gap:2px}
+.pop li button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;border-radius:10px;font-size:13.5px}
+.pop li button:hover,.pop li button[aria-selected="true"]{background:var(--soft)} .pop li button[aria-selected="true"]{font-weight:700}
+.pop li button .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .pop li button .s{color:var(--muted);font-size:12px;white-space:nowrap}
+.pop .hd{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--faint);padding:6px 10px 2px}
+.pop .empty{padding:14px;text-align:center;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:no-preference){.pop{animation:popIn .18s cubic-bezier(.2,.8,.2,1)}@keyframes popIn{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}}
+.av{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:800;color:#fff;flex:none}
+.av.lg{width:48px;height:48px;font-size:16px}
+.seg{position:relative;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--soft);border:1px solid var(--line2);border-radius:11px;padding:3px;isolation:isolate;height:36px}
+.seg button{position:relative;z-index:1;padding:0 12px;border-radius:9px;font-size:13px;font-weight:650;color:var(--muted);white-space:nowrap}
 .seg button[aria-pressed="true"]{color:#fff}
-.seg .thumb{position:absolute;z-index:0;top:4px;bottom:4px;left:4px;border-radius:999px;background:var(--navy);box-shadow:0 2px 8px #0b203233}
+.seg .thumb{position:absolute;z-index:0;top:3px;bottom:3px;left:3px;border-radius:9px;background:var(--navy);box-shadow:0 2px 8px #0b203233}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#062631}:root:not([data-theme="light"]) .seg .thumb{background:var(--teal)}}
 :root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#062631} :root[data-theme="dark"] .seg .thumb{background:var(--teal)}
-.field{display:flex;align-items:center;gap:8px;height:38px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:0 14px;min-width:0}
+.field{display:flex;align-items:center;gap:8px;height:36px;border:1px solid var(--line2);border-radius:11px;background:var(--card);padding:0 12px;min-width:0}
 .field:focus-within{border-color:var(--teal);box-shadow:0 0 0 4px color-mix(in srgb,var(--teal) 16%,transparent)}
-.field svg{width:16px;height:16px;flex:none;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
-.field input{border:0;outline:0;background:transparent;height:100%;min-width:0;width:100%;font-size:14px}
-.scope{font-size:12.5px;color:var(--muted)} .scope b{color:var(--text)}
+.field input{border:0;outline:0;background:transparent;height:100%;min-width:0;width:100%;font-size:13.5px}
+.clear{color:var(--teal);font-weight:700;font-size:13px;padding:0 6px;height:36px}
+.tabsrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tabs{display:inline-flex;gap:2px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:3px;overflow-x:auto;max-width:100%;scrollbar-width:none}
+.tabs button{padding:7px 14px;border-radius:9px;font-size:13.5px;font-weight:650;color:var(--muted);white-space:nowrap;display:inline-flex;gap:7px;align-items:center}
+.tabs button[aria-selected="true"]{background:var(--card);color:var(--text);box-shadow:0 1px 4px #0b203218}
+.tabs button .n{font-size:11px;font-weight:700;background:var(--line);color:var(--muted);border-radius:999px;padding:1px 7px}
+.tabs button[aria-selected="true"] .n{background:var(--teal-soft);color:var(--teal)}
+.crumbs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.crumbs button{color:var(--muted);font-weight:600} .crumbs button:hover{color:var(--text)} .crumbs b{color:var(--text)} .crumbs .sep{color:var(--faint)}
 
-/* page grid */
-main.wrap{padding-block:20px 60px;display:flex;flex-direction:column;gap:20px}
-.g12{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px}
+/* ---------- page ---------- */
+main.wrap{padding-block:22px 64px;display:flex;flex-direction:column;gap:22px}
+.g12{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:22px}
 .c12{grid-column:span 12} .c8{grid-column:span 8} .c7{grid-column:span 7} .c6{grid-column:span 6} .c5{grid-column:span 5} .c4{grid-column:span 4} .c3{grid-column:span 3}
 @media (max-width:1100px){.c8,.c7,.c6,.c5,.c4{grid-column:span 6}} @media (max-width:760px){.g12>*{grid-column:span 12}}
-.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);min-width:0;display:flex;flex-direction:column}
-.pad{padding:20px 22px}
-.ch{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-.ch h2{font-size:17px;letter-spacing:-.3px} .ch p{font-size:12.5px;color:var(--muted);margin-top:3px;max-width:80ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);min-width:0;display:flex;flex-direction:column}
+.pad{padding:22px 24px}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.ch h2{font-size:16.5px;letter-spacing:-.3px;font-weight:700} .ch p{font-size:12.5px;color:var(--muted);margin-top:3px;max-width:80ch}
 .ch .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .foot-note{margin-top:auto;padding-top:12px;font-size:12px;color:var(--muted)}
 .grow{flex:1 1 auto}
 
-/* headline */
-.head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
-@media (max-width:760px){.head{grid-template-columns:1fr}}
-.eyebrow{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px}
-.eyebrow::before{content:"";width:18px;height:2px;background:var(--accent)}
-.head h1{font-size:30px;letter-spacing:-.9px;line-height:1.2;margin-top:8px;max-width:34ch}
-.head h1 em{font-style:normal;color:var(--c-ao)}
-.head .sub{color:var(--muted);margin-top:8px;max-width:90ch}
-.status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:7px 13px;border-radius:11px}
-.status.bad{background:var(--bad-bg);color:var(--bad)} .status.good{background:var(--good-bg);color:var(--good)} .status.flat{background:var(--soft);color:var(--muted)}
-
-/* KPI band */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,196px),1fr));gap:14px}
-.kpi{padding:16px 18px;display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden}
-.kpi .l{font-size:12.5px;font-weight:600;color:var(--muted)}
-.kpi .v{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1.1}
-.kpi .s{font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.kpi .sp{margin-top:6px}
+/* ---------- hero ---------- */
+.hero{border-radius:24px;background:radial-gradient(900px 400px at 85% 0%,color-mix(in srgb,var(--hero-c) 80%,transparent),transparent 60%),linear-gradient(120deg,var(--hero-a),var(--hero-b));color:var(--on-hero);padding:28px 30px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M0 60h120M60 0v120' stroke='%23ffffff' stroke-opacity='.035'/%3E%3C/svg%3E");pointer-events:none}
+.hero>*{position:relative;z-index:1}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.hero .eyebrow{font-size:11.5px;font-weight:700;color:var(--on-hero-muted);text-transform:uppercase;letter-spacing:1.1px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hero .eyebrow .lv{background:var(--glass);border:1px solid var(--glass-line);border-radius:999px;padding:3px 10px;color:var(--on-hero);letter-spacing:.6px}
+.hero h1{font-size:30px;letter-spacing:-1px;line-height:1.2;margin-top:12px;max-width:30ch;color:#fff;font-weight:800}
+.hero h1 em{font-style:normal;color:#ffb27a}
+.hero .sub{color:var(--on-hero-muted);margin-top:10px;max-width:80ch;font-size:14px}
+.hero .status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;padding:7px 12px;border-radius:11px;margin-top:16px;background:var(--glass);border:1px solid var(--glass-line);color:#fff}
+.hero .status.bad{background:#c0454e33;border-color:#f39aa366} .hero .status.good{background:#15806b33;border-color:#74d5b766}
+.ring{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:200px}
+.ring svg{width:200px;height:200px;display:block} .ring .cap{font-size:12px;color:var(--on-hero-muted);text-align:center;max-width:220px}
+.kpis{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px;margin-top:6px}
+.kpi{background:var(--glass);border:1px solid var(--glass-line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden;color:var(--on-hero);transition:background .2s}
+.kpi:hover{background:#ffffff1f}
+.kpi .l{font-size:12px;font-weight:600;color:var(--on-hero-muted)} .kpi .v{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1.1;color:#fff}
+.kpi .s{font-size:12px;color:var(--on-hero-muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.kpi .sp{margin-top:6px;opacity:.9}
+.kpi.bad .v{color:#ffb3b9} .kpi.good .v{color:#9fe6cf}
 .up{color:var(--bad);font-weight:700} .down{color:var(--good);font-weight:700} .flat{color:var(--muted)}
-.kpi.good::before,.kpi.bad::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--good)} .kpi.bad::before{background:var(--bad)}
+.kpi .up{color:#ffb3b9} .kpi .down{color:#9fe6cf} .kpi .flat{color:var(--on-hero-muted)}
 
-/* insights */
-.brief{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px} @media (max-width:1000px){.brief{grid-template-columns:1fr}}
+/* ---------- insights ---------- */
+.brief{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:22px} @media (max-width:1000px){.brief{grid-template-columns:1fr}}
 .ins{display:flex;flex-direction:column;gap:10px}
-.ic{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:13px 14px;border-radius:14px;background:var(--soft);border-left:4px solid var(--teal)}
+.ic{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px 15px;border-radius:var(--r-sm);background:var(--soft);border:1px solid var(--line);border-left:4px solid var(--teal)}
 .ic.s3{border-left-color:var(--bad)} .ic.s2{border-left-color:var(--warn)} .ic.s0{border-left-color:var(--good)}
-.ic .ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--card);font-weight:800;font-size:14px;color:var(--muted)}
-.ic .t{font-weight:700;font-size:14.5px;line-height:1.35} .ic .b{font-size:13.5px;margin-top:3px} .ic .e{font-size:12px;color:var(--faint);margin-top:5px;font-family:var(--mono)}
-.ic .a{margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px}
-.ic .a .own{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--card);color:var(--muted)}
+.ic .ico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--card);font-weight:800;font-size:14px;color:var(--muted);box-shadow:var(--shadow)}
+.ic .t{font-weight:700;font-size:14.5px;line-height:1.35} .ic .b{font-size:13.5px;margin-top:4px} .ic .e{font-size:11.5px;color:var(--faint);margin-top:6px;font-family:var(--mono)}
+.ic .a{margin-top:9px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px}
+.ic .a .own{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;background:var(--card);color:var(--muted);border:1px solid var(--line)}
 .ic .a button{color:var(--teal);font-weight:700}
+.brief>.card:last-child{position:sticky;top:132px;align-self:start}
 .plan{display:flex;flex-direction:column;gap:8px}
-.plan .row{display:grid;grid-template-columns:76px 1fr;gap:10px;padding:11px 12px;border-radius:12px;background:var(--soft);font-size:13.5px}
-.plan .when{font-size:12px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.6px;padding-top:2px}
-.plan .who{color:var(--muted);font-size:12.5px} .plan .metric{color:var(--muted);font-size:12.5px;font-family:var(--mono)}
+.plan .row{display:grid;grid-template-columns:80px 1fr;gap:10px;padding:12px 13px;border-radius:var(--r-sm);background:var(--soft);border:1px solid var(--line);font-size:13.5px}
+.plan .when{font-size:11px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;padding-top:3px}
+.plan .who{color:var(--muted);font-size:12.5px} .plan .metric{color:var(--muted);font-size:12px;font-family:var(--mono)}
 
-/* tables */
+/* ---------- tables ---------- */
 .tw{overflow-x:auto;scrollbar-width:thin}
 table{border-collapse:collapse;width:100%;font-size:13.5px}
-th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:11.5px;font-weight:700;color:var(--faint);text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;letter-spacing:.3px;text-transform:uppercase}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
 tbody tr:last-child td{border-bottom:none}
 .n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 tr.click{cursor:pointer} tr.click:hover td{background:var(--soft)}
@@ -146,79 +164,72 @@ td.comment{min-width:300px;max-width:620px;color:var(--muted);font-size:13px}
 .rank.r1{background:#f4c84a;color:#5a4000}.rank.r2{background:#dfe5ea;color:#24323e}.rank.r3{background:#e9a46b;color:#2b1606}
 .tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
 .tag.bad{background:var(--bad-bg);color:var(--bad)} .tag.good{background:var(--good-bg);color:var(--good)} .tag.warn{background:var(--warn-bg);color:var(--warn)} .tag.flat{background:var(--soft);color:var(--muted)}
-.tagx{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--soft);margin:1px 3px 1px 0;white-space:nowrap}
+.tagx{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--soft);border:1px solid var(--line);margin:1px 3px 1px 0;white-space:nowrap}
 .sbar{display:flex;align-items:center;gap:8px;justify-content:flex-end} .sbar i{display:block;height:7px;border-radius:0 4px 4px 0;background:var(--c-ao)}
 .bullet{display:flex;flex-direction:column;gap:3px;min-width:100px;align-items:flex-end}
 .bullet .val{font-weight:800} .bullet .track{position:relative;height:6px;width:100%;max-width:110px;background:var(--line);border-radius:3px}
 .bullet .track i{position:absolute;left:0;top:0;bottom:0;border-radius:3px} .bullet .track b{position:absolute;top:-3px;width:2px;height:12px;background:var(--text)}
-.idle{padding:12px 14px;border-radius:12px;background:var(--warn-bg);display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;font-size:13px}
+.idle{padding:12px 14px;border-radius:var(--r-sm);background:var(--warn-bg);display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;font-size:13px;margin-bottom:12px}
 .idle b{color:var(--warn)} .idle .p{background:var(--card);border-radius:999px;padding:3px 10px;font-weight:600}
 .empty{padding:26px;text-align:center;color:var(--muted)}
 .banner{padding:10px 14px;border-radius:12px;font-size:14px}
 .banner.err{background:var(--bad-bg);color:var(--bad)} .banner.ok{background:var(--good-bg);color:var(--good)}
 .drop{outline:3px dashed var(--teal);outline-offset:-8px}
-
-/* charts shared */
-.chart{position:relative;width:100%;min-width:0}
-.chart svg{display:block;width:100%;height:auto;overflow:visible}
-.chart text{fill:var(--muted);font-family:var(--font);font-size:11.5px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin-bottom:8px}
-.legend span{display:inline-flex;align-items:center;gap:6px} .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
-.legend i.ln{height:3px;width:16px;border-radius:2px} .legend i.dash{height:0;width:16px;border-top:2px dashed var(--warn);border-radius:0}
-.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);box-shadow:0 10px 30px #0b20332a;border-radius:12px;padding:9px 12px;font-size:12.5px;z-index:5;min-width:150px;max-width:280px;color:var(--text)}
-.tip b{display:block;margin-bottom:4px} .tip .r{display:flex;justify-content:space-between;gap:14px} .tip .r i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
-table.heat td,table.heat th{text-align:center;padding:8px 10px} table.heat td:first-child,table.heat th:first-child{text-align:left}
-table.heat tr.click td:first-child{font-weight:650}
-
-/* agent profile */
 .profile{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
 .profile .meta{display:flex;gap:8px 14px;flex-wrap:wrap;color:var(--muted);font-size:13.5px}
-.timeline{display:flex;flex-direction:column;gap:0}
+.timeline{display:flex;flex-direction:column}
 .tl-item{display:grid;grid-template-columns:92px 14px 1fr;gap:12px;padding:10px 0;position:relative}
 .tl-item .d{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
 .tl-item .dot{width:12px;height:12px;border-radius:50%;margin-top:5px;border:3px solid var(--card);box-shadow:0 0 0 1px var(--line)}
 .tl-item::before{content:"";position:absolute;left:97px;top:0;bottom:0;width:2px;background:var(--line);z-index:-1}
 .tl-item .body b{font-size:13.5px} .tl-item .body p{font-size:13px;color:var(--muted);margin-top:2px;max-width:90ch}
 
-/* motion */
-.reveal>*{animation:none}
+/* ---------- charts ---------- */
+.chart{position:relative;width:100%;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{fill:var(--muted);font-family:var(--font);font-size:11.5px}
+.kpi .chart text{fill:var(--on-hero-muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px} .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.legend i.ln{height:3px;width:16px;border-radius:2px} .legend i.dash{height:0;width:16px;border-top:2px dashed var(--warn);border-radius:0}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line2);box-shadow:var(--shadow-lg);border-radius:12px;padding:9px 12px;font-size:12.5px;z-index:5;min-width:150px;max-width:280px;color:var(--text)}
+.tip b{display:block;margin-bottom:4px} .tip .r{display:flex;justify-content:space-between;gap:14px} .tip .r i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+table.heat td,table.heat th{text-align:center;padding:8px 10px} table.heat td:first-child,table.heat th:first-child{text-align:left}
+table.heat tr.click td:first-child{font-weight:650}
+.secthead{display:flex;align-items:baseline;gap:12px;margin-top:6px}
+.secthead h2{font-size:19px;letter-spacing:-.5px;font-weight:800} .secthead p{color:var(--muted);font-size:13px}
+
+/* ---------- motion ---------- */
 @media (prefers-reduced-motion:no-preference){
   html{scroll-behavior:smooth}
-  .chip,.crumb,.btn,tr.click td{transition:background .18s,border-color .18s,color .18s,box-shadow .18s,transform .18s}
+  .btn,.dd>button,.tabs button,tr.click td,.kpi{transition:background .18s,border-color .18s,color .18s,box-shadow .18s,transform .18s}
   .seg .thumb{transition:transform .3s cubic-bezier(.3,.7,.2,1),width .3s cubic-bezier(.3,.7,.2,1)}
-  .reveal>*{animation:rise .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*60ms)}
+  .reveal>*{animation:rise .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*55ms)}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  .card:hover{box-shadow:0 2px 4px #0b203214,0 10px 28px #0b203312}
+  .card:hover{box-shadow:var(--shadow-lg)}
 }
 .foot{font-size:12.5px;color:var(--muted)}
+@media (max-width:560px){.brand .pill{display:none}.rail .lbl{display:none}.rail .spacer{display:none}.dd>button{max-width:100%}.dd{flex:1 1 100%}.crumbs{font-size:12px}.hero{padding:22px 18px}.hero h1{font-size:24px}}
 </style>
 
-<header class="top">
+<header class="bar">
   <div class="wrap">
-    <div class="brand"><span class="mark">VXI | TSX</span><b>NPS Scrub Insights</b><span class="pill" id="snap">—</span></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap"><label class="btn ghostd" for="rosterInput" tabindex="0" id="rosterBtn">Upload roster</label><label class="btn orange" for="fileInput" tabindex="0" id="uploadBtn">Upload new export</label></div>
-    <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm,.csv" hidden><input type="file" id="rosterInput" accept=".xlsx,.xls,.xlsm,.csv" hidden>
-  </div>
-</header>
-<nav class="navbar" aria-label="Drill-down">
-  <div class="wrap">
-    <div class="crumbs" id="crumbs"></div>
-    <div id="picker"></div>
-    <div class="navrow">
-      <div><div class="flab">Period</div><div class="chips" id="periodChips"></div></div>
-      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
-        <div><div class="flab" id="basisLab">Date basis</div><div class="seg" role="group" aria-labelledby="basisLab" id="basisSeg"><span class="thumb" aria-hidden="true"></span><button type="button" data-v="scrub">Scrub date</button><button type="button" data-v="survey">Survey date</button></div></div>
-        <div id="customBox" hidden><div class="flab">Custom dates</div><div style="display:flex;gap:8px;align-items:center"><label class="field" for="fFrom"><input type="date" id="fFrom" aria-label="From date"></label><span class="muted small">to</span><label class="field" for="fTo"><input type="date" id="fTo" aria-label="To date"></label></div></div>
-        <div><div class="flab">Find an agent</div><label class="field" for="find" style="width:240px"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="find" list="bpids" placeholder="Name or BPID"><datalist id="bpids"></datalist></label></div>
+    <div class="row1">
+      <div class="brand"><span class="mark">VXI | TSX</span><b>NPS Scrub Insights</b><span class="pill" id="snap">—</span></div>
+      <div class="actions">
+        <label class="btn" for="rosterInput" tabindex="0" id="rosterBtn"><svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Roster</label>
+        <label class="btn primary" for="fileInput" tabindex="0" id="uploadBtn"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0 4 4m-4-4-4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Upload export</label>
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm,.csv" hidden><input type="file" id="rosterInput" accept=".xlsx,.xls,.xlsm,.csv" hidden>
       </div>
     </div>
-    <div class="scope" id="scope"></div>
+    <div class="rail" id="rail"></div>
+    <div class="tabsrow"><nav class="tabs" role="tablist" id="tabs"></nav><div class="crumbs" id="crumbs"></div></div>
   </div>
-</nav>
+</header>
 
 <main class="wrap">
   <div id="msg"></div>
-  <div id="view" class="reveal" style="display:flex;flex-direction:column;gap:20px"></div>
+  <div id="view" class="reveal" style="display:flex;flex-direction:column;gap:22px"></div>
   <p class="foot" id="footnote"></p>
 </main>
 
@@ -1584,6 +1595,7 @@ const T2_MAP=[["call handling","Call Handling","QA"],["communication","Communica
  ["outage","Outage",""],["tools outage","Comcast Tools Outage/Update",""],["restriction","Comcast Restriction",""],["ivr","IVR / Routing",""],
  ["avaya","Avaya issue",""],["one cti","ONE CTI down",""],["headset","Headset Issue",""],["global protect","Global Protect / Connectivity",""],["connectivity","Global Protect / Connectivity",""]];
 const BUCKETS=["QA","Repeat (aiCR)","Transfer","AHT / Hold"];
+const SHORTT2={"Call Handling":"Call handling","Communication / Soft Skills":"Communication","Tone - Pace":"Tone / pace","Language Proficiency":"Language","Knowledge Gap":"Knowledge gap","Incorrect/Incomplete Resolution":"Incorrect resolution","Ownership":"Ownership","Customer Education - Setting Expectations":"Expectations","Did not ask discovery questions":"Discovery","Wrong ITG":"Wrong ITG","Incorrect/Incomplete ITG":"Incomplete ITG","Missing ITG":"Missing ITG","Excessive Hold/Mute":"Hold / mute","Tools Navigation/Utilization":"Tools navigation"};const shortT=t=>SHORTT2[t]||String(t).replace("Customer Education - ","").replace("Incorrect/Incomplete ","Incorrect ");
 const BCOLOR={"QA":"var(--s1)","Repeat (aiCR)":"var(--s2)","Transfer":"var(--s7)","AHT / Hold":"var(--s4)"};
 const AGT=T2_MAP.slice(0,14).map(x=>x[1]);
 const BUCKET_OF=Object.fromEntries(T2_MAP.filter(x=>x[2]).map(x=>[x[1],x[2]]));
@@ -1681,7 +1693,7 @@ function applyRoster(){
   // leader → OM (majority of their roster agents)
   for(const[k,L]of LEADERS){const g=ROWS.filter(r=>r.lk===k&&r.om);const[o]=topKey(g,r=>r.om);L.om=o||"";}}
 const topT2=t=>Array.isArray(t)?(t[0]?t[0].t2:""):(t&&t.t2)||t||"";
-const LN=k=>(LEADERS.get(k)||{name:k}).name;const AN=bp=>{const a=ROSTER.get(bp);return a&&a.name?a.name:"";};
+const LN=k=>(LEADERS.get(k)||{name:k}).name;const AN=bp=>{const a=ROSTER.get(bp);return a&&a.name?(a.name===a.name.toLowerCase()||a.name===a.name.toUpperCase()?title(a.name):a.name):"";};
 function parseCSV(text){const rows=[];let row=[],f="",q=false;for(let i=0;i<text.length;i++){const c=text[i];
   if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}else if(c==='"')q=true;else if(c===","){row.push(f);f="";}
   else if(c==="\n"||c==="\r"){if(c==="\r"&&text[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f="";}else f+=c;}
@@ -1716,44 +1728,9 @@ function go(patch){Object.assign(S,patch);render();window.scrollTo({top:0,behavi
 const drillOM=o=>go({om:o,tl:null,agent:null});const drillTL=lk=>{const L=LEADERS.get(lk);go({om:S.om||(L&&L.om)||null,tl:lk,agent:null});};const drillAgent=bp=>{const r=ROWS.filter(x=>x.bpid===bp).sort((a,b)=>b.scrub-a.scrub)[0];go({tl:S.tl||(r?r.lk:null),om:S.om||(r&&LEADERS.get(r.lk)&&LEADERS.get(r.lk).om)||null,agent:bp});};
 
 /* ===================== nav ===================== */
-function renderNav(c){
-  const crumbs=[["Floor","All team leaders",()=>go({om:null,tl:null,agent:null}),S.level==="floor"]];
-  if(S.om)crumbs.push(["Ops manager",S.om,()=>go({tl:null,agent:null}),S.level==="om"]);
-  if(S.tl)crumbs.push(["Team leader",LN(S.tl),()=>go({agent:null}),S.level==="tl"]);
-  if(S.agent)crumbs.push(["Agent",AN(S.agent)||S.agent,null,true]);
-  $("#crumbs").replaceChildren(...crumbs.flatMap(([lvl,name,fn,cur],i)=>[i?h("span",{class:"sep",text:"›"}):null,h("button",{class:"crumb",type:"button","aria-current":cur?"page":null,onclick:fn||(()=>{})},h("span",{class:"lvl",text:lvl}),name)]).filter(Boolean));
-  // picker: siblings at current level
-  const pk=$("#picker");pk.replaceChildren();
-  const oms=[...groupBy([...ROSTER.values()].filter(a=>a.om&&a.om!=="0"),a=>a.om)].map(([o,g])=>[o,g.length]).sort((a,b)=>b[1]-a[1]);
-  const tls=[...LEADERS.values()].filter(L=>!S.om||L.om===S.om||(!L.om&&!S.om)).map(L=>[L,count(c.P,r=>r.lk===L.key)]).filter(x=>x[1]>0||x[0].key===S.tl).sort((a,b)=>b[1]-a[1]);
-  if(S.level==="floor"&&oms.length)pk.append(h("div",null,h("div",{class:"flab",text:"Ops managers"}),h("div",{class:"chips"},oms.map(([o,n])=>h("button",{class:"chip plain",type:"button",onclick:()=>drillOM(o)},`${o} · ${n} agents`)))));
-  if(S.level==="floor"||S.level==="om")pk.append(h("div",null,h("div",{class:"flab",text:S.om?`Team leaders · ${S.om}`:"Team leaders (submitters)"}),h("div",{class:"chips"},tls.map(([L,n])=>h("button",{class:"chip",type:"button",title:L.form?`Form name: ${L.form}`:null,onclick:()=>drillTL(L.key)},avatar(L.name,L.color),`${L.name} · ${n}`)))));
-  if(S.level==="tl"||S.level==="agent"){const sib=tls.filter(([L])=>true);pk.append(h("div",null,h("div",{class:"flab",text:"Switch team leader"}),h("div",{class:"chips"},sib.map(([L,n])=>h("button",{class:"chip",type:"button","aria-pressed":String(L.key===S.tl),onclick:()=>go({tl:L.key,agent:null,om:S.om||L.om||null})},avatar(L.name,L.color),L.name)))));}
-  $("#periodChips").replaceChildren(...PERIODS.map(p=>h("button",{class:"chip plain",type:"button","aria-pressed":String(S.period===p),onclick:()=>{S.period=p;render();},title:p==="Month to date"||p==="Last month"?`Fiscal month runs ${FM_START}th → ${FM_START-1}st`:null},PLABEL(p))));
-  document.querySelectorAll("#basisSeg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===S.basis)));moveThumb($("#basisSeg"));
-  $("#customBox").hidden=S.period!=="Custom";$("#fFrom").value=iso(S.from);$("#fTo").value=iso(S.to);
-  $("#scope").replaceChildren("Showing ",h("b",{text:S.agent?(AN(S.agent)||S.agent):S.tl?LN(S.tl)+"'s team":S.om?S.om:"the whole floor"})," · ",h("b",{text:PLABEL(S.period)}),c.ranged?` (${S.basis==="scrub"?"scrub":"survey"} dates ${c.from==null?"start":fd(c.from,"dm")} – ${c.to==null?"end":fd(c.to)})`:"",` · ${nf(c.F.length)} scrubs · latest scrub ${fd(c.asOf)}`);
-  $("#snap").textContent=`${FILE} · ${nf(ROWS.length)} scrubs · ${fd(c.minScrub,"dm")} – ${fd(c.maxScrub)}`+(ROSTER.size?` · roster ${nf(ROSTER.size)}`:"");
-  $("#bpids").replaceChildren(...[...new Set(ROWS.map(r=>r.bpid))].sort().map(b=>h("option",{value:(AN(b)?AN(b)+" · ":"")+b})));}
 function moveThumb(seg){if(!seg)return;const on=seg.querySelector("button[aria-pressed=true]"),th=seg.querySelector(".thumb");if(!on||!th)return;th.style.width=on.offsetWidth+"px";th.style.transform=`translateX(${on.offsetLeft-4}px)`;}
 
 /* ===================== shared blocks ===================== */
-function headline(c){const H=IN.headline(c);const who=S.agent?(AN(S.agent)||S.agent):S.tl?LN(S.tl)+"'s team":S.om?S.om+"'s group":"Across the floor";
-  return h("section",{class:"card pad head"},h("div",null,h("div",{class:"eyebrow",text:`${who} · ${PLABEL(S.period)}${S.period==="Month to date"||S.period==="Last month"?" · "+fmLabel(S.period==="Month to date"?fm(c.asOf):fm(c.asOf)-1)+" ("+fmRange(S.period==="Month to date"?fm(c.asOf):fm(c.asOf)-1)+")":""}`}),h("h1",null,h("em",{text:H.big})," ",H.text),h("p",{class:"sub",text:H.sub||""})),
-    h("div",{style:"display:flex;flex-direction:column;gap:8px;align-items:flex-start"},h("span",{class:"status "+(H.status?H.status.kind:"flat"),text:H.status?H.status.label:"—"}),H.statusSub?h("span",{class:"muted small",text:H.statusSub}):null));}
-function kpi(l,v,subKids,{spark,ref,cls,fmt}={}){const el=h("div",{class:"card kpi "+(cls||"")},h("span",{class:"l",text:l}),h("span",{class:"v num",text:typeof v==="number"?fmt(0):v}),h("span",{class:"s"},subKids),spark?h("div",{class:"sp chart"}):null);
-  if(typeof v==="number")charts.push(()=>CH.countUp(el.querySelector(".v"),v,{fmt}));if(spark)charts.push(()=>CH.sparkline(el.querySelector(".sp"),spark,{ref}));return el;}
-function kpiBand(c){const F=c.F;const k=IN.rate?null:null;const wk0=wk(c.asOf);const wks=Array.from({length:10},(_,i)=>wk0-7*(9-i));const wg=groupBy(c.W.filter(r=>r.scrub<=c.asOf),r=>wk(r.scrub));
-  const l7=c.W.filter(r=>r.scrub>=c.l7&&r.scrub<=c.asOf),p7=c.W.filter(r=>r.scrub>=c.p7&&r.scrub<c.l7);const r7=aoRate(l7),rp=aoRate(p7);const ao=count(F,isAO),aoP=share(ao,F.length);
-  const cov=IN.coverage(c);const ag=IN.agentStats(c,F);const rep=count(ag,a=>a.status&&a.status[0]==="Chronic"),act=count(ag,a=>a.status&&a.status[0]==="Rising");
-  const lag=avg(F.map(r=>r.lag)),lag7=avg(l7.map(r=>r.lag));const dq=IN.dataQuality(F);
-  const tiles=[kpi("Scrubbed detractors",F.length,[`${nf(l7.length)} this week `,chg(l7.length-p7.length,{bad:"none"})],{spark:wks.map(w=>(wg.get(w)||[]).length),fmt:nf}),
-    kpi("Agent Opportunity %",aoP||0,[`${nf(ao)} controllable · this week ${pct(r7)} `,chg(r7!=null&&rp!=null?(r7-rp)*100:null,{d:1,unit:" pts"})],{spark:wks.map(w=>aoRate(wg.get(w)||[])),ref:c.floorAll,cls:r7!=null&&rp!=null?(r7>rp?"bad":"good"):"",fmt:v=>pct(v,1)})];
-  if(c.level!=="agent"){tiles.push(kpi("Roster coverage",cov.pct||0,[`${nf(cov.scrubbedAgents)} of ${nf(cov.rosterAgents)} agents scrubbed`,cov.idleTLs&&cov.idleTLs.length?h("span",{class:"up",text:` · ${cov.idleTLs.length} idle TL${cov.idleTLs.length>1?"s":""}`}):null],{fmt:v=>pct(v)}),
-    kpi("Agents to coach",rep+act,[h("span",{class:rep?"up":"flat",text:`${rep} chronic`}),` · ${act} rising this week`],{cls:rep?"bad":"",fmt:nf}));}
-  tiles.push(kpi("Survey → scrub lag",lag==null?"—":lag,[`days on average · this week ${lag7==null?"—":lag7.toFixed(1)}`],{cls:lag7!=null&&lag!=null&&lag7>lag+2?"bad":"",fmt:v=>v.toFixed(1)}),
-    kpi("Rows to clean",dq.total||0,[`${pct(dq.rate,1)} of scrubs · ${nf(dq.conflictsSurveys||0)} conflicting surveys`],{cls:(dq.rate||0)>.1?"bad":"",fmt:nf}));
-  return h("div",{class:"kpis"},tiles);}
 function brief(c){const ins=IN.insights(c);const plan=IN.actionPlan(c,ins);const ICO={risk:"!",win:"✓",calibration:"≠",coverage:"◔",behaviour:"↗",concentration:"◎",quality:"⧉",speed:"◷",tenure:"⌛"};
   const list=h("div",{class:"ins"},ins.length?ins.map(i=>h("div",{class:"ic s"+i.severity},h("span",{class:"ico","aria-hidden":"true",text:ICO[i.kind]||"•"}),h("div",null,h("div",{class:"t"},strong(i.title)),h("div",{class:"b"},strong(i.body)),i.evidence?h("div",{class:"e",text:i.evidence}):null,
       h("div",{class:"a"},i.owner?h("span",{class:"own",text:i.owner}):null,h("span",{text:i.action}),i.link?h("button",{type:"button",onclick:()=>followLink(i.link),text:"Open →"}):null)))):h("div",{class:"empty",text:"Nothing significant to report for this scope."}));
@@ -1764,7 +1741,7 @@ function trendCard(c){const W=c.W.filter(r=>r.scrub<=c.asOf);const wkly=IN.weekl
   const cal=days.length?chart(b=>CH.calHeat(b,{days:days.map(d=>({d:d.d,value:d.rate,n:d.n})),weeks:12}),110):null;
   return card("c12","Agent Opportunity % by week","Shaded band = 95% confidence interval · dashed = floor average for the period · grey bars = scrub volume",h("div",null,
     legend([["var(--c-ao)","Agent Opportunity %","ln"],[null,"Floor "+pct(c.floorAll),"dash"],["var(--faint)","Scrubs"]]),
-    chart(b=>CH.trend(b,{cats:wkly.map(w=>fd(w.wk,"dm")),values:wkly.map(w=>w.rate),lower:wkly.map(w=>w.lo),upper:wkly.map(w=>w.hi),vol:wkly.map(w=>w.n),ref:c.floorAll,refLabel:"Floor",height:280}),280),
+    (wkly.filter(w=>w.n>0).length<3?h("div",{class:"empty",text:`Only ${wkly.filter(w=>w.n>0).length} week${wkly.filter(w=>w.n>0).length===1?"":"s"} with scrubs in this scope — the weekly trend needs at least 3. See Movement for day-by-day.`}):chart(b=>CH.trend(b,{cats:wkly.map(w=>fd(w.wk,"dm")),values:wkly.map(w=>w.n?w.rate:null),lower:wkly.map(w=>w.n>=5?w.lo:null),upper:wkly.map(w=>w.n>=5?w.hi:null),vol:wkly.map(w=>w.n),ref:c.floorAll,refLabel:"Floor",height:280}),280)),
     cal?h("div",{style:"margin-top:14px"},h("div",{class:"flab",text:"Daily controllable rate · last 12 weeks"}),cal):null));}
 /* ===== movement: day over day, fiscal month over month, behaviours over time ===== */
 const SLOTS=["var(--s1)","var(--s2)","var(--s3)","var(--s4)","var(--s5)","var(--s6)","var(--s7)","var(--s8)"];
@@ -1786,13 +1763,13 @@ function movement(c){const W=c.W.filter(r=>r.scrub<=c.asOf);const g=h("div",{cla
     chart(b=>CH.stackedCols(b,{cats:fmRows.map(r=>fmLabel(r.k)+(r.partial?" (MTD)":"")),stacks:RCAS.map(x=>({name:SHORT[x],color:COLOR[x],values:fmRows.map(r=>count(r.a,q=>q.rca===x))})),height:260}),260)));
   g.append(card("c6","Month over month — Agent Opportunity %","Bars with 95% intervals · dashed = all-time baseline",h("div",null,
     chart(b=>CH.hbars(b,{items:fmRows.map(r=>({label:`${fmLabel(r.k)}${r.partial?" (MTD)":""} · ${fmRange(r.k)}`,value:r.rate||0,color:(r.rate||0)>c.baseline?"var(--bad)":"var(--good)",extra:[[null,"Scrubs",nf(r.n)],[null,"Agents",nf(r.agents)],[null,"Leaders",nf(r.leaders)]]})),ci:fmRows.map(r=>r.ci?[r.ci.lo,r.ci.hi]:null),fmt:v=>pct(v),max:1,ref:c.baseline,refLabel:"Baseline",rowH:34}),40+34*fmRows.length),
-    table([{t:"Fiscal month",f:r=>h("span",null,h("b",{text:fmLabel(r.k)+(r.partial?" (MTD)":"")}),h("small",{class:"muted",text:" "+fmRange(r.k)}))},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Agents",n:1,f:r=>nf(r.agents)},{t:"Agent Opp",n:1,f:r=>nf(r.ao)},{t:"Agent Opp %",n:1,f:r=>pct(r.rate,1)},{t:"MoM Δ scrubs",n:1,f:r=>chg(r.dn,{bad:"none"})},{t:"MoM Δ pts",n:1,f:r=>chg(r.dr,{d:1,unit:" pts"})}],[...fmRows].reverse()))));
+    table([{t:"Fiscal month",f:r=>h("span",null,h("b",{text:fmLabel(r.k)+(r.partial?" (MTD)":"")}),h("small",{class:"muted",text:" "+fmRange(r.k)}))},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Agent Opp",n:1,f:r=>nf(r.ao)},{t:"AO %",n:1,f:r=>pct(r.rate,1)},{t:"Δ scrubs",n:1,f:r=>chg(r.dn,{bad:"none"})},{t:"Δ pts",n:1,f:r=>chg(r.dr,{d:1,unit:""})}],[...fmRows].reverse()))));
   // (e) behaviours week by week (top 6 T2), 12 weeks
   const wk0=wk(c.asOf);const wks=Array.from({length:12},(_,i)=>wk0-7*(11-i));const ao=W.filter(isAO);const topT=AGT.map(t=>({t,n:count(ao,r=>r.t2===t)})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,6).map(x=>x.t);
-  if(topT.length)g.append(card("c6","Behaviours week by week","Agent Opportunity count by behaviour · top 6 behaviours · last 12 weeks",chart(b=>CH.stackedCols(b,{cats:wks.map(w=>fd(w,"dm")),stacks:topT.map((t,i)=>({name:t,color:SLOTS[i],values:wks.map(w=>count(ao,r=>r.t2===t&&wk(r.scrub)===w))})),height:280}),280)));
+  if(topT.length)g.append(card("c6","Behaviours week by week","Agent Opportunity count by behaviour · top 6 behaviours · last 12 weeks",chart(b=>CH.stackedCols(b,{cats:wks.map(w=>fd(w,"dm")),stacks:topT.map((t,i)=>({name:shortT(t),color:SLOTS[i],values:wks.map(w=>count(ao,r=>r.t2===t&&wk(r.scrub)===w))})),height:280}),280)));
   // (f) behaviours month over month share heat
   const bRows=AGT.map(t=>({t,n:count(ao,r=>r.t2===t)})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,10);
-  if(bRows.length&&fmKeys.length)g.append(card("c6","Behaviours month over month","Share of each fiscal month's Agent Opportunity · darker = bigger share",h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:bRows.map(x=>x.t),cols:fmRows.map(r=>fmLabel(r.k)+(r.partial?"*":"")),matrix:bRows.map(x=>fmRows.map(r=>{const a=r.a.filter(isAO);return share(count(a,q=>q.t2===x.t),a.length)||0;})),fmt:v=>v?pct(v):""})))));
+  if(bRows.length&&fmKeys.length)g.append(card("c6","Behaviours month over month","Share of each fiscal month's Agent Opportunity · darker = bigger share",h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:bRows.map(x=>shortT(x.t)),cols:fmRows.map(r=>fmLabel(r.k)+(r.partial?"*":"")),matrix:bRows.map(x=>fmRows.map(r=>{const a=r.a.filter(isAO);return share(count(a,q=>q.t2===x.t),a.length)||0;})),fmt:v=>v?pct(v):""})))));
   // (g) who submits when: leaders × last 14 scrub days
   if(c.level!=="tl"&&c.level!=="agent"){const d14=days.slice(-14);const lg=[...groupBy(W.filter(r=>d14.includes(r.scrub)),r=>r.lk)].sort((a,b)=>b[1].length-a[1].length);
     if(lg.length)g.append(card("c12","Who submits when",`Scrubs submitted per team leader per day · last ${d14.length} scrub days · click a row to open the leader`,h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:lg.map(([k,a])=>`${LN(k)} (${a.length})`),cols:d14.map(d=>fd(d,"dm")),matrix:lg.map(([,a])=>d14.map(d=>count(a,r=>r.scrub===d))),fmt:v=>v?nf(v):"",rowLink:i=>drillTL(lg[i][0])})))));}
@@ -1811,8 +1788,8 @@ const OMC=new Map();function omColor(o){if(!OMC.has(o))OMC.set(o,`var(--s${(OMC.
 function omLegend(c){const oms=[...new Set([...LEADERS.values()].map(L=>L.om).filter(Boolean))];return oms.map(o=>[omColor(o),o]);}
 function paretoCard(c,cls){const bs=IN.behaviourStats(c,c.F).filter(b=>b.n>0);
   return card(cls||"c6","Which behaviours drive Agent Opportunity","Pareto: the line shows the cumulative share. Colour = KPI bucket.",h("div",null,legend(BUCKETS.map(b=>[BCOLOR[b],b])),
-    chart(b=>CH.pareto(b,{items:bs.map(x=>({label:x.t2,value:x.n,color:BCOLOR[x.bucket]||"var(--s3)"})),height:300}),300)));}
-function waterfallCard(c,cls){const bs=IN.behaviourStats(c,c.F);const items=bs.map(b=>({label:b.t2,delta:(b.l7||0)-(b.p7||0)})).filter(b=>b.delta).sort((a,b)=>b.delta-a.delta);const start=bs.reduce((s,b)=>s+(b.p7||0),0),end=bs.reduce((s,b)=>s+(b.l7||0),0);
+    chart(b=>CH.pareto(b,{items:bs.map(x=>({label:shortT(x.t2),value:x.n,color:BCOLOR[x.bucket]||"var(--s3)"})),height:300}),300)));}
+function waterfallCard(c,cls){const bs=IN.behaviourStats(c,c.F);const items=bs.map(b=>({label:shortT(b.t2),delta:(b.l7||0)-(b.p7||0)})).filter(b=>b.delta).sort((a,b)=>b.delta-a.delta);const start=bs.reduce((s,b)=>s+(b.p7||0),0),end=bs.reduce((s,b)=>s+(b.l7||0),0);
   return card(cls||"c6","What changed this week","Agent Opportunity count, prior 7 days → last 7 days, split by behaviour",items.length?chart(b=>CH.waterfall(b,{items,startLabel:"Prior 7 days",startValue:start,endLabel:"Last 7 days",height:280}),280):h("div",{class:"empty",text:"No change to show for this scope."}));}
 function concentrationCard(c,cls){const con=IN.concentration(c.F);if(!con||!con.shares||!con.shares.length)return card(cls||"c6","Concentration",null,h("div",{class:"empty",text:"No Agent Opportunity in scope."}));
   return card(cls||"c6","How concentrated is the problem?",`Top 10% of agents (${nf(con.top10.agents)}) create ${pct(con.top10.share)} of Agent Opportunity · top 20% create ${pct(con.top20.share)}. Gini ${con.gini.toFixed(2)}.`,
@@ -1820,8 +1797,8 @@ function concentrationCard(c,cls){const con=IN.concentration(c.F);if(!con||!con.
 function tenureCard(c,cls){const ts=IN.tenureStats(c).filter(t=>t.n>0||t.rosterAgents>0);const ps=IN.phaseStats?IN.phaseStats(c).filter(t=>t.n>0||t.rosterAgents>0):[];
   const mk=(rows,lab)=>rows.length?h("div",null,h("div",{class:"flab",text:lab}),chart(b=>CH.hbars(b,{items:rows.map(t=>({label:`${t.bucket} · ${nf(t.scrubbedAgents)}/${nf(t.rosterAgents)} agents`,value:t.aoP||0,color:(t.aoP||0)>c.floor?"var(--bad)":"var(--good)",extra:[[null,"Scrubs",nf(t.n)],[null,"Agent Opp",nf(t.ao)]]})),ci:rows.map(t=>t.ci?[t.ci.lo,t.ci.hi]:null),fmt:v=>pct(v),max:1,ref:c.floor,refLabel:"Floor",rowH:34}),40+34*rows.length)):null;
   return card(cls||"c6","Tenure and phase","Agent Opportunity % with 95% intervals · who needs the support",h("div",{style:"display:flex;flex-direction:column;gap:14px"},mk(ts,"Tenure bucket"),mk(ps,"Phase")));}
-function funnelCard(c,cls){const cov=IN.coverage(c);const F=c.F;const ag=IN.agentStats(c,F);const steps=[{label:"Roster agents",value:cov.rosterAgents||new Set(F.map(r=>r.bpid)).size,color:"var(--s1)"},{label:"Agents with a scrubbed detractor",value:cov.scrubbedAgents||new Set(F.map(r=>r.bpid)).size,color:"var(--s1)"},
-    {label:"Agents with an Agent Opportunity",value:count(ag,a=>a.ao>0),color:"var(--c-ao)"},{label:"Chronic agents (3+ in 30 days)",value:count(ag,a=>a.status&&a.status[0]==="Chronic"),color:"var(--bad)"}];
+function funnelCard(c,cls){const cov=IN.coverage(c);const F=c.F;const ag=IN.agentStats(c,F);const steps=[{label:"Roster agents",value:cov.rosterAgents||new Set(F.map(r=>r.bpid)).size,color:"var(--s1)"},{label:"Scrubbed agents",value:cov.scrubbedAgents||new Set(F.map(r=>r.bpid)).size,color:"var(--s1)"},
+    {label:"With Agent Opportunity",value:count(ag,a=>a.ao>0),color:"var(--c-ao)"},{label:"Chronic (3+ in 30 days)",value:count(ag,a=>a.status&&a.status[0]==="Chronic"),color:"var(--bad)"}];
   return card(cls||"c6","From roster to repeat offenders","Where the coaching effort should go",chart(b=>CH.funnel(b,{steps,height:230}),230));}
 function heatCard(c,cls,mode){const F=c.F.filter(isAO);const topT=AGT.map(t=>({t,n:count(F,r=>r.t2===t)})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,7).map(x=>x.t);
   let groups;if(mode==="agent"){groups=[...groupBy(F,r=>r.bpid)].map(([k,g])=>({key:k,name:AN(k)||k,g})).sort((a,b)=>b.g.length-a.g.length).slice(0,15);}
@@ -1841,52 +1818,136 @@ function qualityCard(c,cls){const F=c.F;const dq=IN.dataQuality(F);const kinds=O
   const fl=F.filter(r=>r.issues.length).sort((a,b)=>b.scrub-a.scrub).slice(0,8);
   return card(cls||"c6","Data quality","Rows that need fixing before the numbers can be trusted",h("div",null,
     kinds.length?chart(b=>CH.hbars(b,{items:kinds.map(([k,n])=>({label:k,value:n,color:"var(--warn)"})),fmt:nf,rowH:30}),20+30*kinds.length):h("div",{class:"empty",text:"Clean — no issues found."}),
-    fl.length?h("details",{style:"margin-top:10px"},h("summary",{class:"small muted",style:"cursor:pointer",text:`Show the newest ${fl.length} flagged rows`}),table([{t:"Scrub",f:r=>fd(r.scrub,"dm")},{t:"Leader",f:r=>LN(r.lk)},{t:"Row",f:r=>r.id},{t:"BPID",f:r=>r.bpid},{t:"What to fix",f:r=>h("span",null,r.issues.map(i=>h("span",{class:"tagx",text:i})))}],fl)):null),{note:`${nf(dq.total)} of ${nf(F.length)} rows (${pct(dq.rate,1)}) carry at least one issue.`});}
+    fl.length?h("details",{style:"margin-top:10px"},h("summary",{class:"small muted",style:"cursor:pointer",text:`Show the newest ${fl.length} flagged rows`}),table([{t:"Scrub",f:r=>fd(r.scrub,"dm")},{t:"Leader",f:r=>LN(r.lk)},{t:"Row",f:r=>r.id},{t:"BPID",f:r=>r.bpid},{t:"What to fix",f:r=>h("span",null,r.issues.map(i=>h("span",{class:"tagx",text:i})))}],fl)):null),{note:`${nf(dq.flagged!=null?dq.flagged:dq.total)} of ${nf(F.length)} rows (${pct(dq.rate,1)}) carry at least one issue.`});}
 function idleStrip(c){const cov=IN.coverage(c);if(!cov.idleTLs||!cov.idleTLs.length)return null;return h("div",{class:"idle"},h("b",{text:`${cov.idleTLs.length} roster team leader${cov.idleTLs.length>1?"s have":" has"} no scrubs in this period`}),cov.idleTLs.map(t=>h("span",{class:"p",text:`${t.tl}${t.om?" · "+t.om:""} · ${t.agents} agents`})));}
 function omCard(c){const os=IN.omStats(c);if(!os.length)return null;const fl=c.floorAll;
   return card("c6","Ops managers","Agent Opportunity % with 95% intervals · coverage = roster agents scrubbed · click to drill down",h("div",null,
     chart(b=>CH.hbars(b,{items:os.map(o=>({label:`${o.om} · ${pct(o.coverage)} covered`,value:o.aoP||0,color:omColor(o.om),extra:[[null,"Scrubs",nf(o.n)],[null,"Team leaders",nf(o.tls)],[null,"Idle TLs",nf((o.idleTLs||[]).length)]]})),ci:os.map(o=>o.ci?[o.ci.lo,o.ci.hi]:null),fmt:v=>pct(v),max:1,ref:fl,refLabel:"Floor",rowH:36,onClick:i=>drillOM(os[i].om)}),50+36*os.length),
-    table([{t:"Ops manager",f:r=>h("b",{text:r.om})},{t:"TLs",n:1,f:r=>nf(r.tls)},{t:"Roster",n:1,f:r=>nf(r.rosterAgents)},{t:"Scrubbed",n:1,f:r=>`${nf(r.scrubbedAgents)} (${pct(r.coverage)})`},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Agent Opp %",n:1,f:r=>bulletEl(r.aoP,fl)},{t:"This week",n:1,f:r=>chg(r.wowPts,{unit:" pts"})}],os,{onRow:r=>drillOM(r.om)})));}
+    table([{t:"Ops manager",f:r=>h("b",{text:r.om})},{t:"TLs",n:1,f:r=>nf(Array.isArray(r.leaders)?r.leaders.length:(typeof r.tls==="number"?r.tls:(r.tls&&r.tls.length)||0))},{t:"Roster",n:1,f:r=>nf(r.rosterAgents)},{t:"Scrubbed",n:1,f:r=>`${nf(r.scrubbedAgents)} (${pct(r.coverage)})`},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Agent Opp %",n:1,f:r=>bulletEl(r.aoP,fl)},{t:"This week",n:1,f:r=>chg(r.wowPts,{unit:" pts"})}],os,{onRow:r=>drillOM(r.om)})));}
 function mixCard(c,cls){const F=c.F;const items=RCAS.map(x=>({label:SHORT[x],value:count(F,r=>r.rca===x),color:COLOR[x]})).filter(i=>i.value);
   const sub=[[COM,"Comcast"],[CUS,"Customer"]].map(([cat,lab])=>{const g=F.filter(r=>r.rca===cat);const rs=[...groupBy(g,r=>r.t2||"(blank)")].map(([t,a])=>({label:t,value:a.length})).sort((a,b)=>b.value-a.value).slice(0,5);return rs.length?h("div",null,h("div",{class:"flab",text:lab+" reasons"}),chart(b=>CH.hbars(b,{items:rs.map(r=>({...r,color:COLOR[cat]})),fmt:nf,rowH:28}),28*rs.length+10)):null;});
   return card(cls||"c6","Where detractors come from","Tier 1 RCA, then the top reasons that are outside the agent's control",h("div",{style:"display:flex;flex-direction:column;gap:14px"},chart(b=>CH.donut(b,{items,centerLabel:"scrubs",size:200}),200),...sub));}
 function dowCard(c,cls){const d=IN.dow?IN.dow(c.F):[];const rows=d.filter(x=>x.n);if(!rows.length)return null;
   return card(cls||"c6","Which call days hurt most","Agent Opportunity % by the weekday the customer was surveyed",chart(b=>CH.hbars(b,{items:rows.map(x=>({label:`${x.label} · ${nf(x.n)} surveys`,value:x.rate||0,color:(x.rate||0)>c.floor?"var(--bad)":"var(--good)"})),ci:rows.map(x=>x.ci?[x.ci.lo,x.ci.hi]:null),fmt:v=>pct(v),max:1,ref:c.floor,refLabel:"Floor",rowH:32}),40+32*rows.length));}
 
-/* ===================== views ===================== */
-function vFloor(c){const ls=IN.leaderStats(c);const out=[headline(c),kpiBand(c),brief(c),h("div",{class:"g12"},trendCard(c)),...movement(c)];
-  const idle=idleStrip(c);const g=h("div",{class:"g12"});if(ROSTER.size){const oc=omCard(c);if(oc)g.append(oc);g.append(funnelCard(c,"c6"));}
-  g.append(card("c12","Team leaders","Lowest Agent Opportunity % first. The reading column separates a genuine performance gap from a tagging difference (two-proportion test vs the floor).",h("div",null,idle,leaderTable(c,ls))));
-  g.append(scatterCard(c,ls),paretoCard(c,"c6"),waterfallCard(c,"c6"),concentrationCard(c,"c6"),heatCard(c,"c12","tl"),agentsTable(c,c.F,{limit:15}));
-  if(ROSTER.size)g.append(tenureCard(c,"c6"));g.append(mixCard(c,"c6"));const dw=dowCard(c,"c6");if(dw)g.append(dw);g.append(qualityCard(c,"c6"));out.push(g);return out;}
-function vOM(c){const ls=IN.leaderStats(c);const out=[headline(c),kpiBand(c),brief(c),h("div",{class:"g12"},trendCard(c)),...movement(c)];const g=h("div",{class:"g12"});
-  g.append(card("c12",`Team leaders · ${S.om}`,"Lowest Agent Opportunity % first · reading = genuine gap vs tagging difference",h("div",null,idleStrip(c),leaderTable(c,ls))));
-  g.append(scatterCard(c,ls),funnelCard(c,"c6"),paretoCard(c,"c6"),waterfallCard(c,"c6"),heatCard(c,"c12","tl"),agentsTable(c,c.F,{limit:15}),concentrationCard(c,"c6"),tenureCard(c,"c6"),mixCard(c,"c6"),qualityCard(c,"c6"));out.push(g);return out;}
-function vTL(c){const me=IN.leaderStats(c,c.D).find(l=>l.lk===S.tl)||IN.leaderStats(c,c.F)[0];const out=[headline(c),kpiBand(c)];
-  if(me){const v=me.verdict||"";const kind=/lenient|strict/.test(v)?"warn":v==="aligned"?"good":"flat";
-    out.push(h("div",{class:"g12"},card("c12",null,null,h("div",{style:"display:flex;gap:16px;align-items:center;flex-wrap:wrap"},avatar(me.L.name,me.L.color,true),h("div",{class:"grow"},h("h2",{style:"font-size:19px",text:me.L.name}),h("div",{class:"muted small",text:`${me.L.form?"Form name "+me.L.form+" · ":""}${me.L.om||"—"} · ${nf(me.agents)}${me.rosterAgents?" of "+nf(me.rosterAgents):""} agents scrubbed · ${nf(me.n)} scrubs`})),
-      h("div",{style:"display:flex;flex-direction:column;gap:6px;align-items:flex-end"},tag("Reading: "+v,kind),h("span",{class:"muted small",text:me.reason||""}))))));}
-  out.push(brief(c),h("div",{class:"g12"},trendCard(c)),...movement(c));const g=h("div",{class:"g12"});
-  g.append(agentsTable(c,c.F,{limit:40,title:"My agents",sub:"Everyone with an Agent Opportunity in the period · click a row for the agent view"}),heatCard(c,"c12","agent"),paretoCard(c,"c6"),waterfallCard(c,"c6"),concentrationCard(c,"c6"),mixCard(c,"c6"),qualityCard(c,"c6"));
-  const dw=dowCard(c,"c6");if(dw)g.append(dw);out.push(g);return out;}
-function vAgent(c){const g=c.W.filter(r=>r.bpid===S.agent).sort((a,b)=>b.scrub-a.scrub);const a=ROSTER.get(S.agent);const st=IN.agentStats(c,g)[0];const inP=c.F;const ao=inP.filter(isAO);
-  const team=c.D.filter(r=>r.lk===(g[0]?g[0].lk:S.tl));const tr=aoRate(team);const ar=aoRate(inP);
-  const prof=card("c12",null,null,h("div",{class:"profile"},avatar(AN(S.agent)||S.agent,avColor(S.agent),true),h("div",null,h("h2",{style:"font-size:20px",text:AN(S.agent)||S.agent}),
-    h("div",{class:"meta"},h("span",{class:"mono",text:S.agent}),a?h("span",{text:"TL "+a.tl}):null,a?h("span",{text:"OM "+(a.om||"—")}):null,a?h("span",{text:"Tenure "+(a.tenure||"—")}):null,a?h("span",{text:(a.phase||"")+(a.wave?" · "+a.wave:"")}):null,st?tag(st.status[0],st.status[1]):null))));
-  const out=[headline(c),h("div",{class:"g12"},prof),kpiBand(c),brief(c)];const gr=h("div",{class:"g12"});
-  const wk0=wk(c.asOf);const wks=Array.from({length:12},(_,i)=>wk0-7*(11-i));
-  gr.append(card("c6","Weekly scrubs","Agent Opportunity vs other reasons · last 12 weeks",h("div",null,chart(b=>CH.stackedCols(b,{cats:wks.map(w=>fd(w,"dm")),stacks:[{name:"Agent Opportunity",color:"var(--c-ao)",values:wks.map(w=>count(g,r=>isAO(r)&&wk(r.scrub)===w))},{name:"Other",color:"var(--c-cus)",values:wks.map(w=>count(g,r=>!isAO(r)&&wk(r.scrub)===w))}],height:220}),220))));
+/* ===================== command bar: scope filters ===================== */
+let openDD=null;
+function closeDD(){if(openDD){openDD.dataset.open="false";const p=openDD.querySelector(".pop");if(p)p.remove();openDD=null;}}
+document.addEventListener("click",e=>{if(openDD&&!openDD.contains(e.target))closeDD();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDD();});
+const svgI=(d,cls)=>{const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");if(cls)s.setAttribute("class",cls);const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",d);s.append(p);return s;};
+const CHEV="M6 9l6 6 6-6",SEARCH="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-3.5-3.5";
+/** dropdown({key,label,value,valueText,options:[{v,t,s,av}],groups?,onPick,searchable,active,right}) */
+function dropdown(o){const dd=h("div",{class:"dd"+(o.active?" active":""),"data-open":"false"});
+  const btn=h("button",{type:"button","aria-haspopup":"listbox","aria-expanded":"false"},o.av?o.av:null,h("span",{class:"k",text:o.label+":"}),h("span",{class:"v",text:o.valueText}),svgI(CHEV,"chev"));
+  btn.addEventListener("click",e=>{e.stopPropagation();if(openDD===dd){closeDD();return;}closeDD();openDD=dd;dd.dataset.open="true";btn.setAttribute("aria-expanded","true");
+    const pop=h("div",{class:"pop"+(o.right?" right":"")});const ul=h("ul",{role:"listbox"});
+    const draw=q=>{ul.replaceChildren();q=(q||"").toLowerCase();let any=false;const groups=o.groups||[{items:o.options}];
+      for(const g of groups){const items=g.items.filter(it=>!q||String(it.t).toLowerCase().includes(q)||String(it.s||"").toLowerCase().includes(q)||String(it.v||"").toLowerCase().includes(q));if(!items.length)continue;any=true;
+        if(g.title)ul.append(h("li",{class:"hd",text:g.title}));
+        for(const it of items)ul.append(h("li",null,h("button",{type:"button",role:"option","aria-selected":String(it.v===o.value),onclick:ev=>{ev.stopPropagation();closeDD();o.onPick(it.v);}},it.av||null,h("span",{class:"t",text:it.t}),it.s?h("span",{class:"s",text:it.s}):null)));}
+      if(!any)ul.append(h("li",{class:"empty",text:"No matches"}));};
+    if(o.searchable){const inp=h("input",{type:"text",placeholder:o.placeholder||"Search…","aria-label":"Search"});inp.addEventListener("input",()=>draw(inp.value));inp.addEventListener("click",e=>e.stopPropagation());pop.append(h("div",{class:"srch"},svgI(SEARCH),inp));setTimeout(()=>inp.focus(),10);}
+    draw("");pop.append(ul);pop.addEventListener("click",e=>e.stopPropagation());dd.append(pop);});
+  dd.append(btn);return dd;}
+function renderRail(c){
+  const rail=$("#rail");rail.replaceChildren();
+  const oms=[...groupBy([...ROSTER.values()].filter(a=>a.om&&a.om!=="0"),a=>a.om)].map(([o,g])=>({v:o,t:o,s:`${g.length} agents`})).sort((a,b)=>parseInt(b.s)-parseInt(a.s));
+  const tls=[...LEADERS.values()].map(L=>({L,n:count(c.P,r=>r.lk===L.key),nAll:count(ROWS,r=>r.lk===L.key)})).filter(x=>!S.om||x.L.om===S.om||!x.L.om).sort((a,b)=>b.n-a.n);
+  const agentsAll=[...new Set(ROWS.map(r=>r.bpid))].map(bp=>{const rs=ROWS.filter(r=>r.bpid===bp);const last=rs.sort((a,b)=>b.scrub-a.scrub)[0];return{bp,name:AN(bp),lk:last.lk,n:rs.length,nP:count(c.P,r=>r.bpid===bp)};})
+    .filter(a=>(!S.tl||a.lk===S.tl)&&(!S.om||(LEADERS.get(a.lk)||{}).om===S.om||!(LEADERS.get(a.lk)||{}).om)).sort((a,b)=>b.nP-a.nP||b.n-a.n);
+  rail.append(h("span",{class:"lbl",text:"Scope"}));
+  if(oms.length)rail.append(dropdown({label:"Ops manager",value:S.om,valueText:S.om||"All",active:!!S.om,options:[{v:null,t:"All ops managers"},...oms],onPick:v=>go({om:v,tl:null,agent:null})}));
+  rail.append(dropdown({label:"Team leader",value:S.tl,valueText:S.tl?LN(S.tl):"All",active:!!S.tl,searchable:true,placeholder:"Search leaders…",
+    options:[{v:null,t:"All team leaders"},...tls.map(x=>({v:x.L.key,t:x.L.name,s:`${x.n} in period · ${x.nAll} total`,av:avatar(x.L.name,x.L.color)}))],onPick:v=>{const L=v?LEADERS.get(v):null;go({tl:v,agent:null,om:v?(S.om||(L&&L.om)||null):S.om});}}));
+  rail.append(dropdown({label:"Agent",value:S.agent,valueText:S.agent?(AN(S.agent)||S.agent):"All",active:!!S.agent,searchable:true,placeholder:"Search by name or BPID…",
+    groups:[{items:[{v:null,t:S.tl?"All agents in this team":"All agents"}]},{title:`${agentsAll.length} agents`,items:agentsAll.slice(0,400).map(a=>({v:a.bp,t:a.name||a.bp,s:`${a.name?a.bp+" · ":""}${a.nP} in period`,av:avatar(a.name||a.bp,avColor(a.bp))}))}],
+    onPick:v=>{if(!v){go({agent:null});return;}drillAgent(v);}}));
+  rail.append(h("span",{class:"spacer"}));
+  rail.append(h("span",{class:"lbl",text:"Time"}));
+  rail.append(dropdown({label:"Period",value:S.period,valueText:PLABEL(S.period),active:S.period!=="All time",right:true,options:PERIODS.map(p=>({v:p,t:PLABEL(p),s:p==="Month to date"?fmRange(fm(c.asOf)):p==="Last month"?fmRange(fm(c.asOf)-1):""})),onPick:v=>{S.period=v;render();}}));
+  const seg=h("div",{class:"seg",role:"group","aria-label":"Date basis"},h("span",{class:"thumb","aria-hidden":"true"}),...[["scrub","Scrub date"],["survey","Survey date"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(S.basis===v),onclick:()=>{if(S.basis!==v){S.basis=v;render();}}},l)));
+  rail.append(seg);requestAnimationFrame(()=>moveThumb(seg));
+  if(S.period==="Custom"){const dIn=v=>v?Date.UTC(+v.slice(0,4),+v.slice(5,7)-1,+v.slice(8,10))/864e5:null;
+    const f=h("input",{type:"date",value:iso(S.from),"aria-label":"From"}),t=h("input",{type:"date",value:iso(S.to),"aria-label":"To"});f.addEventListener("change",()=>{S.from=dIn(f.value);render();});t.addEventListener("change",()=>{S.to=dIn(t.value);render();});
+    rail.append(h("label",{class:"field"},f),h("span",{class:"muted small",text:"to"}),h("label",{class:"field"},t));}
+  if(S.om||S.tl||S.agent||S.period!=="Month to date"||S.basis!=="scrub")rail.append(h("button",{class:"clear",type:"button",onclick:()=>go({om:null,tl:null,agent:null,period:"Month to date",basis:"scrub",from:null,to:null}),text:"Reset"}));
+  // crumbs
+  const cr=[["Floor",()=>go({om:null,tl:null,agent:null}),S.level==="floor"]];if(S.om)cr.push([S.om,()=>go({tl:null,agent:null}),S.level==="om"]);if(S.tl)cr.push([LN(S.tl),()=>go({agent:null}),S.level==="tl"]);if(S.agent)cr.push([AN(S.agent)||S.agent,null,true]);
+  $("#crumbs").replaceChildren(h("span",{class:"muted",text:"Viewing"}),...cr.flatMap(([t,fn,cur],i)=>[i?h("span",{class:"sep",text:"›"}):null,cur?h("b",{text:t}):h("button",{type:"button",onclick:fn,text:t})]).filter(Boolean),
+    h("span",{class:"sep",text:"·"}),h("span",{text:`${nf(c.F.length)} scrubs`}),c.ranged?h("span",{class:"sep",text:`· ${S.basis==="scrub"?"scrub":"survey"} dates ${c.from==null?"start":fd(c.from,"dm")} – ${c.to==null?"end":fd(c.to)}`}):null);
+  $("#snap").textContent=`${FILE} · ${nf(ROWS.length)} scrubs · ${fd(c.minScrub,"dm")} – ${fd(c.maxScrub)}`+(ROSTER.size?` · roster ${nf(ROSTER.size)}`:"");}
+function renderTabs(tabs){const bar=$("#tabs");bar.replaceChildren(...tabs.map(t=>h("button",{role:"tab",type:"button","aria-selected":String(t.id===S.tab),onclick:()=>{S.tab=t.id;render();}},t.label,t.n!=null?h("span",{class:"n",text:nf(t.n)}):null)));}
+
+/* ===================== hero ===================== */
+function ringSVG(val,ref){const NS="http://www.w3.org/2000/svg",s=document.createElementNS(NS,"svg");s.setAttribute("viewBox","0 0 200 200");s.setAttribute("role","img");s.setAttribute("aria-label",`Agent Opportunity ${pct(val,1)}`);
+  const mk=(t,a)=>{const e=document.createElementNS(NS,t);for(const[k,v]of Object.entries(a))e.setAttribute(k,v);s.append(e);return e;};const C=2*Math.PI*78;
+  mk("circle",{cx:100,cy:100,r:78,fill:"none",stroke:"#ffffff22","stroke-width":14});
+  const bad=ref!=null&&val>ref;const arc=mk("circle",{cx:100,cy:100,r:78,fill:"none",stroke:bad?"#ff9aa2":"#7fe0c6","stroke-width":14,"stroke-linecap":"round","stroke-dasharray":`${C*(val||0)} ${C}`,transform:"rotate(-90 100 100)",style:"transition:stroke-dasharray 1.1s cubic-bezier(.2,.7,.2,1)"});
+  if(!matchMedia("(prefers-reduced-motion: reduce)").matches){arc.setAttribute("stroke-dasharray",`0 ${C}`);requestAnimationFrame(()=>requestAnimationFrame(()=>arc.setAttribute("stroke-dasharray",`${C*(val||0)} ${C}`)));}
+  if(ref!=null){const a=-Math.PI/2+2*Math.PI*ref;const x1=100+68*Math.cos(a),y1=100+68*Math.sin(a),x2=100+90*Math.cos(a),y2=100+90*Math.sin(a);mk("line",{x1,y1,x2,y2,stroke:"#ffd27a","stroke-width":3,"stroke-linecap":"round"});}
+  const t=mk("text",{x:100,y:96,"text-anchor":"middle",style:"font:800 38px/1 var(--font);fill:#fff;letter-spacing:-1.5px"});t.textContent=pct(val,1);
+  const t2=mk("text",{x:100,y:120,"text-anchor":"middle",style:"font:600 10px var(--font);fill:#b9cad6;letter-spacing:.4px"});t2.textContent="AGENT OPPORTUNITY";
+  if(ref!=null){const t3=mk("text",{x:100,y:140,"text-anchor":"middle",style:"font:600 12px var(--font);fill:#ffd27a"});t3.textContent=`floor ${pct(ref)}`;}
+  return s;}
+function kpi(l,v,subKids,{spark,ref,cls,fmt}={}){const el=h("div",{class:"kpi "+(cls||"")},h("span",{class:"l",text:l}),h("span",{class:"v num",text:typeof v==="number"?fmt(0):v}),h("span",{class:"s"},subKids),spark?h("div",{class:"sp chart"}):null);
+  if(typeof v==="number")charts.push(()=>CH.countUp(el.querySelector(".v"),v,{fmt}));if(spark)charts.push(()=>CH.sparkline(el.querySelector(".sp"),spark,{ref,color:"#ffffffb3",height:30}));return el;}
+function hero(c){const H=IN.headline(c);const F=c.F;const who=S.agent?(AN(S.agent)||S.agent):S.tl?LN(S.tl)+"'s team":S.om?S.om+"'s group":"Whole floor";
+  const lvl={floor:"Director view",om:"Ops manager view",tl:"Team leader view",agent:"Agent view"}[c.level];
+  const fmTxt=S.period==="Month to date"||S.period==="Last month"?` · ${fmLabel(S.period==="Month to date"?fm(c.asOf):fm(c.asOf)-1)} (${fmRange(S.period==="Month to date"?fm(c.asOf):fm(c.asOf)-1)})`:"";
+  const wk0=wk(c.asOf);const wks=Array.from({length:10},(_,i)=>wk0-7*(9-i));const wg=groupBy(c.W.filter(r=>r.scrub<=c.asOf),r=>wk(r.scrub));
+  const l7=c.W.filter(r=>r.scrub>=c.l7&&r.scrub<=c.asOf),p7=c.W.filter(r=>r.scrub>=c.p7&&r.scrub<c.l7);const okWk=l7.length>=5&&p7.length>=5;const r7=aoRate(l7),rp=okWk?aoRate(p7):null;const ao=count(F,isAO),aoP=share(ao,F.length);
+  const cov=IN.coverage(c);const ag=IN.agentStats(c,F);const rep=count(ag,a=>a.status&&a.status[0]==="Chronic"),act=count(ag,a=>a.status&&a.status[0]==="Rising");
+  const lag=avg(F.map(r=>r.lag)),lag7=avg(l7.map(r=>r.lag));const dq=IN.dataQuality(F);
+  const tiles=[kpi("Scrubbed detractors",F.length,[`${nf(l7.length)} this week `,okWk?chg(l7.length-p7.length,{bad:"none"}):null],{spark:wks.map(w=>(wg.get(w)||[]).length),fmt:nf}),
+    kpi("Agent Opportunity %",aoP||0,[`${nf(ao)} controllable · wk ${pct(r7)} `,okWk?chg((r7-rp)*100,{d:1,unit:" pts"}):h("span",{class:"flat",text:"· not enough to compare"})],{spark:wks.map(w=>aoRate(wg.get(w)||[])),ref:c.floorAll,cls:okWk?(r7>rp?"bad":"good"):"",fmt:v=>pct(v,1)})];
+  if(c.level!=="agent")tiles.push(kpi("Roster coverage",cov.pct||0,[`${nf(cov.scrubbedAgents)} of ${nf(cov.rosterAgents)} agents`,cov.idleTLs&&cov.idleTLs.length?h("span",{class:"up",text:` · ${cov.idleTLs.length} idle TL${cov.idleTLs.length>1?"s":""}`}):null],{fmt:v=>pct(v)}),
+    kpi("Agents to coach",rep+act,[h("span",{class:rep?"up":"flat",text:`${rep} chronic`}),` · ${act} rising`],{cls:rep?"bad":"",fmt:nf}));
+  tiles.push(kpi("Survey → scrub lag",lag==null?"—":lag,[`days · this week ${lag7==null?"—":lag7.toFixed(1)}`],{cls:lag7!=null&&lag!=null&&lag7>lag+2?"bad":"",fmt:v=>v.toFixed(1)}),
+    kpi("Rows to clean",dq.flagged!=null?dq.flagged:(dq.total||0),[`${pct(dq.rate,1)} · ${nf(dq.conflictsSurveys||0)} conflicting surveys`],{cls:(dq.rate||0)>.1?"bad":"",fmt:nf}));
+  return h("section",{class:"hero"},h("div",null,h("div",{class:"eyebrow"},h("span",{class:"lv",text:lvl}),h("span",{text:`${who} · ${PLABEL(S.period)}${fmTxt}`})),
+      h("h1",null,h("em",{text:H.big})," ",H.text),h("p",{class:"sub",text:H.sub||""}),h("span",{class:"status "+(H.status?H.status.kind:"flat"),text:H.status?H.status.label:"—"})),
+    h("div",{class:"ring"},ringSVG(aoP||0,c.level==="floor"?c.baseline:c.floorAll),h("span",{class:"cap",text:c.level==="floor"?`Yellow tick = all-time baseline ${pct(c.baseline)}`:`Yellow tick = floor for this period ${pct(c.floorAll)}`})),
+    h("div",{class:"kpis"},tiles));}
+
+/* ===================== views (tabbed) ===================== */
+const sect=(t,p)=>h("div",{class:"secthead"},h("h2",{text:t}),p?h("p",{text:p}):null);
+function tabsFor(c){const ls=()=>IN.leaderStats(c);const ag=IN.agentStats(c,c.F);const nAO=count(ag,a=>a.ao>0);const nIns=IN.insights(c).length;const dqo=IN.dataQuality(c.F);const dq=dqo.flagged!=null?dqo.flagged:dqo.total;
+  const overview=()=>{const L=ls();const g=h("div",{class:"g12"},trendCard(c));if(c.level==="floor"&&ROSTER.size){const oc=omCard(c);if(oc)g.append(oc);g.append(funnelCard(c,"c6"));}
+    if(c.level==="floor"||c.level==="om")g.append(scatterCard(c,L),paretoCard(c,"c6"));if(c.level==="tl")g.append(paretoCard(c,"c6"),concentrationCard(c,"c6"));return[brief(c),g];};
+  const leaders=()=>{const L=ls();const g=h("div",{class:"g12"});g.append(card("c12",c.om?`Team leaders · ${c.om}`:"Team leaders","Lowest Agent Opportunity % first. The reading column separates a genuine performance gap from a tagging difference (two-proportion test vs the floor). Click a row to open the leader.",h("div",null,idleStrip(c),leaderTable(c,L))));
+    g.append(scatterCard(c,L),funnelCard(c,"c6"),heatCard(c,"c12","tl"));if(ROSTER.size)g.append(tenureCard(c,"c6"));const dw=dowCard(c,"c6");if(dw)g.append(dw);return[g];};
+  const agents=()=>{const g=h("div",{class:"g12"});g.append(agentsTable(c,c.F,{limit:c.level==="tl"?60:25,title:c.level==="tl"?"My agents":"Repeat detractor agents",sub:c.level==="tl"?"Everyone with an Agent Opportunity in the period · click a row for the agent view":undefined}),concentrationCard(c,"c6"),heatCard(c,"c6","agent"));if(ROSTER.size&&c.level!=="tl")g.append(tenureCard(c,"c6"),funnelCard(c,"c6"));return[g];};
+  const behaviours=()=>{const g=h("div",{class:"g12"});g.append(paretoCard(c,"c6"),waterfallCard(c,"c6"),heatCard(c,"c12",c.level==="tl"?"agent":"tl"),mixCard(c,"c6"));const dw=dowCard(c,"c6");if(dw)g.append(dw);return[g];};
+  const quality=()=>[h("div",{class:"g12"},qualityCard(c,"c6"),card("c6","What the checks mean",null,h("ul",{style:"margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px"},
+    ["Duplicate survey — the same Survey ID was submitted more than once.","Conflicting RCA — the same survey carries two different Tier-1 reasons; keep one.","Invalid BPID — the agent ID is not in the bp-xxxxx000 format.","Not on roster — the BPID is not in the uploaded roster (left the floor, or a typo).","Missing T2 / No comment — the scrub has no reason or no evidence written.","Blank or future survey date — the date is missing or after the scrub date."].map(t=>h("li",{text:t})))))];
+  const T=[{id:"overview",label:"Overview",n:nIns,b:overview}];
+  if(c.level!=="agent")T.push({id:"movement",label:"Movement",b:()=>movement(c).slice(1)});
+  if(c.level==="floor"||c.level==="om")T.push({id:"leaders",label:"Leaders",n:ls().length,b:leaders});
+  if(c.level!=="agent")T.push({id:"agents",label:"Agents",n:nAO,b:agents},{id:"behaviours",label:"Behaviours",b:behaviours});
+  if(c.level==="agent")T.push({id:"history",label:"History",n:c.F.length,b:()=>vAgentBody(c)});
+  T.push({id:"quality",label:"Data quality",n:dq,b:quality});return T;}
+function tlCard(c){const me=IN.leaderStats(c,c.D).find(l=>l.lk===S.tl);if(!me)return null;const v=me.verdict||"";const kind=/lenient|strict/.test(v)?"warn":v==="aligned"?"good":"flat";
+  return h("div",{class:"g12"},card("c12",null,null,h("div",{style:"display:flex;gap:16px;align-items:center;flex-wrap:wrap"},avatar(me.L.name,me.L.color,true),h("div",{class:"grow"},h("h2",{style:"font-size:19px",text:me.L.name}),h("div",{class:"muted small",text:`${me.L.form?"Form name "+me.L.form+" · ":""}${me.om||me.L.om||"—"} · ${nf(me.agents)}${me.rosterAgents?" of "+nf(me.rosterAgents):""} agents scrubbed · ${nf(me.n)} scrubs`})),
+    h("div",{style:"display:flex;flex-direction:column;gap:6px;align-items:flex-end;max-width:520px"},tag("Reading: "+v,kind),h("span",{class:"muted small",style:"text-align:right",text:me.reason||""})))));}
+function agentCard(c){const a=ROSTER.get(S.agent);const g=c.W.filter(r=>r.bpid===S.agent).sort((x,y)=>y.scrub-x.scrub);const st=IN.agentStats(c,g)[0];
+  return h("div",{class:"g12"},card("c12",null,null,h("div",{class:"profile"},avatar(AN(S.agent)||S.agent,avColor(S.agent),true),h("div",null,h("h2",{style:"font-size:20px",text:AN(S.agent)||S.agent}),
+    h("div",{class:"meta"},h("span",{class:"mono",text:S.agent}),a?h("span",{text:"TL "+a.tl}):h("span",{text:"TL "+(g[0]?LN(g[0].lk):"—")}),a?h("span",{text:"OM "+(a.om||"—")}):null,a?h("span",{text:"Tenure "+(a.tenure||"—")}):null,a?h("span",{text:(a.phase||"")+(a.wave?" · "+a.wave:"")}):null,st?tag(st.status[0],st.status[1]):null)))));}
+function vAgentBody(c){const g=c.W.filter(r=>r.bpid===S.agent).sort((a,b)=>b.scrub-a.scrub);const inP=c.F;const ao=inP.filter(isAO);const team=c.D.filter(r=>r.lk===(g[0]?g[0].lk:S.tl));const tr=aoRate(team),ar=aoRate(inP);
+  const gr=h("div",{class:"g12"});const wk0=wk(c.asOf);const wks=Array.from({length:12},(_,i)=>wk0-7*(11-i));
+  gr.append(card("c6","Weekly scrubs","Agent Opportunity vs other reasons · last 12 weeks",chart(b=>CH.stackedCols(b,{cats:wks.map(w=>fd(w,"dm")),stacks:[{name:"Agent Opportunity",color:"var(--c-ao)",values:wks.map(w=>count(g,r=>isAO(r)&&wk(r.scrub)===w))},{name:"Other",color:"var(--c-cus)",values:wks.map(w=>count(g,r=>!isAO(r)&&wk(r.scrub)===w))}],height:220}),220)));
   const drv=AGT.map(t=>({label:t,value:count(ao,r=>r.t2===t),color:BCOLOR[BUCKET_OF[t]]||"var(--s3)"})).filter(x=>x.value).sort((a,b)=>b.value-a.value);
   gr.append(card("c6","Behaviours to coach",`${nf(ao.length)} Agent Opportunities in the period · agent ${pct(ar)} vs team ${pct(tr)}`,drv.length?chart(b=>CH.hbars(b,{items:drv,fmt:nf,rowH:32}),20+32*drv.length):h("div",{class:"empty",text:"No Agent Opportunity in the period."})));
-  const tl=h("div",{class:"timeline"},inP.slice(0,40).map(r=>h("div",{class:"tl-item"},h("span",{class:"d",text:fd(r.scrub,"dm")}),h("span",{class:"dot",style:"background:"+(COLOR[r.rca]||"var(--faint)")}),h("div",{class:"body"},h("b",{text:(SHORT[r.rca]||r.rca)+(r.t2?" · "+r.t2:"")}),h("p",{text:r.comment||"(no comment)"}),r.issues.length?h("div",null,r.issues.map(i=>h("span",{class:"tagx",text:i}))):null))));
-  gr.append(card("c12","Scrub history","Newest first · the leader's comment is the evidence for the 1:1",inP.length?tl:h("div",{class:"empty",text:"No scrubs in the selected period. Choose All time for the full history."})));out.push(gr);return out;}
+  const tl=h("div",{class:"timeline"},inP.slice(0,60).map(r=>h("div",{class:"tl-item"},h("span",{class:"d",text:fd(r.scrub,"dm")}),h("span",{class:"dot",style:"background:"+(COLOR[r.rca]||"var(--faint)")}),h("div",{class:"body"},h("b",{text:(SHORT[r.rca]||r.rca)+(r.t2?" · "+r.t2:"")}),h("p",{text:r.comment||"(no comment)"}),r.issues.length?h("div",null,r.issues.map(i=>h("span",{class:"tagx",text:i}))):null))));
+  gr.append(card("c12","Scrub history","Newest first · the leader's comment is the evidence for the 1:1",inP.length?tl:h("div",{class:"empty",text:"No scrubs in the selected period. Choose All time for the full history."})));return[gr];}
 
 /* ===================== render ===================== */
-function render(){const c=ctx();renderNav(c);charts.length=0;const view=$("#view");view.classList.remove("reveal");
-  let kids;if(!c.F.length)kids=[card("","No scrubs match this scope",null,h("div",{class:"empty",text:"Choose a wider period or go up a level."}))];
-  else kids=({floor:vFloor,om:vOM,tl:vTL,agent:vAgent})[c.level](c);
+function render(){closeDD();const c=ctx();renderRail(c);charts.length=0;const view=$("#view");view.classList.remove("reveal");
+  const tabs=c.F.length?tabsFor(c):[];if(!tabs.some(t=>t.id===S.tab))S.tab=tabs.length?tabs[0].id:"overview";renderTabs(tabs);
+  let kids;if(!c.F.length)kids=[card("","No scrubs match this scope",null,h("div",{class:"empty",text:"Choose a wider period or clear a filter."}))];
+  else{kids=[hero(c)];if(c.level==="tl"){const t=tlCard(c);if(t)kids.push(t);}if(c.level==="agent")kids.push(agentCard(c));const tb=tabs.find(t=>t.id===S.tab);if(S.tab==="overview")kids.push(...tb.b());else kids.push(...tb.b());}
   view.replaceChildren(...kids);kids.forEach((k,i)=>k.style.setProperty("--i",String(Math.min(i,8))));void view.offsetWidth;view.classList.add("reveal");
-  $("#footnote").textContent=`Team leader = the person who submitted the scrub (${ROSTER.size?"matched to the roster TL name":"named from the submitter email"}). Agent Opportunity % = controllable detractors ÷ all scrubbed detractors. "This week" = the 7 days up to the latest scrub in the period vs the 7 days before, counted on all dates in scope. Intervals are 95% Wilson; gaps are two-proportion z-tests. KPI buckets: QA · Repeat (aiCR) · Transfer (ITG) · AHT/Hold. Fiscal months run from the ${FM_START}th to the ${FM_START-1}st and are named by the month they end in.`;
+  $("#footnote").textContent=`Team leader = the person who submitted the scrub (${ROSTER.size?"matched to the roster TL name":"named from the submitter email"}). Agent Opportunity % = controllable detractors ÷ all scrubbed detractors. "This week" = the 7 days up to the latest scrub in the period vs the 7 days before, counted on all dates in scope. Intervals are 95% Wilson; gaps are two-proportion z-tests. Fiscal months run from the ${FM_START}th to the ${FM_START-1}st and are named by the month they end in.`;
   requestAnimationFrame(()=>charts.splice(0).forEach(f=>f()));}
 let rt,lw=window.innerWidth;window.addEventListener("resize",()=>{if(Math.abs(window.innerWidth-lw)<40)return;lw=window.innerWidth;clearTimeout(rt);rt=setTimeout(render,200);});
 
@@ -1897,15 +1958,10 @@ $("#rosterInput").addEventListener("change",e=>{const f=e.target.files[0];if(f)l
 document.addEventListener("dragover",e=>{e.preventDefault();document.body.classList.add("drop");});
 document.addEventListener("dragleave",e=>{if(!e.relatedTarget)document.body.classList.remove("drop");});
 document.addEventListener("drop",e=>{e.preventDefault();document.body.classList.remove("drop");const f=e.dataTransfer&&e.dataTransfer.files[0];if(!f)return;/roster/i.test(f.name)?loadRoster(f):loadFile(f);});
-document.querySelectorAll("#basisSeg button").forEach(b=>b.addEventListener("click",()=>{if(S.basis!==b.dataset.v){S.basis=b.dataset.v;render();}}));
-const dIn=v=>v?Date.UTC(+v.slice(0,4),+v.slice(5,7)-1,+v.slice(8,10))/864e5:null;
-$("#fFrom").addEventListener("change",e=>{S.from=dIn(e.target.value);render();});$("#fTo").addEventListener("change",e=>{S.to=dIn(e.target.value);render();});
-const findIt=v=>{v=v.trim().toLowerCase();if(!v)return false;const bp=(v.match(/bp-[a-z0-9]+/)||[])[0];const all=[...new Set(ROWS.map(r=>r.bpid))];let hit=bp&&all.find(b=>b===bp);if(!hit)hit=all.find(b=>b.includes(v)||(AN(b)||"").toLowerCase().includes(v));if(hit){drillAgent(hit);return true;}return false;};
-$("#find").addEventListener("change",e=>{if(findIt(e.target.value))e.target.value="";});$("#find").addEventListener("keydown",e=>{if(e.key==="Enter"&&findIt(e.target.value))e.target.value="";});
-
 try{const seed=JSON.parse(document.getElementById("seed").textContent);if(seed.roster)ROSTER=new Map(seed.roster.map(a=>[a.bp,a]));ROWS=buildRows(seed.rows);applyRoster();FILE=seed.file;}catch(e){showMsg("err","No data loaded yet. Upload the NPS Scrubbing export.");}
 if(ROWS.length)render();
 if(typeof XLSX==="undefined"){const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";document.head.append(s);}
+
 })();
 
 </script>
