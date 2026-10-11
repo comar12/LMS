@@ -196,6 +196,14 @@ td.comment{min-width:300px;max-width:620px;color:var(--muted);font-size:13px}
 .tip b{display:block;margin-bottom:4px} .tip .r{display:flex;justify-content:space-between;gap:14px} .tip .r i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
 table.heat td,table.heat th{text-align:center;padding:8px 10px} table.heat td:first-child,table.heat th:first-child{text-align:left}
 table.heat tr.click td:first-child{font-weight:650}
+/* ---------- comments & cohorts ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px} .chips button{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--soft);color:var(--text);transition:border-color .15s,color .15s,transform .15s}
+.chips button:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-1px)} .chips button b{font-weight:600;color:var(--muted);font-size:11.5px}
+.kwbox{display:flex;align-items:center;gap:10px;height:42px;border:1px solid var(--line2);border-radius:13px;background:var(--card);padding:0 14px}
+.kwbox:focus-within{border-color:var(--teal);box-shadow:0 0 0 4px color-mix(in srgb,var(--teal) 16%,transparent)} .kwbox input{border:0;outline:0;background:transparent;flex:1;min-width:0;font-size:14px} .kwbox svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
+.cmts{display:flex;flex-direction:column;gap:8px} .cmt{display:grid;grid-template-columns:12px 1fr;gap:10px;padding:10px 14px;border-radius:12px;background:var(--soft);font-size:13.5px;min-width:0}
+.cmt .dot{width:10px;height:10px;border-radius:50%;margin-top:6px} .cmt .m{display:flex;gap:4px 12px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-bottom:3px;align-items:center} .cmt .m b{color:var(--text)}
+.cmt .lnk{font-weight:700;color:var(--teal);font-size:12px;padding:0} .cmt .lnk:hover{text-decoration:underline} .cmt p{overflow-wrap:anywhere} .cmt mark{background:var(--warn-bg);color:inherit;border-radius:3px;padding:0 2px}
 .secthead{display:flex;align-items:baseline;gap:12px;margin-top:6px}
 .secthead h2{font-size:19px;letter-spacing:-.5px;font-weight:800} .secthead p{color:var(--muted);font-size:13px}
 
@@ -1875,7 +1883,7 @@ function renderRail(c){
   // crumbs
   const cr=[["Floor",()=>go({om:null,tl:null,agent:null}),S.level==="floor"]];if(S.om)cr.push([S.om,()=>go({tl:null,agent:null}),S.level==="om"]);if(S.tl)cr.push([LN(S.tl),()=>go({agent:null}),S.level==="tl"]);if(S.agent)cr.push([AN(S.agent)||S.agent,null,true]);
   $("#crumbs").replaceChildren(h("span",{class:"muted",text:"Viewing"}),...cr.flatMap(([t,fn,cur],i)=>[i?h("span",{class:"sep",text:"›"}):null,cur?h("b",{text:t}):h("button",{type:"button",onclick:fn,text:t})]).filter(Boolean),
-    h("span",{class:"sep",text:"·"}),h("span",{text:`${nf(c.F.length)} scrubs`}),c.ranged?h("span",{class:"sep",text:`· ${S.basis==="scrub"?"scrub":"survey"} dates ${c.from==null?"start":fd(c.from,"dm")} – ${c.to==null?"end":fd(c.to)}`}):null);
+    h("span",{class:"sep",text:"·"}),h("span",{text:`${nf(c.F.length)} scrubs`}),...(c.ranged?[h("span",{class:"sep",text:`· ${S.basis==="scrub"?"scrub":"survey"} dates ${c.from==null?"start":fd(c.from,"dm")} – ${c.to==null?"end":fd(c.to)}`})]:[]));
   $("#snap").textContent=`${FILE} · ${nf(ROWS.length)} scrubs · ${fd(c.minScrub,"dm")} – ${fd(c.maxScrub)}`+(ROSTER.size?` · roster ${nf(ROSTER.size)}`:"");}
 function renderTabs(tabs){const bar=$("#tabs");bar.replaceChildren(...tabs.map(t=>h("button",{role:"tab",type:"button","aria-selected":String(t.id===S.tab),onclick:()=>{S.tab=t.id;render();}},t.label,t.n!=null?h("span",{class:"n",text:nf(t.n)}):null)));}
 
@@ -1924,7 +1932,8 @@ function tabsFor(c){const ls=()=>IN.leaderStats(c);const ag=IN.agentStats(c,c.F)
   const T=[{id:"overview",label:"Overview",n:nIns,b:overview}];
   if(c.level!=="agent")T.push({id:"movement",label:"Movement",b:()=>movement(c).slice(1)});
   if(c.level==="floor"||c.level==="om")T.push({id:"leaders",label:"Leaders",n:ls().length,b:leaders});
-  if(c.level!=="agent")T.push({id:"agents",label:"Agents",n:nAO,b:agents},{id:"behaviours",label:"Behaviours",b:behaviours});
+  if(c.level!=="agent")T.push({id:"agents",label:"Agents",n:nAO,b:agents},{id:"behaviours",label:"Behaviours",b:behaviours},{id:"comments",label:"Comments",n:count(c.F,r=>r.comment),b:()=>commentsTab(c)});
+  if((c.level==="floor"||c.level==="om")&&ROSTER.size)T.push({id:"cohorts",label:"Cohorts",n:new Set(c.F.map(r=>r.wave).filter(Boolean)).size||null,b:()=>cohortsTab(c)});
   if(c.level==="agent")T.push({id:"history",label:"History",n:c.F.length,b:()=>vAgentBody(c)});
   T.push({id:"quality",label:"Data quality",n:dq,b:quality});return T;}
 function tlCard(c){const me=IN.leaderStats(c,c.D).find(l=>l.lk===S.tl);if(!me)return null;const v=me.verdict||"";const kind=/lenient|strict/.test(v)?"warn":v==="aligned"?"good":"flat";
@@ -1940,6 +1949,124 @@ function vAgentBody(c){const g=c.W.filter(r=>r.bpid===S.agent).sort((a,b)=>b.scr
   gr.append(card("c6","Behaviours to coach",`${nf(ao.length)} Agent Opportunities in the period · agent ${pct(ar)} vs team ${pct(tr)}`,drv.length?chart(b=>CH.hbars(b,{items:drv,fmt:nf,rowH:32}),20+32*drv.length):h("div",{class:"empty",text:"No Agent Opportunity in the period."})));
   const tl=h("div",{class:"timeline"},inP.slice(0,60).map(r=>h("div",{class:"tl-item"},h("span",{class:"d",text:fd(r.scrub,"dm")}),h("span",{class:"dot",style:"background:"+(COLOR[r.rca]||"var(--faint)")}),h("div",{class:"body"},h("b",{text:(SHORT[r.rca]||r.rca)+(r.t2?" · "+r.t2:"")}),h("p",{text:r.comment||"(no comment)"}),r.issues.length?h("div",null,r.issues.map(i=>h("span",{class:"tagx",text:i}))):null))));
   gr.append(card("c12","Scrub history","Newest first · the leader's comment is the evidence for the 1:1",inP.length?tl:h("div",{class:"empty",text:"No scrubs in the selected period. Choose All time for the full history."})));return[gr];}
+
+/* ===================== comment intelligence ===================== */
+const THEMES=[
+ {k:"hold",label:"Hold & mute",kind:"agent",re:/\b(mute|muting|muted|hold|dead air|silen)/i},
+ {k:"empathy",label:"Empathy & tone",kind:"agent",re:/\b(empath|tone|rude|harsh|apolog|sarcas|irritat|unprofessional|appreciat|greeting|acknowledg|listen)/i},
+ {k:"resolution",label:"Resolution & follow-up",kind:"agent",re:/\b(resol|follow[- ]?up|call ?back|promis|ownership|unresolved|not fixed|still not|didn'?t fix|escalat)/i},
+ {k:"info",label:"Wrong or incomplete info",kind:"agent",re:/\b(wrong|incorrect|misinform|inaccurate|knowledge|not aware|unaware|mislead)/i},
+ {k:"handling",label:"Call handling skills",kind:"agent",re:/\b(handling|handle|skill|interrupt|aggressive|frustrat|talk(ing)? over|pace|rush|probing|discovery|troubleshoot)/i},
+ {k:"expect",label:"Expectations & education",kind:"agent",re:/\b(expectation|educat|inform|explain|elaborat|clarif|walk(ed)? (the )?(cx|customer))/i},
+ {k:"avoid",label:"Call avoidance / disconnect",kind:"agent",re:/\b(hung up|hang up|hangup|released|avoid|drop(ped)? the call)/i},
+ {k:"transfer",label:"Transfer & routing",kind:"mixed",re:/\b(transfer|routing|ivr|department|dept|bounced|sales|warm)/i},
+ {k:"tech",label:"Technician & appointment",kind:"external",re:/\b(tech|technician|appointment|appt|visit|dispatch|schedul)/i},
+ {k:"service",label:"Service, outage & equipment",kind:"external",re:/\b(outage|intermittent|dropp|drops|disconnect|no service|not working|signal|modem|gateway|equipment|router|wifi|wi-fi|speed|internet)/i},
+ {k:"billing",label:"Billing & credit",kind:"external",re:/\b(bill|charge|credit|refund|price|cost|fee|promo)/i},
+ {k:"verify",label:"Verification & account",kind:"external",re:/\b(verif|authenticat|security|password|pin\b)/i},
+ {k:"positive",label:"Positive feedback",kind:"positive",re:/\b(positive|helpful|great|excellent|thank|polite|satisf|praise|good job|kudos|wrong rating|rated)/i}];
+const TH_BY=Object.fromEntries(THEMES.map(t=>[t.k,t]));
+const KCOLOR={agent:"var(--c-ao)",mixed:"var(--s7)",external:"var(--c-com)",positive:"var(--c-cus)"};
+const KLABEL={agent:"Agent-controllable",mixed:"Mixed",external:"Outside the agent",positive:"Positive"};
+const CUE=/(\bmute|dead air|empath|\brude\b|harsh|unprofessional|wrong info|should have|failed to|didn'?t|did not|no ownership|delayed greeting|hung up|excessive|interrupt|aggressive|sarcas)/i;
+const STOP=new Set("the a an and or to of in on for with was were is are be been he she it his her they them their cx cst customer agent that this not did didnt didn't do does had has have at by as from but about which while when then than there here so if its it's into out up over after before also very just only all any more most no yes can could would should will ou le la de que ok".split(" "));
+function themesOf(r){if(r._th)return r._th;const t=r.comment||"";const out=[];if(t)for(const th of THEMES)if(th.re.test(t))out.push(th.k);return r._th=out;}
+const hasKind=(r,k)=>themesOf(r).some(x=>TH_BY[x].kind===k);
+const misTagExt=r=>!isAO(r)&&r.rca!==NA&&!!r.comment&&CUE.test(r.comment); // tagged outside the agent, reads controllable
+const misTagAO=r=>isAO(r)&&!!r.comment&&hasKind(r,"external")&&!hasKind(r,"agent")&&!hasKind(r,"mixed")&&!CUE.test(r.comment); // tagged Agent Opp, reads external
+const words=t=>String(t||"").toLowerCase().replace(/[^a-z' ]+/g," ").split(/\s+/).filter(w=>w.length>=3&&!STOP.has(w));
+function themeStats(rows,W,c){const cm=rows.filter(r=>r.comment);const l7=W.filter(r=>r.scrub>=c.l7&&r.scrub<=c.asOf),p7=W.filter(r=>r.scrub>=c.p7&&r.scrub<c.l7);
+  return THEMES.map(t=>{const g=cm.filter(r=>themesOf(r).includes(t.k));return{...t,n:g.length,share:share(g.length,cm.length),ao:count(g,isAO),aoP:aoRate(g),l7:count(l7,r=>themesOf(r).includes(t.k)),p7:count(p7,r=>themesOf(r).includes(t.k))};}).filter(t=>t.n).sort((a,b)=>b.n-a.n);}
+function themeCard(c,cls){const F=c.F;const cm=count(F,r=>r.comment);const ts=themeStats(F,c.W.filter(r=>r.scrub<=c.asOf),c);const any=count(F,r=>themesOf(r).length);
+  if(!ts.length)return card(cls||"c7","What the comments talk about",null,h("div",{class:"empty",text:"No comments in scope."}));
+  return card(cls||"c7","What the comments talk about",`${nf(cm)} of ${nf(F.length)} scrubs carry a comment · ${pct(share(any,cm))} match at least one theme · a comment can hit several themes`,h("div",null,
+    legend(Object.entries(KLABEL).map(([k,l])=>[KCOLOR[k],l])),
+    chart(b=>CH.hbars(b,{items:ts.map(t=>({label:`${t.label} · ${pct(t.share)}`,value:t.n,color:KCOLOR[t.kind],extra:[[null,"Tagged Agent Opp",pct(t.aoP)],[null,"Last 7 days",nf(t.l7)],[null,"Prior 7 days",nf(t.p7)]]})),fmt:nf,rowH:30}),20+30*ts.length)),
+    {note:"Share = comments mentioning the theme ÷ all comments. Hover a bar for how often that theme ends up tagged as Agent Opportunity."});}
+function themeWeekCard(c,cls){const W=c.W.filter(r=>r.scrub<=c.asOf&&r.comment);const wk0=wk(c.asOf);const wks=Array.from({length:12},(_,i)=>wk0-7*(11-i));
+  const top=THEMES.map(t=>({t,n:count(W,r=>r.scrub>=wks[0]&&themesOf(r).includes(t.k))})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,6);
+  if(!top.length)return null;
+  return card(cls||"c5","Themes week by week","Comments mentioning each theme · top 6 themes · last 12 weeks",chart(b=>CH.stackedCols(b,{cats:wks.map(w=>fd(w,"dm")),stacks:top.map((x,i)=>({name:x.t.label,color:SLOTS[i],values:wks.map(w=>count(W,r=>wk(r.scrub)===w&&themesOf(r).includes(x.t.k)))})),height:280}),280));}
+function themeHeatCard(c,cls){const F=c.F.filter(r=>r.comment);const byAgent=c.level==="tl";
+  const top=THEMES.map(t=>({t,n:count(F,r=>themesOf(r).includes(t.k))})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,7).map(x=>x.t);
+  let groups=[...groupBy(F,r=>byAgent?r.bpid:r.lk)].map(([k,g])=>({key:k,name:byAgent?(AN(k)||k):LN(k),g})).sort((a,b)=>b.g.length-a.g.length);if(byAgent)groups=groups.slice(0,15);groups=groups.filter(g=>g.g.length>=3);
+  if(!groups.length||!top.length)return null;
+  return card(cls||"c12",byAgent?"Themes by agent":"Themes by team leader",`Share of each ${byAgent?"agent's":"leader's"} comments that mention the theme · darker = the theme dominates that ${byAgent?"agent's":"leader's"} write-ups · click a row to drill down`,
+    h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:groups.map(g=>`${g.name} (${g.g.length})`),cols:top.map(t=>t.label),matrix:groups.map(g=>top.map(t=>share(count(g.g,r=>themesOf(r).includes(t.k)),g.g.length)||0)),fmt:v=>pct(v),rowLink:i=>byAgent?drillAgent(groups[i].key):drillTL(groups[i].key)}))));}
+function themeMonthCard(c,cls){const W=c.W.filter(r=>r.scrub<=c.asOf&&r.comment);const keys=[...new Set(W.map(r=>fm(r.scrub)))].sort((a,b)=>a-b).slice(-6);const fg=groupBy(W,r=>fm(r.scrub));
+  const top=THEMES.map(t=>({t,n:count(W,r=>themesOf(r).includes(t.k))})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,10).map(x=>x.t);if(keys.length<2||!top.length)return null;
+  return card(cls||"c6","Themes month over month","Share of each fiscal month's comments · darker = bigger share · * = month to date",h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:top.map(t=>t.label),cols:keys.map(k=>fmLabel(k)+(k===fm(c.asOf)?"*":"")),matrix:top.map(t=>keys.map(k=>{const a=fg.get(k)||[];return share(count(a,r=>themesOf(r).includes(t.k)),a.length)||0;})),fmt:v=>v?pct(v):""}))));}
+function cmtItem(r,q){const nm=AN(r.bpid)||r.bpid;const txt=r.comment||"(no comment)";let body;
+  if(q){const parts=txt.split(new RegExp("("+q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","i"));body=h("p",null,parts.map((p,i)=>i%2?h("mark",{text:p}):p));}else body=h("p",{text:txt});
+  return h("div",{class:"cmt"},h("span",{class:"dot",style:"background:"+(COLOR[r.rca]||"var(--faint)")}),h("div",null,h("div",{class:"m"},h("span",{text:fd(r.scrub,"dm")}),h("b",{text:LN(r.lk)}),h("button",{type:"button",class:"lnk",onclick:()=>drillAgent(r.bpid),text:nm}),h("span",{text:(SHORT[r.rca]||r.rca)+(r.t2?" · "+r.t2:"")})),body));}
+function mistagCard(c,cls){const F=c.F;const byAgent=c.level==="tl";const ext=F.filter(misTagExt),aoX=F.filter(misTagAO);
+  const groups=[...groupBy(F,r=>byAgent?r.bpid:r.lk)].map(([k,g])=>{const nonAO=g.filter(r=>!isAO(r)&&r.rca!==NA),ao=g.filter(isAO);const e=count(nonAO,misTagExt),x=count(ao,misTagAO);return{key:k,name:byAgent?(AN(k)||k):LN(k),n:g.length,nonAO:nonAO.length,e,eP:share(e,nonAO.length),ao:ao.length,x,xP:share(x,ao.length),tot:e+x};}).filter(g=>g.tot).sort((a,b)=>b.tot-a.tot).slice(0,12);
+  const cell=(n,of,p)=>h("span",{style:"white-space:nowrap",title:of?`${nf(n)} of ${nf(of)}`:""},nf(n),h("small",{class:"muted",text:of?` · ${pct(p)}`:""}));
+  const list=(rows,t)=>rows.length?h("details",{style:"margin-top:10px"},h("summary",{class:"small muted",style:"cursor:pointer",text:`${t} · show ${Math.min(rows.length,8)} of ${rows.length}`}),h("div",{class:"cmts",style:"margin-top:8px"},rows.sort((a,b)=>b.scrub-a.scrub).slice(0,8).map(r=>cmtItem(r)))):null;
+  return card(cls||"c6","Possible mis-tags",`"Reads controllable" = tagged outside the agent, but the comment describes a controllable behaviour (${nf(ext.length)}) · "Reads external" = tagged Agent Opportunity, but the comment only describes technician, outage or billing issues (${nf(aoX.length)}) · % = share of that ${byAgent?"agent's":"leader's"} tags in the group`,h("div",null,
+    groups.length?table([{t:byAgent?"Agent":"Team leader",f:r=>h("b",{style:"white-space:nowrap",text:r.name})},{t:"Reads controllable",n:1,f:r=>cell(r.e,r.nonAO,r.eP)},{t:"Reads external",n:1,f:r=>cell(r.x,r.ao,r.xP)},{t:"Signal",f:r=>tag(r.eP>=.25&&r.nonAO>=4?"lenient tagging?":r.xP>=.2&&r.ao>=5?"strict tagging?":"check",r.eP>=.25&&r.nonAO>=4||r.xP>=.2&&r.ao>=5?"warn":"flat")}],groups,{onRow:r=>byAgent?drillAgent(r.key):drillTL(r.key)}):h("div",{class:"empty",text:"No mis-tag candidates in scope."}),
+    list(ext,"Tagged outside the agent, reads controllable"),list(aoX,"Tagged Agent Opportunity, reads external")),{note:"Text cues only — a calibration prompt, not a verdict. Re-listen before re-tagging; compare with the Reading column on the Leaders tab."});}
+function evidenceCard(c,cls){const F=c.F;const byAgent=c.level==="tl";
+  const rows=[...groupBy(F,r=>byAgent?r.bpid:r.lk)].map(([k,g])=>{const cm=g.filter(r=>r.comment);const ws=cm.map(r=>String(r.comment).split(/\s+/).filter(Boolean).length);const sh=count(ws,w=>w<6);const texts=cm.map(r=>r.comment.trim().toLowerCase());const dup=texts.length-new Set(texts).size;const noT2=count(g,r=>r.rca!==NA&&!r.t2);
+    const empty=count(g,r=>r.rca!==NA&&!r.comment);const avgW=avg(ws);const weak=share(sh+empty+dup,g.length)||0;return{key:k,name:byAgent?(AN(k)||k):LN(k),n:g.length,avgW,sh,shP:share(sh,cm.length),empty,emptyP:share(empty,g.length),dup,noT2,weak,q:weak>=.35?["Weak","bad"]:weak>=.15?["OK","warn"]:["Strong","good"]};}).filter(r=>r.n>=3).sort((a,b)=>b.weak-a.weak);
+  if(!rows.length)return null;
+  return card(cls||"c6","Evidence quality","Can the 1:1 be run from the comment alone? Short, empty or copy-pasted comments cannot be coached from.",table([{t:byAgent?"Agent":"Team leader",f:r=>h("b",{text:r.name})},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Avg words",n:1,f:r=>r.avgW==null?"—":r.avgW.toFixed(0)},{t:"Under 6 words",n:1,f:r=>`${nf(r.sh)} (${pct(r.shP)})`},{t:"No comment",n:1,f:r=>nf(r.empty)},{t:"Repeated text",n:1,f:r=>nf(r.dup)},{t:"Missing T2",n:1,f:r=>nf(r.noT2)},{t:"Quality",f:r=>tag(r.q[0],r.q[1])}],rows,{onRow:r=>byAgent?drillAgent(r.key):drillTL(r.key)}),{note:"Quality = share of scrubs that are short, empty or repeated: Strong < 15%, OK < 35%, Weak ≥ 35%."});}
+function searchCard(c,cls){const F=[...c.F].sort((a,b)=>b.scrub-a.scrub);const ao=F.filter(isAO);
+  const tf=new Map();for(const r of ao)for(const w of new Set(words(r.comment)))tf.set(w,(tf.get(w)||0)+1);const top=[...tf].sort((a,b)=>b[1]-a[1]).slice(0,24);
+  const inp=h("input",{type:"text",placeholder:"Search the comments… e.g. mute, callback, wrong info, technician","aria-label":"Search comments"});const out=h("div",{style:"margin-top:12px"});const stat=h("span",{class:"muted small"});
+  const run=()=>{const q=inp.value.trim();out.replaceChildren();if(!q){stat.textContent=`${nf(count(F,r=>r.comment))} comments in scope · type to search, or click a word`;return;}
+    const m=F.filter(r=>r.comment&&r.comment.toLowerCase().includes(q.toLowerCase()));const a=count(m,isAO);const lk=[...groupBy(m,r=>r.lk)].sort((x,y)=>y[1].length-x[1].length).slice(0,4).map(([k,g])=>`${LN(k)} ${g.length}`).join(" · ");
+    stat.textContent=m.length?`${nf(m.length)} matches · ${pct(share(a,m.length))} tagged Agent Opportunity · ${nf(new Set(m.map(r=>r.bpid)).size)} agents · ${lk}`:"No matches";
+    out.append(h("div",{class:"cmts"},m.slice(0,40).map(r=>cmtItem(r,q))));if(m.length>40)out.append(h("div",{class:"muted small",style:"margin-top:8px",text:`Showing the newest 40 of ${nf(m.length)}.`}));};
+  let t;inp.addEventListener("input",()=>{clearTimeout(t);t=setTimeout(run,150);});
+  const chips=h("div",{class:"chips"},top.map(([w,n])=>h("button",{type:"button",onclick:()=>{inp.value=w;run();inp.focus();},text:w},h("b",{text:nf(n)}))));
+  const el=card(cls||"c12","Search the evidence","Most-used words in Agent Opportunity comments first · click one, or type anything · newest matches first",h("div",null,h("div",{class:"kwbox"},svgI(SEARCH),inp),h("div",{style:"margin:10px 0 4px"},stat),chips,out));run();return el;}
+function commentsTab(c){const g=h("div",{class:"g12"});g.append(themeCard(c,"c7"));const w=themeWeekCard(c,"c5");if(w)g.append(w);const hc=themeHeatCard(c,"c12");if(hc)g.append(hc);
+  const mm=themeMonthCard(c,"c5");if(mm)g.append(mm);g.append(mistagCard(c,mm?"c7":"c12"));const ev=evidenceCard(c,"c12");if(ev)g.append(ev);g.append(searchCard(c,"c12"));return[g];}
+
+/* ===================== cohorts: waves, tenure, onboarding ===================== */
+const waveNum=w=>{const m=String(w).match(/(\d+)/);return m?+m[1]:0;};const waveTemp=w=>/temp/i.test(String(w));
+const waveSort=(a,b)=>(waveTemp(a)-waveTemp(b))||(waveNum(b)-waveNum(a));
+function rosterIn(c){let r=[...ROSTER.values()];if(c.om)r=r.filter(a=>a.om===c.om);if(c.tl){const L=LEADERS.get(c.tl);r=L&&L.rosterTL?r.filter(a=>a.tl===L.rosterTL):[];}return r;}
+function waveStats(c){const F=c.F;const ros=rosterIn(c);const ag=IN.agentStats(c,F);const chronicBy=new Set(ag.filter(a=>a.status&&a.status[0]==="Chronic").map(a=>a.bpid));
+  const keys=new Set([...ros.map(a=>a.wave),...F.map(r=>r.wave)].filter(Boolean));
+  return[...keys].map(w=>{const rs=F.filter(r=>r.wave===w);const ra=ros.filter(a=>a.wave===w);const sc=new Set(rs.map(r=>r.bpid));const ao=count(rs,isAO);const[t]=topKey(rs.filter(isAO),r=>r.t2);const z=IN.zTest2(ao,rs.length,count(c.D,isAO),c.D.length);
+    const ten=topKey(ra,a=>a.tenure)[0]||topKey(rs,r=>r.tenure)[0]||"";return{wave:w,rosterAgents:ra.length,scrubbedAgents:sc.size,coverage:ra.length?sc.size/ra.length:null,n:rs.length,ao,aoP:aoRate(rs),ci:rs.length?IN.wilson(ao,rs.length):null,chronic:[...sc].filter(b=>chronicBy.has(b)).length,top:t,tenure:ten,z,gap:rs.length?(aoRate(rs)-c.floor)*100:null};}).sort((a,b)=>waveSort(a.wave,b.wave));}
+function waveGridCard(c,cls){const W=c.W.filter(r=>r.scrub<=c.asOf&&r.wave);const keys=[...new Set(W.map(r=>fm(r.scrub)))].sort((a,b)=>a-b).slice(-6);const ros=rosterIn(c);const wc=groupBy(W,r=>r.wave);const waves=[...wc].filter(([w,g])=>g.length>=10||ros.filter(a=>a.wave===w).length>=5).map(([w])=>w).sort(waveSort);
+  if(!waves.length||!keys.length)return null;const fg=groupBy(W,r=>fm(r.scrub));
+  const M=waves.map(w=>keys.map(k=>{const a=(fg.get(k)||[]).filter(r=>r.wave===w);return a.length>=5?aoRate(a):null;}));
+  return card(cls||"c12","Wave by fiscal month","Agent Opportunity % of each hiring wave, month by month · newest wave first · waves with 10+ scrubs or 5+ agents on roster · blank = under 5 scrubs in that month · * = month to date",h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:waves.map(w=>`${w} · ${ros.filter(a=>a.wave===w).length} on roster`),cols:keys.map(k=>fmLabel(k)+(k===fm(c.asOf)?"*":"")),matrix:M,fmt:v=>v?pct(v):"",corner:"Wave"}))),
+    {note:"Read across a row: a wave that stays dark month after month has not been coached out of the problem. Read down a column: which cohorts drive this month."});}
+function waveTableCard(c,cls){const all=waveStats(c).filter(w=>w.n||w.rosterAgents);const ws=all.filter(w=>w.n>=5||w.rosterAgents>=5);const small=all.filter(w=>!ws.includes(w));if(!all.length)return null;const fl=c.floor;
+  const ranked=ws.filter(w=>w.n>=10).sort((a,b)=>b.aoP-a.aoP);
+  return card(cls||"c12","Hiring waves this period","Newest wave first · Agent Opportunity % vs the floor with 95% intervals · bars show waves with 10+ scrubs · click a wave to see its agents",h("div",null,
+    ranked.length?chart(b=>CH.hbars(b,{items:ranked.map(w=>({label:`${w.wave} · ${nf(w.scrubbedAgents)}/${nf(w.rosterAgents)} agents`,value:w.aoP||0,color:(w.aoP||0)>fl?"var(--bad)":"var(--good)",extra:[[null,"Scrubs",nf(w.n)],[null,"Agent Opp",nf(w.ao)],[null,"Chronic agents",nf(w.chronic)]]})),ci:ranked.map(w=>w.ci?[w.ci.lo,w.ci.hi]:null),fmt:v=>pct(v),max:1,ref:fl,refLabel:"Floor",rowH:32}),40+32*ranked.length):null,
+    table([{t:"Wave",f:r=>h("span",null,h("b",{text:r.wave}),h("small",{class:"muted",text:r.tenure?" · "+r.tenure+" days":""}))},{t:"Roster",n:1,f:r=>nf(r.rosterAgents)},{t:"Scrubbed",n:1,f:r=>`${nf(r.scrubbedAgents)}${r.coverage!=null?" ("+pct(r.coverage)+")":""}`},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Agent Opp",n:1,f:r=>nf(r.ao)},{t:"Agent Opp % · vs floor",n:1,f:r=>r.n?bulletEl(r.aoP,fl):"—"},{t:"95% CI",n:1,f:r=>r.ci&&r.n>=5?h("span",{class:"mono muted",text:`${pct(r.ci.lo)}–${pct(r.ci.hi)}`}):"—"},{t:"Chronic",n:1,f:r=>nf(r.chronic)},{t:"Top behaviour",f:r=>r.top?shortT(r.top):"—"},
+      {t:"Reading",f:r=>tag(r.n<10?"low volume":r.z.p<.05?(r.gap>0?"worse than floor":"better than floor"):"in line",r.n<10?"flat":r.z.p<.05?(r.gap>0?"bad":"good"):"flat")}],ws,{onRow:r=>openWave(r.wave)}),
+    small.length?h("div",{class:"muted small",style:"margin-top:10px",text:`${small.length} smaller waves hidden (under 5 scrubs and under 5 agents on roster): ${small.map(w=>`${w.wave} ${nf(w.n)}`).join(" · ")}`}):null));}
+function openWave(w){const el=document.getElementById("waveAgents");if(!el)return;const c=ctx();const ag=IN.agentStats(c,c.F.filter(r=>r.wave===w)).filter(a=>a.n);const ros=rosterIn(c).filter(a=>a.wave===w);const idle=ros.filter(a=>!ag.some(x=>x.bpid===a.bp));
+  el.replaceChildren(card("c12",`${w} · agents`,`${nf(ag.length)} scrubbed · ${nf(idle.length)} on roster with no scrub in the period · click an agent for the agent view`,h("div",null,ag.length?table([{t:"Agent",f:r=>h("span",{class:"namecell"},avatar(r.name||r.bpid,avColor(r.bpid)),h("span",null,h("b",{text:r.name||r.bpid}),h("small",{text:(r.tenure||"—")+(r.phase?" · "+r.phase:"")})))},{t:"Team leader",f:r=>r.leader||LN(r.lk)},{t:"Scrubs",n:1,f:r=>nf(r.n)},{t:"Agent Opp",n:1,f:r=>nf(r.ao)},{t:"Agent Opp %",n:1,f:r=>pct(r.aoP)},{t:"Main behaviour",f:r=>topT2(r.top)||"—"},{t:"Status",f:r=>tag(r.status[0],r.status[1])}],ag.sort((a,b)=>b.ao-a.ao||b.n-a.n),{onRow:r=>drillAgent(r.bpid)}):h("div",{class:"empty",text:"No scrubs for this wave in the period."}),
+    idle.length?h("div",{class:"idle",style:"margin-top:12px"},h("b",{text:"Not scrubbed this period:"}),idle.slice(0,30).map(a=>h("span",{class:"p",text:(AN(a.bp)||a.name)+" · "+a.tl})),idle.length>30?h("span",{class:"muted small",text:`+${idle.length-30} more`}):null):null)));
+  el.scrollIntoView({behavior:"smooth",block:"start"});charts.splice(0).forEach(f=>f());}
+function tenureHeatCard(c,cls){const F=c.F.filter(r=>isAO(r)&&r.tenure);const order=["30-60","60-120","120+"];const ten=[...new Set(F.map(r=>r.tenure))].sort((a,b)=>(order.indexOf(a)+1||99)-(order.indexOf(b)+1||99));
+  const top=AGT.map(t=>({t,n:count(F,r=>r.t2===t)})).filter(x=>x.n).sort((a,b)=>b.n-a.n).slice(0,8).map(x=>x.t);if(ten.length<2||!top.length)return null;
+  return card(cls||"c6","What to coach at each tenure stage","Share of each tenure bucket's Agent Opportunity by behaviour · darker = bigger share",h("div",{class:"tw"},chart(b=>CH.heatmap(b,{rows:ten.map(t=>`${t} days (${count(F,r=>r.tenure===t)})`),cols:top.map(shortT),matrix:ten.map(t=>{const g=F.filter(r=>r.tenure===t);return top.map(b=>share(count(g,r=>r.t2===b),g.length)||0);}),fmt:v=>v?pct(v):""}))),
+    {note:"New hires usually show knowledge and process gaps; tenured agents show tone, hold and ownership. If the pattern is the reverse, the onboarding content is wrong."});}
+function onboardCard(c,cls){const F=c.F;const rows=[...groupBy(F.filter(r=>r.tenure),r=>r.lk)].map(([k,g])=>{const nw=g.filter(r=>r.tenure==="30-60"),old=g.filter(r=>r.tenure==="120+"||r.tenure==="60-120");if(nw.length<5||old.length<5)return null;const z=IN.zTest2(count(nw,isAO),nw.length,count(old,isAO),old.length);
+    return{lk:k,name:LN(k),nNew:nw.length,aNew:new Set(nw.map(r=>r.bpid)).size,pNew:aoRate(nw),nOld:old.length,pOld:aoRate(old),gap:(aoRate(nw)-aoRate(old))*100,p:z.p};}).filter(Boolean).sort((a,b)=>b.gap-a.gap);
+  if(!rows.length)return null;const all30=F.filter(r=>r.tenure==="30-60"),allOld=F.filter(r=>r.tenure&&r.tenure!=="30-60");
+  return card(cls||"c6","New-hire gap by team leader",`Agent Opportunity % for 30–60-day agents vs tenured agents in the same team · floor: new ${pct(aoRate(all30))} vs tenured ${pct(aoRate(allOld))} · leaders with 5+ scrubs on each side`,table([
+    {t:"Team leader",f:r=>h("span",{class:"namecell"},avatar(r.name,(LEADERS.get(r.lk)||{}).color),h("b",{text:r.name}))},{t:"New hires",n:1,f:r=>`${nf(r.aNew)} agents · ${nf(r.nNew)} scrubs`},{t:"New AO %",n:1,f:r=>pct(r.pNew)},{t:"Tenured AO %",n:1,f:r=>pct(r.pOld)},{t:"Gap",n:1,f:r=>chg(r.gap,{d:0,unit:" pts"})},
+    {t:"Reading",f:r=>tag(r.p<.05&&r.gap>0?"onboarding gap":r.p<.05&&r.gap<0?"new hires stronger":"no real gap",r.p<.05&&r.gap>0?"bad":r.p<.05?"good":"flat")}],rows,{onRow:r=>drillTL(r.lk)}),{note:"A significant positive gap means this leader's new hires are tagged far more often than their tenured agents — check nesting support before blaming the hires."});}
+function cohortNotes(c){const ws=waveStats(c).filter(w=>w.n>=10);const ts=IN.tenureStats(c).filter(t=>t.n>=10);const out=[];
+  if(ws.length>=2){const worst=[...ws].sort((a,b)=>b.aoP-a.aoP)[0],best=[...ws].sort((a,b)=>a.aoP-b.aoP)[0];out.push(`**${worst.wave}** is the weakest wave at **${pct(worst.aoP)}** Agent Opportunity (${nf(worst.n)} scrubs${worst.z.p<.05?", significantly above the floor":""}); ${best.wave} is the strongest at ${pct(best.aoP)}.`);}
+  const t30=ts.find(t=>t.bucket==="30-60"),t120=ts.find(t=>t.bucket==="120+");if(t30&&t120)out.push(`Tenure gradient: 30–60-day agents run **${pct(t30.aoP)}** vs **${pct(t120.aoP)}** for 120+ days (${sg((t30.aoP-t120.aoP)*100,0)} pts).`);
+  const cov=waveStats(c).filter(w=>w.rosterAgents>=5&&(w.coverage||0)<.5);if(cov.length)out.push(`${cov.length} wave${cov.length>1?"s":""} under 50% scrub coverage: ${cov.map(w=>`${w.wave} (${pct(w.coverage)})`).join(", ")} — blind spots in the newest cohorts hide problems until they become chronic.`);
+  const ch=waveStats(c).filter(w=>w.chronic).sort((a,b)=>b.chronic-a.chronic)[0];if(ch)out.push(`Most chronic agents sit in **${ch.wave}** (${nf(ch.chronic)}).`);
+  return card("c6","Cohort read-out","What the waves and tenure buckets say",out.length?h("ul",{style:"margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:13.5px"},out.map(t=>h("li",null,strong(t)))):h("div",{class:"empty",text:"Not enough volume per cohort yet."}));}
+function cohortsTab(c){const g=h("div",{class:"g12"});const wg=waveGridCard(c,"c12");if(wg)g.append(wg);const wt=waveTableCard(c,"c12");if(wt)g.append(wt);g.append(h("div",{id:"waveAgents",class:"c12",style:"display:contents"}));
+  g.append(cohortNotes(c),tenureCard(c,"c6"));const th=tenureHeatCard(c,"c6");if(th)g.append(th);const ob=onboardCard(c,"c6");if(ob)g.append(ob);return[g];}
+
 
 /* ===================== render ===================== */
 function render(){closeDD();const c=ctx();renderRail(c);charts.length=0;const view=$("#view");view.classList.remove("reveal");
