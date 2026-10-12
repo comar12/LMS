@@ -1640,6 +1640,41 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 .pulse__ok { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 650; color: var(--success); }
 .pulse__actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
 
+
+/* ---------- Team member picker ---------- */
+.mp { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.pulse__ids { display: flex; flex-wrap: wrap; gap: 6px; }
+.id-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 4px 9px; border-radius: 999px; font-size: 12px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); transition: border-color var(--t) var(--ease), background var(--t) var(--ease), transform var(--t) var(--ease-out); }
+.id-chip:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+.id-chip__k { font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.id-chip__v { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.id-chip .icon { width: 13px; height: 13px; color: var(--text-3); }
+.roster-prev { display: grid; gap: 8px; }
+.roster-prev__sum { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 650; color: var(--success-text, var(--text)); }
+.roster-prev__wrap { max-height: 260px; overflow: auto; border: 1px solid var(--border); border-radius: 12px; }
+.roster-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.roster-tbl th { position: sticky; top: 0; text-align: left; padding: 7px 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); background: var(--surface-2); border-bottom: 1px solid var(--border); }
+.roster-tbl td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text); font-variant-numeric: tabular-nums; }
+.roster-tbl tr:last-child td { border-bottom: 0; }
+.roster-tbl td.is-new { color: var(--accent-text); font-weight: 700; }
+.mp__search { max-width: 320px; }
+.mp__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; max-height: 300px; overflow-y: auto; padding: 4px; margin: -4px; }
+.mp__opt { position: relative; display: flex; align-items: center; gap: 10px; min-width: 0; padding: 9px 10px; border-radius: 13px; text-align: left; background: var(--surface-2); border: 1px solid var(--border); transition: transform var(--t) var(--ease-out), border-color var(--t) var(--ease), background var(--t) var(--ease), box-shadow var(--t) var(--ease); }
+.mp__opt:hover { transform: translateY(-1px); border-color: var(--border-strong); background: var(--surface); box-shadow: var(--shadow-sm); }
+.mp__opt.is-on { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.mp__av { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; color: var(--accent-ink); background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 50%, var(--indigo))); }
+.mp__opt.is-on .mp__av { animation: btn-pop 0.35s var(--ease-spring); }
+.mp__text { display: flex; flex-direction: column; min-width: 0; }
+.mp__name { font-weight: 700; font-size: 13.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mp__code { font-size: 11.5px; color: var(--text-3); font-weight: 600; }
+.mp__check { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 2px var(--surface); }
+.mp__check .icon { width: 12px; height: 12px; }
+.mp__empty { font-size: 13px; color: var(--text-3); padding: 6px; }
+.choice { display: inline-flex; flex-wrap: wrap; margin-top: 6px; }
+.tr-other { margin-top: 10px; }
+.tr-other summary { cursor: pointer; font-size: 12.5px; font-weight: 650; color: var(--accent-text); padding: 4px 0; }
+.tr-other .field { margin-top: 8px; }
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1726,6 +1761,7 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
   <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M8.7 13 7.5 21l4.5-2.5 4.5 2.5-1.2-8"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/></symbol>
   <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M4 10v4a1 1 0 0 0 1 1h2l6 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M3 12c.5-1.4 4-6 9-6s8.5 4.6 9 6c-.5 1.4-4 6-9 6s-8.5-4.6-9-6Z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M4 4l16 16M10.6 6.2A9.6 9.6 0 0 1 12 6c5 0 8.5 4.6 9 6-.3.8-1.4 2.6-3.2 4M6.6 7.7C4.6 9 3.4 11 3 12c.5 1.4 4 6 9 6 1.4 0 2.6-.3 3.7-.8M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
 </svg>
 <a class="skip-link" href="#main">Skip to main content</a>
@@ -2093,7 +2129,7 @@ function fmtBytes(n) {
 }
 
 /** Soft privacy check for user-authored text. Returns human-readable reasons. */
-function piiWarnings(text) {
+function piiWarnings(text, opts = {}) {
   const t = String(text || '');
   const out = [];
   if (!t.trim()) return out;
@@ -2103,6 +2139,11 @@ function piiWarnings(text) {
   if (/\bbp-?[a-z]{2,}\d{2,}\b/i.test(t)) out.push('what looks like a BP-ID');
   if (/\b(bpid|hrid|avaya|employee id|interaction id|acct\.?\s*#|account\s*(?:number|#))\b/i.test(t)) out.push('an identifier label');
   if (/\b(mr|mrs|ms|miss|dr)\.?\s+[A-Z][a-z]+/.test(t)) out.push('what looks like a personal name');
+  // Anything from the team list (names, HRIDs, BP-IDs) must stay out of coaching text.
+  const team = typeof state !== 'undefined' && state.team ? state.team.members : [];
+  const low = t.toLowerCase();
+  if (team.some((m) => [m.hrid, m.bpid].some((v) => v && v.length >= 3 && low.includes(v.toLowerCase())))) out.push('an HRID or BP-ID from your team list');
+  if (opts.names !== false && team.some((m) => m.name && m.name.length >= 3 && new RegExp(`\\b${m.name.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(t))) out.push('a name from your team list');
   return dedupe(out);
 }
 
@@ -2210,6 +2251,7 @@ function defaultPrefs() {
     peopleTab: 'attendance',
     trackerFilter: 'active',
     brand: null,
+    hideIds: false,
   };
 }
 /** Call reviews are kept per call type, so a Technical review and a Sales review can be in progress together. */
@@ -2313,6 +2355,7 @@ function sanitizePrefs(o) {
   if (SALES_OFFER_IDS.includes(src.salesOffer)) p.salesOffer = src.salesOffer;
   if (PEOPLE_TAB_IDS.includes(src.peopleTab)) p.peopleTab = src.peopleTab;
   if (['active', 'done', 'all'].includes(src.trackerFilter)) p.trackerFilter = src.trackerFilter;
+  if (typeof src.hideIds === 'boolean') p.hideIds = src.hideIds;
   if (src.brand && typeof src.brand === 'object') {
     const hex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
     const primary = hex(src.brand.primary);
@@ -2453,6 +2496,10 @@ function sanitizeCalib(o) {
 
 /** Team Pulse: agent codes chosen by the supervisor (never names or IDs) and dated touchpoints. Message text is never stored. */
 const TOUCH_KINDS = ['recognition', 'oneonone', 'stay'];
+/** HRIDs and BP-IDs: letters, digits, and - _ . only. */
+function cleanStaffId(v) {
+  return str(v, 30).trim().replace(/[^A-Za-z0-9._-]/g, '').slice(0, 30);
+}
 function sanitizeTeam(o) {
   const src = o && typeof o === 'object' ? o : {};
   const members = [];
@@ -2464,7 +2511,7 @@ function sanitizeTeam(o) {
     let id = isId(m.id) ? m.id : uid('mem');
     if (seen.has(id)) id = uid('mem');
     seen.add(id);
-    members.push({ id, code, since: isIsoDate(m.since) ? m.since : '' });
+    members.push({ id, code, name: str(m.name, 60).trim(), hrid: cleanStaffId(m.hrid), bpid: cleanStaffId(m.bpid), since: isIsoDate(m.since) ? m.since : '' });
   }
   const ids = new Set(members.map((m) => m.id));
   const touches = [];
@@ -2714,8 +2761,20 @@ function loadSlice(key) {
     case 'team': {
       const raw = store.get('team', null);
       // A personal copy can be built with a team size; it starts with numbered codes only.
-      const n = clampInt(DATA.seedTeam, 0, 40, 0);
-      state.team = raw == null && n ? sanitizeTeam({ members: Array.from({ length: n }, (_, i) => ({ id: `mem-seed-${i + 1}`, code: `Agent ${String(i + 1).padStart(2, '0')}` })) }) : sanitizeTeam(raw);
+      // A personal copy can carry a roster (display names only) or just a team size.
+      const seed = Array.isArray(DATA.seedTeam) ? DATA.seedTeam : Array.from({ length: clampInt(DATA.seedTeam, 0, 40, 0) }, () => ({}));
+      state.team = raw == null && seed.length ? sanitizeTeam({ members: seed.map((r, i) => ({ id: `mem-seed-${i + 1}`, code: `Agent ${String(i + 1).padStart(2, '0')}`, name: r.name || '', hrid: r.hrid || '', bpid: r.bpid || '' })) }) : sanitizeTeam(raw);
+      // Members created from an earlier copy pick up the roster's name and IDs where they are still empty.
+      if (raw != null) {
+        state.team.members.forEach((m) => {
+          const k = /^mem-seed-(\d+)$/.exec(m.id);
+          const r = k && seed[Number(k[1]) - 1];
+          if (!r) return;
+          if (!m.name && r.name) m.name = str(r.name, 60);
+          if (!m.hrid && r.hrid) m.hrid = cleanStaffId(r.hrid);
+          if (!m.bpid && r.bpid) m.bpid = cleanStaffId(r.bpid);
+        });
+      }
       break;
     }
     case 'today': state.today = sanitizeToday(store.get('today', null)); break;
@@ -6423,6 +6482,12 @@ function openTrackFromBuilder() {
   }
   const s = state.settings;
   const label = labelField('');
+  const team = state.team.members.length > 0;
+  // With a team set up, choose the person from the avatar grid; a code can still be typed for anyone else.
+  const picker = team ? memberPicker({ value: null, label: 'Who is this plan for?', onChange: (x) => { label.input.value = x.code; err.hidden = true; } }) : null;
+  const other = team
+    ? h('details', { class: 'tr-other' }, h('summary', null, 'Someone not on your team? Type a code instead'), label.node)
+    : null;
   const start = h('input', { class: 'input', id: 'tr-start', type: 'date', value: todayDay(), max: todayDay() });
   const err = h('p', { class: 'field__error', hidden: true }, 'Enter a code for this plan.');
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
@@ -6432,13 +6497,15 @@ function openTrackFromBuilder() {
   const promise = [hasCall ? `review ${numWord(s.calls)} calls within ${followupPhrase(s.followup)}` : null, hasPeople ? 'hold a weekly check-in' : null].filter(Boolean);
   const m = openModal({
     title: 'Track this coaching plan',
-    size: 'md',
+    size: team ? 'lg' : 'md',
     body: h(
       'div',
       { class: 'tr-form' },
-      label.node,
+      team ? h('p', { class: 'field__label' }, 'Who is this plan for?') : label.node,
+      team ? picker.el : null,
+      other,
       err,
-      h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'tr-start' }, 'Coaching session date'), start),
+      h('div', { class: 'field', style: 'margin-top:14px' }, h('label', { class: 'field__label', for: 'tr-start' }, 'Coaching session date'), start),
       h(
         'div',
         { class: 'tr-summary' },
@@ -6448,14 +6515,15 @@ function openTrackFromBuilder() {
       )
     ),
     footer: [cancel, h('span', { class: 'spacer' }), save],
-    initialFocus: label.input,
+    initialFocus: team ? '.mp__opt' : label.input,
   });
   cancel.addEventListener('click', () => m.close());
   save.addEventListener('click', () => {
     const text = label.input.value.trim();
     err.hidden = !!text;
     if (!text) {
-      label.input.focus();
+      if (team) err.textContent = 'Choose a team member, or type a code.';
+      (team ? m.el.querySelector('.mp__opt') : label.input).focus();
       return;
     }
     const plan = sanitizeTracker({ plans: [{ id: uid('plan'), label: text, start: isIsoDate(start.value) ? start.value : todayDay(), duration: s.duration, calls: s.calls, followup: s.followup, focus: opps.map((o) => o.id), logs: [] }] }).plans[0];
@@ -6463,7 +6531,7 @@ function openTrackFromBuilder() {
     savePlans();
     m.close();
     refresh({ panel: false });
-    toast(`Tracking started for ${plan.label}`, { action: { label: 'Open tracker', fn: () => navigate('tracker') } });
+    toast(`Tracking started for ${planWho(plan)}`, { action: { label: 'Open tracker', fn: () => navigate('tracker') } });
   });
 }
 
@@ -6508,7 +6576,7 @@ function openLogDialog(planId, kind) {
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
   const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('check'), kind === 'call' ? 'Save call review' : 'Save check-in');
   const m = openModal({
-    title: kind === 'call' ? `Log a call review · ${p.label}` : `Log a check-in · ${p.label}`,
+    title: kind === 'call' ? `Log a call review · ${planWho(p)}` : `Log a check-in · ${planWho(p)}`,
     size: 'md',
     body: h(
       'div',
@@ -6563,7 +6631,7 @@ function setPlanStatus(planId, status) {
   p.status = status;
   savePlans();
   refresh({ panel: false });
-  toast(status === 'done' ? `Plan for ${p.label} marked complete` : `Plan for ${p.label} reopened`);
+  toast(status === 'done' ? `Plan for ${planWho(p)} marked complete` : `Plan for ${planWho(p)} reopened`);
 }
 
 function extendPlan(planId) {
@@ -6579,7 +6647,7 @@ function extendPlan(planId) {
 async function deletePlan(planId) {
   const p = findPlan(planId);
   if (!p) return;
-  if (!(await confirmDialog({ title: `Delete the plan for ${p.label}?`, message: 'The plan and everything logged on it will be removed from this browser. Export a backup first if you might need it.', confirmLabel: 'Delete plan', danger: true }))) return;
+  if (!(await confirmDialog({ title: `Delete the plan for ${planWho(p)}?`, message: 'The plan and everything logged on it will be removed from this browser. Export a backup first if you might need it.', confirmLabel: 'Delete plan', danger: true }))) return;
   state.tracker.plans = state.tracker.plans.filter((x) => x.id !== planId);
   savePlans();
   refresh({ panel: false });
@@ -6645,7 +6713,8 @@ function planCard(p) {
   const due = planDue(p);
   const history = p.logs.slice().reverse();
   const text = planProgressText(p);
-  const initials = p.label.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 3).toUpperCase() || '#';
+  const mem = memberByCode(p.label);
+  const initials = mem ? initialsOf(mem) : p.label.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 3).toUpperCase() || '#';
   return h(
     'article',
     { class: `plan plan--${due.level}${state.ui.flash === `plan:${p.id}` ? ' is-flash' : ''}`, 'aria-labelledby': `plan-${p.id}` },
@@ -6653,7 +6722,7 @@ function planCard(p) {
       'div',
       { class: 'plan__head' },
       h('span', { class: 'plan__avatar', 'aria-hidden': 'true' }, initials),
-      h('div', { class: 'plan__who' }, h('h2', { class: 'plan__label', id: `plan-${p.id}` }, p.label), h('p', { class: 'plan__title' }, planTitle(p))),
+      h('div', { class: 'plan__who' }, h('h2', { class: 'plan__label', id: `plan-${p.id}` }, planWho(p)), h('p', { class: 'plan__title' }, mem && mem.name ? `${mem.code} · ${planTitle(p)}` : planTitle(p))),
       h('span', { class: `due-chip due-chip--${due.level}` }, icon(due.level === 'done' ? 'check' : due.level === 'ok' ? 'calendar' : 'alert', 'icon--sm'), due.text)
     ),
     h(
@@ -6679,7 +6748,7 @@ function planCard(p) {
       { class: 'plan__actions' },
       p.status === 'active' && c.callTarget ? h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `tr-log:${p.id}`, onclick: () => openLogDialog(p.id, 'call') }, icon('plus'), 'Log call review') : null,
       p.status === 'active' && c.checkinTarget ? h('button', { type: 'button', class: `btn btn--sm${c.callTarget ? '' : ' btn--primary'}`, 'data-fk': `tr-check:${p.id}`, onclick: () => openLogDialog(p.id, 'checkin') }, icon('calendar'), 'Log check-in') : null,
-      copyButton(() => planProgressText(p), { label: 'Copy progress', srLabel: `Copy progress for ${p.label}`, fk: `tr-copy:${p.id}`, emptyMessage: 'Log at least one call review or check-in first. Progress is written only from what you log.' }),
+      copyButton(() => planProgressText(p), { label: 'Copy progress', srLabel: `Copy progress for ${planWho(p)}`, fk: `tr-copy:${p.id}`, emptyMessage: 'Log at least one call review or check-in first. Progress is written only from what you log.' }),
       h('button', { type: 'button', class: 'btn btn--sm', disabled: !text, 'data-fk': `tr-use:${p.id}`, onclick: () => useProgressInBuilder(p.id) }, icon('clipboard'), 'Use in Builder'),
       h('span', { class: 'toolbar__spacer' }),
       menuButton({
@@ -7330,7 +7399,7 @@ function renderToday(main) {
                 'li',
                 { class: `rt-row rt-row--${due.level === 'overdue' ? 'overdue' : 'due'}` },
                 h('span', { class: 'rt-row__icon', 'aria-hidden': 'true' }, icon('calendar')),
-                h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, p.label), h('span', { class: `rt-due rt-due--${due.level === 'overdue' ? 'overdue' : 'due'}` }, due.text)), h('p', { class: 'rt-row__note' }, planTitle(p))),
+                h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, planWho(p)), h('span', { class: `rt-due rt-due--${due.level === 'overdue' ? 'overdue' : 'due'}` }, due.text)), h('p', { class: 'rt-row__note' }, planTitle(p))),
                 h(
                   'div',
                   { class: 'rt-row__actions' },
@@ -7357,7 +7426,7 @@ function renderToday(main) {
               'li',
               { class: `rt-row rt-row--${pu.earned.length ? 'earned' : 'due'}` },
               h('span', { class: 'rt-row__icon', 'aria-hidden': 'true' }, icon(pu.earned.length ? 'award' : 'heart')),
-              h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, m.code), h('span', { class: `rt-due rt-due--${pu.earned.length ? 'done' : 'due'}` }, pu.flags[0].text))),
+              h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, memberLabel(m)), h('span', { class: `rt-due rt-due--${pu.earned.length ? 'done' : 'due'}` }, pu.flags[0].text))),
               h('div', { class: 'rt-row__actions' }, h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `day-rec:${m.id}`, onclick: () => openRecognize(m.id) }, icon('award'), 'Recognize'))
             )
           )
@@ -7856,6 +7925,94 @@ function renderLeader(main) {
    ========================================================================== */
 
 const sameCode = (a, b) => normalizeText(a) === normalizeText(b);
+/** The name the supervisor gave this person (kept only in this browser), or the code. */
+const memberLabel = (m) => (m ? m.name || m.code : '');
+const firstName = (m) => (m && m.name ? m.name.split(/\s+/)[0] : '');
+function initialsOf(m) {
+  if (m.name) return m.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  return m.code.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).map((w, i, a) => (i === a.length - 1 && /^\d+$/.test(w) ? w : w[0])).join('').slice(0, 4).toUpperCase() || '#';
+}
+/** Who a tracker plan belongs to, shown by name when the plan's code matches a team member. */
+function planWho(p) {
+  const m = memberByCode(p.label);
+  return m ? memberLabel(m) : p.label;
+}
+
+/** A searchable grid of avatar cards for choosing a team member (radio group with arrow keys). */
+function memberPicker({ value, onChange, label = 'Team member' }) {
+  const members = state.team.members;
+  let current = value;
+  const search = members.length > 8 ? h('input', { class: 'input mp__search', type: 'search', placeholder: 'Search by name, code, or ID', 'aria-label': 'Search your team', autocomplete: 'off' }) : null;
+  const grid = h('div', { class: 'mp__grid', role: 'radiogroup', 'aria-label': label });
+  const visible = () => {
+    const q = search ? normalizeText(search.value) : '';
+    return members.filter((m) => !q || normalizeText(`${memberLabel(m)} ${m.code} ${m.hrid} ${m.bpid}`).includes(q));
+  };
+  const choose = (m, focus) => {
+    current = m.id;
+    draw();
+    onChange(m);
+    if (focus) {
+      const b = grid.querySelector('[aria-checked="true"]');
+      if (b) b.focus();
+    }
+  };
+  function draw() {
+    const list = visible();
+    const hasCurrent = list.some((m) => m.id === current);
+    grid.replaceChildren(
+      ...(list.length
+        ? list.map((m, i) =>
+            h(
+              'button',
+              { type: 'button', class: `mp__opt${m.id === current ? ' is-on' : ''}`, role: 'radio', 'aria-checked': String(m.id === current), tabindex: m.id === current || (!hasCurrent && i === 0) ? '0' : '-1', 'data-id': m.id, onclick: () => choose(m, true) },
+              h('span', { class: 'mp__av', 'aria-hidden': 'true' }, initialsOf(m)),
+              h('span', { class: 'mp__text' }, h('span', { class: 'mp__name' }, memberLabel(m)), m.name ? h('span', { class: 'mp__code' }, m.code) : null),
+              m.id === current ? h('span', { class: 'mp__check', 'aria-hidden': 'true' }, icon('check', 'icon--sm')) : null
+            )
+          )
+        : [h('p', { class: 'mp__empty' }, 'No one matches that search.')])
+    );
+  }
+  grid.addEventListener('keydown', (e) => {
+    const list = visible();
+    if (!list.length) return;
+    const i = Math.max(0, list.findIndex((m) => m.id === (document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.id : current)));
+    const cols = Math.max(1, Math.round(grid.clientWidth / 170));
+    const step = { ArrowRight: 1, ArrowDown: cols, ArrowLeft: -1, ArrowUp: -cols }[e.key];
+    if (step === undefined && e.key !== 'Home' && e.key !== 'End') return;
+    e.preventDefault();
+    const next = e.key === 'Home' ? 0 : e.key === 'End' ? list.length - 1 : Math.min(list.length - 1, Math.max(0, i + step));
+    choose(list[next], true);
+  });
+  if (search) search.addEventListener('input', draw);
+  draw();
+  return { el: h('div', { class: 'mp' }, search, grid), get value() { return current; } };
+}
+
+/** Small segmented choice used inside dialogs. */
+function choiceGroup({ label, options, value, onChange }) {
+  let current = value;
+  const wrap = h('div', { class: 'segmented choice', role: 'radiogroup', 'aria-label': label });
+  const draw = () =>
+    wrap.replaceChildren(
+      ...options.map((o) =>
+        h('button', { type: 'button', role: 'radio', 'aria-checked': String(o.value === current), 'aria-pressed': String(o.value === current), tabindex: o.value === current ? '0' : '-1', onclick: () => { current = o.value; draw(); onChange(o.value); wrap.querySelector('[aria-checked="true"]').focus(); } }, o.icon ? icon(o.icon) : null, o.label)
+      )
+    );
+  wrap.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const i = options.findIndex((o) => o.value === current);
+    const n = options[(i + (e.key === 'ArrowRight' ? 1 : options.length - 1)) % options.length];
+    current = n.value;
+    draw();
+    onChange(n.value);
+    wrap.querySelector('[aria-checked="true"]').focus();
+  });
+  draw();
+  return { el: wrap, get value() { return current; }, set(v) { current = v; draw(); } };
+}
 const daysAgo = (d) => (d ? -daysFromToday(d) : null);
 
 function memberByCode(code) {
@@ -7940,7 +8097,7 @@ function logTouch(memberId, kind, extra = {}) {
   state.ui.flash = null;
   const m = state.team.members.find((x) => x.id === memberId);
   const label = { recognition: 'Recognition', oneonone: 'One-on-one', stay: 'Stay conversation' }[kind];
-  toast(`${label} logged for ${m ? m.code : 'this agent'}`, {
+  toast(`${label} logged for ${m ? memberLabel(m) : 'this agent'}`, {
     action: { label: 'Undo', fn: () => { state.team.touches = state.team.touches.filter((x) => x.id !== t.id); saveTeam(); refresh({ panel: false }); } },
   });
 }
@@ -7950,59 +8107,70 @@ function openRecognize(memberId) {
   const members = state.team.members;
   if (!members.length) return;
   let m = members.find((x) => x.id === memberId) || members[0];
-  const who = h('select', { class: 'select', id: 'rc-member' }, members.map((x) => h('option', { value: x.id, selected: x.id === m.id }, x.code)));
-  const source = h('select', { class: 'select', id: 'rc-source' });
   const strength = h('select', { class: 'select', id: 'rc-strength' }, S_GROUPS.map((g) => h('optgroup', { label: g.label }, content.strengths.filter((s) => s.group === g.id).map((s) => h('option', { value: s.id }, s.title)))));
   const strengthField = h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'rc-strength' }, 'Strength you observed'), strength);
+  const greet = h('input', { type: 'checkbox', id: 'rc-greet', checked: true });
+  const greetField = h('label', { class: 'check' }, greet, 'Start with their first name');
   const text = h('textarea', { class: 'textarea', id: 'rc-text', rows: '6' });
   const hint = h('p', { class: 'field__hint' });
-  const fillSources = () => {
-    const earned = earnedText(m);
-    source.replaceChildren(
-      earned ? h('option', { value: 'earned' }, 'Earned: results logged in the tracker') : null,
-      h('option', { value: 'strength' }, 'A strength you observed'),
-      h('option', { value: 'own' }, 'Write my own')
-    );
-  };
+  const sourceOptions = () => [earnedText(m) ? { value: 'earned', label: 'Earned results', icon: 'award' } : null, { value: 'strength', label: 'A strength', icon: 'thumb' }, { value: 'own', label: 'My own words', icon: 'edit' }].filter(Boolean);
+  const sourceBox = h('div');
+  let source = null;
   const fillText = () => {
-    strengthField.hidden = source.value !== 'strength';
-    if (source.value === 'earned') {
-      text.value = earnedText(m);
+    const kind = source.value;
+    strengthField.hidden = kind !== 'strength';
+    greetField.hidden = !m.name;
+    let body = '';
+    if (kind === 'earned') {
+      body = earnedText(m);
       hint.textContent = 'Written only from the results you logged. Edit it before sending if you like.';
-    } else if (source.value === 'strength') {
+    } else if (kind === 'strength') {
       const s = getStrength(strength.value);
-      text.value = s ? s.v[0] : '';
+      body = s ? s.v[0] : '';
       hint.textContent = 'Only send this if you actually observed it. Choose the strength that matches what you saw.';
     } else {
-      text.value = '';
       hint.textContent = 'Be specific: what they did and why it mattered.';
     }
+    text.value = m.name && greet.checked && body ? `Hi ${firstName(m)}, ${body.charAt(0).toLowerCase() + body.slice(1)}` : body;
   };
-  fillSources();
-  fillText();
-  who.addEventListener('change', () => {
-    m = members.find((x) => x.id === who.value) || m;
-    fillSources();
-    fillText();
+  const buildSource = () => {
+    const opts = sourceOptions();
+    const keep = source && opts.some((o) => o.value === source.value) ? source.value : opts[0].value;
+    source = choiceGroup({ label: 'Based on', options: opts, value: keep, onChange: fillText });
+    sourceBox.replaceChildren(source.el);
+  };
+  const picker = memberPicker({
+    value: m.id,
+    label: 'Who are you recognizing?',
+    onChange: (x) => {
+      m = x;
+      buildSource();
+      fillText();
+    },
   });
-  source.addEventListener('change', fillText);
+  buildSource();
+  fillText();
   strength.addEventListener('change', fillText);
+  greet.addEventListener('change', fillText);
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
   const copy = copyButton(() => text.value.trim(), { label: 'Copy message', srLabel: 'Copy recognition message', size: 'md', fk: 'rc-copy', emptyMessage: 'Write the message first.' });
   const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('award'), 'Log as recognized');
   const dlg = openModal({
     title: 'Recognize',
-    size: 'md',
+    size: 'lg',
     body: h(
       'div',
       { class: 'tr-form' },
-      h('div', { class: 'form-grid' }, h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'rc-member' }, 'Agent'), who), h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'rc-source' }, 'Based on'), source)),
-      strengthField,
-      h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'rc-text' }, 'Message'), text, hint),
-      h('p', { class: 'hint' }, icon('lock'), 'Only the date is saved, never the message. Add the agent’s name when you send it, outside this app.')
+      h('p', { class: 'field__label' }, 'Who are you recognizing?'),
+      picker.el,
+      h('p', { class: 'field__label', style: 'margin-top:16px' }, 'Based on'),
+      sourceBox,
+      h('div', { style: 'margin-top:12px' }, strengthField),
+      h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { class: 'field__label', for: 'rc-text' }, 'Message'), text, hint, greetField),
+      h('p', { class: 'hint' }, icon('lock'), 'Only the date is saved, never the message.')
     ),
     footer: [cancel, h('span', { class: 'spacer' }), copy, save],
-    initialFocus: text,
+    initialFocus: '.mp__opt.is-on',
   });
   cancel.addEventListener('click', () => dlg.close());
   save.addEventListener('click', () => {
@@ -8029,7 +8197,7 @@ function openAddMembers() {
     body: h(
       'div',
       { class: 'tr-form' },
-      h('p', { class: 'prose' }, 'Each agent gets a numbered code such as Agent 01. Keep the list of who is who in your own records. Never type names, HRIDs, or BP-IDs here.'),
+      h('p', { class: 'prose' }, 'Each agent gets a numbered code such as Agent 01. Add names, HRIDs, and BP-IDs afterwards with Paste roster or Edit details.'),
       h('div', { class: 'form-grid', style: 'margin-top:12px' }, h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'tm-count' }, 'How many'), count), h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'tm-prefix' }, 'Code prefix'), prefix)),
       warn
     ),
@@ -8059,33 +8227,210 @@ function openAddMembers() {
 async function removeMember(id) {
   const m = state.team.members.find((x) => x.id === id);
   if (!m) return;
-  if (!(await confirmDialog({ title: `Remove ${m.code}?`, message: 'Their recognition and one-on-one dates are removed from Team Pulse. Follow-up plans in the tracker are kept.', confirmLabel: 'Remove', danger: true }))) return;
+  if (!(await confirmDialog({ title: `Remove ${memberLabel(m)}?`, message: 'Their recognition and one-on-one dates are removed from Team Pulse. Follow-up plans in the tracker are kept.', confirmLabel: 'Remove', danger: true }))) return;
   state.team.members = state.team.members.filter((x) => x.id !== id);
   state.team.touches = state.team.touches.filter((t) => t.member !== id);
   saveTeam();
   refresh({ panel: false });
 }
 
-async function renameMember(id) {
+function editMember(id) {
   const m = state.team.members.find((x) => x.id === id);
   if (!m) return;
-  const code = await promptDialog({ title: 'Edit code', label: 'Code', value: m.code, hint: 'A code you recognize, such as Agent 03 or Seat 12. No names or IDs.', maxLength: 30 });
-  if (!code || !code.trim()) return;
-  const old = m.code;
-  m.code = code.trim();
-  // Keep tracker plans connected to the renamed code.
-  state.tracker.plans.forEach((p) => {
-    if (sameCode(p.label, old)) p.label = m.code;
+  const name = h('input', { class: 'input', id: 'tm-name', type: 'text', value: m.name || '', maxlength: '60', autocomplete: 'off', placeholder: 'First and family name' });
+  const code = h('input', { class: 'input', id: 'tm-code', type: 'text', value: m.code, maxlength: '30', autocomplete: 'off' });
+  const hrid = h('input', { class: 'input', id: 'tm-hrid', type: 'text', value: m.hrid || '', maxlength: '30', autocomplete: 'off', spellcheck: 'false' });
+  const bpid = h('input', { class: 'input', id: 'tm-bpid', type: 'text', value: m.bpid || '', maxlength: '30', autocomplete: 'off', spellcheck: 'false' });
+  const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
+  const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('save'), 'Save');
+  const field = (id, label, input, hint) => h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), input, hint ? h('p', { class: 'field__hint' }, hint) : null);
+  const dlg = openModal({
+    title: 'Edit team member',
+    size: 'sm',
+    body: h(
+      'div',
+      { class: 'tr-form' },
+      field('tm-name', 'Name shown in the app', name),
+      field('tm-code', 'Code', code, 'Connects this person to their follow-up plans.'),
+      h('div', { class: 'form-grid' }, field('tm-hrid', 'HRID', hrid), field('tm-bpid', 'BP-ID', bpid)),
+      h('p', { class: 'field__hint' }, icon('lock', 'icon--sm'), ' Names and IDs stay only in this browser. They are never copied into coaching text or a team pack.')
+    ),
+    footer: [cancel, h('span', { class: 'spacer' }), save],
+    initialFocus: name,
   });
-  persist('tracker');
-  saveTeam();
+  cancel.addEventListener('click', () => dlg.close());
+  save.addEventListener('click', () => {
+    const old = m.code;
+    m.name = name.value.trim().slice(0, 60);
+    m.code = code.value.trim().slice(0, 30) || old;
+    m.hrid = cleanStaffId(hrid.value);
+    m.bpid = cleanStaffId(bpid.value);
+    // Keep tracker plans connected to a renamed code.
+    state.tracker.plans.forEach((p) => {
+      if (sameCode(p.label, old)) p.label = m.code;
+    });
+    persist('tracker');
+    saveTeam();
+    dlg.close();
+    refresh({ panel: false });
+    toast('Team member saved');
+  });
+}
+
+/* ---------- Paste roster ---------- */
+/** Split one pasted line into cells: tabs, commas, pipes, or wide gaps; otherwise IDs are the words with digits. */
+function rosterCells(line) {
+  const parts = line.split(/\t|\s{2,}|,|;|\|/).map((c) => c.trim()).filter(Boolean);
+  if (parts.length > 1) return parts;
+  const out = [];
+  line.trim().split(/\s+/).forEach((t) => {
+    if (/\d/.test(t) || !out.length || /\d/.test(out[out.length - 1])) out.push(t);
+    else out[out.length - 1] += ` ${t}`;
+  });
+  return out;
+}
+
+/** Read a pasted table of HRID, BP-ID, and name, in any column order, with or without a header row. */
+function parseRoster(text) {
+  let cols = null;
+  const rows = [];
+  for (const line of String(text || '').split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    let cells = rosterCells(line);
+    if (!/\d/.test(line)) {
+      const byCell = cells.length > 1 ? cells.map((c) => (/^hr\s*-?\s*id/i.test(c) ? 'hrid' : /^bp\s*-?\s*id/i.test(c) ? 'bpid' : /name/i.test(c) ? 'name' : '')) : null;
+      const byOrder = [['hrid', /\bhr\s*-?\s*id\b/i], ['bpid', /\bbp\s*-?\s*id\b/i], ['name', /\bname\b/i]].map(([k, re]) => ({ k, at: line.search(re) })).filter((x) => x.at >= 0).sort((a, b) => a.at - b.at).map((x) => x.k);
+      const head = byCell && byCell.filter(Boolean).length >= 2 ? byCell : byOrder.length >= 2 ? byOrder : null;
+      if (head) {
+        cols = head;
+        continue;
+      }
+    }
+    if (cols && cells.length === cols.length + 1 && /^\d{1,2}\.?$/.test(cells[0])) cells = cells.slice(1);
+    const r = { name: '', hrid: '', bpid: '' };
+    if (cols && cells.length === cols.length) {
+      cells.forEach((c, i) => {
+        if (cols[i]) r[cols[i]] = c;
+      });
+    } else {
+      const ids = [];
+      cells.forEach((c) => (/\d/.test(c) ? ids.push(c) : (r.name = r.name ? `${r.name} ${c}` : c)));
+      // Without a header: an all-digit ID is the HRID and the other one is the BP-ID.
+      const hr = ids.findIndex((c) => /^\d+$/.test(c));
+      if (hr >= 0) r.hrid = ids.splice(hr, 1)[0];
+      if (ids.length) r.bpid = ids.shift();
+    }
+    r.name = r.name.replace(/\d/g, '').replace(/\s+/g, ' ').trim().slice(0, 60);
+    r.hrid = cleanStaffId(r.hrid);
+    r.bpid = cleanStaffId(r.bpid);
+    if (r.name || r.hrid || r.bpid) rows.push(r);
+  }
+  return rows.slice(0, 60);
+}
+
+/** Match pasted rows to cards: same HRID, BP-ID, or name first, then empty cards in order, then new cards. */
+function rosterMatches(rows) {
+  const taken = new Set();
+  const same = (a, b) => a && b && normalizeText(a) === normalizeText(b);
+  const free = state.team.members.filter((x) => !x.name && !x.hrid && !x.bpid);
+  return rows.map((r) => {
+    let m = state.team.members.find((x) => !taken.has(x.id) && (same(x.hrid, r.hrid) || same(x.bpid, r.bpid) || same(x.name, r.name)));
+    if (!m) m = free.find((x) => !taken.has(x.id));
+    if (m) taken.add(m.id);
+    return { r, m };
+  });
+}
+
+function nextCodes(n) {
+  const used = new Set(state.team.members.map((x) => normalizeText(x.code)));
+  const out = [];
+  for (let k = 1; out.length < n && k < 200; k++) {
+    const code = `Agent ${String(k).padStart(2, '0')}`;
+    if (!used.has(normalizeText(code))) out.push(code);
+  }
+  return out;
+}
+
+function openPasteRoster() {
+  const area = h('textarea', { class: 'textarea', id: 'tm-roster', rows: '7', spellcheck: 'false', placeholder: 'HRID\tBP-ID\tAgent Name\n…' });
+  const preview = h('div', { class: 'roster-prev', 'aria-live': 'polite' });
+  const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
+  const apply = h('button', { type: 'button', class: 'btn btn--primary', disabled: true }, icon('users'), 'Add to my team');
+  let matches = [];
+  const draw = () => {
+    matches = rosterMatches(parseRoster(area.value));
+    apply.disabled = !matches.length;
+    if (!matches.length) {
+      preview.replaceChildren(area.value.trim() ? h('p', { class: 'field__error' }, 'No rows found. Put each person on their own line.') : h('p', { class: 'field__hint' }, 'Copy the table from Excel, Teams, or an email and paste it here. Columns can be in any order.'));
+      return;
+    }
+    const isNew = matches.filter((x) => !x.m).length;
+    const codes = nextCodes(isNew);
+    let k = 0;
+    preview.replaceChildren(
+      h('p', { class: 'roster-prev__sum' }, icon('check', 'icon--sm'), `${plural(matches.length, 'person', 'people')} found: ${matches.length - isNew} update existing cards${isNew ? `, ${isNew} new` : ''}.`),
+      h(
+        'div',
+        { class: 'roster-prev__wrap' },
+        h(
+          'table',
+          { class: 'roster-tbl' },
+          h('thead', null, h('tr', null, h('th', { scope: 'col' }, 'Name'), h('th', { scope: 'col' }, 'HRID'), h('th', { scope: 'col' }, 'BP-ID'), h('th', { scope: 'col' }, 'Card'))),
+          h('tbody', null, matches.map(({ r, m }) => h('tr', null, h('td', null, r.name || '—'), h('td', null, r.hrid || '—'), h('td', null, r.bpid || '—'), h('td', { class: m ? '' : 'is-new' }, m ? m.code : `${codes[k++] || 'New'} (new)`))))
+        )
+      )
+    );
+  };
+  area.addEventListener('input', draw);
+  const dlg = openModal({
+    title: 'Paste your team roster',
+    size: 'lg',
+    body: h(
+      'div',
+      { class: 'tr-form' },
+      h('p', { class: 'notice notice--privacy', role: 'note' }, icon('lock'), h('span', { class: 'notice__body' }, 'Your roster stays only in this browser. Names and IDs are never copied into coaching text or a team pack. A backup file does include them, so keep backups private.')),
+      h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'tm-roster' }, 'One person per line: HRID, BP-ID, and name'), area),
+      preview
+    ),
+    footer: [cancel, h('span', { class: 'spacer' }), apply],
+    initialFocus: area,
+  });
+  draw();
+  cancel.addEventListener('click', () => dlg.close());
+  apply.addEventListener('click', () => {
+    const codes = nextCodes(matches.filter((x) => !x.m).length);
+    let added = 0;
+    let k = 0;
+    matches.forEach(({ r, m }) => {
+      let t = m;
+      if (!t) {
+        if (state.team.members.length >= 60) return;
+        t = { id: uid('mem'), code: codes[k++], name: '', hrid: '', bpid: '', since: '' };
+        state.team.members.push(t);
+        added++;
+      }
+      if (r.name) t.name = r.name;
+      if (r.hrid) t.hrid = r.hrid;
+      if (r.bpid) t.bpid = r.bpid;
+    });
+    saveTeam();
+    dlg.close();
+    refresh({ panel: false });
+    toast(`Roster saved: ${plural(matches.length - added, 'card')} updated${added ? `, ${added} added` : ''}`);
+  });
+}
+
+function toggleIds() {
+  state.prefs.hideIds = !state.prefs.hideIds;
+  persist('prefs');
   refresh({ panel: false });
+  announce(state.prefs.hideIds ? 'IDs hidden' : 'IDs shown');
 }
 
 /* ---------- Page ---------- */
 function memberCard(m) {
   const pu = memberPulse(m);
-  const initials = m.code.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).map((w, i, a) => (i === a.length - 1 && /^\d+$/.test(w) ? w : w[0])).join('').slice(0, 4).toUpperCase();
+  const initials = initialsOf(m);
   const top = pu.flags[0];
   const recBar = Math.min(pu.rec30, 6);
   const coBar = Math.min(pu.coached30, 6);
@@ -8097,17 +8442,24 @@ function memberCard(m) {
       'div',
       { class: 'pulse__head' },
       h('span', { class: 'plan__avatar pulse__avatar', 'aria-hidden': 'true' }, initials || '#'),
-      h('div', { class: 'pulse__who' }, h('h2', { class: 'plan__label', id: `mem-${m.id}` }, m.code), h('p', { class: 'plan__title' }, pu.active ? `${plural(pu.active, 'active plan')}${pu.due ? `, ${pu.due} due` : ''}` : 'No active plans')),
+      h('div', { class: 'pulse__who' }, h('h2', { class: 'plan__label', id: `mem-${m.id}` }, memberLabel(m)), h('p', { class: 'plan__title' }, m.name ? `${m.code} · ` : '', pu.active ? `${plural(pu.active, 'active plan')}${pu.due ? `, ${pu.due} due` : ''}` : 'No active plans')),
       menuButton({
         label: 'More',
         fk: `mem-menu:${m.id}`,
         items: [
           { label: 'Log stay conversation', icon: 'heart', onSelect: () => logTouch(m.id, 'stay') },
-          { label: 'Edit code', icon: 'edit', onSelect: () => renameMember(m.id) },
+          { label: 'Edit details', icon: 'edit', onSelect: () => editMember(m.id) },
           { label: 'Remove from team', icon: 'trash', onSelect: () => removeMember(m.id) },
         ],
       })
     ),
+    !state.prefs.hideIds && (m.hrid || m.bpid)
+      ? h(
+          'div',
+          { class: 'pulse__ids' },
+          [['HRID', m.hrid], ['BP-ID', m.bpid]].map(([k, v]) => (v ? h('button', { type: 'button', class: 'id-chip', 'aria-label': `Copy ${k} for ${memberLabel(m)}`, 'data-fk': `mem-${k}:${m.id}`, onclick: () => copyText(v, { label: k }) }, h('span', { class: 'id-chip__k' }, k), h('span', { class: 'id-chip__v' }, v), icon('copy', 'icon--sm')) : null))
+        )
+      : null,
     h(
       'dl',
       { class: 'pulse__facts' },
@@ -8137,7 +8489,7 @@ function renderTeam(main) {
     put(
       main,
       pageHead({ eyebrow: [h('span', { class: 'group__icon cat-people', style: 'width:22px;height:22px;border-radius:6px' }, icon('heart', 'icon--sm')), 'Team'], title: 'Team Pulse', sub: 'One card per agent: when they were last recognized, when you last talked one-on-one, and whether coaching and recognition are in balance. People stay with leaders who notice their good work, not only their gaps.' }),
-      emptyState({ iconName: 'users', title: 'Set up your team', text: 'Add a numbered code for each agent, such as Agent 01 to Agent 16. Use codes only, never names, HRIDs, or BP-IDs, and keep the list of who is who in your own records.', action: h('button', { type: 'button', class: 'btn btn--primary btn--sm', 'data-fk': 'tm-setup', onclick: openAddMembers }, icon('plus'), 'Add team members') })
+      emptyState({ iconName: 'users', title: 'Set up your team', text: 'Paste your roster (HRID, BP-ID, and name) to make one card per agent, or start with numbered codes such as Agent 01 to Agent 16.', action: h('div', { class: 'toolbar', style: 'margin:0;justify-content:center' }, h('button', { type: 'button', class: 'btn btn--primary btn--sm', 'data-fk': 'tm-paste0', onclick: openPasteRoster }, icon('clipboard'), 'Paste roster'), h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-setup', onclick: openAddMembers }, icon('plus'), 'Add team members')) })
     );
     return;
   }
@@ -8155,9 +8507,13 @@ function renderTeam(main) {
       eyebrow: [h('span', { class: 'group__icon cat-people', style: 'width:22px;height:22px;border-radius:6px' }, icon('heart', 'icon--sm')), 'Team'],
       title: 'Team Pulse',
       sub: 'One card per agent: when they were last recognized, when you last talked one-on-one, and whether coaching and recognition are in balance. People stay with leaders who notice their good work, not only their gaps.',
-      actions: h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-add', onclick: openAddMembers }, icon('plus'), 'Add members'),
+      actions: [
+        members.some((m) => m.hrid || m.bpid) ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-ids', onclick: toggleIds }, icon(state.prefs.hideIds ? 'eye' : 'eye-off'), state.prefs.hideIds ? 'Show IDs' : 'Hide IDs') : null,
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-paste', onclick: openPasteRoster }, icon('clipboard'), 'Paste roster'),
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-add', onclick: openAddMembers }, icon('plus'), 'Add members'),
+      ],
     }),
-    h('p', { class: 'notice notice--privacy', role: 'note', style: 'margin-bottom:16px' }, icon('lock'), h('span', { class: 'notice__body' }, 'Codes only. Never enter names, HRIDs, or BP-IDs. Only dates are saved, never message text, and Team Pulse is never included in a team pack.')),
+    h('p', { class: 'notice notice--privacy', role: 'note', style: 'margin-bottom:16px' }, icon('lock'), h('span', { class: 'notice__body' }, 'Names, HRIDs, and BP-IDs stay only in this browser. They are never copied into coaching text or a team pack. Use Hide IDs before sharing your screen. Only dates are saved, never message text.')),
     h('div', { class: 'stats' }, stat(members.length, 'agents', 'users'), stat(earnedN, 'with earned recognition ready', 'award', earnedN ? 'stat--good' : ''), stat(noRec, 'not recognized in 14 days', 'alert', noRec ? 'stat--alert' : ''), stat(rec30, `recognitions vs ${co30} coachings (30 days)`, 'heart')),
     needList.length
       ? h(
@@ -8172,7 +8528,7 @@ function renderTeam(main) {
                 'li',
                 { class: `rt-row rt-row--${pu.earned.length ? 'earned' : 'overdue'}` },
                 h('span', { class: 'rt-row__icon', 'aria-hidden': 'true' }, icon(pu.earned.length ? 'award' : 'heart')),
-                h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, m.code), h('span', { class: `rt-due rt-due--${pu.earned.length ? 'done' : 'overdue'}` }, pu.flags[0].text)), pu.earned.length ? h('p', { class: 'rt-row__note' }, `Met: ${joinList(dedupe(pu.earned.map((e) => focusPhrase(e.opp))))}`) : null),
+                h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, memberLabel(m)), h('span', { class: `rt-due rt-due--${pu.earned.length ? 'done' : 'overdue'}` }, pu.flags[0].text)), pu.earned.length ? h('p', { class: 'rt-row__note' }, `Met: ${joinList(dedupe(pu.earned.map((e) => focusPhrase(e.opp))))}`) : null),
                 h('div', { class: 'rt-row__actions' }, h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `need-rec:${m.id}`, onclick: () => openRecognize(m.id) }, icon('award'), 'Recognize'))
               )
             )

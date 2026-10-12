@@ -10,10 +10,13 @@ Usage:
   python3 tools/build.py --check    # build, then syntax-check the generated JavaScript with Node
   python3 tools/build.py --links my-links.json --out My_Copy.html
                                     # personal copy with Quick Links preloaded (keep that JSON out of git)
-  python3 tools/build.py --team-size 16 ...   # also start Team Pulse with codes Agent 01 to Agent 16 (codes only)
+  python3 tools/build.py --team-size 16 ...   # also start Team Pulse with codes Agent 01 to Agent 16
+  python3 tools/build.py --team my-roster.json ...  # personal copy with names, HRIDs, and BP-IDs
+                                    # ([{"name": "...", "hrid": "...", "bpid": "..."}]; keep it out of git)
 """
 import glob
 import json
+import re
 import os
 import subprocess
 import sys
@@ -103,7 +106,7 @@ def build(check=False, links_path=None, out=OUT, team_size=0):
     with open(out, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(html)
     size = os.path.getsize(out)
-    extra = (f", {len(data['seedLinks'])} preset links" if data["seedLinks"] else "") + (f", {team_size} team codes" if team_size else "")
+    extra = (f", {len(data['seedLinks'])} preset links" if data["seedLinks"] else "") + (f", {len(team_size) if isinstance(team_size, list) else team_size} team members" if team_size else "")
     print(f"Built {os.path.relpath(out, ROOT)}: {size / 1024:.1f} KB, {len(data['opps'])} opportunities, {len(data['strengths'])} strengths, {len(modules)} JS modules{extra}")
     if check:
         with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False, encoding="utf-8") as tmp:
@@ -132,4 +135,23 @@ if __name__ == "__main__":
     size = sys.argv[sys.argv.index("--team-size") + 1] if "--team-size" in sys.argv else "0"
     if not size.isdigit() or int(size) > 40:
         raise SystemExit("--team-size needs a number from 0 to 40")
-    build(check="--check" in sys.argv, links_path=arg_value("--links"), out=arg_value("--out") or OUT, team_size=int(size))
+    team = int(size)
+    roster = arg_value("--team")
+    if roster:
+        # A personal roster: a list of names, or of {"name", "hrid", "bpid"} objects.
+        # Keep this file out of git (it matches *roster*.json in .gitignore).
+        with open(roster, encoding="utf-8") as fh:
+            rows = json.load(fh)
+        if not isinstance(rows, list) or len(rows) > 40:
+            raise SystemExit(f"{roster}: expected a list of up to 40 team members")
+        id_ok = re.compile(r"^[A-Za-z0-9._-]{0,30}$")
+        team = []
+        for r in rows:
+            r = {"name": r} if isinstance(r, str) else r
+            name = str(r.get("name", "")).strip() if isinstance(r, dict) else ""
+            hrid = str(r.get("hrid", "")).strip() if isinstance(r, dict) else ""
+            bpid = str(r.get("bpid", "")).strip() if isinstance(r, dict) else ""
+            if not name or any(ch.isdigit() for ch in name) or not id_ok.match(hrid) or not id_ok.match(bpid):
+                raise SystemExit(f"{roster}: each member needs a name without digits; HRID and BP-ID may use letters, digits, and - _ . only")
+            team.append({"name": name[:60], "hrid": hrid, "bpid": bpid})
+    build(check="--check" in sys.argv, links_path=arg_value("--links"), out=arg_value("--out") or OUT, team_size=team)

@@ -199,7 +199,7 @@ function renderToday(main) {
                 'li',
                 { class: `rt-row rt-row--${due.level === 'overdue' ? 'overdue' : 'due'}` },
                 h('span', { class: 'rt-row__icon', 'aria-hidden': 'true' }, icon('calendar')),
-                h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, p.label), h('span', { class: `rt-due rt-due--${due.level === 'overdue' ? 'overdue' : 'due'}` }, due.text)), h('p', { class: 'rt-row__note' }, planTitle(p))),
+                h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, planWho(p)), h('span', { class: `rt-due rt-due--${due.level === 'overdue' ? 'overdue' : 'due'}` }, due.text)), h('p', { class: 'rt-row__note' }, planTitle(p))),
                 h(
                   'div',
                   { class: 'rt-row__actions' },
@@ -226,7 +226,7 @@ function renderToday(main) {
               'li',
               { class: `rt-row rt-row--${pu.earned.length ? 'earned' : 'due'}` },
               h('span', { class: 'rt-row__icon', 'aria-hidden': 'true' }, icon(pu.earned.length ? 'award' : 'heart')),
-              h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, m.code), h('span', { class: `rt-due rt-due--${pu.earned.length ? 'done' : 'due'}` }, pu.flags[0].text))),
+              h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, memberLabel(m)), h('span', { class: `rt-due rt-due--${pu.earned.length ? 'done' : 'due'}` }, pu.flags[0].text))),
               h('div', { class: 'rt-row__actions' }, h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `day-rec:${m.id}`, onclick: () => openRecognize(m.id) }, icon('award'), 'Recognize'))
             )
           )

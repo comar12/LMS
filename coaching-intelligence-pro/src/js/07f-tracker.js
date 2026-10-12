@@ -148,6 +148,12 @@ function openTrackFromBuilder() {
   }
   const s = state.settings;
   const label = labelField('');
+  const team = state.team.members.length > 0;
+  // With a team set up, choose the person from the avatar grid; a code can still be typed for anyone else.
+  const picker = team ? memberPicker({ value: null, label: 'Who is this plan for?', onChange: (x) => { label.input.value = x.code; err.hidden = true; } }) : null;
+  const other = team
+    ? h('details', { class: 'tr-other' }, h('summary', null, 'Someone not on your team? Type a code instead'), label.node)
+    : null;
   const start = h('input', { class: 'input', id: 'tr-start', type: 'date', value: todayDay(), max: todayDay() });
   const err = h('p', { class: 'field__error', hidden: true }, 'Enter a code for this plan.');
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
@@ -157,13 +163,15 @@ function openTrackFromBuilder() {
   const promise = [hasCall ? `review ${numWord(s.calls)} calls within ${followupPhrase(s.followup)}` : null, hasPeople ? 'hold a weekly check-in' : null].filter(Boolean);
   const m = openModal({
     title: 'Track this coaching plan',
-    size: 'md',
+    size: team ? 'lg' : 'md',
     body: h(
       'div',
       { class: 'tr-form' },
-      label.node,
+      team ? h('p', { class: 'field__label' }, 'Who is this plan for?') : label.node,
+      team ? picker.el : null,
+      other,
       err,
-      h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'tr-start' }, 'Coaching session date'), start),
+      h('div', { class: 'field', style: 'margin-top:14px' }, h('label', { class: 'field__label', for: 'tr-start' }, 'Coaching session date'), start),
       h(
         'div',
         { class: 'tr-summary' },
@@ -173,14 +181,15 @@ function openTrackFromBuilder() {
       )
     ),
     footer: [cancel, h('span', { class: 'spacer' }), save],
-    initialFocus: label.input,
+    initialFocus: team ? '.mp__opt' : label.input,
   });
   cancel.addEventListener('click', () => m.close());
   save.addEventListener('click', () => {
     const text = label.input.value.trim();
     err.hidden = !!text;
     if (!text) {
-      label.input.focus();
+      if (team) err.textContent = 'Choose a team member, or type a code.';
+      (team ? m.el.querySelector('.mp__opt') : label.input).focus();
       return;
     }
     const plan = sanitizeTracker({ plans: [{ id: uid('plan'), label: text, start: isIsoDate(start.value) ? start.value : todayDay(), duration: s.duration, calls: s.calls, followup: s.followup, focus: opps.map((o) => o.id), logs: [] }] }).plans[0];
@@ -188,7 +197,7 @@ function openTrackFromBuilder() {
     savePlans();
     m.close();
     refresh({ panel: false });
-    toast(`Tracking started for ${plan.label}`, { action: { label: 'Open tracker', fn: () => navigate('tracker') } });
+    toast(`Tracking started for ${planWho(plan)}`, { action: { label: 'Open tracker', fn: () => navigate('tracker') } });
   });
 }
 
@@ -233,7 +242,7 @@ function openLogDialog(planId, kind) {
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
   const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('check'), kind === 'call' ? 'Save call review' : 'Save check-in');
   const m = openModal({
-    title: kind === 'call' ? `Log a call review · ${p.label}` : `Log a check-in · ${p.label}`,
+    title: kind === 'call' ? `Log a call review · ${planWho(p)}` : `Log a check-in · ${planWho(p)}`,
     size: 'md',
     body: h(
       'div',
@@ -288,7 +297,7 @@ function setPlanStatus(planId, status) {
   p.status = status;
   savePlans();
   refresh({ panel: false });
-  toast(status === 'done' ? `Plan for ${p.label} marked complete` : `Plan for ${p.label} reopened`);
+  toast(status === 'done' ? `Plan for ${planWho(p)} marked complete` : `Plan for ${planWho(p)} reopened`);
 }
 
 function extendPlan(planId) {
@@ -304,7 +313,7 @@ function extendPlan(planId) {
 async function deletePlan(planId) {
   const p = findPlan(planId);
   if (!p) return;
-  if (!(await confirmDialog({ title: `Delete the plan for ${p.label}?`, message: 'The plan and everything logged on it will be removed from this browser. Export a backup first if you might need it.', confirmLabel: 'Delete plan', danger: true }))) return;
+  if (!(await confirmDialog({ title: `Delete the plan for ${planWho(p)}?`, message: 'The plan and everything logged on it will be removed from this browser. Export a backup first if you might need it.', confirmLabel: 'Delete plan', danger: true }))) return;
   state.tracker.plans = state.tracker.plans.filter((x) => x.id !== planId);
   savePlans();
   refresh({ panel: false });
@@ -370,7 +379,8 @@ function planCard(p) {
   const due = planDue(p);
   const history = p.logs.slice().reverse();
   const text = planProgressText(p);
-  const initials = p.label.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 3).toUpperCase() || '#';
+  const mem = memberByCode(p.label);
+  const initials = mem ? initialsOf(mem) : p.label.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 3).toUpperCase() || '#';
   return h(
     'article',
     { class: `plan plan--${due.level}${state.ui.flash === `plan:${p.id}` ? ' is-flash' : ''}`, 'aria-labelledby': `plan-${p.id}` },
@@ -378,7 +388,7 @@ function planCard(p) {
       'div',
       { class: 'plan__head' },
       h('span', { class: 'plan__avatar', 'aria-hidden': 'true' }, initials),
-      h('div', { class: 'plan__who' }, h('h2', { class: 'plan__label', id: `plan-${p.id}` }, p.label), h('p', { class: 'plan__title' }, planTitle(p))),
+      h('div', { class: 'plan__who' }, h('h2', { class: 'plan__label', id: `plan-${p.id}` }, planWho(p)), h('p', { class: 'plan__title' }, mem && mem.name ? `${mem.code} · ${planTitle(p)}` : planTitle(p))),
       h('span', { class: `due-chip due-chip--${due.level}` }, icon(due.level === 'done' ? 'check' : due.level === 'ok' ? 'calendar' : 'alert', 'icon--sm'), due.text)
     ),
     h(
@@ -404,7 +414,7 @@ function planCard(p) {
       { class: 'plan__actions' },
       p.status === 'active' && c.callTarget ? h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `tr-log:${p.id}`, onclick: () => openLogDialog(p.id, 'call') }, icon('plus'), 'Log call review') : null,
       p.status === 'active' && c.checkinTarget ? h('button', { type: 'button', class: `btn btn--sm${c.callTarget ? '' : ' btn--primary'}`, 'data-fk': `tr-check:${p.id}`, onclick: () => openLogDialog(p.id, 'checkin') }, icon('calendar'), 'Log check-in') : null,
-      copyButton(() => planProgressText(p), { label: 'Copy progress', srLabel: `Copy progress for ${p.label}`, fk: `tr-copy:${p.id}`, emptyMessage: 'Log at least one call review or check-in first. Progress is written only from what you log.' }),
+      copyButton(() => planProgressText(p), { label: 'Copy progress', srLabel: `Copy progress for ${planWho(p)}`, fk: `tr-copy:${p.id}`, emptyMessage: 'Log at least one call review or check-in first. Progress is written only from what you log.' }),
       h('button', { type: 'button', class: 'btn btn--sm', disabled: !text, 'data-fk': `tr-use:${p.id}`, onclick: () => useProgressInBuilder(p.id) }, icon('clipboard'), 'Use in Builder'),
       h('span', { class: 'toolbar__spacer' }),
       menuButton({

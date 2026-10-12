@@ -1367,10 +1367,10 @@ async function test(name, fn) {
     const expected = `You met the expected standard for ${oppById['hold-dead-air'].b.focus} on one of the two calls I reviewed since our coaching session. You met the expected standard for ${oppById['com-missing-empathy'].b.focus} on both calls I reviewed since our coaching session. That is exactly what we worked on together, and it makes a real difference for the customers and the team. Thank you.`;
     assert((await page.locator('#rc-text').inputValue()) === expected, 'Earned recognition text is wrong:\n' + (await page.locator('#rc-text').inputValue()));
     assertClean(expected, 'earned recognition');
-    await page.selectOption('#rc-source', 'strength');
+    await page.getByRole('radio', { name: 'A strength' }).click();
     await page.selectOption('#rc-strength', 's-empathy');
     assert((await page.locator('#rc-text').inputValue()) === strengthById['s-empathy'].v[0], 'Strength-based message is wrong');
-    await page.selectOption('#rc-source', 'earned');
+    await page.getByRole('radio', { name: 'Earned results' }).click();
     assert((await clickCopy(page, 'Copy recognition message')) === expected, 'Copied message is wrong');
     await page.getByRole('button', { name: 'Log as recognized' }).click();
     assert((await card('Agent 02').locator('.pulse__facts dd').first().innerText()) === 'today', 'Recognition date did not update');
@@ -1385,16 +1385,88 @@ async function test(name, fn) {
     await page.locator('.tr-logrow').first().getByRole('button', { name: 'Met', exact: true }).click();
     await page.getByRole('button', { name: 'Save call review' }).click();
     await page.locator('.toast button', { hasText: 'Recognize it' }).click();
-    assert((await page.locator('#rc-member option:checked').innerText()) === 'Agent 03', 'Recognize prompt opened for the wrong agent');
+    assert((await page.locator('.mp__opt[aria-checked="true"] .mp__name').innerText()) === 'Agent 03', 'Recognize prompt opened for the wrong agent');
+    await page.waitForFunction(() => document.activeElement && document.activeElement.closest('.modal'));
     await page.keyboard.press('Escape');
+    await page.locator('.modal').waitFor({ state: 'detached' });
     await page.goto(URL + '#/today');
     assert((await page.locator('section[aria-labelledby="dayRec"] .rt-row__title').first().innerText()) === 'Agent 03', 'My Day should list earned recognition first');
+    // Names: kept in this browser, shown everywhere in the app, never in copied coaching text.
+    await page.goto(URL + '#/team');
+    await card('Agent 03').getByRole('button', { name: 'More' }).click();
+    await page.getByRole('button', { name: 'Edit details' }).click();
+    await page.fill('#tm-name', 'Sam Rivers');
+    await page.locator('.modal').getByRole('button', { name: 'Save' }).click();
+    assert((await card('Sam Rivers').count()) === 1, 'Name is not shown on the card');
+    await card('Sam Rivers').getByRole('button', { name: /Recognize/ }).click();
+    assert((await page.locator('#rc-text').inputValue()).startsWith('Hi Sam, on the call I reviewed'), 'Message should greet the agent by first name');
+    await page.locator('#rc-greet').uncheck();
+    assert((await page.locator('#rc-text').inputValue()).startsWith('On the call I reviewed'), 'Greeting toggle did not work');
+    assert((await page.locator('.mp__search').count()) === 0, 'A small team should not need a search box');
+    await page.keyboard.press('Escape');
+    await page.locator('.modal').waitFor({ state: 'detached' });
+    await page.goto(URL + '#/tracker');
+    assert((await page.locator('.plan .plan__label').allInnerTexts()).includes('Sam Rivers'), 'Tracker should show the name for a matching code');
+    await page.locator('.plan', { hasText: 'Sam Rivers' }).first().getByRole('button', { name: /Copy progress/ }).click();
+    await page.waitForTimeout(150);
+    assert(!(await clipboard(page)).includes('Sam'), 'Names must never appear in copied coaching text');
     // Team Pulse is in backups but never in a team pack.
     await page.goto(URL + '#/settings');
     const [d1] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export team pack' }).click()]);
     assert(!('team' in JSON.parse(fs.readFileSync(await d1.path(), 'utf8')).data), 'Team pack must not include Team Pulse');
     const [d2] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Export backup/ }).click()]);
     assert(JSON.parse(fs.readFileSync(await d2.path(), 'utf8')).data.team.members.length === 4, 'Backup should include Team Pulse');
+    await finish(page, context);
+  });
+
+  await test('Team picker: a full team gets avatars and a search box', async () => {
+    const { page, context } = await newPage({ hash: '#/team' });
+    await page.evaluate(() => localStorage.setItem('cip.v1.team', JSON.stringify({ members: Array.from({ length: 16 }, (_, i) => ({ id: `mem-${i + 1}`, code: `Agent ${String(i + 1).padStart(2, '0')}`, name: i === 4 ? 'Sam Rivers' : '' })), touches: [] })));
+    await page.reload();
+    await page.locator('.pulse').first().getByRole('button', { name: /Recognize/ }).click();
+    assert((await page.locator('.mp__opt').count()) === 16, 'All team members should be in the picker');
+    await page.fill('.mp__search', 'sam');
+    assert((await page.locator('.mp__opt .mp__name').allInnerTexts()).join() === 'Sam Rivers', 'Picker search did not filter by name');
+    await page.fill('.mp__search', 'agent 01');
+    assert((await page.locator('.mp__opt .mp__name').allInnerTexts()).join() === 'Agent 01', 'Picker search did not filter by code');
+    await page.locator('.mp__opt').first().click();
+    assert((await page.locator('.mp__opt[aria-checked="true"] .mp__name').innerText()) === 'Agent 01', 'Clicking an agent should select them');
+    await page.keyboard.press('Escape');
+    await page.locator('.modal').waitFor({ state: 'detached' });
+    // Paste a roster (fictional people): header row in any order, tab separated and single spaced.
+    await page.getByRole('button', { name: 'Paste roster' }).click();
+    await page.fill('#tm-roster', 'Agent Name\tHRID\tBP-ID\nSam Rivers\t900111\tbpxsr11\nLee Park\t900222\tbpxlp22\n\nNew Person 900333 bpxnp33');
+    assert((await page.locator('.roster-tbl tbody tr').count()) === 3, 'Roster preview should list 3 people');
+    assert((await page.locator('.roster-prev__sum').innerText()).includes('3 people found: 3 update existing cards'), 'Roster preview summary is wrong');
+    assert((await page.locator('.roster-tbl tbody tr').nth(0).innerText()).includes('Agent 05'), 'Sam Rivers should match their existing card by name');
+    await page.getByRole('button', { name: 'Add to my team' }).click();
+    const team = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.team')).members);
+    const sam = team.find((m) => m.name === 'Sam Rivers');
+    assert(sam && sam.code === 'Agent 05' && sam.hrid === '900111' && sam.bpid === 'bpxsr11', 'Roster IDs were not saved to the matching card');
+    assert(team.find((m) => m.name === 'New Person' && m.hrid === '900333' && m.bpid === 'bpxnp33'), 'Single-spaced rows should be read too');
+    // IDs show on the card, copy on click, and hide for screen sharing.
+    const samCard = page.locator('.pulse', { has: page.getByRole('heading', { name: 'Sam Rivers', exact: true }) });
+    await samCard.getByRole('button', { name: 'Copy HRID for Sam Rivers' }).click();
+    await page.waitForTimeout(150);
+    assert((await clipboard(page)) === '900111', 'HRID was not copied');
+    await page.getByRole('button', { name: 'Hide IDs' }).click();
+    assert((await page.locator('.id-chip').count()) === 0, 'Hide IDs should hide every ID');
+    await page.getByRole('button', { name: 'Show IDs' }).click();
+    assert((await page.locator('.id-chip').count()) > 0, 'Show IDs should bring them back');
+    // Editing an ID, and a team ID typed into coaching text is flagged.
+    await samCard.getByRole('button', { name: 'More' }).click();
+    await page.getByRole('button', { name: 'Edit details' }).click();
+    assert((await page.inputValue('#tm-hrid')) === '900111', 'Edit dialog should show the HRID');
+    await page.fill('#tm-bpid', 'bpxsr99');
+    await page.locator('.modal').getByRole('button', { name: 'Save' }).click();
+    assert((await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.team')).members.find((m) => m.name === 'Sam Rivers').bpid)) === 'bpxsr99', 'Edited BP-ID was not saved');
+    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['hold-dead-air'], strengths: [] })));
+    await page.goto(URL + '#/builder');
+    await page.reload();
+    await page.locator('#note-evidence').fill('Great call today, ref bpxsr99');
+    assert((await page.locator('.pii').innerText()).includes('an HRID or BP-ID from your team list'), 'A team BP-ID in coaching text should be flagged');
+    await page.locator('#note-evidence').fill('Sam handled the hold well');
+    assert((await page.locator('.pii').innerText()).includes('a name from your team list'), 'A team name in coaching text should be flagged');
     await finish(page, context);
   });
 

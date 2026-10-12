@@ -330,7 +330,7 @@ function fmtBytes(n) {
 }
 
 /** Soft privacy check for user-authored text. Returns human-readable reasons. */
-function piiWarnings(text) {
+function piiWarnings(text, opts = {}) {
   const t = String(text || '');
   const out = [];
   if (!t.trim()) return out;
@@ -340,6 +340,11 @@ function piiWarnings(text) {
   if (/\bbp-?[a-z]{2,}\d{2,}\b/i.test(t)) out.push('what looks like a BP-ID');
   if (/\b(bpid|hrid|avaya|employee id|interaction id|acct\.?\s*#|account\s*(?:number|#))\b/i.test(t)) out.push('an identifier label');
   if (/\b(mr|mrs|ms|miss|dr)\.?\s+[A-Z][a-z]+/.test(t)) out.push('what looks like a personal name');
+  // Anything from the team list (names, HRIDs, BP-IDs) must stay out of coaching text.
+  const team = typeof state !== 'undefined' && state.team ? state.team.members : [];
+  const low = t.toLowerCase();
+  if (team.some((m) => [m.hrid, m.bpid].some((v) => v && v.length >= 3 && low.includes(v.toLowerCase())))) out.push('an HRID or BP-ID from your team list');
+  if (opts.names !== false && team.some((m) => m.name && m.name.length >= 3 && new RegExp(`\\b${m.name.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(t))) out.push('a name from your team list');
   return dedupe(out);
 }
 

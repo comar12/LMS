@@ -4,3 +4,5 @@ tests/last-run.json
 *_MyLinks.html
 My_Copy.html
 __pycache__/
+# Personal team rosters (names) stay out of the repository
+*roster*.json

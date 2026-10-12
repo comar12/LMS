@@ -92,6 +92,7 @@ function defaultPrefs() {
     peopleTab: 'attendance',
     trackerFilter: 'active',
     brand: null,
+    hideIds: false,
   };
 }
 /** Call reviews are kept per call type, so a Technical review and a Sales review can be in progress together. */
@@ -195,6 +196,7 @@ function sanitizePrefs(o) {
   if (SALES_OFFER_IDS.includes(src.salesOffer)) p.salesOffer = src.salesOffer;
   if (PEOPLE_TAB_IDS.includes(src.peopleTab)) p.peopleTab = src.peopleTab;
   if (['active', 'done', 'all'].includes(src.trackerFilter)) p.trackerFilter = src.trackerFilter;
+  if (typeof src.hideIds === 'boolean') p.hideIds = src.hideIds;
   if (src.brand && typeof src.brand === 'object') {
     const hex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
     const primary = hex(src.brand.primary);
@@ -335,6 +337,10 @@ function sanitizeCalib(o) {
 
 /** Team Pulse: agent codes chosen by the supervisor (never names or IDs) and dated touchpoints. Message text is never stored. */
 const TOUCH_KINDS = ['recognition', 'oneonone', 'stay'];
+/** HRIDs and BP-IDs: letters, digits, and - _ . only. */
+function cleanStaffId(v) {
+  return str(v, 30).trim().replace(/[^A-Za-z0-9._-]/g, '').slice(0, 30);
+}
 function sanitizeTeam(o) {
   const src = o && typeof o === 'object' ? o : {};
   const members = [];
@@ -346,7 +352,7 @@ function sanitizeTeam(o) {
     let id = isId(m.id) ? m.id : uid('mem');
     if (seen.has(id)) id = uid('mem');
     seen.add(id);
-    members.push({ id, code, since: isIsoDate(m.since) ? m.since : '' });
+    members.push({ id, code, name: str(m.name, 60).trim(), hrid: cleanStaffId(m.hrid), bpid: cleanStaffId(m.bpid), since: isIsoDate(m.since) ? m.since : '' });
   }
   const ids = new Set(members.map((m) => m.id));
   const touches = [];
@@ -596,8 +602,20 @@ function loadSlice(key) {
     case 'team': {
       const raw = store.get('team', null);
       // A personal copy can be built with a team size; it starts with numbered codes only.
-      const n = clampInt(DATA.seedTeam, 0, 40, 0);
-      state.team = raw == null && n ? sanitizeTeam({ members: Array.from({ length: n }, (_, i) => ({ id: `mem-seed-${i + 1}`, code: `Agent ${String(i + 1).padStart(2, '0')}` })) }) : sanitizeTeam(raw);
+      // A personal copy can carry a roster (display names only) or just a team size.
+      const seed = Array.isArray(DATA.seedTeam) ? DATA.seedTeam : Array.from({ length: clampInt(DATA.seedTeam, 0, 40, 0) }, () => ({}));
+      state.team = raw == null && seed.length ? sanitizeTeam({ members: seed.map((r, i) => ({ id: `mem-seed-${i + 1}`, code: `Agent ${String(i + 1).padStart(2, '0')}`, name: r.name || '', hrid: r.hrid || '', bpid: r.bpid || '' })) }) : sanitizeTeam(raw);
+      // Members created from an earlier copy pick up the roster's name and IDs where they are still empty.
+      if (raw != null) {
+        state.team.members.forEach((m) => {
+          const k = /^mem-seed-(\d+)$/.exec(m.id);
+          const r = k && seed[Number(k[1]) - 1];
+          if (!r) return;
+          if (!m.name && r.name) m.name = str(r.name, 60);
+          if (!m.hrid && r.hrid) m.hrid = cleanStaffId(r.hrid);
+          if (!m.bpid && r.bpid) m.bpid = cleanStaffId(r.bpid);
+        });
+      }
       break;
     }
     case 'today': state.today = sanitizeToday(store.get('today', null)); break;
