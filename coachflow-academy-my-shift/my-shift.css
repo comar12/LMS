@@ -219,6 +219,17 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 .ms-hold-tip{margin-top:.3rem!important;font-size:.8125rem;color:var(--color-body)}
 .ms-hold[data-state="due"] .ms-hold-tip,.ms-hold[data-state="long"] .ms-hold-tip{font-weight:600;color:var(--color-ink)}
 .ms-hold-tip .sl-link-button{padding:0;min-height:2rem;font-size:.8125rem}
+.ms-hold-bar{display:block;height:.3rem;margin:.45rem 0 .1rem;border-radius:999px;background:var(--color-canvas);box-shadow:inset 0 0 0 1px var(--color-line);overflow:hidden}
+.ms-hold-fill{display:block;width:var(--w,0%);height:100%;border-radius:inherit;background:var(--color-insight,#2b8fd6)}
+.ms-hold[data-state="due"] .ms-hold-fill{background:var(--color-attention)}
+.ms-hold[data-state="long"] .ms-hold-fill{background:var(--color-risk)}
+.ms-msg,.ms-goal{position:relative}
+[data-copied]{color:var(--color-success-text)!important}
+.ms-burst{position:absolute;left:.6rem;top:.7rem;width:0;height:0;pointer-events:none}
+.ms-goal .ms-burst{left:50%;top:50%}
+.ms-burst i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:2px;background:var(--sl-signal,#ff6d10);opacity:0}
+.ms-burst i:nth-child(3n+2){background:var(--sl-done,#159b80);border-radius:999px}
+.ms-burst i:nth-child(3n){width:4px;height:8px;background:var(--color-insight,#2b8fd6)}
 .ms-msg .sl-link-button{min-height:1.75rem;margin-left:.75rem;padding:0;font-size:.875rem}
 /* Team board. */
 .tb-drop{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.5rem 1rem;padding:1.25rem 1rem;border:2px dashed var(--color-line-strong);border-radius:var(--radius-card);background:var(--color-canvas);text-align:center;transition:border-color var(--m-hover,.18s) var(--e-out,ease-out),background-color var(--m-hover,.18s) var(--e-out,ease-out)}
@@ -305,6 +316,33 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 #my-shift .ms-reset[data-state="run"] .ms-breath{animation:ms-breathe 8s ease-in-out infinite}
 @keyframes ms-breathe{0%,100%{transform:scale(.62)}50%{transform:scale(1)}}
 @keyframes ms-settle{0%{background-color:var(--color-success-soft)}to{background-color:transparent}}
+/* More motion: tiles and lists arrive in order, numbers count up, wins burst, meters fill, cards lift, the hold timer nudges. */
+#my-shift :is(.tb-tiles,.ms-win-list,.ms-streak-list,.tb-shout-list,.tb-lines,#tb-rows,.tb-reps,.ms-days,.ms-goal-row)>:nth-child(2){--l-n:1}
+#my-shift :is(.tb-tiles,.ms-win-list,.ms-streak-list,.tb-shout-list,.tb-lines,#tb-rows,.tb-reps,.ms-days,.ms-goal-row)>:nth-child(3){--l-n:2}
+#my-shift :is(.tb-tiles,.ms-win-list,.ms-streak-list,.tb-shout-list,.tb-lines,#tb-rows,.tb-reps,.ms-days,.ms-goal-row)>:nth-child(4){--l-n:3}
+#my-shift :is(.tb-tiles,.ms-win-list,.ms-streak-list,.tb-shout-list,.tb-lines,#tb-rows,.tb-reps,.ms-days,.ms-goal-row)>:nth-child(5){--l-n:4}
+#my-shift :is(.tb-tiles,.ms-win-list,.ms-streak-list,.tb-shout-list,.tb-lines,#tb-rows,.tb-reps,.ms-days,.ms-goal-row)>:nth-child(6){--l-n:5}
+#my-shift :is(.tb-tiles,.ms-win-list,.ms-streak-list,.tb-shout-list,.tb-lines,#tb-rows,.tb-reps,.ms-days,.ms-goal-row)>:nth-child(7){--l-n:6}
+#my-shift :is(.tb-tiles,.ms-win-list,.ms-streak-list,.tb-shout-list,.tb-lines,#tb-rows,.tb-reps,.ms-days,.ms-goal-row)>:nth-child(8){--l-n:7}
+#my-shift :is(.tb-tiles,.ms-win-list,.ms-streak-list,.tb-shout-list,.tb-lines,#tb-rows,.tb-reps,.ms-days,.ms-goal-row)>:nth-child(n+9){--l-n:8}
+#my-shift :is(.tb-tiles>.tb-tile,.ms-win-list>li,.ms-streak-list>li,.tb-shout-list>li,.tb-lines>li,#tb-rows>tr,.tb-reps>li,.ms-goal-row>.ms-goal){animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) calc(var(--l-n,0) * 45ms) backwards}
+#my-shift .ms-day-fill{animation-delay:calc(var(--l-n,0) * 45ms)}
+#my-shift .ms-meter-fill{transform-origin:left center;animation:sl-draw-across var(--m-segment,.32s) var(--e-out,ease-out) calc(var(--l-n,0) * 45ms + 120ms) backwards}
+#my-shift .ms-meter-goal{animation:sl-node-arrive var(--m-node,.18s) var(--e-out,ease-out) calc(var(--l-n,0) * 45ms + 300ms) backwards}
+#my-shift .ms-streak svg,#my-shift .tb-shout-list svg{animation:ms-star .6s var(--e-out,ease-out) calc(var(--l-n,0) * 45ms + 150ms) backwards}
+@keyframes ms-star{0%{transform:scale(0) rotate(-140deg)}70%{transform:scale(1.25) rotate(12deg)}to{transform:none}}
+.ms-burst i{animation:ms-burst .9s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes ms-burst{0%{opacity:1;transform:rotate(var(--a)) translateX(0) scale(1)}to{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scale(.3)}}
+#my-shift [data-copied]{animation:ms-pop .35s var(--e-settle,ease-out)}
+@keyframes ms-pop{0%{transform:scale(.92)}60%{transform:scale(1.06)}to{transform:none}}
+.ms-hold-fill{transition:width 1s linear,background-color var(--m-hover,.18s) var(--e-out,ease-out)}
+#my-shift .ms-hold[data-state="due"] .ms-hold-row,#my-shift .ms-hold[data-state="long"] .ms-hold-row{animation:ms-nudge .5s var(--e-out,ease-out)}
+@keyframes ms-nudge{0%,to{transform:none}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+#my-shift .ms-hold[data-state="long"]{animation:ms-alarm 1.6s ease-in-out infinite}
+#my-shift .ms-hold[data-state="long"] .ms-hold-dot{animation-duration:.8s}
+@keyframes ms-alarm{50%{box-shadow:0 0 0 4px var(--color-risk-soft)}}
+#my-shift :is(.tb-tile,.ms-goal,.tb-rep,.ms-said-item,.ms-warm[data-state="todo"],.ms-next){transition:transform var(--m-hover,.18s) var(--e-out,ease-out),box-shadow var(--m-hover,.18s) var(--e-out,ease-out),border-color var(--m-hover,.18s) var(--e-out,ease-out)}
+@media (hover:hover){#my-shift :is(.tb-tile,.ms-goal,.tb-rep,.ms-warm[data-state="todo"],.ms-next):hover{transform:translateY(-2px);box-shadow:0 8px 20px -10px color-mix(in srgb,var(--color-ink) 35%,transparent)}#my-shift .ms-said-item:hover{transform:translateY(-1px)}}
 @keyframes ms-tick{0%{opacity:.3;transform:translateY(.3rem)}to{opacity:1;transform:none}}
 }
 @media (prefers-reduced-motion:reduce){.ms-ring .fg,.ms-meter-fill{transition:none}}

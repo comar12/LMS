@@ -212,6 +212,22 @@ ring and turns green, opened checks rise, and the confirmation seals.
 Reduced motion turns all of it off. `academy-motion-desktop.mp4` and
 `academy-motion-phone.mp4` show it.
 
+My Shift and the team board add more on top:
+
+- Tiles, goal cards, wins, streak chips, shout-outs, lines, board rows and
+  repeat-caller cards arrive one after another; the numbers on the tiles count
+  up to their value.
+- Goal meters draw across with their goal marker popping in; the day bars in
+  My week grow one after another.
+- A new win, and a goal reached for the first time, give a small burst of
+  colour; streak and shout-out stars spin in.
+- The hold timer has a bar that fills toward 0:45, nudges when it is time to
+  go back, and pulses past 1:30.
+- Copy buttons pop and turn green; cards lift a little under the mouse.
+
+Reduced motion keeps all of this still too: numbers show at once and no burst
+is drawn. `my-shift-more-motion.mp4` shows it.
+
 ## Deploying
 
 Deploy the folder as-is with the Vercel CLI (`vercel deploy`) alongside
