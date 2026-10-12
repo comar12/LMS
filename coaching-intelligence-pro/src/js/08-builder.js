@@ -230,6 +230,25 @@ function settingsCard() {
         h(
           'div',
           { class: 'setting' },
+          h('span', { class: 'setting__label' }, 'Format'),
+          segmented({
+            label: 'Format',
+            value: b.style,
+            fkPrefix: 'style',
+            options: [
+              { value: 'points', label: 'Points', icon: 'list' },
+              { value: 'paragraphs', label: 'Paragraphs', icon: 'note' },
+            ],
+            onChange: (v) => {
+              b.style = v;
+              persist('builder');
+              refresh({ panel: false });
+            },
+          })
+        ),
+        h(
+          'div',
+          { class: 'setting' },
           h('span', { class: 'setting__label' }, 'Coaching is based on'),
           segmented({
             label: 'Coaching is based on',
@@ -247,6 +266,95 @@ function settingsCard() {
           })
         )
       )
+    )
+  );
+}
+
+/* ---------- Real numbers from the KPI dashboard ---------- */
+let numsExtra = [];
+function numbersCard() {
+  const b = state.builder;
+  const opps = builderOpps();
+  const fromOpps = dedupe(opps.flatMap((o) => o.kpi || [])).filter((k) => KPI_MEASURE[k]);
+  const keys = Object.keys(KPI_MEASURE).filter((k) => fromOpps.includes(k) || numsExtra.includes(k) || (b.nums[k] && (b.nums[k].cur !== null || b.nums[k].target !== null)));
+  const others = Object.keys(KPI_MEASURE).filter((k) => !keys.includes(k));
+  const attrition = opps.some((o) => (o.kpi || []).includes('Attrition'));
+  const setVal = (k, field, raw, input) => {
+    const clean = raw.replace('%', '').trim();
+    const v = clean === '' ? null : numOrNull(clean);
+    input.classList.toggle('is-invalid', clean !== '' && v === null);
+    input.setAttribute('aria-invalid', String(clean !== '' && v === null));
+    if (clean !== '' && v === null) return;
+    const cur = b.nums[k] || { cur: null, target: null, unit: KPI_MEASURE[k].unit, asOf: todayDay() };
+    cur[field] = v;
+    if (field === 'cur') cur.asOf = todayDay();
+    if (cur.cur === null && cur.target === null) delete b.nums[k];
+    else b.nums[k] = cur;
+    persistBuilderSoon();
+    updateBuilderOutputs();
+  };
+  const row = (k) => {
+    const m = KPI_MEASURE[k];
+    const v = b.nums[k] || { cur: null, target: null, unit: m.unit };
+    const field = (f, label) => {
+      const id = `num-${k}-${f}`;
+      const input = h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', 'data-fk': id, value: v[f] === null || v[f] === undefined ? '' : String(v[f]), placeholder: f === 'cur' ? 'From dashboard' : m.dir === 'down' ? 'Lower is better' : 'Higher is better' });
+      input.addEventListener('input', () => setVal(k, f, input.value, input));
+      return h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), input);
+    };
+    const unit = h(
+      'select',
+      {
+        class: 'select',
+        id: `num-${k}-unit`,
+        'data-fk': `num-${k}-unit`,
+        onchange: (e) => {
+          const cur = b.nums[k] || { cur: null, target: null, unit: m.unit, asOf: todayDay() };
+          cur.unit = e.target.value;
+          if (cur.cur !== null || cur.target !== null) b.nums[k] = cur;
+          persist('builder');
+          updateBuilderOutputs();
+        },
+      },
+      NUM_UNITS.map((u) => h('option', { value: u, selected: (v.unit || m.unit) === u }, u === '%' ? 'Percent (%)' : capFirst(u)))
+    );
+    return h(
+      'div',
+      { class: `num-row${fromOpps.includes(k) ? '' : ' is-extra'}` },
+      h('div', { class: 'num-row__head' }, h('span', { class: 'num-row__name' }, icon('trend', 'icon--sm'), m.name), h('span', { class: `num-row__dir num-row__dir--${m.dir}` }, icon(m.dir === 'down' ? 'arrow-down' : 'arrow-up', 'icon--sm'), m.dir === 'down' ? 'Lower is better' : 'Higher is better')),
+      h('div', { class: 'num-row__grid' }, field('cur', 'Current'), field('target', 'Target'), h('div', { class: 'field' }, h('label', { class: 'field__label', for: `num-${k}-unit` }, 'Unit'), unit))
+    );
+  };
+  const add = others.length
+    ? h(
+        'select',
+        {
+          class: 'select',
+          id: 'num-add',
+          'aria-label': 'Add another KPI',
+          'data-fk': 'num-add',
+          onchange: (e) => {
+            if (!e.target.value) return;
+            numsExtra.push(e.target.value);
+            refresh({ panel: false });
+            focusByKey(`num-${e.target.value}-cur`);
+          },
+        },
+        h('option', { value: '' }, 'Add another KPI'),
+        others.map((k) => h('option', { value: k }, KPI_MEASURE[k].name))
+      )
+    : null;
+  return h(
+    'section',
+    { class: 'card nums-card', 'aria-labelledby': 'bNumsTitle' },
+    h('div', { class: 'card__head' }, h('h2', { class: 'card__title', id: 'bNumsTitle' }, icon('trend'), 'Measure with real numbers'), h('span', { class: 'sec__sub' }, 'optional')),
+    h(
+      'div',
+      { class: 'card__body nums-body' },
+      h('p', { class: 'field__hint' }, 'Type the agent\'s numbers from your KPI dashboard. The action plan then states where they are today and the target by the end of the plan. Nothing is estimated.'),
+      keys.length ? keys.map(row) : h('p', { class: 'day-empty' }, icon('info'), 'Add opportunities to see the KPIs they affect, or add a KPI below.'),
+      attrition ? h('p', { class: 'field__hint' }, icon('info', 'icon--sm'), ' Attrition is a team measure, so it has no agent number here.') : null,
+      add ? h('div', { class: 'num-add' }, add) : null
     )
   );
 }
@@ -578,7 +686,7 @@ function renderBuilder(main) {
       sub: 'Combine several opportunities and the strengths you observed into one cohesive coaching entry, with a single consolidated SMART plan and follow-up. Edit any section before copying; your edits are kept.',
       actions: h('button', { type: 'button', class: 'btn btn--sm btn--danger', 'data-fk': 'breset', disabled: !builderHasContent(), onclick: resetBuilder }, icon('refresh'), 'Reset builder'),
     }),
-    h('div', { class: 'builder' }, h('div', { class: 'builder__col' }, oppsCard(), strengthsCard(), settingsCard(), notesCard(), savedCard()), outputColumn())
+    h('div', { class: 'builder' }, h('div', { class: 'builder__col' }, oppsCard(), strengthsCard(), numbersCard(), settingsCard(), notesCard(), savedCard()), outputColumn())
   );
   requestAnimationFrame(() => {
     BUILDER_FIELDS.forEach((f) => {

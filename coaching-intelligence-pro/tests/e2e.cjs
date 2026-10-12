@@ -237,25 +237,28 @@ async function test(name, fn) {
     const sentences = all.split(/(?<=[.?!])\s+/).map((s) => s.trim().toLowerCase()).filter((s) => s.split(' ').length > 4);
     const dupes = sentences.filter((s, i) => sentences.indexOf(s) !== i);
     assert(dupes.length === 0, 'Repeated sentences: ' + dupes.join(' || '));
-    assert((plan.match(/We will review/g) || []).length === 1, 'Plan should contain exactly one review commitment');
-    assert((followup.match(/I will review/g) || []).length === 1, 'Follow-up should contain exactly one audit commitment');
+    assert((plan.match(/Call reviews:/g) || []).length === 1, 'Plan should contain exactly one review commitment');
+    assert(/^1\. /m.test(plan) && plan.includes('How we will measure success:') && /^\u2022 /m.test(followup), 'Points format should number the actions and bullet the measures and follow-up');
+    assert((followup.match(/I review/g) || []).length === 1, 'Follow-up should contain exactly one audit commitment');
     assert(!/\b(three|four|six|seven|eight|nine|ten) (applicable |reviewed )?calls\b/.test(plan + followup), 'Conflicting call counts in plan or follow-up');
-    assert(/two weeks/.test(plan) && /seven days/.test(plan), 'Plan does not use the default timeframes');
+    const [d7, d14] = await page.evaluate(() => [7, 14].map((k) => { const d = new Date(); d.setDate(d.getDate() + k); return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }); }));
+    assert(plan.includes(`Focus until ${d14}:`) && plan.includes(`Call reviews: 5 applicable calls by ${d7}.`), 'Plan does not use the default timeframes as real dates');
     for (const t of pick.map((x) => opps.find((o) => o.title === x))) {
       assert(challenges.includes(t.b.obs), `Challenges missing observation for ${t.title}`);
-      assert(plan.includes(t.b.commit), `Plan missing commitment for ${t.title}`);
+      assert(plan.toLowerCase().includes(t.b.commit.toLowerCase()), `Plan missing commitment for ${t.title}`);
     }
     assert(!challenges.includes(oppById['hold-dead-air'].feedback), 'Challenges pasted a full feedback paragraph instead of merging');
     // Grammar spot checks
-    for (const s of all.split(/(?<=[.?!])\s+/)) {
+    for (const s of all.replace(/^(\u2022|\d+\.)\s+/gm, '').split(/(?<=[.?!])\s+/)) {
       if (!s.trim()) continue;
-      assert(/^[A-Z"]/.test(s.trim()), 'Sentence does not start with a capital letter: ' + s.slice(0, 60));
+      // Points start with a bullet or a number; the sentence after it must still be capitalized.
+      assert(/^[A-Z"]/.test(s.trim().replace(/^(\u2022|\d+\.)\s+/, '')), 'Sentence does not start with a capital letter: ' + s.slice(0, 60));
     }
     assert(!/ {2,}|\s[,.]|\.\./.test(all), 'Spacing or punctuation problem in builder text');
     // Tone switch
     await page.getByRole('button', { name: 'Direct' }).click();
     await page.waitForTimeout(150);
-    assert(/you are expected to/.test(await read('plan')), 'Direct tone did not change the plan wording');
+    assert(/you are expected to/i.test(await read('plan')), 'Direct tone did not change the plan wording');
     await page.getByRole('button', { name: 'Supportive' }).click();
     await page.waitForTimeout(150);
     assert(/work on together|work together/.test(await read('challenges') + (await read('plan'))), 'Supportive tone did not change the wording');
@@ -1055,7 +1058,7 @@ async function test(name, fn) {
     assert((await page.locator('.opp-card__title').first().innerText()) === 'Stress and Fatigue', 'Search "burnout" should find Stress and Fatigue first');
     await search(page, '');
     // Builder with attendance and engagement entries only: no call language in the plan or follow-up.
-    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['people-late-login', 'people-break-overrun', 'people-disengagement'], strengths: [{ id: 's-team-support', v: 0 }] })));
+    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ style: 'paragraphs', opps: ['people-late-login', 'people-break-overrun', 'people-disengagement'], strengths: [{ id: 's-team-support', v: 0 }] })));
     await page.goto(URL + '#/builder');
     await page.reload();
     await page.waitForSelector('.out-sec__text');
@@ -1066,7 +1069,7 @@ async function test(name, fn) {
     assert(out[2].includes(fill(oppById['people-late-login'].b.mx)), 'Attendance plan is missing the entry measure');
     assert(out[3].includes('review your schedule adherence and attendance together'), 'Follow-up does not mention the schedule review');
     // Mixed call and attendance coaching keeps both measures.
-    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['hold-dead-air', 'people-late-login'], strengths: [] })));
+    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ style: 'paragraphs', opps: ['hold-dead-air', 'people-late-login'], strengths: [] })));
     await page.reload();
     await page.waitForSelector('.out-sec__text');
     const mixed = await page.locator('.out-sec__text').evaluateAll((els) => els.map((e) => e.value));
@@ -1135,7 +1138,7 @@ async function test(name, fn) {
     assert(!progress.includes('Agent 4'), 'The plan label must never appear in coaching text');
     await card.getByRole('button', { name: 'Use in Builder' }).click();
     await page.waitForSelector('.out-sec__text');
-    assert((await page.locator('.out-sec__text').first().inputValue()).startsWith(expected), 'Progress did not reach the Builder progress section');
+    assert((await page.locator('.out-sec__text').first().inputValue()).replace(/\u2022 /g, '').replace(/\n/g, ' ').startsWith(expected), 'Progress did not reach the Builder progress section');
     // An overdue plan shows on the badge and on Home.
     await page.evaluate((st) => {
       const t = JSON.parse(localStorage.getItem('cip.v1.tracker'));
@@ -1250,7 +1253,7 @@ async function test(name, fn) {
     await page.waitForSelector('.sess-card');
     assert((await page.locator('.sess-step').count()) === 7, 'Expected seven steps');
     await page.getByRole('button', { name: 'Next step' }).click();
-    assert((await page.locator('.sess-read').first().innerText()).trim() === strengthById['s-diagnosis'].v[0], 'Strength step should show the observed strength');
+    assert((await page.locator('.sess-read').first().innerText()).trim().replace(/^\u2022 /, '') === strengthById['s-diagnosis'].v[0], 'Strength step should show the observed strength');
     await page.getByRole('button', { name: 'Next step' }).click();
     const qs = await page.locator('.sess-card .hd-seg__list li').allInnerTexts();
     assert(qs[0] === oppById['hold-dead-air'].questions[0] && qs[1] === oppById['com-missing-empathy'].questions[0], 'Ask step should use each entry\'s first coaching question');
@@ -1547,7 +1550,7 @@ async function test(name, fn) {
     await page.locator('.mp__opt', { hasText: 'Sam Rivers' }).click();
     await page.getByRole('button', { name: 'Start the role-play' }).click();
     // Role-play: the timer runs and lines can be marked as used.
-    await page.waitForTimeout(1300);
+    await page.waitForFunction(() => { const c = document.querySelector('[data-clock="practice"]'); return c && c.textContent !== '0:00'; }, null, { timeout: 4000 }).catch(() => {});
     assert((await page.locator('[data-clock="practice"]').innerText()) !== '0:00', 'Role-play timer did not run');
     assert((await page.locator('.pr-line').count()) === sc.lines.length, 'Customer lines missing');
     await page.locator('[data-fk="pr-said:0"]').click();
@@ -1635,6 +1638,61 @@ async function test(name, fn) {
     await page.getByRole('button', { name: 'New call' }).click();
     await page.locator('.modal').getByRole('button', { name: 'Start a new call' }).click();
     assert((await page.locator('.ls-moment').count()) === 0 && (await page.locator('[data-clock="listen"]').innerText()) === '0:00', 'New call should clear the timer and moments');
+    await finish(page, context);
+  });
+
+  await test('Real numbers: Builder KPI targets in points and paragraphs, tracked plans, updates, and honest progress', async () => {
+    const { page, context } = await newPage({ hash: '#/builder' });
+    const day = (n) => page.evaluate((k) => { const d = new Date(); d.setDate(d.getDate() + k); return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }); }, n);
+    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['hold-dead-air', 'own-unnecessary-transfer'], strengths: [] })));
+    await page.reload();
+    await page.waitForSelector('.nums-card');
+    // Only the KPIs the chosen behaviors affect are offered; others can be added.
+    assert((await page.locator('#num-Transfer-cur').count()) === 1 && (await page.locator('#num-QA-cur').count()) === 1, 'Related KPIs should be offered');
+    assert((await page.locator('#num-ABS-cur').count()) === 0, 'Unrelated KPIs should not be offered by default');
+    await page.fill('#num-Transfer-cur', '18');
+    await page.fill('#num-Transfer-target', '12%');
+    await page.fill('#num-QA-cur', 'abc');
+    assert((await page.locator('#num-QA-cur').getAttribute('aria-invalid')) === 'true', 'Non-numbers should be flagged');
+    await page.fill('#num-QA-cur', '');
+    await page.waitForTimeout(400);
+    const end = await day(14);
+    let plan = await page.locator('#out-plan').inputValue();
+    assert(plan.includes(`\u2022 Transfer rate: 18% as of ${await day(0)}, target 12% or lower by ${end}.`), 'Points plan should state the real numbers: ' + plan);
+    assert(!plan.includes('QA score'), 'A KPI without numbers must not appear');
+    assert((await page.locator('#out-followup').inputValue()).includes('we look at your Transfer rate on the dashboard together'), 'Follow-up should mention the dashboard check');
+    // The same numbers in paragraph format.
+    await page.locator('.segmented').getByRole('button', { name: 'Paragraphs' }).click();
+    plan = await page.locator('#out-plan').inputValue();
+    assert(plan.includes(`Your transfer rate is 18% as of ${await day(0)}, and the target is 12% or lower by ${end}.`), 'Paragraph plan should state the real numbers: ' + plan);
+    assert(!plan.includes('\u2022'), 'Paragraphs must not have bullets');
+    await page.locator('.segmented').getByRole('button', { name: 'Points' }).click();
+    // Track the plan: the numbers go with it.
+    await page.getByRole('button', { name: 'Track this plan' }).click();
+    await page.fill('#tr-label', 'Agent 9');
+    await page.getByRole('button', { name: 'Start tracking' }).click();
+    const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.tracker')).plans[0]);
+    assert(stored.kpis.length === 1 && stored.kpis[0].k === 'Transfer' && stored.kpis[0].base === 18 && stored.kpis[0].target === 12, 'Plan did not keep the numbers: ' + JSON.stringify(stored.kpis));
+    await page.goto(URL + '#/tracker');
+    const card = page.locator('.plan').first();
+    assert((await card.locator('.kb__status').innerText()) === 'No update yet', 'No progress should be claimed before an update');
+    assert((await clickCopy(page, 'Copy progress for Agent 9').catch(() => '')) === '', 'Progress text must be empty with no logged data');
+    // Log the latest number: progress is computed only from it.
+    await card.getByRole('button', { name: 'Update numbers' }).click();
+    await page.fill('#nd-Transfer-now', '15');
+    await page.getByRole('button', { name: 'Save numbers' }).click();
+    assert((await card.locator('.kb__status').innerText()) === '50% of the way', 'Progress toward the target is wrong');
+    let text = await clickCopy(page, 'Copy progress for Agent 9');
+    assert(text === `Your transfer rate was 18% on ${await day(0)} and is 15% as of ${await day(0)}; the target is 12% or lower.`, 'KPI progress text is wrong: ' + text);
+    await card.getByRole('button', { name: 'Update numbers' }).click();
+    await page.fill('#nd-Transfer-now', '11.5');
+    await page.getByRole('button', { name: 'Save numbers' }).click();
+    assert((await card.locator('.kb__status').innerText()) === 'Target met', 'Target met was not detected');
+    text = await clickCopy(page, 'Copy progress for Agent 9');
+    assert(text.endsWith('is 11.5% as of ' + (await day(0)) + ', which meets the target of 12% or lower.'), 'Target met text is wrong: ' + text);
+    assert((await card.locator('.hist__what').first().textContent()) === 'Numbers: Transfer rate 11.5%', 'History should show the numbers update: ' + (await card.locator('.hist__what').first().textContent()));
+    // Numbers updates are not counted as call reviews or check-ins.
+    assert((await card.locator('.ring__value').innerText()).replace(/\s/g, '') === '0/5', 'Numbers updates must not count as follow-ups');
     await finish(page, context);
   });
 

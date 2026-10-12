@@ -1971,6 +1971,35 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 .ls-moment__note { font-size: 12.5px; color: var(--text-2); }
 .ls-send__body { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
 
+/* ---------- Real KPI numbers (Builder and Tracker) ---------- */
+.nums-body { display: flex; flex-direction: column; gap: 12px; }
+.num-row { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 14px; background: linear-gradient(160deg, var(--accent-soft), var(--surface) 70%); border: 1px solid var(--border); animation: rise 0.35s var(--ease-out); }
+.num-row__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.num-row__name { display: inline-flex; align-items: center; gap: 6px; font-weight: 750; font-size: 14px; color: var(--text); }
+.num-row__name .icon { color: var(--accent-text); }
+.num-row__dir { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; color: var(--text-2); background: var(--surface); border: 1px solid var(--border); }
+.num-row__grid { display: grid; grid-template-columns: 1fr 1fr 1.1fr; gap: 10px; }
+@media (max-width: 520px) { .num-row__grid { grid-template-columns: 1fr 1fr; } }
+.input.is-invalid { border-color: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
+.num-add { max-width: 260px; }
+.kb-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.kb { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.kb__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.kb__name { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 750; color: var(--text); }
+.kb__status { font-size: 12px; font-weight: 700; color: var(--text-2); }
+.kb.is-met .kb__status { color: var(--success); }
+.kb.is-worse .kb__status { color: var(--danger); }
+.kb__bar { display: block; height: 10px; border-radius: 5px; background: var(--surface-3); overflow: hidden; }
+.kb__fill { display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--accent), var(--indigo)); transition: width 0.8s var(--ease-out); }
+.anim-enter .kb__fill { animation: tl-grow 0.9s var(--ease-out) 0.4s both; transform-origin: left center; }
+.kb.is-met .kb__fill { background: linear-gradient(90deg, var(--success), var(--accent)); }
+.kb__nums { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--text-2); }
+.kb__nums strong { color: var(--text); font-variant-numeric: tabular-nums; }
+.tl-dot.is-kpi { background: var(--indigo); border-radius: 3px; transform: rotate(45deg); }
+.nd-row { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px 12px; margin-top: 12px; }
+.nd-row legend { padding: 0 6px; font-size: 13px; font-weight: 750; color: var(--text); }
+.nd-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
 /* ---------- Premium dropdown ---------- */
 .pick { position: relative; display: block; width: 100%; min-width: 0; }
 .pick--auto { display: inline-block; width: auto; }
@@ -2628,6 +2657,8 @@ function defaultBuilder() {
     strengths: [],
     tone: 'balanced',
     scope: 'single',
+    style: 'points',
+    nums: {},
     notes: { progress: '', evidence: '', includeEvidence: true, private: '' },
     edited: emptyEdits(),
     base: emptyEdits(),
@@ -2733,6 +2764,19 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const isIsoDate = (v) => typeof v === 'string' && ISO_DATE.test(v) && !Number.isNaN(new Date(v + 'T00:00:00').getTime());
 
 /** Follow-up plans: a label the supervisor chooses (never a name), the focus entries, the plan settings, and logged results. */
+/** A plan's KPI numbers: where the agent started and the target, both typed by the supervisor. */
+function sanitizePlanKpis(v) {
+  const out = [];
+  for (const x of Array.isArray(v) ? v.slice(0, 6) : []) {
+    if (!x || typeof x !== 'object' || !KPI_MEASURE[x.k] || out.some((y) => y.k === x.k)) continue;
+    const base = numOrNull(x.base);
+    const target = numOrNull(x.target);
+    if (base === null && target === null) continue;
+    out.push({ k: x.k, base, target, unit: NUM_UNITS.includes(x.unit) ? x.unit : KPI_MEASURE[x.k].unit, asOf: isIsoDate(x.asOf) ? x.asOf : todayDay() });
+  }
+  return out;
+}
+
 function sanitizeTracker(o) {
   const src = o && typeof o === 'object' ? o : {};
   const plans = [];
@@ -2751,8 +2795,13 @@ function sanitizeTracker(o) {
       const results = {};
       const raw = l.results && typeof l.results === 'object' ? l.results : {};
       for (const fid of focus) if (['met', 'miss', 'na'].includes(raw[fid])) results[fid] = raw[fid];
-      if (!Object.keys(results).length) continue;
-      logs.push({ id: isId(l.id) ? l.id : uid('log'), kind: l.kind === 'checkin' ? 'checkin' : 'call', date: l.date, results, note: str(l.note, 300).trim() });
+      // A numbers update carries only KPI values typed from the dashboard.
+      const kv = {};
+      const rawK = l.kpis && typeof l.kpis === 'object' ? l.kpis : {};
+      for (const k of Object.keys(KPI_MEASURE)) if (numOrNull(rawK[k]) !== null) kv[k] = numOrNull(rawK[k]);
+      const kind = l.kind === 'checkin' ? 'checkin' : l.kind === 'kpi' ? 'kpi' : 'call';
+      if (kind === 'kpi' ? !Object.keys(kv).length : !Object.keys(results).length) continue;
+      logs.push({ id: isId(l.id) ? l.id : uid('log'), kind, date: l.date, results: kind === 'kpi' ? {} : results, kpis: kind === 'kpi' ? kv : {}, note: str(l.note, 300).trim() });
     }
     logs.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     plans.push({
@@ -2765,6 +2814,7 @@ function sanitizeTracker(o) {
       focus,
       status: p.status === 'done' ? 'done' : 'active',
       created: num(p.created) || Date.now(),
+      kpis: sanitizePlanKpis(p.kpis),
       logs,
     });
   }
@@ -3066,6 +3116,27 @@ function sanitizeEdits(v) {
   return out;
 }
 
+/** The agent's real KPI numbers, as typed from the dashboard: current value, target, unit, and the date of the current value. */
+const NUM_UNITS = ['%', 'points', 'hours', 'count'];
+const numOrNull = (v) => {
+  if (v === '' || v == null) return null;
+  const n = Number(String(v).replace(',', '.'));
+  return Number.isFinite(n) && n >= 0 && n <= 100000 ? Math.round(n * 100) / 100 : null;
+};
+function sanitizeNums(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const out = {};
+  for (const k of Object.keys(KPI_MEASURE)) {
+    const v = src[k];
+    if (!v || typeof v !== 'object') continue;
+    const cur = numOrNull(v.cur);
+    const target = numOrNull(v.target);
+    if (cur === null && target === null) continue;
+    out[k] = { cur, target, unit: NUM_UNITS.includes(v.unit) ? v.unit : KPI_MEASURE[k].unit, asOf: isIsoDate(v.asOf) ? v.asOf : todayDay() };
+  }
+  return out;
+}
+
 function sanitizeBuilder(o) {
   const src = o && typeof o === 'object' ? o : {};
   const b = defaultBuilder();
@@ -3073,6 +3144,8 @@ function sanitizeBuilder(o) {
   b.strengths = sanitizeStrengthSelection(src.strengths);
   if (['supportive', 'balanced', 'direct'].includes(src.tone)) b.tone = src.tone;
   if (['single', 'multiple'].includes(src.scope)) b.scope = src.scope;
+  if (['points', 'paragraphs'].includes(src.style)) b.style = src.style;
+  b.nums = sanitizeNums(src.nums);
   const n = src.notes && typeof src.notes === 'object' ? src.notes : {};
   b.notes = {
     progress: str(n.progress, 4000),
@@ -3506,6 +3579,43 @@ const SECTION = {
 };
 const planHeading = (settings) => `${durationTitle((settings || state.settings).duration)} SMART Action Plan`;
 
+/* ---------- Real KPI numbers ---------- */
+/** How each KPI is named in coaching text, and which direction is better. Attrition is a team measure, so it has no agent number. */
+const KPI_MEASURE = {
+  QA: { name: 'QA score', dir: 'up', unit: '%' },
+  aiCR: { name: 'Repeat contact rate (aiCR)', dir: 'down', unit: '%' },
+  Transfer: { name: 'Transfer rate', dir: 'down', unit: '%' },
+  ABS: { name: 'Absenteeism (ABS)', dir: 'down', unit: '%' },
+};
+function fmtNum(n, unit) {
+  if (n === null || n === undefined) return '';
+  return unit === '%' ? `${n}%` : unit === 'count' ? String(n) : `${n} ${unit}`;
+}
+/** Dates in coaching text are always written in English (for example, October 19), whatever the browser language. */
+const textDay = (d) => parseDay(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+const planEndDay = (s) => textDay(addDays(todayDay(), s.duration));
+const followDay = (s) => textDay(addDays(todayDay(), s.followup));
+/** KPIs with at least one number entered, in a fixed order. */
+function numberedKpis(b) {
+  return Object.keys(KPI_MEASURE).filter((k) => b.nums && b.nums[k] && (b.nums[k].cur !== null || b.nums[k].target !== null));
+}
+/** One measurable line per KPI, built only from the numbers the supervisor typed. */
+function kpiMeasureLine(k, v, s) {
+  const m = KPI_MEASURE[k];
+  const better = m.dir === 'down' ? 'or lower' : 'or higher';
+  const cur = v.cur !== null ? `${fmtNum(v.cur, v.unit)} as of ${textDay(v.asOf)}` : '';
+  const tgt = v.target !== null ? `target ${fmtNum(v.target, v.unit)} ${better} by ${planEndDay(s)}` : `we will track it through ${planEndDay(s)}`;
+  return cur ? `${m.name}: ${cur}, ${tgt}.` : `${m.name}: ${tgt}.`;
+}
+function kpiMeasureSentence(k, v, s) {
+  const m = KPI_MEASURE[k];
+  const name = m.name.charAt(0).toLowerCase() + m.name.slice(1);
+  const better = m.dir === 'down' ? 'or lower' : 'or higher';
+  if (v.cur !== null && v.target !== null) return `Your ${name} is ${fmtNum(v.cur, v.unit)} as of ${textDay(v.asOf)}, and the target is ${fmtNum(v.target, v.unit)} ${better} by ${planEndDay(s)}.`;
+  if (v.target !== null) return `The target for your ${name} is ${fmtNum(v.target, v.unit)} ${better} by ${planEndDay(s)}.`;
+  return `Your ${name} is ${fmtNum(v.cur, v.unit)} as of ${textDay(v.asOf)}, and we will track it through ${planEndDay(s)}.`;
+}
+
 /* ---------- Single opportunity ---------- */
 const oppFeedback = (o) => String(o.feedback || '').trim();
 const oppImpact = (o) => String(o.impact || '').trim();
@@ -3721,7 +3831,8 @@ function composePlan(b, opps, s) {
   if (mode !== 'people' && !std.length && !opps.some((o) => !isPeopleOpp(o) && o.b && o.b.mx)) {
     measure.push(`The target is for all ${calls} reviewed calls to show the expected behaviors in this plan.`);
   }
-  return intro.map(tidySentence).join(' ') + '\n\n' + measure.map(tidySentence).join(' ');
+  const nums = numberedKpis(b).map((k) => kpiMeasureSentence(k, b.nums[k], s));
+  return intro.map(tidySentence).join(' ') + '\n\n' + measure.map(tidySentence).join(' ') + (nums.length ? '\n\n' + nums.join(' ') : '');
 }
 
 function composeFollowup(b, opps, s) {
@@ -3751,11 +3862,104 @@ function composeFollowup(b, opps, s) {
   return parts.map(tidySentence).join(' ');
 }
 
+/* ---------- Points format: short, scannable lines with real dates ---------- */
+const bullet = (t) => `\u2022 ${tidySentence(capFirst(String(t).trim()))}`;
+const focusLabel = (o) => capFirst((o.b && o.b.focus) || lowerTitle(o.title));
+
+function pointsProgress(b) {
+  const lines = [];
+  // Verified progress is kept word for word, one point per sentence.
+  b.notes.progress
+    .split(/\n+|(?<=[.?!])\s+(?=[A-Z])/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .forEach((l) => lines.push(bullet(l)));
+  for (const sel of b.strengths) {
+    if (!getStrength(sel.id)) continue;
+    const t = strengthText(sel);
+    if (t) lines.push(bullet(t));
+  }
+  return lines.join('\n');
+}
+
+function pointsChallenges(b, opps) {
+  if (!opps.length) return '';
+  const lead = { supportive: 'What we will work on together:', direct: 'Behaviors that did not meet the expected standard:', balanced: 'What to work on:' }[b.tone] || 'What to work on:';
+  const lines = [lead];
+  const groups = groupByTheme(opps);
+  for (const g of groups) {
+    for (const o of g.items) {
+      if (o.b && o.b.obs) lines.push(`\u2022 ${focusLabel(o)}: ${tidySentence(`you ${o.b.obs}`)}`);
+      else lines.push(bullet(o.title));
+    }
+  }
+  const impacts = dedupe(groups.map((g) => themeOf(g.theme).impact)).slice(0, 3);
+  lines.push('', tidySentence(`Why it matters: this can ${joinList(impacts)}`));
+  const evidence = b.notes.evidence.trim();
+  if (evidence && b.notes.includeEvidence) lines.push('', evidence);
+  return lines.join('\n');
+}
+
+function pointsPlan(b, opps, s) {
+  if (!opps.length) return '';
+  const mode = builderMode(opps);
+  const direct = b.tone === 'direct';
+  const focus = dedupe(opps.map((o) => (o.b && o.b.focus) || lowerTitle(o.title)));
+  const lines = [tidySentence(`Focus until ${planEndDay(s)}: ${joinList(focus)}`), direct ? 'You are expected to:' : 'You will:'];
+  let n = 0;
+  dedupe(opps.map((o) => (o.b && o.b.commit ? capFirst(o.b.commit) : `Apply the expected behavior for ${lowerTitle(o.title)} on ${unitPhrase(isPeopleOpp(o) ? 'people' : 'call')}`))).forEach((c) => lines.push(`${++n}. ${tidySentence(c)}`));
+  lines.push('', 'How we will measure success:');
+  numberedKpis(b).forEach((k) => lines.push(`\u2022 ${kpiMeasureLine(k, b.nums[k], s)}`));
+  const calls = s.calls;
+  if (mode === 'people') lines.push(bullet(`Check-in by ${followDay(s)} to review how the plan is going`));
+  else {
+    lines.push(bullet(`Call reviews: ${calls} applicable calls by ${followDay(s)}`));
+    const std = dedupe(opps.filter((o) => !isPeopleOpp(o)).map((o) => o.b && o.b.m).filter(Boolean));
+    std.forEach((m) => lines.push(bullet(`On every reviewed call: ${m}`)));
+    if (!std.length && !opps.some((o) => !isPeopleOpp(o) && o.b && o.b.mx)) lines.push(bullet('On every reviewed call: the expected behaviors in this plan'));
+  }
+  dedupe(opps.map((o) => o.b && o.b.mx).filter(Boolean)).forEach((mx) => lines.push(bullet(fillTokens(mx, s))));
+  return lines.join('\n');
+}
+
+function pointsFollowup(b, opps, s) {
+  if (!opps.length) return '';
+  const mode = builderMode(opps);
+  const people = opps.filter(isPeopleOpp);
+  const hasSchedule = people.some((o) => o.theme === 'attend' || o.theme === 'adhere');
+  const hasEngage = people.some((o) => o.theme === 'engage');
+  const peopleTopics = [hasSchedule ? 'review your schedule adherence and attendance together' : null, hasEngage ? 'talk about what is going well and where you would like more support' : null].filter(Boolean);
+  const coach = dedupe(opps.map((o) => o.b && o.b.coach).filter(Boolean)).slice(0, 2);
+  const lines = [];
+  if (!coach.length) lines.push(bullet(mode === 'people' ? 'Today: we talk through the expectations and agree on the support you need' : 'Today: we walk through the expected behaviors using examples from the call'));
+  coach.forEach((c) => lines.push(bullet(`Today: ${c}`)));
+  if (mode === 'people') lines.push(bullet(`By ${followDay(s)}: a short check-in to ${joinList(peopleTopics)}`));
+  else {
+    lines.push(bullet(`Around ${textDay(addDays(todayDay(), Math.max(1, Math.round(s.followup / 2))))}: a short check-in on what is working and any recurring gaps`));
+    lines.push(bullet(`By ${followDay(s)}: I review ${s.calls} of your applicable calls and share what I find`));
+    if (mode === 'mixed' && peopleTopics.length) lines.push(bullet(`Also by ${followDay(s)}: we ${joinList(peopleTopics)}`));
+  }
+  const nums = numberedKpis(b);
+  if (nums.length) lines.push(bullet(`At each check-in: we look at your ${joinList(nums.map((k) => KPI_MEASURE[k].name))} on the dashboard together`));
+  lines.push(bullet(`${planEndDay(s)}: we review the results together and decide if the plan is complete, extended, or adjusted`));
+  if (b.tone === 'supportive') lines.push(bullet('Anytime: if something is unclear or you want more practice, tell me and we will set up time'));
+  if (b.tone === 'direct') lines.push(bullet(`If the targets are not met by ${planEndDay(s)}, we will discuss next steps, which may include an extended plan`));
+  return lines.join('\n');
+}
+
 /** Generate all four builder sections from the current selections. */
 function composeBuilder(b, settings) {
   const builder = b || state.builder;
   const s = settings || state.settings;
   const opps = builderOpps(builder);
+  if (builder.style !== 'paragraphs') {
+    return {
+      progress: pointsProgress(builder),
+      challenges: pointsChallenges(builder, opps),
+      plan: pointsPlan(builder, opps, s),
+      followup: pointsFollowup(builder, opps, s),
+    };
+  }
   return {
     progress: composeProgress(builder),
     challenges: composeChallenges(builder, opps),
@@ -7179,10 +7383,38 @@ function focusTally(p, o, kind) {
   return { met, n };
 }
 
+/** The latest number logged for a plan KPI (or none), never estimated. */
+function latestKpi(p, k) {
+  const l = p.logs.filter((x) => x.kind === 'kpi' && x.kpis[k] !== undefined).slice(-1)[0];
+  return l ? { value: l.kpis[k], date: l.date } : null;
+}
+/** How far the latest number has moved from the start toward the target (0 to 1), or null without all three numbers. */
+function kpiProgress(x, latest) {
+  if (!latest || x.base === null || x.target === null) return null;
+  const down = KPI_MEASURE[x.k].dir === 'down';
+  const met = down ? latest.value <= x.target : latest.value >= x.target;
+  if (met) return 1;
+  const span = x.base - x.target;
+  if (!span) return 0;
+  return Math.max(0, Math.min(1, (x.base - latest.value) / span));
+}
+function kpiProgressSentence(p, x) {
+  const m = KPI_MEASURE[x.k];
+  const name = m.name.charAt(0).toLowerCase() + m.name.slice(1);
+  const latest = latestKpi(p, x.k);
+  const better = m.dir === 'down' ? 'or lower' : 'or higher';
+  if (!latest) return '';
+  const start = x.base !== null ? `Your ${name} was ${fmtNum(x.base, x.unit)} on ${textDay(x.asOf)} and is ${fmtNum(latest.value, x.unit)} as of ${textDay(latest.date)}` : `Your ${name} is ${fmtNum(latest.value, x.unit)} as of ${textDay(latest.date)}`;
+  if (x.target === null) return `${start}.`;
+  const met = m.dir === 'down' ? latest.value <= x.target : latest.value >= x.target;
+  return met ? `${start}, which meets the target of ${fmtNum(x.target, x.unit)} ${better}.` : `${start}; the target is ${fmtNum(x.target, x.unit)} ${better}.`;
+}
+
 function planProgressText(p) {
   const callLogs = p.logs.filter((l) => l.kind === 'call');
   const checkLogs = p.logs.filter((l) => l.kind === 'checkin');
-  if (!callLogs.length && !checkLogs.length) return '';
+  const kpiLines = (p.kpis || []).map((x) => kpiProgressSentence(p, x)).filter(Boolean);
+  if (!callLogs.length && !checkLogs.length && !kpiLines.length) return '';
   const out = [];
   const since = `Since our coaching session on ${fmtDay(p.start, true)}`;
   if (callLogs.length) {
@@ -7199,6 +7431,7 @@ function planProgressText(p) {
       if (t.n) out.push(resultSentence(o, t.met, t.n, 'check-in').replace('check-ins reviewed', 'check-ins').replace('check-in reviewed', 'check-in'));
     });
   }
+  out.push(...kpiLines);
   return out.join(' ');
 }
 
@@ -7290,7 +7523,8 @@ function openTrackFromBuilder() {
       (team ? m.el.querySelector('.mp__opt') : label.input).focus();
       return;
     }
-    const plan = sanitizeTracker({ plans: [{ id: uid('plan'), label: text, start: isIsoDate(start.value) ? start.value : todayDay(), duration: s.duration, calls: s.calls, followup: s.followup, focus: opps.map((o) => o.id), logs: [] }] }).plans[0];
+    const kpis = numberedKpis(state.builder).map((k) => ({ k, base: state.builder.nums[k].cur, target: state.builder.nums[k].target, unit: state.builder.nums[k].unit, asOf: state.builder.nums[k].asOf }));
+    const plan = sanitizeTracker({ plans: [{ id: uid('plan'), label: text, start: isIsoDate(start.value) ? start.value : todayDay(), duration: s.duration, calls: s.calls, followup: s.followup, focus: opps.map((o) => o.id), kpis, logs: [] }] }).plans[0];
     state.tracker.plans.unshift(plan);
     savePlans();
     m.close();
@@ -7440,6 +7674,7 @@ function planTimeline(p) {
     const vals = Object.values(l.results).filter((v) => v !== 'na');
     const ok = vals.length && vals.every((v) => v === 'met');
     const some = vals.some((v) => v === 'met');
+    if (l.kind === 'kpi') return h('span', { class: 'tl-dot is-kpi', style: `left:${pos(l.date)}`, title: `${fmtDay(l.date)} · numbers update` });
     return h('span', { class: `tl-dot ${ok ? 'is-met' : some ? 'is-mixed' : 'is-miss'}${l.kind === 'checkin' ? ' is-checkin' : ''}`, style: `left:${pos(l.date)}`, title: `${fmtDay(l.date)} · ${l.kind === 'call' ? 'call review' : 'check-in'}` });
   });
   return h(
@@ -7470,6 +7705,115 @@ function focusBars(p) {
     );
   });
   return h('ul', { class: 'fb-list' }, rows);
+}
+
+/** Start, latest, and target for each KPI, with a bar for how far it has moved toward the target. */
+function kpiBars(p) {
+  const list = p.kpis || [];
+  if (!list.length) return null;
+  return h(
+    'ul',
+    { class: 'kb-list' },
+    list.map((x) => {
+      const m = KPI_MEASURE[x.k];
+      const latest = latestKpi(p, x.k);
+      const prog = kpiProgress(x, latest);
+      const met = prog === 1;
+      const worse = latest && x.base !== null && (m.dir === 'down' ? latest.value > x.base : latest.value < x.base);
+      const status = !latest ? 'No update yet' : met ? 'Target met' : worse ? 'Moving away from target' : prog !== null ? `${Math.round(prog * 100)}% of the way` : 'Updated';
+      return h(
+        'li',
+        { class: `kb${met ? ' is-met' : worse ? ' is-worse' : ''}` },
+        h('div', { class: 'kb__head' }, h('span', { class: 'kb__name' }, icon('trend', 'icon--sm'), m.name), h('span', { class: 'kb__status' }, status)),
+        h('span', { class: 'kb__bar', role: 'img', 'aria-label': `${m.name}: ${status}` }, h('span', { class: 'kb__fill', style: `width:${prog === null ? 0 : Math.max(4, Math.round(prog * 100))}%` })),
+        h(
+          'div',
+          { class: 'kb__nums' },
+          h('span', null, 'Start ', h('strong', null, x.base !== null ? fmtNum(x.base, x.unit) : '\u2014')),
+          h('span', null, 'Now ', h('strong', null, latest ? fmtNum(latest.value, x.unit) : '\u2014')),
+          h('span', null, 'Target ', h('strong', null, x.target !== null ? `${fmtNum(x.target, x.unit)} ${m.dir === 'down' ? 'or lower' : 'or higher'}` : '\u2014'))
+        )
+      );
+    })
+  );
+}
+
+/** Set a plan's start and target numbers, and log the latest numbers from the dashboard. */
+function openNumbersDialog(planId) {
+  const p = findPlan(planId);
+  if (!p) return;
+  const keys = dedupe([...(p.kpis || []).map((x) => x.k), ...planFocus(p).flatMap((o) => o.kpi || []).filter((k) => KPI_MEASURE[k])]);
+  if (!keys.length) keys.push('QA');
+  const date = h('input', { class: 'input', id: 'nd-date', type: 'date', value: todayDay(), min: p.start, max: todayDay() });
+  const rows = keys.map((k) => {
+    const x = (p.kpis || []).find((y) => y.k === k) || { k, base: null, target: null, unit: KPI_MEASURE[k].unit };
+    const inp = (id, label, value) => h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', value: value === null || value === undefined ? '' : String(value), placeholder: x.unit === '%' ? 'e.g. 12.5' : '' }));
+    return {
+      k,
+      x,
+      node: h(
+        'fieldset',
+        { class: 'nd-row' },
+        h('legend', null, `${KPI_MEASURE[k].name} (${x.unit === '%' ? '%' : x.unit}), ${KPI_MEASURE[k].dir === 'down' ? 'lower is better' : 'higher is better'}`),
+        h('div', { class: 'nd-grid' }, inp(`nd-${k}-base`, 'Start', x.base), inp(`nd-${k}-target`, 'Target', x.target), inp(`nd-${k}-now`, 'Latest', ''))
+      ),
+    };
+  });
+  const err = h('p', { class: 'field__error', hidden: true }, 'Numbers only, such as 12 or 12.5.');
+  const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
+  const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('check'), 'Save numbers');
+  const m = openModal({
+    title: `Numbers · ${planWho(p)}`,
+    size: 'md',
+    body: h(
+      'div',
+      { class: 'tr-form' },
+      h('p', { class: 'field__hint' }, 'Type the numbers exactly as your KPI dashboard shows them. Progress is written only from numbers you enter, never estimated.'),
+      h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'nd-date' }, 'Date of the latest numbers'), date),
+      rows.map((r) => r.node),
+      err
+    ),
+    footer: [cancel, h('span', { class: 'spacer' }), save],
+    initialFocus: `#nd-${keys[0]}-${(p.kpis || []).length ? 'now' : 'base'}`,
+  });
+  cancel.addEventListener('click', () => m.close());
+  save.addEventListener('click', () => {
+    const read = (id) => {
+      const raw = m.el.querySelector(`#${id}`).value.replace('%', '').trim();
+      return raw === '' ? { ok: true, v: null } : { ok: numOrNull(raw) !== null, v: numOrNull(raw) };
+    };
+    const kpis = [];
+    const now = {};
+    let bad = false;
+    rows.forEach((r) => {
+      const base = read(`nd-${r.k}-base`);
+      const target = read(`nd-${r.k}-target`);
+      const cur = read(`nd-${r.k}-now`);
+      if (!base.ok || !target.ok || !cur.ok) bad = true;
+      if (base.v !== null || target.v !== null) kpis.push({ k: r.k, base: base.v, target: target.v, unit: r.x.unit, asOf: r.x.asOf || p.start });
+      if (cur.v !== null) now[r.k] = cur.v;
+    });
+    err.hidden = !bad;
+    if (bad) return;
+    if (Object.keys(now).length && (!isIsoDate(date.value) || date.value < p.start || date.value > todayDay())) {
+      date.focus();
+      toast('Choose a date between the coaching session and today.', { type: 'warn' });
+      return;
+    }
+    p.kpis = sanitizePlanKpis(kpis);
+    if (Object.keys(now).length) {
+      p.logs.push({ id: uid('log'), kind: 'kpi', date: date.value, results: {}, kpis: now, note: '' });
+      p.logs.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    }
+    state.ui.flash = `plan:${p.id}`;
+    savePlans();
+    m.close();
+    refresh({ panel: false });
+    state.ui.flash = null;
+    const hit = (p.kpis || []).filter((x) => kpiProgress(x, latestKpi(p, x.k)) === 1);
+    toast(Object.keys(now).length ? (hit.length ? `Numbers saved: ${joinList(hit.map((x) => KPI_MEASURE[x.k].name))} on target` : 'Numbers saved') : 'Start and target saved');
+    if (hit.length && Object.keys(now).some((k) => hit.some((x) => x.k === k))) celebrateAt(`[aria-labelledby="plan-${p.id}"] .kb.is-met`, null);
+  });
 }
 
 function planCard(p) {
@@ -7504,7 +7848,8 @@ function planCard(p) {
           c.callTarget ? ` · ${c.calls} of ${c.callTarget} call reviews` : '',
           c.checkinTarget ? ` · ${plural(c.checkins, 'check-in')}` : ''
         ),
-        focusBars(p)
+        focusBars(p),
+        kpiBars(p)
       )
     ),
     h(
@@ -7512,6 +7857,7 @@ function planCard(p) {
       { class: 'plan__actions' },
       p.status === 'active' && c.callTarget ? h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `tr-log:${p.id}`, onclick: () => openLogDialog(p.id, 'call') }, icon('plus'), 'Log call review') : null,
       p.status === 'active' && c.checkinTarget ? h('button', { type: 'button', class: `btn btn--sm${c.callTarget ? '' : ' btn--primary'}`, 'data-fk': `tr-check:${p.id}`, onclick: () => openLogDialog(p.id, 'checkin') }, icon('calendar'), 'Log check-in') : null,
+      p.status === 'active' ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `tr-num:${p.id}`, onclick: () => openNumbersDialog(p.id) }, icon('trend'), (p.kpis || []).length ? 'Update numbers' : 'Add numbers') : null,
       copyButton(() => planProgressText(p), { label: 'Copy progress', srLabel: `Copy progress for ${planWho(p)}`, fk: `tr-copy:${p.id}`, emptyMessage: 'Log at least one call review or check-in first. Progress is written only from what you log.' }),
       h('button', { type: 'button', class: 'btn btn--sm', disabled: !text, 'data-fk': `tr-use:${p.id}`, onclick: () => useProgressInBuilder(p.id) }, icon('clipboard'), 'Use in Builder'),
       h('span', { class: 'toolbar__spacer' }),
@@ -7537,14 +7883,15 @@ function planCard(p) {
               const vals = Object.entries(l.results);
               const met = vals.filter(([, v]) => v === 'met').length;
               const miss = vals.filter(([, v]) => v === 'miss').length;
+              const what = l.kind === 'kpi' ? `Numbers: ${Object.entries(l.kpis).map(([k, v]) => `${KPI_MEASURE[k].name} ${fmtNum(v, ((p.kpis || []).find((x) => x.k === k) || KPI_MEASURE[k]).unit)}`).join(', ')}` : `${l.kind === 'call' ? 'Call review' : 'Check-in'}: ${met} met${miss ? `, ${miss} not met` : ''}`;
               return h(
                 'li',
                 { class: 'hist' },
-                icon(l.kind === 'call' ? 'checklist' : 'calendar', 'icon--sm'),
+                icon(l.kind === 'call' ? 'checklist' : l.kind === 'kpi' ? 'trend' : 'calendar', 'icon--sm'),
                 h('span', { class: 'hist__date' }, fmtDay(l.date)),
-                h('span', { class: 'hist__what' }, `${l.kind === 'call' ? 'Call review' : 'Check-in'}: ${met} met${miss ? `, ${miss} not met` : ''}`),
+                h('span', { class: 'hist__what' }, what),
                 l.note ? h('span', { class: 'hist__note' }, l.note) : null,
-                h('button', { type: 'button', class: 'icon-btn icon-btn--sm', 'aria-label': `Delete ${l.kind === 'call' ? 'call review' : 'check-in'} from ${fmtDay(l.date)}`, onclick: () => deleteLog(p.id, l.id) }, icon('trash'))
+                h('button', { type: 'button', class: 'icon-btn icon-btn--sm', 'aria-label': `Delete ${l.kind === 'call' ? 'call review' : l.kind === 'kpi' ? 'numbers update' : 'check-in'} from ${fmtDay(l.date)}`, onclick: () => deleteLog(p.id, l.id) }, icon('trash'))
               );
             })
           )
@@ -8392,7 +8739,7 @@ function snapshotData(days) {
     p.logs.forEach((l) => {
       if (l.date < since || l.date > today) return;
       if (l.kind === 'call') calls++;
-      else checkins++;
+      else if (l.kind === 'checkin') checkins++;
       Object.entries(l.results).forEach(([id, r]) => {
         if (r === 'na' || !getOpp(id)) return;
         const b = behaviors[id] || (behaviors[id] = { id, met: 0, miss: 0, kind: l.kind });
@@ -9406,7 +9753,7 @@ function pauseClock(o) {
     o.runAt = 0;
   }
 }
-/** Running clocks update in place twice a second; nothing else re-renders. */
+/** Running clocks update in place four times a second; nothing else re-renders. */
 function tickClocks() {
   document.querySelectorAll('[data-clock]').forEach((el) => {
     const o = clockSource(el.getAttribute('data-clock'));
@@ -9414,7 +9761,7 @@ function tickClocks() {
   });
   if (typeof tickListenTrack === 'function') tickListenTrack();
 }
-setInterval(tickClocks, 500);
+setInterval(tickClocks, 250);
 
 function clockFace(key, o) {
   return h('span', { class: `clock${o && o.runAt ? ' is-running' : ''}`, role: 'timer', 'aria-label': 'Elapsed time', 'data-clock': key }, fmtClock(clockMs(o)));
@@ -10429,6 +10776,25 @@ function settingsCard() {
         h(
           'div',
           { class: 'setting' },
+          h('span', { class: 'setting__label' }, 'Format'),
+          segmented({
+            label: 'Format',
+            value: b.style,
+            fkPrefix: 'style',
+            options: [
+              { value: 'points', label: 'Points', icon: 'list' },
+              { value: 'paragraphs', label: 'Paragraphs', icon: 'note' },
+            ],
+            onChange: (v) => {
+              b.style = v;
+              persist('builder');
+              refresh({ panel: false });
+            },
+          })
+        ),
+        h(
+          'div',
+          { class: 'setting' },
           h('span', { class: 'setting__label' }, 'Coaching is based on'),
           segmented({
             label: 'Coaching is based on',
@@ -10446,6 +10812,95 @@ function settingsCard() {
           })
         )
       )
+    )
+  );
+}
+
+/* ---------- Real numbers from the KPI dashboard ---------- */
+let numsExtra = [];
+function numbersCard() {
+  const b = state.builder;
+  const opps = builderOpps();
+  const fromOpps = dedupe(opps.flatMap((o) => o.kpi || [])).filter((k) => KPI_MEASURE[k]);
+  const keys = Object.keys(KPI_MEASURE).filter((k) => fromOpps.includes(k) || numsExtra.includes(k) || (b.nums[k] && (b.nums[k].cur !== null || b.nums[k].target !== null)));
+  const others = Object.keys(KPI_MEASURE).filter((k) => !keys.includes(k));
+  const attrition = opps.some((o) => (o.kpi || []).includes('Attrition'));
+  const setVal = (k, field, raw, input) => {
+    const clean = raw.replace('%', '').trim();
+    const v = clean === '' ? null : numOrNull(clean);
+    input.classList.toggle('is-invalid', clean !== '' && v === null);
+    input.setAttribute('aria-invalid', String(clean !== '' && v === null));
+    if (clean !== '' && v === null) return;
+    const cur = b.nums[k] || { cur: null, target: null, unit: KPI_MEASURE[k].unit, asOf: todayDay() };
+    cur[field] = v;
+    if (field === 'cur') cur.asOf = todayDay();
+    if (cur.cur === null && cur.target === null) delete b.nums[k];
+    else b.nums[k] = cur;
+    persistBuilderSoon();
+    updateBuilderOutputs();
+  };
+  const row = (k) => {
+    const m = KPI_MEASURE[k];
+    const v = b.nums[k] || { cur: null, target: null, unit: m.unit };
+    const field = (f, label) => {
+      const id = `num-${k}-${f}`;
+      const input = h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', 'data-fk': id, value: v[f] === null || v[f] === undefined ? '' : String(v[f]), placeholder: f === 'cur' ? 'From dashboard' : m.dir === 'down' ? 'Lower is better' : 'Higher is better' });
+      input.addEventListener('input', () => setVal(k, f, input.value, input));
+      return h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), input);
+    };
+    const unit = h(
+      'select',
+      {
+        class: 'select',
+        id: `num-${k}-unit`,
+        'data-fk': `num-${k}-unit`,
+        onchange: (e) => {
+          const cur = b.nums[k] || { cur: null, target: null, unit: m.unit, asOf: todayDay() };
+          cur.unit = e.target.value;
+          if (cur.cur !== null || cur.target !== null) b.nums[k] = cur;
+          persist('builder');
+          updateBuilderOutputs();
+        },
+      },
+      NUM_UNITS.map((u) => h('option', { value: u, selected: (v.unit || m.unit) === u }, u === '%' ? 'Percent (%)' : capFirst(u)))
+    );
+    return h(
+      'div',
+      { class: `num-row${fromOpps.includes(k) ? '' : ' is-extra'}` },
+      h('div', { class: 'num-row__head' }, h('span', { class: 'num-row__name' }, icon('trend', 'icon--sm'), m.name), h('span', { class: `num-row__dir num-row__dir--${m.dir}` }, icon(m.dir === 'down' ? 'arrow-down' : 'arrow-up', 'icon--sm'), m.dir === 'down' ? 'Lower is better' : 'Higher is better')),
+      h('div', { class: 'num-row__grid' }, field('cur', 'Current'), field('target', 'Target'), h('div', { class: 'field' }, h('label', { class: 'field__label', for: `num-${k}-unit` }, 'Unit'), unit))
+    );
+  };
+  const add = others.length
+    ? h(
+        'select',
+        {
+          class: 'select',
+          id: 'num-add',
+          'aria-label': 'Add another KPI',
+          'data-fk': 'num-add',
+          onchange: (e) => {
+            if (!e.target.value) return;
+            numsExtra.push(e.target.value);
+            refresh({ panel: false });
+            focusByKey(`num-${e.target.value}-cur`);
+          },
+        },
+        h('option', { value: '' }, 'Add another KPI'),
+        others.map((k) => h('option', { value: k }, KPI_MEASURE[k].name))
+      )
+    : null;
+  return h(
+    'section',
+    { class: 'card nums-card', 'aria-labelledby': 'bNumsTitle' },
+    h('div', { class: 'card__head' }, h('h2', { class: 'card__title', id: 'bNumsTitle' }, icon('trend'), 'Measure with real numbers'), h('span', { class: 'sec__sub' }, 'optional')),
+    h(
+      'div',
+      { class: 'card__body nums-body' },
+      h('p', { class: 'field__hint' }, 'Type the agent\'s numbers from your KPI dashboard. The action plan then states where they are today and the target by the end of the plan. Nothing is estimated.'),
+      keys.length ? keys.map(row) : h('p', { class: 'day-empty' }, icon('info'), 'Add opportunities to see the KPIs they affect, or add a KPI below.'),
+      attrition ? h('p', { class: 'field__hint' }, icon('info', 'icon--sm'), ' Attrition is a team measure, so it has no agent number here.') : null,
+      add ? h('div', { class: 'num-add' }, add) : null
     )
   );
 }
@@ -10777,7 +11232,7 @@ function renderBuilder(main) {
       sub: 'Combine several opportunities and the strengths you observed into one cohesive coaching entry, with a single consolidated SMART plan and follow-up. Edit any section before copying; your edits are kept.',
       actions: h('button', { type: 'button', class: 'btn btn--sm btn--danger', 'data-fk': 'breset', disabled: !builderHasContent(), onclick: resetBuilder }, icon('refresh'), 'Reset builder'),
     }),
-    h('div', { class: 'builder' }, h('div', { class: 'builder__col' }, oppsCard(), strengthsCard(), settingsCard(), notesCard(), savedCard()), outputColumn())
+    h('div', { class: 'builder' }, h('div', { class: 'builder__col' }, oppsCard(), strengthsCard(), numbersCard(), settingsCard(), notesCard(), savedCard()), outputColumn())
   );
   requestAnimationFrame(() => {
     BUILDER_FIELDS.forEach((f) => {

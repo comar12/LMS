@@ -27,7 +27,7 @@ function pauseClock(o) {
     o.runAt = 0;
   }
 }
-/** Running clocks update in place twice a second; nothing else re-renders. */
+/** Running clocks update in place four times a second; nothing else re-renders. */
 function tickClocks() {
   document.querySelectorAll('[data-clock]').forEach((el) => {
     const o = clockSource(el.getAttribute('data-clock'));
@@ -35,7 +35,7 @@ function tickClocks() {
   });
   if (typeof tickListenTrack === 'function') tickListenTrack();
 }
-setInterval(tickClocks, 500);
+setInterval(tickClocks, 250);
 
 function clockFace(key, o) {
   return h('span', { class: `clock${o && o.runAt ? ' is-running' : ''}`, role: 'timer', 'aria-label': 'Elapsed time', 'data-clock': key }, fmtClock(clockMs(o)));

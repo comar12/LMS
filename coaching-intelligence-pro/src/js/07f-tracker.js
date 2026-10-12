@@ -81,10 +81,38 @@ function focusTally(p, o, kind) {
   return { met, n };
 }
 
+/** The latest number logged for a plan KPI (or none), never estimated. */
+function latestKpi(p, k) {
+  const l = p.logs.filter((x) => x.kind === 'kpi' && x.kpis[k] !== undefined).slice(-1)[0];
+  return l ? { value: l.kpis[k], date: l.date } : null;
+}
+/** How far the latest number has moved from the start toward the target (0 to 1), or null without all three numbers. */
+function kpiProgress(x, latest) {
+  if (!latest || x.base === null || x.target === null) return null;
+  const down = KPI_MEASURE[x.k].dir === 'down';
+  const met = down ? latest.value <= x.target : latest.value >= x.target;
+  if (met) return 1;
+  const span = x.base - x.target;
+  if (!span) return 0;
+  return Math.max(0, Math.min(1, (x.base - latest.value) / span));
+}
+function kpiProgressSentence(p, x) {
+  const m = KPI_MEASURE[x.k];
+  const name = m.name.charAt(0).toLowerCase() + m.name.slice(1);
+  const latest = latestKpi(p, x.k);
+  const better = m.dir === 'down' ? 'or lower' : 'or higher';
+  if (!latest) return '';
+  const start = x.base !== null ? `Your ${name} was ${fmtNum(x.base, x.unit)} on ${textDay(x.asOf)} and is ${fmtNum(latest.value, x.unit)} as of ${textDay(latest.date)}` : `Your ${name} is ${fmtNum(latest.value, x.unit)} as of ${textDay(latest.date)}`;
+  if (x.target === null) return `${start}.`;
+  const met = m.dir === 'down' ? latest.value <= x.target : latest.value >= x.target;
+  return met ? `${start}, which meets the target of ${fmtNum(x.target, x.unit)} ${better}.` : `${start}; the target is ${fmtNum(x.target, x.unit)} ${better}.`;
+}
+
 function planProgressText(p) {
   const callLogs = p.logs.filter((l) => l.kind === 'call');
   const checkLogs = p.logs.filter((l) => l.kind === 'checkin');
-  if (!callLogs.length && !checkLogs.length) return '';
+  const kpiLines = (p.kpis || []).map((x) => kpiProgressSentence(p, x)).filter(Boolean);
+  if (!callLogs.length && !checkLogs.length && !kpiLines.length) return '';
   const out = [];
   const since = `Since our coaching session on ${fmtDay(p.start, true)}`;
   if (callLogs.length) {
@@ -101,6 +129,7 @@ function planProgressText(p) {
       if (t.n) out.push(resultSentence(o, t.met, t.n, 'check-in').replace('check-ins reviewed', 'check-ins').replace('check-in reviewed', 'check-in'));
     });
   }
+  out.push(...kpiLines);
   return out.join(' ');
 }
 
@@ -192,7 +221,8 @@ function openTrackFromBuilder() {
       (team ? m.el.querySelector('.mp__opt') : label.input).focus();
       return;
     }
-    const plan = sanitizeTracker({ plans: [{ id: uid('plan'), label: text, start: isIsoDate(start.value) ? start.value : todayDay(), duration: s.duration, calls: s.calls, followup: s.followup, focus: opps.map((o) => o.id), logs: [] }] }).plans[0];
+    const kpis = numberedKpis(state.builder).map((k) => ({ k, base: state.builder.nums[k].cur, target: state.builder.nums[k].target, unit: state.builder.nums[k].unit, asOf: state.builder.nums[k].asOf }));
+    const plan = sanitizeTracker({ plans: [{ id: uid('plan'), label: text, start: isIsoDate(start.value) ? start.value : todayDay(), duration: s.duration, calls: s.calls, followup: s.followup, focus: opps.map((o) => o.id), kpis, logs: [] }] }).plans[0];
     state.tracker.plans.unshift(plan);
     savePlans();
     m.close();
@@ -342,6 +372,7 @@ function planTimeline(p) {
     const vals = Object.values(l.results).filter((v) => v !== 'na');
     const ok = vals.length && vals.every((v) => v === 'met');
     const some = vals.some((v) => v === 'met');
+    if (l.kind === 'kpi') return h('span', { class: 'tl-dot is-kpi', style: `left:${pos(l.date)}`, title: `${fmtDay(l.date)} · numbers update` });
     return h('span', { class: `tl-dot ${ok ? 'is-met' : some ? 'is-mixed' : 'is-miss'}${l.kind === 'checkin' ? ' is-checkin' : ''}`, style: `left:${pos(l.date)}`, title: `${fmtDay(l.date)} · ${l.kind === 'call' ? 'call review' : 'check-in'}` });
   });
   return h(
@@ -372,6 +403,115 @@ function focusBars(p) {
     );
   });
   return h('ul', { class: 'fb-list' }, rows);
+}
+
+/** Start, latest, and target for each KPI, with a bar for how far it has moved toward the target. */
+function kpiBars(p) {
+  const list = p.kpis || [];
+  if (!list.length) return null;
+  return h(
+    'ul',
+    { class: 'kb-list' },
+    list.map((x) => {
+      const m = KPI_MEASURE[x.k];
+      const latest = latestKpi(p, x.k);
+      const prog = kpiProgress(x, latest);
+      const met = prog === 1;
+      const worse = latest && x.base !== null && (m.dir === 'down' ? latest.value > x.base : latest.value < x.base);
+      const status = !latest ? 'No update yet' : met ? 'Target met' : worse ? 'Moving away from target' : prog !== null ? `${Math.round(prog * 100)}% of the way` : 'Updated';
+      return h(
+        'li',
+        { class: `kb${met ? ' is-met' : worse ? ' is-worse' : ''}` },
+        h('div', { class: 'kb__head' }, h('span', { class: 'kb__name' }, icon('trend', 'icon--sm'), m.name), h('span', { class: 'kb__status' }, status)),
+        h('span', { class: 'kb__bar', role: 'img', 'aria-label': `${m.name}: ${status}` }, h('span', { class: 'kb__fill', style: `width:${prog === null ? 0 : Math.max(4, Math.round(prog * 100))}%` })),
+        h(
+          'div',
+          { class: 'kb__nums' },
+          h('span', null, 'Start ', h('strong', null, x.base !== null ? fmtNum(x.base, x.unit) : '\u2014')),
+          h('span', null, 'Now ', h('strong', null, latest ? fmtNum(latest.value, x.unit) : '\u2014')),
+          h('span', null, 'Target ', h('strong', null, x.target !== null ? `${fmtNum(x.target, x.unit)} ${m.dir === 'down' ? 'or lower' : 'or higher'}` : '\u2014'))
+        )
+      );
+    })
+  );
+}
+
+/** Set a plan's start and target numbers, and log the latest numbers from the dashboard. */
+function openNumbersDialog(planId) {
+  const p = findPlan(planId);
+  if (!p) return;
+  const keys = dedupe([...(p.kpis || []).map((x) => x.k), ...planFocus(p).flatMap((o) => o.kpi || []).filter((k) => KPI_MEASURE[k])]);
+  if (!keys.length) keys.push('QA');
+  const date = h('input', { class: 'input', id: 'nd-date', type: 'date', value: todayDay(), min: p.start, max: todayDay() });
+  const rows = keys.map((k) => {
+    const x = (p.kpis || []).find((y) => y.k === k) || { k, base: null, target: null, unit: KPI_MEASURE[k].unit };
+    const inp = (id, label, value) => h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', value: value === null || value === undefined ? '' : String(value), placeholder: x.unit === '%' ? 'e.g. 12.5' : '' }));
+    return {
+      k,
+      x,
+      node: h(
+        'fieldset',
+        { class: 'nd-row' },
+        h('legend', null, `${KPI_MEASURE[k].name} (${x.unit === '%' ? '%' : x.unit}), ${KPI_MEASURE[k].dir === 'down' ? 'lower is better' : 'higher is better'}`),
+        h('div', { class: 'nd-grid' }, inp(`nd-${k}-base`, 'Start', x.base), inp(`nd-${k}-target`, 'Target', x.target), inp(`nd-${k}-now`, 'Latest', ''))
+      ),
+    };
+  });
+  const err = h('p', { class: 'field__error', hidden: true }, 'Numbers only, such as 12 or 12.5.');
+  const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
+  const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('check'), 'Save numbers');
+  const m = openModal({
+    title: `Numbers · ${planWho(p)}`,
+    size: 'md',
+    body: h(
+      'div',
+      { class: 'tr-form' },
+      h('p', { class: 'field__hint' }, 'Type the numbers exactly as your KPI dashboard shows them. Progress is written only from numbers you enter, never estimated.'),
+      h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'nd-date' }, 'Date of the latest numbers'), date),
+      rows.map((r) => r.node),
+      err
+    ),
+    footer: [cancel, h('span', { class: 'spacer' }), save],
+    initialFocus: `#nd-${keys[0]}-${(p.kpis || []).length ? 'now' : 'base'}`,
+  });
+  cancel.addEventListener('click', () => m.close());
+  save.addEventListener('click', () => {
+    const read = (id) => {
+      const raw = m.el.querySelector(`#${id}`).value.replace('%', '').trim();
+      return raw === '' ? { ok: true, v: null } : { ok: numOrNull(raw) !== null, v: numOrNull(raw) };
+    };
+    const kpis = [];
+    const now = {};
+    let bad = false;
+    rows.forEach((r) => {
+      const base = read(`nd-${r.k}-base`);
+      const target = read(`nd-${r.k}-target`);
+      const cur = read(`nd-${r.k}-now`);
+      if (!base.ok || !target.ok || !cur.ok) bad = true;
+      if (base.v !== null || target.v !== null) kpis.push({ k: r.k, base: base.v, target: target.v, unit: r.x.unit, asOf: r.x.asOf || p.start });
+      if (cur.v !== null) now[r.k] = cur.v;
+    });
+    err.hidden = !bad;
+    if (bad) return;
+    if (Object.keys(now).length && (!isIsoDate(date.value) || date.value < p.start || date.value > todayDay())) {
+      date.focus();
+      toast('Choose a date between the coaching session and today.', { type: 'warn' });
+      return;
+    }
+    p.kpis = sanitizePlanKpis(kpis);
+    if (Object.keys(now).length) {
+      p.logs.push({ id: uid('log'), kind: 'kpi', date: date.value, results: {}, kpis: now, note: '' });
+      p.logs.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    }
+    state.ui.flash = `plan:${p.id}`;
+    savePlans();
+    m.close();
+    refresh({ panel: false });
+    state.ui.flash = null;
+    const hit = (p.kpis || []).filter((x) => kpiProgress(x, latestKpi(p, x.k)) === 1);
+    toast(Object.keys(now).length ? (hit.length ? `Numbers saved: ${joinList(hit.map((x) => KPI_MEASURE[x.k].name))} on target` : 'Numbers saved') : 'Start and target saved');
+    if (hit.length && Object.keys(now).some((k) => hit.some((x) => x.k === k))) celebrateAt(`[aria-labelledby="plan-${p.id}"] .kb.is-met`, null);
+  });
 }
 
 function planCard(p) {
@@ -406,7 +546,8 @@ function planCard(p) {
           c.callTarget ? ` · ${c.calls} of ${c.callTarget} call reviews` : '',
           c.checkinTarget ? ` · ${plural(c.checkins, 'check-in')}` : ''
         ),
-        focusBars(p)
+        focusBars(p),
+        kpiBars(p)
       )
     ),
     h(
@@ -414,6 +555,7 @@ function planCard(p) {
       { class: 'plan__actions' },
       p.status === 'active' && c.callTarget ? h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `tr-log:${p.id}`, onclick: () => openLogDialog(p.id, 'call') }, icon('plus'), 'Log call review') : null,
       p.status === 'active' && c.checkinTarget ? h('button', { type: 'button', class: `btn btn--sm${c.callTarget ? '' : ' btn--primary'}`, 'data-fk': `tr-check:${p.id}`, onclick: () => openLogDialog(p.id, 'checkin') }, icon('calendar'), 'Log check-in') : null,
+      p.status === 'active' ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `tr-num:${p.id}`, onclick: () => openNumbersDialog(p.id) }, icon('trend'), (p.kpis || []).length ? 'Update numbers' : 'Add numbers') : null,
       copyButton(() => planProgressText(p), { label: 'Copy progress', srLabel: `Copy progress for ${planWho(p)}`, fk: `tr-copy:${p.id}`, emptyMessage: 'Log at least one call review or check-in first. Progress is written only from what you log.' }),
       h('button', { type: 'button', class: 'btn btn--sm', disabled: !text, 'data-fk': `tr-use:${p.id}`, onclick: () => useProgressInBuilder(p.id) }, icon('clipboard'), 'Use in Builder'),
       h('span', { class: 'toolbar__spacer' }),
@@ -439,14 +581,15 @@ function planCard(p) {
               const vals = Object.entries(l.results);
               const met = vals.filter(([, v]) => v === 'met').length;
               const miss = vals.filter(([, v]) => v === 'miss').length;
+              const what = l.kind === 'kpi' ? `Numbers: ${Object.entries(l.kpis).map(([k, v]) => `${KPI_MEASURE[k].name} ${fmtNum(v, ((p.kpis || []).find((x) => x.k === k) || KPI_MEASURE[k]).unit)}`).join(', ')}` : `${l.kind === 'call' ? 'Call review' : 'Check-in'}: ${met} met${miss ? `, ${miss} not met` : ''}`;
               return h(
                 'li',
                 { class: 'hist' },
-                icon(l.kind === 'call' ? 'checklist' : 'calendar', 'icon--sm'),
+                icon(l.kind === 'call' ? 'checklist' : l.kind === 'kpi' ? 'trend' : 'calendar', 'icon--sm'),
                 h('span', { class: 'hist__date' }, fmtDay(l.date)),
-                h('span', { class: 'hist__what' }, `${l.kind === 'call' ? 'Call review' : 'Check-in'}: ${met} met${miss ? `, ${miss} not met` : ''}`),
+                h('span', { class: 'hist__what' }, what),
                 l.note ? h('span', { class: 'hist__note' }, l.note) : null,
-                h('button', { type: 'button', class: 'icon-btn icon-btn--sm', 'aria-label': `Delete ${l.kind === 'call' ? 'call review' : 'check-in'} from ${fmtDay(l.date)}`, onclick: () => deleteLog(p.id, l.id) }, icon('trash'))
+                h('button', { type: 'button', class: 'icon-btn icon-btn--sm', 'aria-label': `Delete ${l.kind === 'call' ? 'call review' : l.kind === 'kpi' ? 'numbers update' : 'check-in'} from ${fmtDay(l.date)}`, onclick: () => deleteLog(p.id, l.id) }, icon('trash'))
               );
             })
           )

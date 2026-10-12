@@ -13,6 +13,43 @@ const SECTION = {
 };
 const planHeading = (settings) => `${durationTitle((settings || state.settings).duration)} SMART Action Plan`;
 
+/* ---------- Real KPI numbers ---------- */
+/** How each KPI is named in coaching text, and which direction is better. Attrition is a team measure, so it has no agent number. */
+const KPI_MEASURE = {
+  QA: { name: 'QA score', dir: 'up', unit: '%' },
+  aiCR: { name: 'Repeat contact rate (aiCR)', dir: 'down', unit: '%' },
+  Transfer: { name: 'Transfer rate', dir: 'down', unit: '%' },
+  ABS: { name: 'Absenteeism (ABS)', dir: 'down', unit: '%' },
+};
+function fmtNum(n, unit) {
+  if (n === null || n === undefined) return '';
+  return unit === '%' ? `${n}%` : unit === 'count' ? String(n) : `${n} ${unit}`;
+}
+/** Dates in coaching text are always written in English (for example, October 19), whatever the browser language. */
+const textDay = (d) => parseDay(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+const planEndDay = (s) => textDay(addDays(todayDay(), s.duration));
+const followDay = (s) => textDay(addDays(todayDay(), s.followup));
+/** KPIs with at least one number entered, in a fixed order. */
+function numberedKpis(b) {
+  return Object.keys(KPI_MEASURE).filter((k) => b.nums && b.nums[k] && (b.nums[k].cur !== null || b.nums[k].target !== null));
+}
+/** One measurable line per KPI, built only from the numbers the supervisor typed. */
+function kpiMeasureLine(k, v, s) {
+  const m = KPI_MEASURE[k];
+  const better = m.dir === 'down' ? 'or lower' : 'or higher';
+  const cur = v.cur !== null ? `${fmtNum(v.cur, v.unit)} as of ${textDay(v.asOf)}` : '';
+  const tgt = v.target !== null ? `target ${fmtNum(v.target, v.unit)} ${better} by ${planEndDay(s)}` : `we will track it through ${planEndDay(s)}`;
+  return cur ? `${m.name}: ${cur}, ${tgt}.` : `${m.name}: ${tgt}.`;
+}
+function kpiMeasureSentence(k, v, s) {
+  const m = KPI_MEASURE[k];
+  const name = m.name.charAt(0).toLowerCase() + m.name.slice(1);
+  const better = m.dir === 'down' ? 'or lower' : 'or higher';
+  if (v.cur !== null && v.target !== null) return `Your ${name} is ${fmtNum(v.cur, v.unit)} as of ${textDay(v.asOf)}, and the target is ${fmtNum(v.target, v.unit)} ${better} by ${planEndDay(s)}.`;
+  if (v.target !== null) return `The target for your ${name} is ${fmtNum(v.target, v.unit)} ${better} by ${planEndDay(s)}.`;
+  return `Your ${name} is ${fmtNum(v.cur, v.unit)} as of ${textDay(v.asOf)}, and we will track it through ${planEndDay(s)}.`;
+}
+
 /* ---------- Single opportunity ---------- */
 const oppFeedback = (o) => String(o.feedback || '').trim();
 const oppImpact = (o) => String(o.impact || '').trim();
@@ -228,7 +265,8 @@ function composePlan(b, opps, s) {
   if (mode !== 'people' && !std.length && !opps.some((o) => !isPeopleOpp(o) && o.b && o.b.mx)) {
     measure.push(`The target is for all ${calls} reviewed calls to show the expected behaviors in this plan.`);
   }
-  return intro.map(tidySentence).join(' ') + '\n\n' + measure.map(tidySentence).join(' ');
+  const nums = numberedKpis(b).map((k) => kpiMeasureSentence(k, b.nums[k], s));
+  return intro.map(tidySentence).join(' ') + '\n\n' + measure.map(tidySentence).join(' ') + (nums.length ? '\n\n' + nums.join(' ') : '');
 }
 
 function composeFollowup(b, opps, s) {
@@ -258,11 +296,104 @@ function composeFollowup(b, opps, s) {
   return parts.map(tidySentence).join(' ');
 }
 
+/* ---------- Points format: short, scannable lines with real dates ---------- */
+const bullet = (t) => `\u2022 ${tidySentence(capFirst(String(t).trim()))}`;
+const focusLabel = (o) => capFirst((o.b && o.b.focus) || lowerTitle(o.title));
+
+function pointsProgress(b) {
+  const lines = [];
+  // Verified progress is kept word for word, one point per sentence.
+  b.notes.progress
+    .split(/\n+|(?<=[.?!])\s+(?=[A-Z])/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .forEach((l) => lines.push(bullet(l)));
+  for (const sel of b.strengths) {
+    if (!getStrength(sel.id)) continue;
+    const t = strengthText(sel);
+    if (t) lines.push(bullet(t));
+  }
+  return lines.join('\n');
+}
+
+function pointsChallenges(b, opps) {
+  if (!opps.length) return '';
+  const lead = { supportive: 'What we will work on together:', direct: 'Behaviors that did not meet the expected standard:', balanced: 'What to work on:' }[b.tone] || 'What to work on:';
+  const lines = [lead];
+  const groups = groupByTheme(opps);
+  for (const g of groups) {
+    for (const o of g.items) {
+      if (o.b && o.b.obs) lines.push(`\u2022 ${focusLabel(o)}: ${tidySentence(`you ${o.b.obs}`)}`);
+      else lines.push(bullet(o.title));
+    }
+  }
+  const impacts = dedupe(groups.map((g) => themeOf(g.theme).impact)).slice(0, 3);
+  lines.push('', tidySentence(`Why it matters: this can ${joinList(impacts)}`));
+  const evidence = b.notes.evidence.trim();
+  if (evidence && b.notes.includeEvidence) lines.push('', evidence);
+  return lines.join('\n');
+}
+
+function pointsPlan(b, opps, s) {
+  if (!opps.length) return '';
+  const mode = builderMode(opps);
+  const direct = b.tone === 'direct';
+  const focus = dedupe(opps.map((o) => (o.b && o.b.focus) || lowerTitle(o.title)));
+  const lines = [tidySentence(`Focus until ${planEndDay(s)}: ${joinList(focus)}`), direct ? 'You are expected to:' : 'You will:'];
+  let n = 0;
+  dedupe(opps.map((o) => (o.b && o.b.commit ? capFirst(o.b.commit) : `Apply the expected behavior for ${lowerTitle(o.title)} on ${unitPhrase(isPeopleOpp(o) ? 'people' : 'call')}`))).forEach((c) => lines.push(`${++n}. ${tidySentence(c)}`));
+  lines.push('', 'How we will measure success:');
+  numberedKpis(b).forEach((k) => lines.push(`\u2022 ${kpiMeasureLine(k, b.nums[k], s)}`));
+  const calls = s.calls;
+  if (mode === 'people') lines.push(bullet(`Check-in by ${followDay(s)} to review how the plan is going`));
+  else {
+    lines.push(bullet(`Call reviews: ${calls} applicable calls by ${followDay(s)}`));
+    const std = dedupe(opps.filter((o) => !isPeopleOpp(o)).map((o) => o.b && o.b.m).filter(Boolean));
+    std.forEach((m) => lines.push(bullet(`On every reviewed call: ${m}`)));
+    if (!std.length && !opps.some((o) => !isPeopleOpp(o) && o.b && o.b.mx)) lines.push(bullet('On every reviewed call: the expected behaviors in this plan'));
+  }
+  dedupe(opps.map((o) => o.b && o.b.mx).filter(Boolean)).forEach((mx) => lines.push(bullet(fillTokens(mx, s))));
+  return lines.join('\n');
+}
+
+function pointsFollowup(b, opps, s) {
+  if (!opps.length) return '';
+  const mode = builderMode(opps);
+  const people = opps.filter(isPeopleOpp);
+  const hasSchedule = people.some((o) => o.theme === 'attend' || o.theme === 'adhere');
+  const hasEngage = people.some((o) => o.theme === 'engage');
+  const peopleTopics = [hasSchedule ? 'review your schedule adherence and attendance together' : null, hasEngage ? 'talk about what is going well and where you would like more support' : null].filter(Boolean);
+  const coach = dedupe(opps.map((o) => o.b && o.b.coach).filter(Boolean)).slice(0, 2);
+  const lines = [];
+  if (!coach.length) lines.push(bullet(mode === 'people' ? 'Today: we talk through the expectations and agree on the support you need' : 'Today: we walk through the expected behaviors using examples from the call'));
+  coach.forEach((c) => lines.push(bullet(`Today: ${c}`)));
+  if (mode === 'people') lines.push(bullet(`By ${followDay(s)}: a short check-in to ${joinList(peopleTopics)}`));
+  else {
+    lines.push(bullet(`Around ${textDay(addDays(todayDay(), Math.max(1, Math.round(s.followup / 2))))}: a short check-in on what is working and any recurring gaps`));
+    lines.push(bullet(`By ${followDay(s)}: I review ${s.calls} of your applicable calls and share what I find`));
+    if (mode === 'mixed' && peopleTopics.length) lines.push(bullet(`Also by ${followDay(s)}: we ${joinList(peopleTopics)}`));
+  }
+  const nums = numberedKpis(b);
+  if (nums.length) lines.push(bullet(`At each check-in: we look at your ${joinList(nums.map((k) => KPI_MEASURE[k].name))} on the dashboard together`));
+  lines.push(bullet(`${planEndDay(s)}: we review the results together and decide if the plan is complete, extended, or adjusted`));
+  if (b.tone === 'supportive') lines.push(bullet('Anytime: if something is unclear or you want more practice, tell me and we will set up time'));
+  if (b.tone === 'direct') lines.push(bullet(`If the targets are not met by ${planEndDay(s)}, we will discuss next steps, which may include an extended plan`));
+  return lines.join('\n');
+}
+
 /** Generate all four builder sections from the current selections. */
 function composeBuilder(b, settings) {
   const builder = b || state.builder;
   const s = settings || state.settings;
   const opps = builderOpps(builder);
+  if (builder.style !== 'paragraphs') {
+    return {
+      progress: pointsProgress(builder),
+      challenges: pointsChallenges(builder, opps),
+      plan: pointsPlan(builder, opps, s),
+      followup: pointsFollowup(builder, opps, s),
+    };
+  }
   return {
     progress: composeProgress(builder),
     challenges: composeChallenges(builder, opps),

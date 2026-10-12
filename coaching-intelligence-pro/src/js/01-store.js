@@ -126,6 +126,8 @@ function defaultBuilder() {
     strengths: [],
     tone: 'balanced',
     scope: 'single',
+    style: 'points',
+    nums: {},
     notes: { progress: '', evidence: '', includeEvidence: true, private: '' },
     edited: emptyEdits(),
     base: emptyEdits(),
@@ -231,6 +233,19 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const isIsoDate = (v) => typeof v === 'string' && ISO_DATE.test(v) && !Number.isNaN(new Date(v + 'T00:00:00').getTime());
 
 /** Follow-up plans: a label the supervisor chooses (never a name), the focus entries, the plan settings, and logged results. */
+/** A plan's KPI numbers: where the agent started and the target, both typed by the supervisor. */
+function sanitizePlanKpis(v) {
+  const out = [];
+  for (const x of Array.isArray(v) ? v.slice(0, 6) : []) {
+    if (!x || typeof x !== 'object' || !KPI_MEASURE[x.k] || out.some((y) => y.k === x.k)) continue;
+    const base = numOrNull(x.base);
+    const target = numOrNull(x.target);
+    if (base === null && target === null) continue;
+    out.push({ k: x.k, base, target, unit: NUM_UNITS.includes(x.unit) ? x.unit : KPI_MEASURE[x.k].unit, asOf: isIsoDate(x.asOf) ? x.asOf : todayDay() });
+  }
+  return out;
+}
+
 function sanitizeTracker(o) {
   const src = o && typeof o === 'object' ? o : {};
   const plans = [];
@@ -249,8 +264,13 @@ function sanitizeTracker(o) {
       const results = {};
       const raw = l.results && typeof l.results === 'object' ? l.results : {};
       for (const fid of focus) if (['met', 'miss', 'na'].includes(raw[fid])) results[fid] = raw[fid];
-      if (!Object.keys(results).length) continue;
-      logs.push({ id: isId(l.id) ? l.id : uid('log'), kind: l.kind === 'checkin' ? 'checkin' : 'call', date: l.date, results, note: str(l.note, 300).trim() });
+      // A numbers update carries only KPI values typed from the dashboard.
+      const kv = {};
+      const rawK = l.kpis && typeof l.kpis === 'object' ? l.kpis : {};
+      for (const k of Object.keys(KPI_MEASURE)) if (numOrNull(rawK[k]) !== null) kv[k] = numOrNull(rawK[k]);
+      const kind = l.kind === 'checkin' ? 'checkin' : l.kind === 'kpi' ? 'kpi' : 'call';
+      if (kind === 'kpi' ? !Object.keys(kv).length : !Object.keys(results).length) continue;
+      logs.push({ id: isId(l.id) ? l.id : uid('log'), kind, date: l.date, results: kind === 'kpi' ? {} : results, kpis: kind === 'kpi' ? kv : {}, note: str(l.note, 300).trim() });
     }
     logs.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     plans.push({
@@ -263,6 +283,7 @@ function sanitizeTracker(o) {
       focus,
       status: p.status === 'done' ? 'done' : 'active',
       created: num(p.created) || Date.now(),
+      kpis: sanitizePlanKpis(p.kpis),
       logs,
     });
   }
@@ -564,6 +585,27 @@ function sanitizeEdits(v) {
   return out;
 }
 
+/** The agent's real KPI numbers, as typed from the dashboard: current value, target, unit, and the date of the current value. */
+const NUM_UNITS = ['%', 'points', 'hours', 'count'];
+const numOrNull = (v) => {
+  if (v === '' || v == null) return null;
+  const n = Number(String(v).replace(',', '.'));
+  return Number.isFinite(n) && n >= 0 && n <= 100000 ? Math.round(n * 100) / 100 : null;
+};
+function sanitizeNums(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const out = {};
+  for (const k of Object.keys(KPI_MEASURE)) {
+    const v = src[k];
+    if (!v || typeof v !== 'object') continue;
+    const cur = numOrNull(v.cur);
+    const target = numOrNull(v.target);
+    if (cur === null && target === null) continue;
+    out[k] = { cur, target, unit: NUM_UNITS.includes(v.unit) ? v.unit : KPI_MEASURE[k].unit, asOf: isIsoDate(v.asOf) ? v.asOf : todayDay() };
+  }
+  return out;
+}
+
 function sanitizeBuilder(o) {
   const src = o && typeof o === 'object' ? o : {};
   const b = defaultBuilder();
@@ -571,6 +613,8 @@ function sanitizeBuilder(o) {
   b.strengths = sanitizeStrengthSelection(src.strengths);
   if (['supportive', 'balanced', 'direct'].includes(src.tone)) b.tone = src.tone;
   if (['single', 'multiple'].includes(src.scope)) b.scope = src.scope;
+  if (['points', 'paragraphs'].includes(src.style)) b.style = src.style;
+  b.nums = sanitizeNums(src.nums);
   const n = src.notes && typeof src.notes === 'object' ? src.notes : {};
   b.notes = {
     progress: str(n.progress, 4000),

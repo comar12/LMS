@@ -13,7 +13,7 @@ function snapshotData(days) {
     p.logs.forEach((l) => {
       if (l.date < since || l.date > today) return;
       if (l.kind === 'call') calls++;
-      else checkins++;
+      else if (l.kind === 'checkin') checkins++;
       Object.entries(l.results).forEach(([id, r]) => {
         if (r === 'na' || !getOpp(id)) return;
         const b = behaviors[id] || (behaviors[id] = { id, met: 0, miss: 0, kind: l.kind });
