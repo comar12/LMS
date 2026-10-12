@@ -76,7 +76,7 @@ function choiceGroup({ label, options, value, onChange }) {
   const draw = () =>
     wrap.replaceChildren(
       ...options.map((o) =>
-        h('button', { type: 'button', role: 'radio', 'aria-checked': String(o.value === current), 'aria-pressed': String(o.value === current), tabindex: o.value === current ? '0' : '-1', onclick: () => { current = o.value; draw(); onChange(o.value); wrap.querySelector('[aria-checked="true"]').focus(); } }, o.icon ? icon(o.icon) : null, o.label)
+        h('button', { type: 'button', role: 'radio', 'aria-checked': String(o.value === current), tabindex: o.value === current ? '0' : '-1', onclick: () => { current = o.value; draw(); onChange(o.value); wrap.querySelector('[aria-checked="true"]').focus(); } }, o.icon ? icon(o.icon) : null, o.label)
       )
     );
   wrap.addEventListener('keydown', (e) => {
