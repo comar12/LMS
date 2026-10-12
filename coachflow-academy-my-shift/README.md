@@ -127,10 +127,11 @@ and where to practise them.
 ### Reset after a tough call, wins and lines that worked
 
 - **Reset after a tough call.** When a call is logged with the customer not
-  satisfied, a 30-second reset appears: a breathing circle and a few short
-  lines, then "Ready for the next one". After two unhappy customers in a row
-  it says so and suggests a word with the leader. It can be skipped and
-  nothing about it is stored.
+  satisfied, a card offers 30 seconds before the next call: a breathing
+  circle, a countdown and a few short lines, then "Ready when you are." After
+  two unhappy customers in a row it says so and that it's fine to tell the
+  team leader they need a minute. It can be skipped; only the agent sees it
+  and nothing is logged.
 - **Wins and streaks.** Streaks for offering on every call, giving next steps,
   ticking the QA self-check and doing the warm-up show as chips under the
   bar; milestones (5, 10, 20, 50 calls with an offer; sales counts; first GSR
