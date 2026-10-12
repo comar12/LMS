@@ -92,7 +92,7 @@ only their own calls. Download CSV asks for the name and HR ID first if they
 are missing.
 
 The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id`,
-`warmup`, `next_steps` and `qa_check` columns, and the file is named
+`warmup`, `next_steps`, `qa_check` and `what_worked` columns, and the file is named
 `my-shift-<name>-<hr id>-<date>.csv`.
 
 ### Warm-up, goals, "Customer said" and My week
@@ -123,6 +123,28 @@ The board also shows, per agent and for the team, the unresolved calls with
 next steps given in full and the sales with the QA self-check fully ticked,
 two tiles for them, and a "Left unticked" column with the items missed most
 and where to practise them.
+
+### Reset after a tough call, wins and lines that worked
+
+- **Reset after a tough call.** When a call is logged with the customer not
+  satisfied, a 30-second reset appears: a breathing circle and a few short
+  lines, then "Ready for the next one". After two unhappy customers in a row
+  it says so and suggests a word with the leader. It can be skipped and
+  nothing about it is stored.
+- **Wins and streaks.** Streaks for offering on every call, giving next steps,
+  ticking the QA self-check and doing the warm-up show as chips under the
+  bar; milestones (5, 10, 20, 50 calls with an offer; sales counts; first GSR
+  and XM sale; best day) are listed under "Wins". A new win is named when the
+  call that earned it is logged.
+- **Lines that worked.** After a completed sale the agent can note the line
+  that worked, in the customer's own words. Their lines, and any the leader
+  shares, show under "Customer said" when a few words match. "Add team lines"
+  reads the file the leader downloads from the board.
+
+The team board adds shout-outs (each agent's best wins, with a copy button)
+and a "What worked" list of the team's lines, with "Download for the team"
+(`my-shift-team-lines-<date>.csv`, columns `line,product,agent,date`). Check
+shared lines against the Sales Integrity Gate before passing them on.
 
 ## The team board
 

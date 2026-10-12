@@ -40,14 +40,19 @@ PRACTICE.qa=[GATE,"The Sales Integrity Gate"];
 var CLOSE=[["ref","Gave the ticket or reference number","Reference number"],["next","Told them what happens next","What happens next"],["time","Gave no time frame I couldn't confirm","Time frame"]];
 var QA=[["pitch","Before I pitched, the account and the offer were right for this customer.","Before pitching"],["approval","Before I sent approval, the customer heard the full price and approved it themselves.","Before approval"],["activate","Before I activated, nothing was outstanding and the customer said back what they are getting and paying.","Before activating"],["redlines","I crossed no red line on this call.","Red lines"]];
 var FIRST=["cameback","repeat","not:No opening"];
+/* Wins: streaks, firsts and personal bests, worked out from the calls already logged. Each is celebrated once. */
+var OFFER_LV=[5,10,20,50], RUN_LV=[3,5,10,20], SALES_LV=[10,25,50,100,200];
+var STAR='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>';
+/* Reset after a tough call: private, never logged. */
+var RESET_LINES=["Breathe in for 4, out for 4.","That call wasn't about you.","You did what you could with what you had.","Next customer, fresh start."], resetT=null;
 var EVERY_CALL=[LAB+"sales-practice","The every-call practice"];
 function opts(a){ return a.map(function(x){ return [x,x]; }); }
 var st=load(), whoEdit=false, goalEdit=false, saidOpen=null, root=null, view=null, form={}, editId=null, tries=0, timer=null, newId=null, tick=false, lastRail={}, arriveT=null, loggedT=null;
-var bd={files:[],rows:[],idx:{},period:"week",full:false,example:false,allReps:false};
+var bd={files:[],rows:[],idx:{},period:"week",full:false,example:false,allReps:false,allLines:false,lineRows:[]};
 var SEAL='<span class="ms-seal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
 var LOOP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2.5l3 3-3 3"/><path d="M4 11.5v-2a4 4 0 0 1 4-4h12"/><path d="M7 21.5l-3-3 3-3"/><path d="M20 12.5v2a4 4 0 0 1-4 4H4"/></svg>';
 var FINE=false; try{ FINE=window.matchMedia("(hover: hover) and (pointer: fine)").matches; }catch(e){}
-function load(){ try{ var s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.calls){ if(typeof s.agent!=="string") s.agent=""; if(typeof s.hrId!=="string") s.hrId=""; if(!s.warmups) s.warmups=[]; if(!s.goalsBy) s.goalsBy={}; return s; } }catch(e){} return {shift:null,calls:[],history:[],agent:"",hrId:"",warmups:[],goalsBy:{}}; }
+function load(){ try{ var s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.calls){ if(typeof s.agent!=="string") s.agent=""; if(typeof s.hrId!=="string") s.hrId=""; if(!s.warmups) s.warmups=[]; if(!s.goalsBy) s.goalsBy={}; if(!s.winsSeen) s.winsSeen={}; if(!s.teamLines) s.teamLines=[]; return s; } }catch(e){} return {shift:null,calls:[],history:[],agent:"",hrId:"",warmups:[],goalsBy:{},winsSeen:{},teamLines:[]}; }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
 function q(id){ return root.querySelector("#"+id); }
 function pad(n){ return (n<10?"0":"")+n; }
@@ -84,10 +89,10 @@ function shiftMarkup(){ return '<header class="role-rail mb-6" data-ms-i="0"><di
   '<div class="sl-gate-layout"><div class="sl-gate-main">'+
    '<section class="sl-gate-phase" aria-labelledby="ms-h1" data-ms-i="1"><div class="sl-gate-phase-head"><span class="'+NODE+'" id="ms-n1" aria-hidden="true">1</span><h2 id="ms-h1">Your shift</h2><p class="'+TALLY+'" id="ms-t1">not started</p></div>'+
     '<div class="ms-warm" id="ms-warm"></div>'+
-    '<div class="ms-bar" id="ms-bar" data-state="idle"><div class="ms-ring" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="14" fill="none" stroke-width="4"/><circle class="fg" id="ms-fg" cx="18" cy="18" r="14" fill="none" stroke-width="4" stroke-dasharray="88" stroke-dashoffset="88"/></svg></div><span class="ms-time" id="ms-clock">0:00:00</span><span class="text-sm text-body" id="ms-note"></span><span class="ms-sep" id="ms-sep" hidden></span><div class="ms-stats" id="ms-stats" hidden></div><div class="ms-right" id="ms-btns"></div></div><div class="ms-goals" id="ms-goals"></div></section>'+
+    '<div class="ms-bar" id="ms-bar" data-state="idle"><div class="ms-ring" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="14" fill="none" stroke-width="4"/><circle class="fg" id="ms-fg" cx="18" cy="18" r="14" fill="none" stroke-width="4" stroke-dasharray="88" stroke-dashoffset="88"/></svg></div><span class="ms-time" id="ms-clock">0:00:00</span><span class="text-sm text-body" id="ms-note"></span><span class="ms-sep" id="ms-sep" hidden></span><div class="ms-stats" id="ms-stats" hidden></div><div class="ms-right" id="ms-btns"></div></div><div class="ms-goals" id="ms-goals"></div><div class="ms-streaks" id="ms-streaks" hidden></div></section>'+
    '<section class="sl-gate-phase" aria-labelledby="ms-h2" data-ms-i="2"><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">2</span><h2 id="ms-h2">Log this call</h2><p class="'+TALLY+'" id="ms-t2">under a minute</p></div>'+
     '<div class="ms-quick"><button type="button" class="'+BTN_S+' ms-btn-sm" id="ms-same" disabled>Same as last call</button><button type="button" class="'+BTN_S+' ms-btn-sm" id="ms-said-btn" aria-expanded="false" aria-controls="ms-said">Customer said…</button><span class="ms-keys" aria-hidden="true"><kbd>1</kbd>–<kbd>6</kbd> pick the call type · <kbd>Enter</kbd> in the account or note box logs the call</span></div>'+
-    '<div class="ms-said" id="ms-said" hidden><div class="ms-said-top"><label class="ms-lab" for="ms-said-q">What did the customer say?</label><div class="ms-said-row"><input class="ms-input ms-note" id="ms-said-q" type="search" autocomplete="off" placeholder="A few words: carrier, bill, contract, phone…"><button type="button" class="sl-link-button" id="ms-said-close">Close</button></div></div><ul class="ms-said-list" id="ms-said-list"></ul><div class="ms-said-card" id="ms-said-card" hidden></div><p class="ms-who-help">The Academy\'s own answers, from its Value Conversation guidance. Nothing here is logged.</p></div>'+
+    '<div class="ms-said" id="ms-said" hidden><div class="ms-said-top"><label class="ms-lab" for="ms-said-q">What did the customer say?</label><div class="ms-said-row"><input class="ms-input ms-note" id="ms-said-q" type="search" autocomplete="off" placeholder="A few words: carrier, bill, contract, phone…"><button type="button" class="sl-link-button" id="ms-said-close">Close</button></div></div><ul class="ms-said-list" id="ms-said-list"></ul><div class="ms-said-card" id="ms-said-card" hidden></div><div class="ms-lines" id="ms-said-lines"></div><p class="ms-who-help">The Academy\'s own answers, from its Value Conversation guidance, and the lines that worked for you and your team. Nothing here is logged.</p><p class="ms-lines-add"><button type="button" class="sl-link-button" id="ms-lines-add">Add your team\'s lines</button><input type="file" id="ms-lines-file" accept=".csv,text/csv" hidden><span class="ms-who-help" id="ms-lines-msg" role="status" aria-live="polite"></span></p></div>'+
     '<div class="ms-grid1 grid gap-4 sm:grid-cols-2"><div><label class="ms-lab" for="ms-acct">Account number <i>*</i></label><input class="ms-input" id="ms-acct" type="text" inputmode="numeric" autocomplete="off" placeholder="Numbers only" maxlength="24"></div>'+
      '<div class="ms-repeat" id="ms-repeat" hidden></div>'+
      '<div><span class="ms-lab">Call type <i>*</i></span>'+chips("callType","Call type",opts(CALL_TYPES),"",true)+'</div>'+
@@ -97,15 +102,16 @@ function shiftMarkup(){ return '<header class="role-rail mb-6" data-ms-i="0"><di
     '<div class="grid gap-4 sm:grid-cols-2 ms-sub"><div class="sl-measure"><p class="sl-measure-kind">GSR · home upgrade <span>offered → result → why</span></p>'+chips("gsrOffered","GSR offered",[["yes","Offered"],["no","Not offered"]])+'<div class="ms-why ms-hide" id="ms-w-gsrNotWhy"><span class="ms-lab">Why was it not offered? <i>*</i></span>'+chips("gsrNotWhy","Why GSR was not offered",opts(NOT_OFFERED))+'</div>'+chips("gsrResult","GSR result",[["completed","Completed"],["declined","Declined"],["followup","Follow-up"]],"ms-hide")+chips("gsrWhich","Which GSR",[["Internet tier","Internet tier"],["TV package","TV package"],["Home add-on","Home add-on"],["Watch line","Watch line"],["Tablet line","Tablet line"]],"ms-hide")+'<div class="ms-why ms-hide" id="ms-w-gsrWhy"><span class="ms-lab" id="ms-l-gsrWhy">Why did the customer decline? <i>*</i></span>'+chips("gsrWhy","Why GSR was declined",opts(GSR_WHY))+'<p class="ms-fu-tip" id="ms-fu-gsr" hidden>Only when the customer asked for a call back. Never offer or promise one. Put the time they asked for in the note.</p></div></div>'+
      '<div class="sl-measure"><p class="sl-measure-kind">XM · Xfinity Mobile <span>offered → result → why not</span></p>'+chips("xmOffered","XM offered",[["yes","Offered"],["no","Not offered"]])+'<div class="ms-why ms-hide" id="ms-w-xmNotWhy"><span class="ms-lab">Why was it not offered? <i>*</i></span>'+chips("xmNotWhy","Why XM was not offered",opts(NOT_OFFERED))+'</div>'+chips("xmResult","XM result",[["completed","Completed"],["declined","Declined"],["followup","Follow-up"]],"ms-hide")+'<div class="ms-why ms-hide" id="ms-w-xmWhy"><span class="ms-lab" id="ms-l-xmWhy">Why did the customer decline? <i>*</i></span>'+chips("xmWhy","Why XM was declined",opts(XM_WHY))+'<p class="ms-fu-tip" id="ms-fu-xm" hidden>Only when the customer asked for a call back. Never offer or promise one. Put the time they asked for in the note.</p></div></div></div>'+
     '<div class="ms-why ms-hide" id="ms-w-qa"><span class="ms-lab">QA self-check on this sale: tick what is true</span>'+ticks("qa",QA)+'<p class="ms-tick-help">Anything you can\'t tick: go through the <a class="ms-inline" href="'+href(GATE)+'"'+ext()+'>Sales Integrity Gate</a> and check it with your team leader.</p></div>'+
+    '<div class="ms-why ms-hide" id="ms-w-worked"><label class="ms-lab" for="ms-worked">What worked? (optional)</label><input class="ms-input ms-note" id="ms-worked" type="text" maxlength="200" autocomplete="off" placeholder="The question or line that got the yes"><p class="ms-tick-help">It goes into your lines under Customer said, and your team leader can share the best ones.</p></div>'+
     '<div class="mt-4"><label class="ms-lab" for="ms-notein">What happened, in a few words (optional)</label><input class="ms-input ms-note" id="ms-notein" type="text" placeholder="A call back the customer asked for and when, what was quoted, what they said" maxlength="240"></div>'+
     '<div class="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4"><button type="button" class="'+BTN_P+'" id="ms-save">Log call</button><button type="button" class="'+BTN_S+'" id="ms-cancel" hidden>Cancel edit</button><button type="button" class="sl-link-button" id="ms-del" hidden>Delete this call</button></div>'+
-    '<p class="ms-msg" id="ms-msg" role="status" aria-live="polite"></p><p class="visually-hidden" id="ms-live" role="status" aria-live="polite"></p></section>'+
+    '<p class="ms-msg" id="ms-msg" role="status" aria-live="polite"></p><p class="visually-hidden" id="ms-live" role="status" aria-live="polite"></p><div class="ms-reset" id="ms-reset" hidden></div></section>'+
    '<section class="sl-gate-phase" aria-labelledby="ms-h3" data-ms-i="3"><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">3</span><h2 id="ms-h3" ><span id="ms-listname">Today</span></h2><p class="'+TALLY+'" id="ms-t3">0 calls</p></div>'+
     '<div class="mb-3 flex flex-wrap items-center gap-3"><input class="ms-input ms-search" id="ms-search" type="text" inputmode="numeric" placeholder="Search by account number, all days" aria-label="Search by account number"><span class="text-sm text-muted" id="ms-searchnote"></span></div>'+
     '<div class="overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-[var(--shadow-card)]"><div class="scrollable-x" tabindex="0" role="region" aria-label="Calls table"><table class="w-full border-collapse text-sm" id="ms-tbl"><thead><tr><th '+TH+'>Time</th><th '+TH+'>Type</th><th '+TH+'>Account</th><th '+TH+'>Issue</th><th '+TH+'>Happy</th><th '+TH+'>GSR</th><th '+TH+'>XM</th><th '+TH+'>Note</th></tr></thead><tbody id="ms-rows"></tbody></table><p class="ms-empty" id="ms-empty" hidden>No calls logged yet today. The first one goes here.</p></div></div>'+
     '<p class="mt-2 text-sm text-muted">Tap a row to open it again.</p></section>'+
    '<section class="sl-gate-phase" aria-labelledby="ms-h5" data-ms-i="4"><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">4</span><h2 id="ms-h5">My week</h2><p class="'+TALLY+'" id="ms-t5">last 7 days</p></div>'+
-    '<p class="ms-who-help ms-week-lead">Your own last 7 days against the 7 before. Only you see this.</p><div class="ms-days" id="ms-days"></div><div class="tb-tiles" id="ms-week"></div></section>'+
+    '<p class="ms-who-help ms-week-lead">Your own last 7 days against the 7 before. Only you see this.</p><div class="ms-days" id="ms-days"></div><div class="tb-tiles" id="ms-week"></div><div class="ms-wins" id="ms-wins"></div></section>'+
    '<section class="sl-gate-final" aria-labelledby="ms-h4" data-ms-i="5"><h2 id="ms-h4" class="sl-gate-h">End of shift</h2><p class="mt-2 max-w-prose text-sm leading-relaxed text-body">One line for your team leader. Nothing leaves this browser unless you copy or download it.</p><p class="tabular mt-3 max-w-prose text-sm font-semibold text-ink" id="ms-summary"></p>'+
     '<div class="ms-next" id="ms-next" hidden></div>'+
     '<div class="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4"><button type="button" class="'+BTN_S+'" id="ms-copy">Copy summary</button><button type="button" class="'+BTN_S+'" id="ms-csv">Download CSV</button><button type="button" class="sl-link-button" id="ms-clear">Clear calls older than 30 days</button></div>'+
@@ -122,7 +128,7 @@ function boardMarkup(){ return '<header class="role-rail mb-6" data-ms-i="0"><di
    '<div class="tb-row"><button type="button" class="sl-link-button" id="tb-example">See it with example data</button><button type="button" class="sl-link-button" id="tb-clear" hidden>Clear the board</button></div></section>'+
   '<section class="sl-gate-phase" aria-labelledby="tb-h2" data-ms-i="2" data-tb-part hidden><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">2</span><h2 id="tb-h2">The team at a glance</h2><p class="'+TALLY+'" id="tb-t2"></p></div>'+
    '<div class="sl-chips ms-chips" role="group" aria-label="Which days to count" id="tb-period"><button type="button" class="sl-chip" aria-pressed="false" data-v="latest">Latest day</button><button type="button" class="sl-chip" aria-pressed="false" data-v="week">Last 7 days</button><button type="button" class="sl-chip" aria-pressed="false" data-v="all">Every day in the files</button></div>'+
-   '<div class="tb-tiles" id="tb-tiles"></div></section>'+
+   '<div class="tb-tiles" id="tb-tiles"></div><div class="tb-shout" id="tb-shout"></div></section>'+
   '<section class="sl-gate-phase" aria-labelledby="tb-h3" data-ms-i="3" data-tb-part hidden><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">3</span><h2 id="tb-h3">Agent by agent</h2><p class="'+TALLY+'" id="tb-t3"></p></div>'+
    '<div class="overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-[var(--shadow-card)]"><div class="scrollable-x" tabindex="0" role="region" aria-label="Agents table"><table class="w-full border-collapse text-sm"><thead><tr><th '+TH+'>Agent</th><th '+TH+'>Calls</th><th '+TH+'>GSR offered</th><th '+TH+'>GSR got</th><th '+TH+'>XM offered</th><th '+TH+'>XM got</th><th '+TH+'>Resolved</th><th '+TH+'>Came back</th><th '+TH+'>Transferred</th><th '+TH+'>Warm-up</th><th '+TH+'>Next steps</th><th '+TH+'>QA check</th><th '+TH+'>Practise next</th></tr></thead><tbody id="tb-rows"></tbody><tfoot id="tb-foot"></tfoot></table></div></div>'+
    '<p class="tb-help">Came back: the customer called the team again within '+REPEAT_DAYS+' days. Warm-up: the days the agent did the 5-minute practice before their shift. Next steps: unresolved and escalated calls where all three "before you hang up" boxes were ticked. QA check: sales where all four QA self-check boxes were ticked. Practise next: the Academy call for the reason that comes up more for that agent than for the team as a whole.</p></section>'+
@@ -131,6 +137,9 @@ function boardMarkup(){ return '<header class="role-rail mb-6" data-ms-i="0"><di
   '<section class="sl-gate-phase" aria-labelledby="tb-h5" data-ms-i="5" data-tb-part hidden><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">5</span><h2 id="tb-h5">Repeat callers</h2><p class="'+TALLY+'" id="tb-t5"></p></div>'+
    '<p class="tb-help">The same account calling the team again within '+REPEAT_DAYS+' days. A transfer that reaches another of your agents within 30 minutes counts as one contact.</p>'+
    '<label class="tb-check"><input type="checkbox" id="tb-full"> Show full account numbers</label><ol class="tb-reps" id="tb-reps"></ol><button type="button" class="sl-link-button tb-more" id="tb-more" hidden></button></section>'+
+  '<section class="sl-gate-phase" aria-labelledby="tb-h7" data-ms-i="5" data-tb-part hidden><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">6</span><h2 id="tb-h7">What worked</h2><p class="'+TALLY+'" id="tb-t7"></p></div>'+
+   '<p class="tb-help">Lines agents noted after a sale. Read each one against the Sales Integrity Gate before you share it. Agents add the downloaded file in My Shift, under Customer said, and find the lines while they are on a call.</p>'+
+   '<ol class="tb-lines" id="tb-lines"></ol><div class="tb-row"><button type="button" class="sl-link-button" id="tb-lines-more" hidden></button><button type="button" class="sl-link-button" id="tb-lines-copy">Copy the lines</button><button type="button" class="sl-link-button" id="tb-lines-dl">Download for the team</button></div></section>'+
   '<section class="sl-gate-final" aria-labelledby="tb-h6" data-ms-i="6" data-tb-part hidden><h2 id="tb-h6" class="sl-gate-h">One line for your supervisor</h2><p class="tabular mt-3 max-w-prose text-sm font-semibold text-ink" id="tb-summary"></p>'+
    '<div class="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4"><button type="button" class="'+BTN_S+'" id="tb-copy">Copy team summary</button></div></section>'; }
 function build(){
@@ -157,7 +166,10 @@ function build(){
   q("ms-said-q").addEventListener("input",function(){ saidOpen=null; renderSaid(); });
   q("ms-said-q").addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); var b=q("ms-said-list").querySelector("[data-said]"); if(b) b.click(); } else if(e.key==="Escape"){ toggleSaid(false); q("ms-said-btn").focus(); } });
   q("ms-said").addEventListener("click",function(e){ var b=e.target.closest("[data-said]"); if(b){ saidOpen=b.getAttribute("data-said"); renderSaid(); var h=q("ms-said-card").querySelector("h3"); if(h) h.focus(); return; } if(e.target.closest("[data-said-back]")){ saidOpen=null; renderSaid(); q("ms-said-q").focus(); } });
-  q("ms-warm").addEventListener("click",function(e){ var b=e.target.closest("[data-warm]"); if(!b) return; var a=b.getAttribute("data-warm"), w=warmToday(), p=warmPick(); if(a==="undo"){ st.warmups=st.warmups.filter(function(x){ return x!==w; }); } else if(!w){ st.warmups.push({date:dkey(Date.now()),hrId:st.hrId||null,href:p.href,title:p.title,done:a==="done",at:Date.now()}); } save(); renderWarm(true); renderSummary(); });
+  q("ms-reset").addEventListener("click",function(e){ var b=e.target.closest("[data-reset]"); if(!b) return; if(b.getAttribute("data-reset")==="start") startReset(); else { hideReset(); focusAcct(true); } });
+  q("ms-lines-add").addEventListener("click",function(){ q("ms-lines-file").click(); });
+  q("ms-lines-file").addEventListener("change",function(){ var f=this.files&&this.files[0], inp=this; if(f) addTeamLines(f).then(function(){ inp.value=""; }); });
+  q("ms-warm").addEventListener("click",function(e){ var b=e.target.closest("[data-warm]"); if(!b) return; var a=b.getAttribute("data-warm"), w=warmToday(), p=warmPick(); if(a==="undo"){ st.warmups=st.warmups.filter(function(x){ return x!==w; }); } else if(!w){ st.warmups.push({date:dkey(Date.now()),hrId:st.hrId||null,href:p.href,title:p.title,done:a==="done",at:Date.now()}); } save(); renderWarm(true); renderSummary(); renderWins(); var nw=newWins(); if(nw.length) say("New win: "+nw.join(", ")); });
   q("ms-goals").addEventListener("click",function(e){ var b=e.target.closest("[data-goal]"); if(!b) return; var a=b.getAttribute("data-goal");
     if(a==="save"){ var g={}; ["gsr","xm","sales"].forEach(function(k){ var v=q("ms-g-"+k).value.replace(/\D/g,""); if(v!=="") g[k]=Math.min(k==="sales"?50:100,+v); }); st.goalsBy[st.hrId||"_"]=g; save(); goalEdit=false; }
     else goalEdit=a==="edit"; renderGoals(); if(goalEdit) q("ms-g-gsr").focus(); });
@@ -182,6 +194,10 @@ function build(){
   q("tb-full").addEventListener("change",function(){ bd.full=this.checked; renderBoard(); });
   q("tb-more").addEventListener("click",function(){ bd.allReps=!bd.allReps; renderBoard(); });
   q("tb-copy").addEventListener("click",function(){ copy(boardSummary(),this,"Copy team summary"); });
+  q("tb-shout").addEventListener("click",function(e){ var b=e.target.closest("#tb-shout-copy"); if(b) copy("Shout-outs: "+(bd.shout||[]).map(function(x){ return x.who+": "+lc(x.t); }).join("; ")+".",b,"Copy shout-outs"); });
+  q("tb-lines-more").addEventListener("click",function(){ bd.allLines=!bd.allLines; renderBoard(); });
+  q("tb-lines-copy").addEventListener("click",function(){ copy(bd.lineRows.map(function(r){ return "“"+r.worked+"” ("+r.agent+", "+(saleLabel(r)||"sale")+")"; }).join("\n"),this,"Copy the lines"); });
+  q("tb-lines-dl").addEventListener("click",function(){ var rows=[["line","product","agent","date"]].concat(bd.lineRows.map(function(r){ return [r.worked,saleLabel(r),r.agent,r.date]; })); download(rows.map(function(r){ return r.map(csvCell).join(","); }).join("\r\n"),"my-shift-team-lines-"+dkey(Date.now())+".csv"); });
   resetForm();
 }
 /* Who is logging: a name and an HR ID, asked once and remembered. Each call is stamped with the HR ID, so if someone else uses this computer, each person's summary and file hold only their own calls. */
@@ -222,13 +238,13 @@ function renderGoals(){ var el=q("ms-goals"), g=goals(), keys=Object.keys(g);
 function concerns(){ return window.MyShiftConcerns||[]; }
 function toggleSaid(open){ q("ms-said").hidden=!open; q("ms-said-btn").setAttribute("aria-expanded",open?"true":"false"); if(open){ saidOpen=null; q("ms-said-q").value=""; renderSaid(); q("ms-said-q").focus(); } }
 function renderSaid(){ var list=q("ms-said-list"), card=q("ms-said-card"), all=concerns();
-  if(saidOpen){ var c=all.filter(function(x){ return x.id===saidOpen; })[0]; if(c){ list.hidden=true; card.hidden=false;
+  if(saidOpen){ var c=all.filter(function(x){ return x.id===saidOpen; })[0]; if(c){ list.hidden=true; card.hidden=false; q("ms-said-lines").hidden=true;
     var li=function(a){ return '<ul>'+a.map(function(t){ return '<li>'+esc(t)+'</li>'; }).join("")+'</ul>'; };
     card.innerHTML='<h3 tabindex="-1">“'+esc(c.said)+'”</h3><dl><dt>Find out</dt><dd>'+esc(c.clarify)+'</dd><dt>Ask</dt><dd class="ms-said-ask">“'+esc(c.ask)+'”</dd><dt>If there is a real need</dt><dd>'+esc(c.option)+'</dd><dt>Before anything is agreed</dt><dd>'+esc(c.conditions)+'</dd><dt>Then</dt><dd>'+esc(c.decision)+'</dd>'+(c.stop.length?'<dt>Stop when</dt><dd>'+li(c.stop)+'</dd>':'')+(c.avoid.length?'<dt>Don\'t</dt><dd>'+li(c.avoid)+'</dd>':'')+'</dl><p class="ms-said-act"><button type="button" class="sl-link-button" data-said-back>All of them</button><a class="sl-coach-link" href="'+href(LAB+c.scenario)+'"'+ext()+'>Practise it later: '+esc(c.scenarioTitle)+'</a></p>'; return; } }
   list.hidden=false; card.hidden=true;
   var words=q("ms-said-q").value.toLowerCase().split(/[^a-z0-9']+/).filter(Boolean), fam=form.callType==="Mobile"?"MOBILE":form.callType==="Internet"||form.callType==="TV"?"INTERNET_TV":"";
   var hits=all.filter(function(c){ var t=(c.said+" "+c.clarify+" "+c.ask).toLowerCase(); return words.every(function(w){ return t.indexOf(w)>=0; }); }).sort(function(a,b){ return (b.family===fam)-(a.family===fam); });
-  list.innerHTML=hits.length?hits.map(function(c){ return '<li><button type="button" class="ms-said-item" data-said="'+esc(c.id)+'">“'+esc(c.said)+'”</button></li>'; }).join(""):'<li class="tb-empty">Nothing matches. Try one word, such as bill, phone or contract.</li>'; }
+  list.innerHTML=hits.length?hits.map(function(c){ return '<li><button type="button" class="ms-said-item" data-said="'+esc(c.id)+'">“'+esc(c.said)+'”</button></li>'; }).join(""):'<li class="tb-empty">Nothing matches. Try one word, such as bill, phone or contract.</li>'; renderLines(words); }
 /* My week: the agent's own last 7 days against the 7 before. */
 function renderWeek(){ var k=dkey(Date.now()), d6=addDays(k,-6), d13=addDays(k,-13), all=mine(), idx=byAccount(), cur=[], prev=[];
   all.forEach(function(c){ var d=dkey(c.ts); if(d>=d6&&d<=k) cur.push(c); else if(d>=d13&&d<d6) prev.push(c); });
@@ -247,6 +263,58 @@ function renderWeek(){ var k=dkey(Date.now()), d6=addDays(k,-6), d13=addDays(k,-
   var html=""; for(var i=6;i>=0;i--){ var d=addDays(k,-i), x=per[d]||{n:0,o:0}, p=d.split("-"), dt=new Date(+p[0],+p[1]-1,+p[2]), wd=dt.toLocaleDateString(undefined,{weekday:"short"});
     html+='<div class="ms-day'+(i===0?" today":"")+'" title="'+esc(dt.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"})+": "+plural(x.n,"call")+(x.n?", an offer on "+x.o:""))+'"><b class="tabular">'+(x.n||"")+'</b><span class="ms-day-bar"><span class="ms-day-fill" data-h="'+Math.round(100*x.n/max)+'"></span></span><span class="ms-day-d">'+esc(wd)+'</span></div>'; }
   days.innerHTML='<p class="visually-hidden">Calls per day this week</p>'+html; days.querySelectorAll("[data-h]").forEach(function(f){ f.style.setProperty("--h",f.getAttribute("data-h")+"%"); }); }
+/* Reset after a tough call. Offered after a call logged as not satisfied; nothing about it is kept. */
+function showReset(){ var el=q("ms-reset"), L=mine().slice().sort(function(a,b){ return b.ts-a.ts; }), two=L.length>1&&L[0].satisfied==="no"&&L[1].satisfied==="no"; clearInterval(resetT);
+  el.setAttribute("data-state","offer");
+  el.innerHTML='<p class="ms-next-k">Tough call</p><div class="ms-reset-row"><span class="ms-breath" aria-hidden="true"></span><div><p class="ms-reset-line" id="ms-reset-line">That one was hard. Take 30 seconds before the next call.</p><p class="ms-reset-sub" id="ms-reset-sub">'+(two?"Two tough calls in a row. It's fine to tell your team leader you need a minute.":"Only you see this. Nothing is logged.")+'</p></div></div><p class="ms-warm-act"><button type="button" class="'+BTN_S+' ms-btn-sm" data-reset="start">Take 30 seconds</button><button type="button" class="sl-link-button" data-reset="skip">Not now</button></p>';
+  el.hidden=false; }
+function startReset(){ var el=q("ms-reset"), left=30, i=0, line=q("ms-reset-line"), sub=q("ms-reset-sub"), act=el.querySelector(".ms-warm-act"); clearInterval(resetT);
+  el.setAttribute("data-state","run"); line.textContent=RESET_LINES[0]; sub.textContent="0:30"; act.innerHTML='<button type="button" class="sl-link-button" data-reset="skip">Stop</button>'; say(RESET_LINES[0]);
+  resetT=setInterval(function(){ left--; sub.textContent="0:"+pad(Math.max(0,left)); if(left>0&&left%8===6){ i=Math.min(i+1,RESET_LINES.length-1); line.textContent=RESET_LINES[i]; }
+    if(left<=0){ clearInterval(resetT); el.setAttribute("data-state","done"); line.textContent="Ready when you are."; sub.textContent="Next customer, fresh start."; act.innerHTML='<button type="button" class="sl-link-button" data-reset="skip">Close</button>'; say("Ready when you are."); } },1000); }
+function hideReset(){ clearInterval(resetT); var el=q("ms-reset"); el.hidden=true; el.innerHTML=""; el.removeAttribute("data-state"); }
+/* Wins and streaks, from the calls in a list (the agent's own, or one agent's rows on the board). */
+function lc(t){ return t&&!/^[A-Z]{2}/.test(t)?t.charAt(0).toLowerCase()+t.slice(1):t; }
+function noon(d){ var p=d.split("-"); return new Date(+p[0],+p[1]-1,+p[2],12).getTime(); }
+function computeWins(list,warm){ var L=list.slice().sort(function(a,b){ return a.ts-b.ts; }), ev=[], run={offer:0,steps:0,qa:0}, start={}, sales=0, first={}, day={}, best=0, cur=null, bests={};
+  var step=function(k,ok,id,lv,text,ts){ if(!ok){ run[k]=0; return; } if(!run[k]) start[k]=id; run[k]++; if(lv.indexOf(run[k])>=0) ev.push({key:k+":"+run[k]+":"+start[k],text:text(run[k]),ts:ts}); };
+  L.forEach(function(c){ var d=c.date||dkey(c.ts); if(d!==cur){ if(cur&&(day[cur]||0)>best) best=day[cur]; cur=d; }
+    step("offer",c.gsrOffered==="yes"||c.xmOffered==="yes",c.id,OFFER_LV,function(n){ return "Offered on "+n+" calls in a row"; },c.ts);
+    if(Array.isArray(c.close)) step("steps",c.close.length>=CLOSE.length,c.id,RUN_LV,function(n){ return "Next steps given in full on "+n+" unresolved calls in a row"; },c.ts);
+    if(Array.isArray(c.qa)) step("qa",c.qa.length>=QA.length,c.id,RUN_LV,function(n){ return "QA self-check fully ticked on "+n+" sales in a row"; },c.ts);
+    var g=c.gsrResult==="completed", x=c.xmResult==="completed";
+    if(g&&!first.gsr){ first.gsr=1; ev.push({key:"first:gsr",text:"First GSR sale",ts:c.ts}); }
+    if(x&&!first.xm){ first.xm=1; ev.push({key:"first:xm",text:"First XM sale",ts:c.ts}); }
+    [g,x].forEach(function(on){ if(!on) return; sales++; day[d]=(day[d]||0)+1; if(SALES_LV.indexOf(sales)>=0) ev.push({key:"sales:"+sales,text:sales+" sales logged",ts:c.ts});
+      if(best>=2&&day[d]===best+1){ bests[d]={key:"best:"+d,text:"",ts:c.ts}; ev.push(bests[d]); } }); });
+  Object.keys(bests).forEach(function(d){ bests[d].text="Personal best: "+day[d]+" sales in one day"; });
+  var days={}, wr=0, ws=null; L.forEach(function(c){ days[c.date||dkey(c.ts)]=1; }); Object.keys(warm||{}).forEach(function(d){ days[d]=1; });
+  Object.keys(days).sort().forEach(function(d){ if(warm&&warm[d]){ if(!wr) ws=d; wr++; if(RUN_LV.indexOf(wr)>=0) ev.push({key:"warm:"+wr+":"+ws,text:"Warm-up done "+wr+" working days in a row",ts:noon(d)}); } else wr=0; });
+  ev.sort(function(a,b){ return a.ts-b.ts; });
+  return {streak:{offer:run.offer,steps:run.steps,qa:run.qa,warm:wr},events:ev}; }
+function streakLines(s){ var o=[]; if(s.offer>=5) o.push("Offered on "+s.offer+" calls in a row"); if(s.qa>=3) o.push("QA check fully ticked on "+s.qa+" sales in a row"); if(s.steps>=3) o.push("Next steps in full on "+s.steps+" unresolved calls in a row"); if(s.warm>=2) o.push("Warm-up done "+s.warm+" days running"); return o; }
+function myWarm(){ var w={}, me=st.hrId||null; st.warmups.forEach(function(x){ if(x.done&&(x.hrId||null)===me) w[x.date]=1; }); return w; }
+function newWins(){ var id=st.hrId||"_", seen=st.winsSeen[id], ev=computeWins(mine(),myWarm()).events, out=[];
+  if(!seen){ seen=st.winsSeen[id]={}; ev.forEach(function(e){ seen[e.key]=1; }); save(); return out; }
+  ev.forEach(function(e){ if(!seen[e.key]){ seen[e.key]=1; out.push(e.text); } }); if(out.length) save(); return out.reverse(); }
+function renderWins(){ var w=computeWins(mine(),myWarm()), id=st.hrId||"_", el=q("ms-streaks"), ws=q("ms-wins"), lines=streakLines(w.streak), ev=w.events.slice().reverse().slice(0,6);
+  if(!st.winsSeen[id]){ st.winsSeen[id]={}; w.events.forEach(function(e){ st.winsSeen[id][e.key]=1; }); save(); }
+  var sk=lines.join("|"); if(el.getAttribute("data-key")!==sk){ el.setAttribute("data-key",sk); el.innerHTML=lines.length?'<p class="ms-next-k">Going strong</p><ul class="ms-streak-list">'+lines.map(function(t){ return '<li class="ms-streak">'+STAR+'<span>'+esc(t)+'</span></li>'; }).join("")+'</ul>':""; el.hidden=!lines.length; }
+  var wk=ev.map(function(e){ return e.key+e.text; }).join("|")+dkey(Date.now()); if(ws.getAttribute("data-key")===wk) return; ws.setAttribute("data-key",wk);
+  ws.innerHTML='<p class="ms-rh">Wins</p>'+(ev.length?'<ul class="ms-win-list">'+ev.map(function(e){ return '<li><span class="ms-win-dot" aria-hidden="true"></span><span>'+esc(e.text)+'</span><span class="ms-win-when">'+esc(cap(dayName(e.ts)))+'</span></li>'; }).join("")+'</ul>':'<p class="tb-empty">Your wins show here: first sales, streaks and personal bests.</p>'); }
+/* Lines that worked: the agent's own, and the ones their team leader shares. */
+function saleLabel(c){ var p=[]; if(c.gsrResult==="completed") p.push("GSR"+(c.gsrWhich?" · "+c.gsrWhich:"")); if(c.xmResult==="completed") p.push("XM"); return p.join(" + "); }
+function allLines(){ var seen={}, out=[]; mine().filter(function(c){ return c.worked; }).sort(function(a,b){ return b.ts-a.ts; }).forEach(function(c){ var k=c.worked.toLowerCase(); if(seen[k]) return; seen[k]=1; out.push({t:c.worked,p:saleLabel(c),by:"You",d:dkey(c.ts)}); });
+  st.teamLines.slice().reverse().forEach(function(l){ var k=l.t.toLowerCase(); if(seen[k]) return; seen[k]=1; out.push(l); }); return out; }
+function renderLines(words){ var el=q("ms-said-lines"), all=allLines(); el.hidden=false;
+  if(!all.length){ el.innerHTML='<p class="ms-rh">Lines that worked</p><p class="tb-empty">When you log a sale, add the line that got the yes. It shows up here, with any lines your team leader shares.</p>'; return; }
+  var hits=words.length?all.filter(function(l){ var t=(l.t+" "+l.p).toLowerCase(); return words.every(function(w){ return t.indexOf(w)>=0; }); }):all;
+  el.innerHTML='<p class="ms-rh">Lines that worked'+(words.length?'':', latest')+'</p>'+(hits.length?'<ul class="ms-line-list">'+hits.slice(0,words.length?6:4).map(function(l){ return '<li><p class="ms-line-t">“'+esc(l.t)+'”</p><span class="tb-of">'+esc([l.by,l.p].filter(Boolean).join(" · "))+'</span></li>'; }).join("")+'</ul>':'<p class="tb-empty">No line matches those words yet.</p>'); }
+function addTeamLines(f){ var m=q("ms-lines-msg"); return readFile(f).then(function(t){ var rows=parseCsv(t), h=rows.length?rows[0].map(function(x){ return x.trim().toLowerCase(); }):[], i=h.indexOf("line"), have={}, n=0, col=function(r,k){ var j=h.indexOf(k); return j<0?"":String(r[j]||"").trim(); };
+  if(i<0){ m.textContent="That isn't a team lines file. Ask your team leader for the one the team board downloads."; return; }
+  st.teamLines.forEach(function(l){ have[l.t.toLowerCase()]=1; });
+  rows.slice(1).forEach(function(r){ var t=col(r,"line").slice(0,200); if(!t||have[t.toLowerCase()]) return; have[t.toLowerCase()]=1; n++; st.teamLines.push({t:t,p:col(r,"product"),by:col(r,"agent"),d:col(r,"date")}); });
+  if(st.teamLines.length>300) st.teamLines=st.teamLines.slice(-300); save(); m.textContent=n?"Added "+plural(n,"line")+" from your team.":"Nothing new in that file."; saidOpen=null; renderSaid(); }); }
 function copy(t,btn,label){ var done=function(){ btn.textContent="Copied"; setTimeout(function(){ btn.textContent=label; },1500); }; if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done,function(){ fallbackCopy(t); done(); }); else { fallbackCopy(t); done(); } }
 function fallbackCopy(t){ var ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(e){} document.body.removeChild(ta); }
 function download(text,name){ var blob=new Blob([text],{type:"text/csv"}); var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },500); }
@@ -294,12 +362,12 @@ function syncForm(){
   q("ms-w-xmNotWhy").classList.toggle("ms-hide",!xOff); group("xmResult").classList.toggle("ms-hide",!xOn); q("ms-w-xmWhy").classList.toggle("ms-hide",!xNo);
   var cOn=form.resolved==="not"||form.resolved==="escalated", qOn=form.gsrResult==="completed"||form.xmResult==="completed";
   if(!cOn) form.close=null; else if(!form.close) form.close=[]; if(!qOn) form.qa=null; else if(!form.qa) form.qa=[];
-  q("ms-w-close").classList.toggle("ms-hide",!cOn); q("ms-w-qa").classList.toggle("ms-hide",!qOn);
+  q("ms-w-close").classList.toggle("ms-hide",!cOn); q("ms-w-qa").classList.toggle("ms-hide",!qOn); q("ms-w-worked").classList.toggle("ms-hide",!qOn);
   root.querySelectorAll("#ms-view-shift [data-multi] input").forEach(function(i){ var f=i.closest("[data-multi]").getAttribute("data-multi"); i.checked=(form[f]||[]).indexOf(i.value)>=0; });
   q("ms-fu-gsr").hidden=form.gsrResult!=="followup"; q("ms-fu-xm").hidden=form.xmResult!=="followup";
   q("ms-l-gsrWhy").firstChild.textContent=form.gsrResult==="followup"?"Why not today? ":"Why did the customer decline? "; q("ms-l-xmWhy").firstChild.textContent=form.xmResult==="followup"?"Why not today? ":"Why did the customer decline? ";
 }
-function resetForm(){ form={}; editId=null; q("ms-acct").value=""; q("ms-notein").value=""; q("ms-acct").classList.remove("err"); syncForm(); q("ms-save").textContent="Log call"; q("ms-cancel").hidden=true; q("ms-del").hidden=true; q("ms-del").textContent="Delete this call"; q("ms-t2").textContent="under a minute"; renderRepeat(); updateSame(); }
+function resetForm(){ form={}; editId=null; q("ms-acct").value=""; q("ms-notein").value=""; q("ms-worked").value=""; q("ms-acct").classList.remove("err"); syncForm(); q("ms-save").textContent="Log call"; q("ms-cancel").hidden=true; q("ms-del").hidden=true; q("ms-del").textContent="Delete this call"; q("ms-t2").textContent="under a minute"; renderRepeat(); updateSame(); }
 function validate(){ var a=q("ms-acct").value.replace(/\D/g,""), miss=[];
   if(a.length<6){ q("ms-acct").classList.add("err"); miss.push("the account number"); }
   if(!form.callType) miss.push("the call type");
@@ -309,20 +377,23 @@ function validate(){ var a=q("ms-acct").value.replace(/\D/g,""), miss=[];
   if(!form.xmOffered) miss.push("whether XM was offered"); else if(form.xmOffered==="no"&&!form.xmNotWhy) miss.push("why XM was not offered"); else if(form.xmOffered==="yes"&&!form.xmResult) miss.push("the XM result"); else if((form.xmResult==="declined"||form.xmResult==="followup")&&!form.xmWhy) miss.push("why XM was "+(form.xmResult==="declined"?"declined":"not closed today"));
   return miss; }
 function saveCall(){ var miss=validate(); if(miss.length){ setMsg("Still needed: "+miss.join(", ")+"."); return; }
-  var rec={account:q("ms-acct").value.replace(/\D/g,""),note:q("ms-notein").value.trim()}, when; FIELDS.forEach(function(f){ rec[f]=form[f]||null; }); rec.close=form.close?form.close.slice():null; rec.qa=form.qa?form.qa.slice():null;
+  var rec={account:q("ms-acct").value.replace(/\D/g,""),note:q("ms-notein").value.trim()}, when; FIELDS.forEach(function(f){ rec[f]=form[f]||null; }); rec.close=form.close?form.close.slice():null; rec.qa=form.qa?form.qa.slice():null; rec.worked=form.qa?q("ms-worked").value.trim():""; var wasEdit=!!editId;
   if(editId){ var i=st.calls.findIndex(function(c){ return c.id===editId; }); if(i>=0){ rec.id=editId; rec.ts=st.calls[i].ts; rec.edited=Date.now(); rec.shiftId=st.calls[i].shiftId; rec.hrId=st.calls[i].hrId||null; st.calls[i]=rec; } newId=editId; setMsg("Call updated.",true); when="updated"; }
   else { rec.id="c"+Date.now(); rec.ts=Date.now(); rec.shiftId=st.shift?st.shift.id:null; rec.hrId=st.hrId||null; st.calls.push(rec); newId=rec.id; setMsg("Logged at "+hm(rec.ts)+".",true); when="logged "+hm(rec.ts); }
   save(); resetForm(); q("ms-t2").textContent=when; retick(q("ms-t2")); clearTimeout(loggedT); loggedT=setTimeout(function(){ if(!editId) q("ms-t2").textContent="under a minute"; },5000);
-  tick=true; renderList(); renderBar(); tick=false; focusAcct(); }
+  tick=true; renderList(); renderBar(); tick=false;
+  var nw=newWins(); if(nw.length){ setMsg((wasEdit?"Call updated.":"Logged at "+hm(rec.ts)+".")+" New win: "+nw.slice(0,2).join(" · ")+".",true); q("ms-msg").setAttribute("data-win",""); say("New win: "+nw.slice(0,2).join(", ")); } else q("ms-msg").removeAttribute("data-win");
+  if(!wasEdit){ if(rec.satisfied==="no") showReset(); else hideReset(); }
+  focusAcct(); }
 function setMsg(t,ok){ var m=q("ms-msg"); m.innerHTML=(ok&&t?SEAL:"")+esc(t); m.className="ms-msg"+(ok?" ok":""); }
 function say(t){ var l=q("ms-live"); l.textContent=""; setTimeout(function(){ l.textContent=t; },50); }
-function editCall(id){ var c=st.calls.find(function(x){ return x.id===id; }); if(!c) return; editId=id; form={}; FIELDS.forEach(function(f){ form[f]=c[f]||null; }); if(!form.xmWhy&&c.xmReason) form.xmWhy=c.xmReason; form.close=Array.isArray(c.close)?c.close.slice():null; form.qa=Array.isArray(c.qa)?c.qa.slice():null; q("ms-acct").value=c.account; q("ms-notein").value=c.note||""; syncForm();
+function editCall(id){ var c=st.calls.find(function(x){ return x.id===id; }); if(!c) return; editId=id; form={}; FIELDS.forEach(function(f){ form[f]=c[f]||null; }); if(!form.xmWhy&&c.xmReason) form.xmWhy=c.xmReason; form.close=Array.isArray(c.close)?c.close.slice():null; form.qa=Array.isArray(c.qa)?c.qa.slice():null; q("ms-acct").value=c.account; q("ms-notein").value=c.note||""; q("ms-worked").value=c.worked||""; syncForm();
   q("ms-save").textContent="Update call"; q("ms-cancel").hidden=false; q("ms-del").hidden=false; q("ms-del").textContent="Delete this call"; q("ms-t2").textContent="editing "+hm(c.ts); setMsg(""); renderRepeat(); updateSame(); renderList(); scrollToEl(q("ms-h2")); }
 /* Faster logging: the last call's answers in one press, number keys for the call type, Enter to log, and the cursor back in the account box. */
 function mine(){ var id=st.hrId||null; return st.calls.filter(function(c){ return (c.hrId||null)===id; }); }
 function lastCall(){ var l=null; mine().forEach(function(c){ if(!l||c.ts>l.ts) l=c; }); return l; }
 function updateSame(){ var b=q("ms-same"); b.disabled=!lastCall()||!!editId; b.hidden=!!editId; }
-function sameAsLast(){ var c=lastCall(); if(!c||editId) return; FIELDS.forEach(function(f){ form[f]=c[f]||null; }); if(!form.xmWhy&&c.xmReason) form.xmWhy=c.xmReason; form.close=null; form.qa=null; syncForm();
+function sameAsLast(){ var c=lastCall(); if(!c||editId) return; FIELDS.forEach(function(f){ form[f]=c[f]||null; }); if(!form.xmWhy&&c.xmReason) form.xmWhy=c.xmReason; form.close=null; form.qa=null; q("ms-worked").value=""; syncForm();
   setMsg("Filled in from your "+hm(c.ts)+" call. Add the account number and change anything that was different.",true); if(!q("ms-acct").value) focusAcct(true); }
 function focusAcct(always){ if(!FINE&&!always) return; var a=q("ms-acct"), hh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sl-header-h"))||72, r=a.getBoundingClientRect();
   if(r.top<hh||r.bottom>window.innerHeight) scrollToEl(q("ms-h2")); try{ a.focus({preventScroll:true}); }catch(e){ a.focus(); } }
@@ -330,7 +401,7 @@ function sheetOpen(){ var s=document.getElementById("academy-navigation-sheet");
 document.addEventListener("keydown",function(e){
   if(!root||root.hidden||view!=="shift"||e.defaultPrevented||e.altKey||e.metaKey||e.isComposing) return;
   var t=e.target, field=t&&t.nodeType===1&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
-  if(e.key==="Enter"){ if((t&&(t.id==="ms-acct"||t.id==="ms-notein")&&root.contains(t))||(e.ctrlKey&&(root.contains(t)||t===document.body))){ e.preventDefault(); saveCall(); } return; }
+  if(e.key==="Enter"){ if((t&&(t.id==="ms-acct"||t.id==="ms-notein"||t.id==="ms-worked")&&root.contains(t))||(e.ctrlKey&&(root.contains(t)||t===document.body))){ e.preventDefault(); saveCall(); } return; }
   if(e.ctrlKey||field||sheetOpen()||!/^[1-9]$/.test(e.key)) return;
   var i=+e.key-1; if(i>=CALL_TYPES.length) return; e.preventDefault(); form.callType=CALL_TYPES[i]; syncForm(); say("Call type: "+CALL_TYPES[i]);
 });
@@ -408,7 +479,7 @@ function renderList(){
   q("ms-rows").innerHTML=list.map(function(c){ var when=qv?new Date(c.ts).toLocaleDateString(undefined,{day:"numeric",month:"short"})+" "+hm(c.ts):hm(c.ts);
     return '<tr class="ms-row" data-id="'+c.id+'" tabindex="0"'+(c.id===editId?' data-editing=""':'')+(c.id===newId?' data-new=""':'')+'><td class="ms-td">'+when+'</td><td class="ms-td">'+esc(c.callType||"")+'</td><td class="ms-td">'+fmtAcct(c.account)+(isRepeat(c,idx)?' '+tag("rep","Repeat"):'')+'</td><td class="ms-td">'+issueTag(c)+'</td><td class="ms-td">'+(c.satisfied==="yes"?tag("ok","Yes"):tag("no","No"))+'</td><td class="ms-td">'+gsrTag(c)+'</td><td class="ms-td">'+xmTag(c)+'</td><td class="ms-td note">'+esc(c.note)+'</td></tr>'; }).join("");
   q("ms-empty").hidden=list.length>0||!!qv; q("ms-tbl").hidden=list.length===0; newId=null;
-  renderSummary(); renderRail(); updateSame(); renderGoals(); renderWeek(); renderWarm();
+  renderSummary(); renderRail(); updateSame(); renderGoals(); renderWeek(); renderWarm(); renderWins();
 }
 function renderSummary(){ var sum=summaryText(), sEl=q("ms-summary"); if(sEl.textContent!==sum){ sEl.textContent=sum; if(tick) retick(sEl); } renderNext(); }
 function renderNext(){ var el=q("ms-next"), p=nextPractice(myCounts(todayCalls()).coach);
@@ -438,8 +509,8 @@ function summaryText(){ var c=myCounts(todayCalls()); var sh=st.shift&&dkey(st.s
 function tickCell(a){ return Array.isArray(a)?(a.length?a.join(" "):"none"):""; }
 function tickParse(v){ return v===undefined||v===""?null:v==="none"?[]:v.split(/\s+/); }
 function csvCell(v){ v=String(v==null?"":v); return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
-function csvText(){ var warm={}, me=st.hrId||null; st.warmups.forEach(function(w){ if(w.done&&(w.hrId||null)===me) warm[w.date]=w.title; }); var idx=byAccount(), head=["date","time","account","call_type","issue","satisfied","gsr_offered","gsr_not_offered_why","gsr_result","gsr_which","gsr_why","xm_offered","xm_not_offered_why","xm_result","xm_why","what_happened","transfer_reason","repeat_7d","agent","hr_id","call_id","warmup","next_steps","qa_check"];
-  var rows=mine().sort(function(a,b){ return a.ts-b.ts; }).map(function(c){ return [dkey(c.ts),hm(c.ts),c.account,c.callType||"",c.resolved,c.satisfied,c.gsrOffered,c.gsrNotWhy||"",c.gsrResult||"",c.gsrWhich||"",c.gsrWhy||"",c.xmOffered,c.xmNotWhy||"",c.xmResult||"",c.xmWhy||c.xmReason||"",c.note||"",c.transferWhy||"",isRepeat(c,idx)?"yes":"",st.agent||"",c.hrId||st.hrId||"",c.id,warm[dkey(c.ts)]||"",tickCell(c.close),tickCell(c.qa)]; });
+function csvText(){ var warm={}, me=st.hrId||null; st.warmups.forEach(function(w){ if(w.done&&(w.hrId||null)===me) warm[w.date]=w.title; }); var idx=byAccount(), head=["date","time","account","call_type","issue","satisfied","gsr_offered","gsr_not_offered_why","gsr_result","gsr_which","gsr_why","xm_offered","xm_not_offered_why","xm_result","xm_why","what_happened","transfer_reason","repeat_7d","agent","hr_id","call_id","warmup","next_steps","qa_check","what_worked"];
+  var rows=mine().sort(function(a,b){ return a.ts-b.ts; }).map(function(c){ return [dkey(c.ts),hm(c.ts),c.account,c.callType||"",c.resolved,c.satisfied,c.gsrOffered,c.gsrNotWhy||"",c.gsrResult||"",c.gsrWhich||"",c.gsrWhy||"",c.xmOffered,c.xmNotWhy||"",c.xmResult||"",c.xmWhy||c.xmReason||"",c.note||"",c.transferWhy||"",isRepeat(c,idx)?"yes":"",st.agent||"",c.hrId||st.hrId||"",c.id,warm[dkey(c.ts)]||"",tickCell(c.close),tickCell(c.qa),c.worked||""]; });
   return [head].concat(rows).map(function(r){ return r.map(csvCell).join(","); }).join("\r\n"); }
 
 /* ---------- team board: reads My Shift CSV files in this browser, keeps nothing ---------- */
@@ -457,7 +528,7 @@ function parseShiftCsv(text,name,i){ var rows=parseCsv(text); if(!rows.length) r
   var get=function(r,k){ var j=h.indexOf(k); return j<0||r[j]==null?"":String(r[j]).trim(); }, out=[], names={}, ids={}, skipped=0, damaged=0;
   rows.slice(1).forEach(function(r){ var d=get(r,"date"), tm=get(r,"time"), raw=get(r,"account"); if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!/^\d{1,2}:\d{2}$/.test(tm)){ skipped++; return; }
     var p=d.split("-"), hh=tm.split(":"), bad=/e\+/i.test(raw); if(bad) damaged++; bump(names,get(r,"agent")); bump(ids,get(r,"hr_id").replace(/\D/g,""));
-    out.push({ts:new Date(+p[0],+p[1]-1,+p[2],+hh[0],+hh[1]).getTime(),date:d,account:bad?"":raw.replace(/\D/g,""),callType:get(r,"call_type"),resolved:get(r,"issue"),satisfied:get(r,"satisfied"),gsrOffered:get(r,"gsr_offered"),gsrNotWhy:get(r,"gsr_not_offered_why"),gsrResult:get(r,"gsr_result"),gsrWhich:get(r,"gsr_which"),gsrWhy:get(r,"gsr_why"),xmOffered:get(r,"xm_offered"),xmNotWhy:get(r,"xm_not_offered_why"),xmResult:get(r,"xm_result"),xmWhy:get(r,"xm_why"),transferWhy:get(r,"transfer_reason"),warmup:get(r,"warmup"),close:tickParse(h.indexOf("next_steps")<0?undefined:get(r,"next_steps")),qa:tickParse(h.indexOf("qa_check")<0?undefined:get(r,"qa_check")),id:get(r,"call_id")||d+" "+tm+" "+get(r,"account")}); });
+    out.push({ts:new Date(+p[0],+p[1]-1,+p[2],+hh[0],+hh[1]).getTime(),date:d,account:bad?"":raw.replace(/\D/g,""),callType:get(r,"call_type"),resolved:get(r,"issue"),satisfied:get(r,"satisfied"),gsrOffered:get(r,"gsr_offered"),gsrNotWhy:get(r,"gsr_not_offered_why"),gsrResult:get(r,"gsr_result"),gsrWhich:get(r,"gsr_which"),gsrWhy:get(r,"gsr_why"),xmOffered:get(r,"xm_offered"),xmNotWhy:get(r,"xm_not_offered_why"),xmResult:get(r,"xm_result"),xmWhy:get(r,"xm_why"),transferWhy:get(r,"transfer_reason"),warmup:get(r,"warmup"),close:tickParse(h.indexOf("next_steps")<0?undefined:get(r,"next_steps")),qa:tickParse(h.indexOf("qa_check")<0?undefined:get(r,"qa_check")),worked:get(r,"what_worked"),id:get(r,"call_id")||d+" "+tm+" "+get(r,"account")}); });
   var ff=fromFile(name,i); return {name:name,agent:top(names,1)[0]||ff.agent,hrId:top(ids,1)[0]||ff.hrId,rows:out,skipped:skipped,damaged:damaged}; }
 function readFile(f){ if(f.text) return f.text().catch(function(){ return ""; }); return new Promise(function(res){ var r=new FileReader(); r.onload=function(){ res(String(r.result||"")); }; r.onerror=function(){ res(""); }; r.readAsText(f); }); }
 function addFiles(list){ var fs=Array.prototype.slice.call(list||[]); if(!fs.length) return;
@@ -511,9 +582,22 @@ function renderBoard(opening){
   q("tb-tr").innerHTML=bars(c.trWhy,function(k){ return "transfer:"+k; },"No transfers.");
   q("tb-miss").innerHTML=bars(merge(c.clMiss,c.qaMiss),missKey,c.clN||c.qaN?"Every box was ticked.":"No ticks in these files yet.");
   root.querySelectorAll("#ms-view-board .tb-fill[data-w]").forEach(function(f){ f.style.setProperty("--w",f.getAttribute("data-w")+"%"); });
-  renderRepeats(list); q("tb-full").checked=bd.full;
+  renderRepeats(list); renderShout(list); renderBoardLines(list); q("tb-full").checked=bd.full;
   var sum=boardSummary(); if(q("tb-summary").textContent!==sum){ q("tb-summary").textContent=sum; if(tick) retick(q("tb-summary")); }
   if(opening) arrive(); }
+/* Shout-outs: each agent's live streaks and personal bests in these days, for the leader to recognise. */
+function renderShout(list){ var keys={}, out=[], from=list.length?list[0].date:"", to=list.length?list[list.length-1].date:"", el=q("tb-shout");
+  list.forEach(function(r){ keys[r.key]=1; });
+  Object.keys(keys).sort(function(a,b){ return a.localeCompare(b); }).forEach(function(k){ var rows=bd.rows.filter(function(r){ return r.key===k; }), warm={}; rows.forEach(function(r){ if(r.warmup) warm[r.date]=1; });
+    var w=computeWins(rows,warm), got=streakLines(w.streak); w.events.forEach(function(e){ var d=dkey(e.ts); if(d>=from&&d<=to&&/^(best|sales):/.test(e.key)) got.push(e.text); });
+    got.slice(0,2).forEach(function(t){ out.push({who:rows[0].agent,t:t}); }); });
+  out.sort(function(a,b){ return a.who.localeCompare(b.who); }); bd.shout=out;
+  el.innerHTML='<h3 class="tb-shout-h">Shout-outs</h3>'+(out.length?'<ul class="tb-shout-list">'+out.slice(0,12).map(function(x){ return '<li>'+STAR+'<span><b>'+esc(x.who)+'</b>: '+esc(lc(x.t))+'</span></li>'; }).join("")+'</ul><button type="button" class="sl-link-button" id="tb-shout-copy">Copy shout-outs</button>':'<p class="tb-empty">No streaks or personal bests in these days yet.</p>'); }
+function renderBoardLines(list){ var seen={}, U=[]; list.filter(function(r){ return r.worked; }).sort(function(a,b){ return b.ts-a.ts; }).forEach(function(r){ var k=r.worked.toLowerCase(); if(seen[k]) return; seen[k]=1; U.push(r); });
+  bd.lineRows=U; q("tb-t7").textContent=plural(U.length,"line");
+  var shown=bd.allLines?U:U.slice(0,8), more=q("tb-lines-more"); more.hidden=U.length<=8; more.textContent=bd.allLines?"Show fewer":"Show all "+U.length;
+  q("tb-lines").innerHTML=U.length?shown.map(function(r){ return '<li class="tb-line"><p class="ms-line-t">“'+esc(r.worked)+'”</p><span class="tb-of">'+esc(r.agent+" · "+(saleLabel(r)||"sale")+" · "+shortDay(r.ts))+'</span></li>'; }).join(""):'<li class="tb-empty">No lines yet. Agents add one after a sale, under "What worked".</li>';
+  q("tb-lines-copy").hidden=!U.length; q("tb-lines-dl").hidden=!U.length; }
 function renderRepeats(list){ var inPeriod={}, chains=[]; list.forEach(function(r){ if(r.rep||r.back) inPeriod[r.account]=1; });
   Object.keys(inPeriod).forEach(function(a){ var l=bd.idx[a]||[]; if(l.length>1) chains.push(l); });
   chains.sort(function(x,y){ return y.length-x.length||y[y.length-1].ts-x[x.length-1].ts; });
@@ -549,6 +633,9 @@ function exampleFiles(){ var seed=20261011, rnd=function(){ seed|=0; seed=seed+0
   files.forEach(function(f,i){ var weak=i===4?.5:i===1?.7:.88; f.rows.forEach(function(r){
     if(r.resolved==="not"||r.resolved==="escalated") r.close=CLOSE.filter(function(t){ return r2()<(t[0]==="ref"?weak+.05:weak); }).map(function(t){ return t[0]; });
     if(r.gsrResult==="completed"||r.xmResult==="completed") r.qa=QA.filter(function(t){ return r2()<(i===7&&t[0]==="activate"?.6:.96); }).map(function(t){ return t[0]; }); }); });
+  var s3=4242, r3=function(){ s3=(s3*16807)%2147483647; return s3/2147483647; };
+  var EX=["I asked where it needs to work first, and coverage was the gap.","Asked what they like about their carrier; the gap came up by itself.","Gave the monthly price and the one-time fee as two separate figures.","Confirmed the fix worked, then asked how they use the internet in the evening.","Let them check with their partner on the call instead of after.","Read what changes when the promotion ends before asking for anything.","Asked who uses the internet at home, then matched the tier to that.","Checked the phone would work before talking about the line.","Repeated back what they need before offering anything.","Explained the porting step in the approved words, with no timing promised.","Asked what they use their phone for most, then showed the one plan that fits."];
+  var ex=0; files.forEach(function(f){ f.rows.forEach(function(r){ if((r.gsrResult==="completed"||r.xmResult==="completed")&&r3()<.2) r.worked=EX[ex++%EX.length]; }); });
   return files.map(function(f,i){ var done={}; f.rows.forEach(function(r){ if(!(r.date in done)) done[r.date]=rnd()<(i%3===0?.35:.85); if(done[r.date]) r.warmup="Example warm-up"; }); return {name:f.name,agent:f.agent,hrId:String(204117+i*311),rows:f.rows}; }); }
 document.addEventListener("dragover",function(e){ if(root&&!root.hidden&&view==="board") e.preventDefault(); });
 document.addEventListener("drop",function(e){ if(root&&!root.hidden&&view==="board"&&!(e.target&&e.target.closest&&e.target.closest("#tb-drop"))){ e.preventDefault(); addFiles(e.dataTransfer&&e.dataTransfer.files); } });
