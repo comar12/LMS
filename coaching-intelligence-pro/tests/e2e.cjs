@@ -1423,6 +1423,10 @@ async function test(name, fn) {
     const { page, context } = await newPage({ hash: '#/team' });
     await page.evaluate(() => localStorage.setItem('cip.v1.team', JSON.stringify({ members: Array.from({ length: 16 }, (_, i) => ({ id: `mem-${i + 1}`, code: `Agent ${String(i + 1).padStart(2, '0')}`, name: i === 4 ? 'Sam Rivers' : '' })), touches: [] })));
     await page.reload();
+    // Team health ring: one segment per agent, and the legend adds up to the team.
+    assert((await page.locator('.health__seg').count()) === 16, 'Team health ring should have one segment per agent');
+    await page.waitForTimeout(1200);
+    assert((await page.locator('.health__n').allInnerTexts()).reduce((n, x) => n + Number(x), 0) === 16, 'Team health legend should add up to the team');
     await page.locator('.pulse').first().getByRole('button', { name: /Recognize/ }).click();
     assert((await page.locator('.mp__opt').count()) === 16, 'All team members should be in the picker');
     await page.fill('.mp__search', 'sam');
@@ -1431,6 +1435,11 @@ async function test(name, fn) {
     assert((await page.locator('.mp__opt .mp__name').allInnerTexts()).join() === 'Agent 01', 'Picker search did not filter by code');
     await page.locator('.mp__opt').first().click();
     assert((await page.locator('.mp__opt[aria-checked="true"] .mp__name').innerText()) === 'Agent 01', 'Clicking an agent should select them');
+    await page.getByRole('button', { name: 'Log as recognized' }).click();
+    assert((await page.locator('.confetti').count()) === 1, 'Logging a recognition should celebrate');
+    await page.locator('.confetti').waitFor({ state: 'detached' });
+    await page.locator('.pulse', { hasText: 'Agent 01' }).first().getByRole('button', { name: /Recognize/ }).click();
+    await page.waitForFunction(() => document.activeElement && document.activeElement.closest('.modal'));
     await page.keyboard.press('Escape');
     await page.locator('.modal').waitFor({ state: 'detached' });
     // Paste a roster (fictional people): header row in any order, tab separated and single spaced.

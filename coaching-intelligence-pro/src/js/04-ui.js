@@ -556,9 +556,11 @@ function pageHead({ eyebrow, title, sub, actions }) {
 }
 
 /* Simple disclosure menu */
-function menuButton({ label, iconName = 'more', items, fk }) {
+function menuButton({ label, iconName = 'more', items, fk, iconOnly = false }) {
   const menuId = uid('menu');
-  const btn = h('button', { type: 'button', class: 'btn btn--sm', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'aria-controls': menuId, 'data-fk': fk }, icon(iconName), h('span', { class: 'btn__label' }, label));
+  const btn = iconOnly
+    ? h('button', { type: 'button', class: 'btn btn--sm btn--icon', 'aria-label': label, title: label, 'aria-haspopup': 'true', 'aria-expanded': 'false', 'aria-controls': menuId, 'data-fk': fk }, icon(iconName))
+    : h('button', { type: 'button', class: 'btn btn--sm', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'aria-controls': menuId, 'data-fk': fk }, icon(iconName), h('span', { class: 'btn__label' }, label));
   const menu = h('div', { class: 'menu', id: menuId, hidden: true });
   const wrap = h('div', { class: 'menu-wrap' }, btn, menu);
   const close = (focusBtn) => {

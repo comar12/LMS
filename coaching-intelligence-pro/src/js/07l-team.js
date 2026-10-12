@@ -171,14 +171,37 @@ function logTouch(memberId, kind, extra = {}) {
   const t = { id: uid('touch'), member: memberId, kind, date: todayDay(), earned: !!extra.earned, strength: extra.strength || null };
   state.team.touches.push(t);
   saveTeam();
+  const avatar = () => document.querySelector(`.pulse[aria-labelledby="mem-${memberId}"] .pulse__avatar`);
+  const before = avatar() ? avatar().getBoundingClientRect() : null;
   state.ui.flash = `mem:${memberId}`;
   refresh({ panel: false });
   state.ui.flash = null;
+  if (kind === 'recognition') {
+    // Burst where the card is now, or where it was if it moved off screen.
+    const onScreen = (r) => r && r.bottom > 0 && r.top < window.innerHeight;
+    const after = avatar() ? avatar().getBoundingClientRect() : null;
+    celebrate(onScreen(after) ? after : onScreen(before) ? before : null);
+  }
   const m = state.team.members.find((x) => x.id === memberId);
   const label = { recognition: 'Recognition', oneonone: 'One-on-one', stay: 'Stay conversation' }[kind];
   toast(`${label} logged for ${m ? memberLabel(m) : 'this agent'}`, {
     action: { label: 'Undo', fn: () => { state.team.touches = state.team.touches.filter((x) => x.id !== t.id); saveTeam(); refresh({ panel: false }); } },
   });
+}
+
+/** A short confetti burst from a screen rectangle (or the bottom of the screen). Skipped when motion is reduced. */
+function celebrate(rect) {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const r = rect || { left: window.innerWidth / 2, top: window.innerHeight - 90, width: 0, height: 0 };
+  const colors = ['var(--accent)', 'var(--success)', 'var(--warning)', 'var(--indigo)', '#ffb020', '#ff6b8a'];
+  const box = h('div', { class: 'confetti', 'aria-hidden': 'true', style: `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px` });
+  for (let i = 0; i < 26; i++) {
+    const a = (i / 26) * Math.PI * 2 + Math.random() * 0.4;
+    const dist = 60 + Math.random() * 70;
+    box.appendChild(h('span', { class: `confetti__bit${i % 3 === 0 ? ' confetti__bit--round' : ''}`, style: `--x:${Math.cos(a) * dist}px;--y:${Math.sin(a) * dist - 30}px;--r:${Math.round(Math.random() * 540 - 270)}deg;--c:${colors[i % colors.length]};--t:${700 + Math.round(Math.random() * 400)}ms` }));
+  }
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 1300);
 }
 
 /* ---------- Recognition dialog ---------- */
@@ -507,7 +530,7 @@ function toggleIds() {
 }
 
 /* ---------- Page ---------- */
-function memberCard(m) {
+function memberCard(m, idx = 0) {
   const pu = memberPulse(m);
   const initials = initialsOf(m);
   const top = pu.flags[0];
@@ -516,14 +539,15 @@ function memberCard(m) {
   const ago = (d, none) => (d === null ? none : d === 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`);
   return h(
     'article',
-    { class: `pulse pulse--${top ? top.level : 'ok'}${state.ui.flash === `mem:${m.id}` ? ' is-flash' : ''}`, 'aria-labelledby': `mem-${m.id}` },
+    { class: `pulse pulse--${top ? top.level : 'ok'}${state.ui.flash === `mem:${m.id}` ? ' is-flash' : ''}`, 'aria-labelledby': `mem-${m.id}`, style: `--d:${Math.min(idx, 14) * 45}ms` },
     h(
       'div',
       { class: 'pulse__head' },
-      h('span', { class: 'plan__avatar pulse__avatar', 'aria-hidden': 'true' }, initials || '#'),
+      h('span', { class: 'plan__avatar pulse__avatar', 'aria-hidden': 'true' }, initials || '#', pu.earned.length ? h('span', { class: 'pulse__spark' }, icon('sparkle', 'icon--sm')) : null),
       h('div', { class: 'pulse__who' }, h('h2', { class: 'plan__label', id: `mem-${m.id}` }, memberLabel(m)), h('p', { class: 'plan__title' }, m.name ? `${m.code} · ` : '', pu.active ? `${plural(pu.active, 'active plan')}${pu.due ? `, ${pu.due} due` : ''}` : 'No active plans')),
       menuButton({
-        label: 'More',
+        label: `More for ${memberLabel(m)}`,
+        iconOnly: true,
         fk: `mem-menu:${m.id}`,
         items: [
           { label: 'Log stay conversation', icon: 'heart', onSelect: () => logTouch(m.id, 'stay') },
@@ -549,8 +573,8 @@ function memberCard(m) {
       'div',
       { class: 'balance', title: `Last 30 days: ${pu.rec30} recognitions, ${pu.coached30} coaching plans` },
       h('span', { class: 'balance__label' }, 'Last 30 days'),
-      h('span', { class: 'balance__row' }, h('span', { class: 'balance__name' }, 'Recognized'), h('span', { class: 'balance__pips' }, Array.from({ length: 6 }, (_, i) => h('span', { class: `pip${i < recBar ? ' pip--rec' : ''}` }))), h('strong', null, String(pu.rec30))),
-      h('span', { class: 'balance__row' }, h('span', { class: 'balance__name' }, 'Coached'), h('span', { class: 'balance__pips' }, Array.from({ length: 6 }, (_, i) => h('span', { class: `pip${i < coBar ? ' pip--co' : ''}` }))), h('strong', null, String(pu.coached30)))
+      h('span', { class: 'balance__row' }, h('span', { class: 'balance__name' }, 'Recognized'), h('span', { class: 'balance__pips' }, Array.from({ length: 6 }, (_, i) => h('span', { class: `pip${i < recBar ? ' pip--rec' : ''}`, style: `--i:${i}` }))), h('strong', null, String(pu.rec30))),
+      h('span', { class: 'balance__row' }, h('span', { class: 'balance__name' }, 'Coached'), h('span', { class: 'balance__pips' }, Array.from({ length: 6 }, (_, i) => h('span', { class: `pip${i < coBar ? ' pip--co' : ''}`, style: `--i:${i + 3}` }))), h('strong', null, String(pu.coached30)))
     ),
     pu.flags.length ? h('ul', { class: 'pulse__flags' }, pu.flags.slice(0, 3).map((f) => h('li', { class: `flag flag--${f.level}` }, icon(f.level === 'good' ? 'award' : f.level === 'alert' ? 'alert' : 'info', 'icon--sm'), f.text))) : h('p', { class: 'pulse__ok' }, icon('check', 'icon--sm'), 'Recently recognized and talked with'),
     h(
@@ -558,6 +582,65 @@ function memberCard(m) {
       { class: 'pulse__actions' },
       h('button', { type: 'button', class: `btn btn--sm${pu.earned.length || pu.dRec === null || pu.dRec >= 14 ? ' btn--primary' : ''}`, 'data-fk': `mem-rec:${m.id}`, onclick: () => openRecognize(m.id) }, icon('award'), pu.earned.length ? 'Recognize (earned)' : 'Recognize'),
       h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `mem-1on1:${m.id}`, onclick: () => logTouch(m.id, 'oneonone') }, icon('chat'), 'Log one-on-one')
+    )
+  );
+}
+
+/** Cards light up under the pointer. */
+function spotlight(e) {
+  const card = e.target.closest ? e.target.closest('.pulse') : null;
+  if (!card) return;
+  const r = card.getBoundingClientRect();
+  card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+  card.style.setProperty('--my', `${e.clientY - r.top}px`);
+}
+
+const HEALTH = [
+  { id: 'good', label: 'Earned praise ready', hint: 'Recognize first' },
+  { id: 'alert', label: 'Needs recognition', hint: 'Not recognized in 14 days' },
+  { id: 'warn', label: 'Needs a one-on-one', hint: 'No talk in 30 days' },
+  { id: 'ok', label: 'In balance', hint: 'Recently recognized and talked with' },
+];
+
+/** The team at a glance: a ring with one segment per agent, colored by what they need next. */
+function teamHealth(pulses) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs) => {
+    const el = document.createElementNS(ns, tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    return el;
+  };
+  const level = (pu) => (pu.flags[0] ? pu.flags[0].level : 'ok');
+  const groups = HEALTH.map((g) => ({ ...g, n: pulses.filter((x) => level(x.pu) === g.id).length }));
+  const total = pulses.length;
+  const R = 62;
+  const C = 2 * Math.PI * R;
+  const gap = total > 1 ? Math.min(6, C / total / 3) : 0;
+  const seg = C / total;
+  const svg = mk('svg', { viewBox: '0 0 160 160', class: 'health__ring', 'aria-hidden': 'true' });
+  svg.appendChild(mk('circle', { cx: '80', cy: '80', r: String(R), class: 'health__track' }));
+  const segs = mk('g', { transform: 'rotate(-90 80 80)' });
+  let k = 0;
+  groups.forEach((g) => {
+    for (let j = 0; j < g.n; j++, k++) segs.appendChild(mk('circle', { cx: '80', cy: '80', r: String(R), class: `health__seg health__seg--${g.id}`, style: `--len:${Math.max(0.5, seg - gap)}px;--c:${C}px;--i:${k}`, 'stroke-dasharray': `${Math.max(0.5, seg - gap)} ${C}`, 'stroke-dashoffset': String(-k * seg) }));
+  });
+  svg.appendChild(segs);
+  const orbit = mk('g', { class: 'health__orbit' });
+  orbit.appendChild(mk('circle', { cx: '80', cy: String(80 - R - 13), r: '3.5', class: 'health__moon' }));
+  svg.appendChild(orbit);
+  const recent = pulses.filter((x) => x.pu.dRec !== null && x.pu.dRec < 14).length;
+  const pct = total ? Math.round((recent / total) * 100) : 0;
+  const lead = groups[0].n ? `${plural(groups[0].n, 'agent has', 'agents have')} earned praise waiting. Start there.` : groups[1].n ? `${plural(groups[1].n, 'agent has', 'agents have')} not been recognized in 14 days.` : groups[2].n ? `${plural(groups[2].n, 'agent is', 'agents are')} due a one-on-one.` : 'Everyone is recognized and talked with. Keep the rhythm going.';
+  return h(
+    'section',
+    { class: 'card health', 'aria-labelledby': 'healthTitle' },
+    h('div', { class: 'health__viz' }, svg, h('div', { class: 'health__center' }, h('span', { class: 'health__pct' }, h('span', { 'data-count': String(pct) }, String(pct)), '%'), h('span', { class: 'health__cap' }, 'recognized in 14 days'))),
+    h(
+      'div',
+      { class: 'health__body' },
+      h('h2', { class: 'card__title', id: 'healthTitle' }, icon('pulse'), 'Team health'),
+      h('p', { class: 'health__lead' }, lead),
+      h('ul', { class: 'health__legend' }, groups.map((g, i) => h('li', { class: `health__item health__item--${g.id}`, style: `--i:${i}` }, h('span', { class: 'health__dot', 'aria-hidden': 'true' }), h('span', { class: 'health__name' }, g.label, h('span', { class: 'health__hint' }, g.hint)), h('strong', { class: 'health__n', 'data-count': String(g.n) }, String(g.n)))))
     )
   );
 }
@@ -593,6 +676,7 @@ function renderTeam(main) {
       ],
     }),
     h('p', { class: 'notice notice--privacy', role: 'note', style: 'margin-bottom:16px' }, icon('lock'), h('span', { class: 'notice__body' }, 'Names, HRIDs, and BP-IDs stay only in this browser. They are never copied into coaching text or a team pack. Use Hide IDs before sharing your screen. Only dates are saved, never message text.')),
+    teamHealth(pulses),
     h('div', { class: 'stats' }, stat(members.length, 'agents', 'users'), stat(earnedN, 'with earned recognition ready', 'award', earnedN ? 'stat--good' : ''), stat(noRec, 'not recognized in 14 days', 'alert', noRec ? 'stat--alert' : ''), stat(rec30, `recognitions vs ${co30} coachings (30 days)`, 'heart')),
     needList.length
       ? h(
@@ -615,7 +699,7 @@ function renderTeam(main) {
         )
       : null,
     h('h2', { class: 'sr-only' }, 'Team members'),
-    h('div', { class: 'pulse-grid' }, sorted.map(({ m }) => memberCard(m)))
+    h('div', { class: 'pulse-grid', onpointermove: spotlight }, sorted.map(({ m }, i) => memberCard(m, i)))
   );
   if (main.classList.contains('anim-enter')) countUp(main);
 }

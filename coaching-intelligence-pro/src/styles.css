@@ -1595,12 +1595,12 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 /* ---------- Team Pulse ---------- */
 .stat--good .stat__icon { background: var(--success-soft); color: var(--success); }
 .needs { margin: 16px 0; }
-.pulse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 14px; margin-top: 16px; }
-.pulse { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--success); box-shadow: var(--shadow-xs); transition: transform var(--t) var(--ease-out), box-shadow var(--t) var(--ease); }
+.pulse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 14px; margin-top: 16px; }
+.pulse { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--success); box-shadow: var(--shadow-xs); transition: transform var(--t) var(--ease-out), box-shadow var(--t) var(--ease); }
 .pulse:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
 .pulse--alert { border-top-color: var(--danger); }
 .pulse--warn { border-top-color: var(--warning); }
-.pulse--good { border-top-color: var(--accent); }
+.pulse--good { border-top-color: var(--indigo); }
 .pulse.is-flash { animation: soft-pop 0.5s var(--ease-out); }
 .pulse__head { display: flex; align-items: center; gap: 12px; }
 .pulse__avatar { font-size: 12px; }
@@ -1623,7 +1623,7 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 .flag { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 650; }
 .flag--alert { color: var(--danger); }
 .flag--warn { color: var(--warning); }
-.flag--good { color: var(--success); }
+.flag--good { color: var(--indigo); }
 .pulse__ok { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 650; color: var(--success); }
 .pulse__actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
 
@@ -1661,6 +1661,77 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 .tr-other { margin-top: 10px; }
 .tr-other summary { cursor: pointer; font-size: 12.5px; font-weight: 650; color: var(--accent-text); padding: 4px 0; }
 .tr-other .field { margin-top: 8px; }
+
+/* ---------- Team Pulse motion ---------- */
+.btn--icon { width: 30px; padding: 0; justify-content: center; }
+/* Light that follows the pointer, and a sheen across the status stripe. */
+.pulse::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1; opacity: 0; background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--accent) 13%, transparent), transparent 70%); transition: opacity 0.3s var(--ease); }
+.pulse:hover::after { opacity: 1; }
+.pulse::before { content: ""; position: absolute; top: -4px; left: 14px; right: 14px; height: 4px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent) no-repeat; background-size: 40% 100%; background-position: -60% 0; }
+.anim-enter .pulse::before { animation: sheen 1.1s var(--ease-out) both; animation-delay: calc(500ms + var(--d, 0ms)); }
+.pulse:hover::before { animation: sheen 0.9s var(--ease-out); }
+@keyframes sheen { from { background-position: -60% 0; } to { background-position: 160% 0; } }
+.pulse__head .pulse__avatar { position: relative; transition: transform 0.35s var(--ease-spring); }
+.pulse:hover .pulse__avatar { transform: rotate(-6deg) scale(1.06); }
+.pulse--alert .pulse__avatar::before, .pulse--good .pulse__avatar::before { content: ""; position: absolute; inset: -4px; border-radius: 16px; border: 2px solid var(--danger); opacity: 0; animation: halo 2.4s ease-out infinite; }
+.pulse--good .pulse__avatar::before { border-color: var(--indigo); }
+.pulse--alert .pulse__avatar::before { animation-iteration-count: 4; }
+.pulse:has([aria-expanded="true"]) { z-index: 5; }
+@keyframes halo { 0% { opacity: 0.7; transform: scale(0.92); } 70%, 100% { opacity: 0; transform: scale(1.22); } }
+.pulse__spark { position: absolute; top: -7px; right: -7px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: #ffb020; color: #3a2600; box-shadow: 0 0 0 2px var(--surface); animation: twinkle 2.2s ease-in-out infinite; }
+.pulse__spark .icon { width: 12px; height: 12px; }
+@keyframes twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.18) rotate(18deg); } }
+.anim-enter .pip--rec, .anim-enter .pip--co { animation: pip-in 0.45s var(--ease-spring) both; animation-delay: calc(450ms + var(--d, 0ms) + var(--i, 0) * 70ms); transform-origin: left center; }
+@keyframes pip-in { from { transform: scaleX(0); opacity: 0; } to { transform: none; opacity: 1; } }
+.flag--alert .icon { animation: pulse-dot 1.6s ease-in-out 3; }
+.id-chip:active { transform: scale(0.96); }
+.needs .rt-row__icon .icon { animation: heartbeat 1.5s ease-in-out 1s 3; }
+@keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.18); } }
+.anim-enter .needs .rt-row { animation: slide-in 0.5s var(--ease-out) both; }
+.anim-enter .needs .rt-row:nth-child(2) { animation-delay: 70ms; }
+.anim-enter .needs .rt-row:nth-child(3) { animation-delay: 140ms; }
+.anim-enter .needs .rt-row:nth-child(4) { animation-delay: 210ms; }
+.anim-enter .needs .rt-row:nth-child(5) { animation-delay: 280ms; }
+@keyframes slide-in { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+
+/* Team health ring */
+.health { display: flex; align-items: center; gap: 26px; padding: 20px 24px; margin-bottom: 16px; overflow: hidden; position: relative; background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 10%, var(--surface)), var(--surface) 60%); }
+.health__viz { position: relative; flex: none; width: 170px; height: 170px; }
+.health__ring { width: 100%; height: 100%; overflow: visible; }
+.health__track { fill: none; stroke: var(--surface-3); stroke-width: 14; }
+.health__seg { fill: none; stroke-width: 14; stroke-linecap: butt; transition: stroke-width 0.25s var(--ease); }
+.anim-enter .health__seg { animation: seg-in 0.7s var(--ease-out) both; animation-delay: calc(200ms + var(--i) * 55ms); }
+@keyframes seg-in { from { stroke-dasharray: 0 var(--c); } }
+.health__seg--good { stroke: var(--indigo); }
+.health__seg--alert { stroke: var(--danger); }
+.health__seg--warn { stroke: var(--warning); }
+.health__seg--ok { stroke: var(--success); }
+.health__orbit { transform-box: view-box; transform-origin: 80px 80px; animation: orbit 14s linear infinite; }
+.health__moon { fill: var(--accent); filter: drop-shadow(0 0 4px var(--accent)); }
+@keyframes orbit { to { transform: rotate(360deg); } }
+.health__center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.health__pct { font-size: 34px; font-weight: 820; letter-spacing: -0.03em; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; }
+.health__cap { font-size: 11px; font-weight: 650; color: var(--text-3); max-width: 90px; margin-top: 4px; line-height: 1.25; }
+.health__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.health__lead { font-size: 14.5px; font-weight: 600; color: var(--text-2); }
+.health__legend { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 8px; margin-top: 4px; }
+.health__item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); transition: transform var(--t) var(--ease-out), box-shadow var(--t) var(--ease); }
+.health__item:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.anim-enter .health__item { animation: rise 0.5s var(--ease-out) both; animation-delay: calc(350ms + var(--i) * 80ms); }
+.health__dot { flex: none; width: 12px; height: 12px; border-radius: 4px; background: var(--success); }
+.health__item--good .health__dot { background: var(--indigo); }
+.health__item--alert .health__dot { background: var(--danger); }
+.health__item--warn .health__dot { background: var(--warning); }
+.health__name { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 13px; font-weight: 700; color: var(--text); }
+.health__hint { font-size: 11.5px; font-weight: 550; color: var(--text-3); }
+.health__n { font-size: 20px; font-weight: 820; font-variant-numeric: tabular-nums; color: var(--text); }
+@media (max-width: 640px) { .health { flex-direction: column; align-items: stretch; padding: 18px; } .health__viz { align-self: center; } }
+
+/* Confetti when a recognition is logged */
+.confetti { position: fixed; z-index: 9999; width: 0; height: 0; pointer-events: none; }
+.confetti__bit { position: absolute; left: -4px; top: -3px; width: 8px; height: 6px; border-radius: 2px; background: var(--c); animation: confetti var(--t) cubic-bezier(0.15, 0.7, 0.3, 1) forwards; }
+.confetti__bit--round { width: 7px; height: 7px; border-radius: 50%; }
+@keyframes confetti { 0% { transform: translate(0, 0) rotate(0) scale(0.4); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(var(--x), calc(var(--y) + 40px)) rotate(var(--r)) scale(1); opacity: 0; } }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
