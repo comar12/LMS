@@ -10,6 +10,18 @@ To see it working first, watch the one-minute walkthrough: [`docs-walkthrough.mp
 
 ## What it does
 
+- **My Day**: the team leader's daily and weekly routine in one place, with counters that reset each day (for
+  example AICR scrubbing 0 of 4, NPS scrubbing, the Thursday calibration form), one-click **Open** to the matching
+  Quick Link, the follow-ups due from the tracker, and today's huddle idea. Every item can be edited or removed.
+- **Run the Session**: a seven-step guide for delivering the coaching written in the Builder (set the tone, start
+  with what went well, ask before you tell, share what you observed, agree on the plan, set the follow-up, close),
+  with tips, model lines, the Builder text at each step, a session timer, and Track this plan at the end.
+- **Weekly Snapshot**: charts of the behaviors met and missed, plan status, huddles held, and routine completion for
+  the last 7, 14, or 30 days, with **Copy summary**. Every number comes from what was logged; nothing is estimated.
+- **Coach the Coach**: an observation checklist for a team leader's coaching session that writes feedback to the
+  leader, and side-by-side calibration of the same call with an agreement score and the differences to discuss.
+- **Team pack** (Settings & Data): export custom templates, customized wording, quick links, routine items, and
+  brand colors for your team leaders to import. Personal plans, drafts, and Builder content are never included.
 - **Home dashboard** with a quick start, coach-by-KPI tiles (QA, Repeat (aiCR), Transfer, ABS, Attrition), quick
   actions, and pinned links. Pages and cards animate in smoothly; animation turns off automatically when the
   computer asks for reduced motion.
@@ -101,6 +113,7 @@ src/
   data/sales_toolkit.json  Sales Toolkit: review steps and skills, offer guides, objections, buying signals
   data/call_reviews.json   Call Review checklists for Technical Support, Billing, and Customer Service
   data/people_toolkit.json ABS & Attrition Toolkit: conversations, stay questions, warning signs, recognition
+  data/leader.json         Run the Session steps and the Coach the Coach observation checklist
 tools/
   CONTENT_GUIDE.md     writing standard for coaching content
   validate_content.py  content validator (schema, word counts, tone, privacy rules)
@@ -108,7 +121,8 @@ tools/
 tests/
   e2e.cjs              browser tests (Playwright + Chromium): the ten QA scenarios plus copy, storage,
                        import, Builder, Home, Call Review, ABS & Attrition, Follow-Up Tracker, Team Huddle,
-                       Sales Toolkit, Quick Links, and brand color checks
+                       My Day, Run the Session, Weekly Snapshot, Coach the Coach, team pack, Sales Toolkit,
+                       Quick Links, and brand color checks
 ```
 
 ```

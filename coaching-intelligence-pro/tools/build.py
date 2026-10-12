@@ -78,6 +78,7 @@ def build_data(links_path=None):
         "salesToolkit": load_json("data/sales_toolkit.json"),
         "callReviews": load_json("data/call_reviews.json"),
         "peopleToolkit": load_json("data/people_toolkit.json"),
+        "leader": load_json("data/leader.json"),
         "seedLinks": load_seed_links(links_path),
     }
 

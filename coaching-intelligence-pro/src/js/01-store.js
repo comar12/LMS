@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const STORAGE_PREFIX = 'cip.v1.';
-const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle'];
+const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle', 'today', 'observe', 'calib'];
 
 const store = (() => {
   let ok = false;
@@ -98,6 +98,17 @@ function defaultPrefs() {
 function defaultReview() {
   return { type: 'tech', byType: {} };
 }
+/** The daily routine. Defaults come from a supervisor's own list and can all be edited or removed. */
+function defaultRoutines() {
+  return [
+    { id: 'rt-aicr', title: 'AICR scrubbing', kind: 'count', target: 4, freq: 'daily', day: 4, note: '4 calls per day', link: 'AICR Scrubbing' },
+    { id: 'rt-nps', title: 'NPS scrubbing', kind: 'check', target: 1, freq: 'daily', day: 4, note: 'Submit at least 70% of detractors', link: 'NPS Scrubbing' },
+    { id: 'rt-calib', title: 'Internal calibration form', kind: 'check', target: 1, freq: 'weekly', day: 4, note: 'Every Thursday by 9:00 PM', link: 'Calibration' },
+  ];
+}
+function defaultToday() {
+  return { routines: defaultRoutines(), progress: {} };
+}
 function defaultHuddle() {
   return { opp: null, strength: null, minutes: 10, history: [] };
 }
@@ -134,6 +145,9 @@ const state = {
   links: { items: [] },
   tracker: { plans: [] },
   huddle: defaultHuddle(),
+  today: defaultToday(),
+  observe: { label: '', marks: {} },
+  calib: { type: 'tech', a: {}, b: {} },
   ui: { view: 'all', cat: null, query: '', linkQuery: '', openId: null, sVersion: {}, visibleIds: [], returnFocusKey: null },
 };
 
@@ -262,6 +276,60 @@ function sanitizeHuddle(o) {
     if (r && isIsoDate(r.date) && isId(r.opp)) out.history.push({ date: r.date, opp: r.opp, minutes: [5, 10, 15].includes(r.minutes) ? r.minutes : 10 });
   }
   return out;
+}
+
+function sanitizeRoutines(v) {
+  const out = [];
+  const seen = new Set();
+  for (const r of Array.isArray(v) ? v.slice(0, 40) : []) {
+    if (!r || typeof r !== 'object') continue;
+    const title = str(r.title, 60).trim();
+    if (!title) continue;
+    let id = isId(r.id) ? r.id : uid('rt');
+    if (seen.has(id)) id = uid('rt');
+    seen.add(id);
+    const kind = r.kind === 'count' ? 'count' : 'check';
+    out.push({ id, title, kind, target: kind === 'count' ? clampInt(r.target, 1, 50, 1) : 1, freq: r.freq === 'weekly' ? 'weekly' : 'daily', day: clampInt(r.day, 0, 6, 4), note: str(r.note, 120).trim(), link: str(r.link, 80).trim() });
+  }
+  return out;
+}
+
+function sanitizeToday(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const routines = Array.isArray(src.routines) ? sanitizeRoutines(src.routines) : defaultRoutines();
+  const progress = {};
+  const raw = src.progress && typeof src.progress === 'object' ? src.progress : {};
+  // Keep only the last few weeks of ticks.
+  Object.keys(raw)
+    .filter(isIsoDate)
+    .sort()
+    .slice(-21)
+    .forEach((d) => {
+      const day = {};
+      Object.entries(raw[d] || {}).forEach(([id, n]) => {
+        if (routines.some((r) => r.id === id)) day[id] = clampInt(n, 0, 50, 0);
+      });
+      progress[d] = day;
+    });
+  return { routines, progress };
+}
+
+function sanitizeObserve(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const ids = (DATA.leader.observe || []).map((x) => x.id);
+  const marks = {};
+  Object.entries(src.marks && typeof src.marks === 'object' ? src.marks : {}).forEach(([k, v]) => {
+    if (ids.includes(k) && ['met', 'gap', 'na'].includes(v)) marks[k] = v;
+  });
+  return { label: str(src.label, 40).trim(), marks };
+}
+
+function sanitizeCalib(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const type = REVIEW_TYPE_IDS.includes(src.type) ? src.type : 'tech';
+  const ok = new Set(REVIEW_TYPES.find((t) => t.id === type).steps.concat(REVIEW_TYPES.find((t) => t.id === type).skills).map((x) => x.id));
+  const clean = (m) => Object.fromEntries(Object.entries(m && typeof m === 'object' ? m : {}).filter(([k, v]) => ok.has(k) && ['met', 'gap', 'na'].includes(v)));
+  return { type, a: clean(src.a), b: clean(src.b) };
 }
 
 function sanitizeLinks(o) {
@@ -500,6 +568,9 @@ function loadSlice(key) {
     case 'combos': state.combos = sanitizeCombos(store.get('combos', [])); break;
     case 'drafts': state.drafts = sanitizeDrafts(store.get('drafts', [])); break;
     case 'review': state.review = sanitizeReview(store.get('review', null)); break;
+    case 'today': state.today = sanitizeToday(store.get('today', null)); break;
+    case 'observe': state.observe = sanitizeObserve(store.get('observe', null)); break;
+    case 'calib': state.calib = sanitizeCalib(store.get('calib', null)); break;
     case 'huddle': state.huddle = sanitizeHuddle(store.get('huddle', null)); break;
     case 'tracker': state.tracker = sanitizeTracker(store.get('tracker', null)); break;
     case 'links': {

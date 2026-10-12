@@ -431,6 +431,11 @@ async function test(name, fn) {
       await page.goto(URL + '#/home');
       await page.waitForSelector('.hero');
       await overflow('home');
+      for (const v of ['#/today', '#/snapshot', '#/leader']) {
+        await page.goto(URL + v);
+        await page.waitForSelector('#pageTitle');
+        await overflow(v);
+      }
       await page.goto(URL + '#/huddle');
       await page.locator('.hd-sug').first().click();
       await page.waitForSelector('.hd-agenda');
@@ -1206,9 +1211,139 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('My Day: routine counters, weekly items, follow-ups due, and the huddle idea', async () => {
+    const { page, context } = await newPage({ hash: '#/today' });
+    await page.waitForSelector('.rt-row');
+    const titles = await page.locator('.rt-row__title').allInnerTexts();
+    assert(titles.join('|') === 'AICR scrubbing|NPS scrubbing|Internal calibration form', 'Default routine is wrong: ' + titles.join('|'));
+    const plus = page.getByRole('button', { name: 'One more: AICR scrubbing' });
+    for (let i = 0; i < 4; i++) await plus.click();
+    const aicr = page.locator('.rt-row', { hasText: 'AICR scrubbing' });
+    assert((await aicr.locator('.rt-counter__num').innerText()).replace(/\s/g, '') === '4/4' && /Done today/.test(await aicr.innerText()), 'Counter did not reach the target');
+    await page.locator('.rt-row', { hasText: 'NPS scrubbing' }).getByRole('button', { name: 'Mark done' }).click();
+    // Add a weekly item and remove one with undo.
+    await page.getByRole('button', { name: 'Add item' }).click();
+    await page.fill('#rt-title', 'QA audits');
+    await page.selectOption('#rt-kind', 'count');
+    await page.fill('#rt-target', '3');
+    await page.getByRole('button', { name: 'Add to routine' }).click();
+    assert((await page.locator('.rt-row', { hasText: 'QA audits' }).locator('.rt-counter__num').innerText()).replace(/\s/g, '') === '0/3', 'New counted item is wrong');
+    await page.getByRole('button', { name: 'Remove QA audits' }).click();
+    assert((await page.locator('.rt-row', { hasText: 'QA audits' }).count()) === 0, 'Remove failed');
+    await page.locator('.toast button', { hasText: 'Undo' }).click();
+    assert((await page.locator('.rt-row', { hasText: 'QA audits' }).count()) === 1, 'Undo failed');
+    await page.reload();
+    await page.waitForSelector('.rt-row');
+    assert(/Done today/.test(await page.locator('.rt-row', { hasText: 'AICR scrubbing' }).innerText()), 'Routine progress did not persist');
+    const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.today')));
+    const today = await page.evaluate(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; });
+    assert(stored.progress[today]['rt-aicr'] === 4, 'Progress is not stored under today');
+    assert((await page.locator('.day-huddle').count()) === 1, 'Huddle idea is missing');
+    await finish(page, context);
+  });
+
+  await test('Run the Session: steps follow the Builder text and finish with copy and track', async () => {
+    const { page, context } = await newPage({ hash: '#/session' });
+    assert((await page.locator('.empty__title').innerText()) === 'Build the coaching first', 'Empty Builder should explain what to do');
+    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['hold-dead-air', 'com-missing-empathy'], strengths: [{ id: 's-diagnosis', v: 0 }] })));
+    await page.reload();
+    await page.waitForSelector('.sess-card');
+    assert((await page.locator('.sess-step').count()) === 7, 'Expected seven steps');
+    await page.getByRole('button', { name: 'Next step' }).click();
+    assert((await page.locator('.sess-read').first().innerText()).trim() === strengthById['s-diagnosis'].v[0], 'Strength step should show the observed strength');
+    await page.getByRole('button', { name: 'Next step' }).click();
+    const qs = await page.locator('.sess-card .hd-seg__list li').allInnerTexts();
+    assert(qs[0] === oppById['hold-dead-air'].questions[0] && qs[1] === oppById['com-missing-empathy'].questions[0], 'Ask step should use each entry\'s first coaching question');
+    await page.locator('.sess-step', { hasText: 'Close with confidence' }).click();
+    assert((await page.locator('.sess-finish').count()) === 1 && (await page.getByRole('button', { name: 'Next step' }).count()) === 0, 'Last step should finish the session');
+    const all = await clickCopy(page, 'Copy all four coaching sections');
+    assert(all.includes('What Progress Has Been Made Since Last Coaching Session?'), 'Copy all is wrong');
+    await page.getByRole('button', { name: 'Track this plan' }).click();
+    await page.fill('#tr-label', 'Agent 8');
+    await page.getByRole('button', { name: 'Start tracking' }).click();
+    assert((await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.tracker')).plans[0].label)) === 'Agent 8', 'Track from the session failed');
+    await finish(page, context);
+  });
+
+  await test('Weekly Snapshot: counts come only from logged data, with a copyable summary', async () => {
+    const day = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+    const { page, context } = await newPage({ hash: '#/snapshot' });
+    assert(/Nothing logged in this period/.test(await page.locator('#main').innerText()), 'Empty snapshot should say nothing was logged');
+    await page.evaluate((d) => {
+      localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-s1', label: 'Agent 3', start: d.a, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [{ id: 'log-s1', kind: 'call', date: d.a, results: { 'hold-dead-air': 'miss' } }, { id: 'log-s2', kind: 'call', date: d.b, results: { 'hold-dead-air': 'met' } }, { id: 'log-s3', kind: 'call', date: d.old, results: { 'hold-dead-air': 'miss' } }] }] }));
+    }, { a: day(-3), b: day(-1), old: day(-20) });
+    await page.reload();
+    await page.waitForSelector('.snap-row');
+    assert((await page.locator('.snap-row__num').first().innerText()) === '1 of 2 met', 'Last 7 days should count only the two recent reviews');
+    await page.getByRole('button', { name: 'Last 30 days' }).click();
+    assert((await page.locator('.snap-row__num').first().innerText()) === '1 of 3 met', 'Last 30 days should include the older review');
+    const text = await clickCopy(page, 'Copy snapshot summary');
+    assert(text.includes('Logged: 3 call reviews and 0 check-ins.') && text.includes('Excessive Dead Air: 1 of 3'), 'Summary text is wrong:\n' + text);
+    assert(!text.includes('Agent 3'), 'Plan labels must not appear in the summary');
+    await finish(page, context);
+  });
+
+  await test('Coach the Coach: observation feedback and side-by-side calibration', async () => {
+    const leader = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'leader.json'), 'utf8'));
+    const { page, context } = await newPage({ hash: '#/leader' });
+    const row = (t) => page.locator('.rv-row', { has: page.locator('.rv-row__title', { hasText: new RegExp('^' + t + '$') }) });
+    await row(leader.observe[0].title).getByRole('button', { name: 'Met', exact: true }).click();
+    await row(leader.observe[2].title).getByRole('button', { name: 'Opportunity' }).click();
+    const fb = await clickCopy(page, 'Copy feedback for the leader');
+    assert(fb === `Coaching Observation\n\nWhat went well\n${leader.observe[0].good}\n\nFocus for your next session\n${leader.observe[2].gap}\n\nNext step\nI will observe another of your coaching sessions so we can look at these points together again.`, 'Observation feedback is wrong:\n' + fb);
+    await page.getByRole('tab', { name: 'Calibrate a call' }).click();
+    await page.selectOption('#cal-type', 'billing');
+    const items = callReviews.types.find((t) => t.id === 'billing').steps;
+    const mark = async (who, id, v) => page.locator(`[data-fk="cal:${who}:${id}:${v}"]`).click();
+    await mark('a', items[0].id, 'met');
+    await mark('b', items[0].id, 'met');
+    await mark('a', items[1].id, 'met');
+    await mark('b', items[1].id, 'gap');
+    assert(/50% agreement on 2 steps/.test(await page.locator('.scorecard__title').innerText()), 'Agreement score is wrong');
+    const cal = await clickCopy(page, 'Copy calibration summary');
+    assert(cal.startsWith('Calibration: Billing call\nAgreement: 1 of 2') && cal.includes(`${items[1].title}: supervisor Met, team leader Opportunity`), 'Calibration summary is wrong:\n' + cal);
+    await finish(page, context);
+  });
+
+  await test('Team pack: export shared material only, import merges without touching plans', async () => {
+    const { page, context } = await newPage({ hash: '#/settings' });
+    await page.evaluate(() => {
+      localStorage.setItem('cip.v1.links', JSON.stringify({ items: [{ id: 'link-t1', name: 'Team dashboard', url: 'https://example.com/team', group: 'Daily' }] }));
+      localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-t1', label: 'Agent 1', start: '2026-01-05', duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }] }));
+    });
+    await page.reload();
+    await page.waitForSelector('.page-title');
+    const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export team pack' }).click()]);
+    const file = await download.path();
+    const pack = JSON.parse(fs.readFileSync(file, 'utf8'));
+    assert(pack.kind === 'team-pack' && pack.data.links.items.length === 1 && pack.data.routines.length === 3, 'Team pack content is wrong');
+    assert(!('tracker' in pack.data) && !('builder' in pack.data) && !('drafts' in pack.data), 'Team pack must not include personal plans or drafts');
+    // A second leader imports it into a fresh browser.
+    const ctx2 = await browser.newContext({ acceptDownloads: true });
+    await ctx2.setOffline(true);
+    const p2 = await ctx2.newPage();
+    await p2.goto(URL + '#/settings');
+    await p2.evaluate(() => localStorage.setItem('cip.v1.today', JSON.stringify({ routines: [{ id: 'rt-own', title: 'My own check', kind: 'check' }], progress: {} })));
+    await p2.reload();
+    await p2.waitForSelector('.page-title');
+    const [chooser] = await Promise.all([p2.waitForEvent('filechooser'), p2.getByRole('button', { name: 'Import team pack' }).click()]);
+    await chooser.setFiles(file);
+    await p2.waitForSelector('.modal');
+    assert((await p2.locator('.modal').innerText()).includes('1 new quick link'), 'Import summary is wrong');
+    await p2.getByRole('button', { name: 'Add team pack' }).click();
+    await p2.waitForTimeout(200);
+    const links = await p2.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.links')).items.map((l) => l.name));
+    const routines = await p2.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.today')).routines.map((r) => r.title));
+    assert(links.includes('Team dashboard'), 'Links were not imported');
+    assert(routines[0] === 'My own check' && routines.includes('AICR scrubbing'), 'Routine items were not merged');
+    assert((await p2.evaluate(() => localStorage.getItem('cip.v1.tracker'))) === null, 'Importing a team pack must not create plans');
+    await ctx2.close();
+    await finish(page, context);
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
-    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/links', '#/templates', '#/settings'];
+    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/links', '#/templates', '#/settings'];
     const sweep = async (label) => {
       for (const v of views) {
         await page.goto(URL + v);

@@ -537,6 +537,7 @@ function outputColumn() {
       'div',
       { class: 'out-head' },
       h('h2', { class: 'out-head__title', id: 'outTitle' }, 'Generated coaching entry'),
+      h('a', { class: `btn btn--sm${state.builder.opps.some((id) => getOpp(id)) ? '' : ' is-disabled'}`, href: '#/session', 'data-fk': 'osession', 'aria-disabled': state.builder.opps.some((id) => getOpp(id)) ? null : 'true' }, icon('chat'), 'Run the session'),
       h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'otrack', disabled: !state.builder.opps.some((id) => getOpp(id)), onclick: openTrackFromBuilder }, icon('calendar'), 'Track this plan'),
       copyButton(
         () => (hasAny ? builderAllText() : ''),

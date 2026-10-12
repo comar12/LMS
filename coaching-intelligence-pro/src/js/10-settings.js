@@ -22,6 +22,7 @@ function exportPayload() {
       links: state.links,
       tracker: state.tracker,
       huddle: state.huddle,
+      today: state.today,
     },
   };
 }
@@ -89,6 +90,7 @@ function parseImport(text) {
       links: d.links ? sanitizeLinks(d.links) : null,
       tracker: d.tracker ? sanitizeTracker(d.tracker) : null,
       huddle: d.huddle ? sanitizeHuddle(d.huddle) : null,
+      today: d.today ? sanitizeToday(d.today) : null,
     },
   };
 }
@@ -113,6 +115,7 @@ function applyImport(pack, mode) {
     if (pack.links) state.links = pack.links;
     if (pack.tracker) state.tracker = pack.tracker;
     if (pack.huddle) state.huddle = pack.huddle;
+    if (pack.today) state.today = pack.today;
   } else {
     if (pack.tracker) state.tracker = { plans: mergeById(state.tracker.plans, pack.tracker.plans) };
     if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items) };
@@ -129,7 +132,94 @@ function applyImport(pack, mode) {
   refresh();
 }
 
+/* ---------- Team pack: shared material for team leaders ---------- */
+function teamPackPayload() {
+  return {
+    app: EXPORT_APP_ID,
+    format: 1,
+    kind: 'team-pack',
+    version: APP_VERSION,
+    exportedAt: new Date().toISOString(),
+    data: { custom: state.custom, overrides: state.overrides, links: state.links, routines: state.today.routines, brand: state.prefs.brand },
+  };
+}
+
+function exportTeamPack() {
+  const json = JSON.stringify(teamPackPayload(), null, 2);
+  const filename = `coaching-intelligence-pro-team-pack-${todayDay()}.json`;
+  try {
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: filename, style: 'display:none' });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast(`Exported ${filename}`);
+  } catch (e) {
+    showCopyFallback(json, 'the team pack');
+  }
+}
+
+/** Adds a team pack to what this leader already has; nothing personal (plans, drafts, Builder) is touched. */
+function handleTeamPack(d) {
+  const custom = sanitizeCustom(d.custom);
+  const overrides = sanitizeOverrides(d.overrides);
+  const links = sanitizeLinks(d.links).items;
+  const routines = sanitizeRoutines(d.routines);
+  const brand = d.brand ? sanitizePrefs({ brand: d.brand }).brand : null;
+  const known = new Set(state.links.items.map((l) => `${normalizeText(l.name)}|${l.url}`));
+  const newLinks = links.filter((l) => !known.has(`${normalizeText(l.name)}|${l.url}`));
+  const haveRoutine = new Set(state.today.routines.map((r) => normalizeText(r.title)));
+  const newRoutines = routines.filter((r) => !haveRoutine.has(normalizeText(r.title)));
+  const useBrand = h('input', { type: 'checkbox', id: 'tp-brand', checked: !!brand });
+  const counts = [
+    plural(custom.opps.length + custom.strengths.length, 'custom template'),
+    plural(Object.keys(overrides.opps).length + Object.keys(overrides.strengths).length, 'customized entry', 'customized entries'),
+    plural(newLinks.length, 'new quick link'),
+    plural(newRoutines.length, 'new routine item'),
+  ];
+  const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
+  const add = h('button', { type: 'button', class: 'btn btn--primary' }, icon('download'), 'Add team pack');
+  const m = openModal({
+    title: 'Import team pack',
+    size: 'md',
+    body: [
+      h('p', { class: 'prose' }, 'This team pack adds:'),
+      h('ul', { class: 'bullets', style: 'margin:10px 0 14px' }, counts.map((c) => h('li', null, icon('check'), c))),
+      brand ? h('label', { class: 'check' }, useBrand, 'Also use the brand colors from the pack') : null,
+      h('p', { class: 'prose', style: 'margin-top:12px' }, 'Your own plans, drafts, Builder content, and favorites are not changed. Links and routine items you already have are skipped.'),
+    ].filter(Boolean),
+    footer: [cancel, h('span', { class: 'spacer' }), add],
+    initialFocus: add,
+  });
+  cancel.addEventListener('click', () => m.close());
+  add.addEventListener('click', () => {
+    m.close();
+    state.custom = { opps: mergeById(state.custom.opps, custom.opps), strengths: mergeById(state.custom.strengths, custom.strengths) };
+    state.overrides = { opps: { ...state.overrides.opps, ...overrides.opps }, strengths: { ...state.overrides.strengths, ...overrides.strengths } };
+    state.links.items.push(...newLinks);
+    state.today.routines.push(...newRoutines);
+    if (brand && useBrand.checked) state.prefs.brand = brand;
+    persist('custom', 'overrides', 'links', 'today', 'prefs');
+    applyBrand();
+    rebuildContent();
+    refresh();
+    toast('Team pack added');
+  });
+}
+
 function handleImportText(text) {
+  let raw = null;
+  try {
+    raw = JSON.parse(text);
+  } catch (e) {
+    raw = null;
+  }
+  if (raw && raw.app === EXPORT_APP_ID && raw.kind === 'team-pack' && raw.data && typeof raw.data === 'object') {
+    handleTeamPack(raw.data);
+    return;
+  }
   const { pack, error } = parseImport(text);
   if (error) {
     toast(error, { type: 'error', duration: 5000 });
@@ -200,6 +290,9 @@ async function clearAllData() {
   state.links = initialLinks();
   state.tracker = { plans: [] };
   state.huddle = defaultHuddle();
+  state.today = defaultToday();
+  state.observe = { label: '', marks: {} };
+  state.calib = { type: 'tech', a: {}, b: {} };
   store.remove('brandcss');
   applyTheme();
   applyBrand();
@@ -306,6 +399,16 @@ function renderSettings(main) {
         h('p', { class: 'hint' }, icon('info'), 'Animations are reduced automatically when your system asks for reduced motion.'),
       ]),
       brandCard(),
+      card('Team pack', 'users', [
+        h('p', { class: 'prose' }, 'Share your setup with your team leaders so everyone coaches from the same material: custom templates, customized wording, quick links, routine items, and brand colors. Personal plans, drafts, and Builder content are never included.'),
+        h(
+          'div',
+          { class: 'data-row' },
+          h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'steamexport', onclick: exportTeamPack }, icon('download'), 'Export team pack'),
+          h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'steamimport', onclick: importFromFile }, icon('upload'), 'Import team pack')
+        ),
+        h('p', { class: 'hint' }, icon('info'), 'Send the file through your usual internal channel. Leaders import it here; nothing they already have is overwritten except entries you customized.'),
+      ]),
       card('Data & storage', 'lock', [
         h(
           'div',

@@ -721,6 +721,51 @@ def validate_call_reviews(path, meta, rep, opp_ids):
                         rep.err(where, f"unknown KPI '{k}'")
 
 
+def validate_leader(path, meta, rep, opp_ids):
+    """Run the Session steps and the Coach the Coach observation checklist."""
+    fname = os.path.basename(path)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except Exception as exc:  # noqa: BLE001
+        rep.err(fname, f"invalid JSON: {exc}")
+        return
+    sources = {None, "strength", "questions", "challenges", "plan", "followup"}
+    steps = d.get("session") or []
+    if [s.get("id") for s in steps] != ["open", "strength", "ask", "observe", "plan", "followup", "close"]:
+        rep.err(fname, "session steps must be open, strength, ask, observe, plan, followup, close")
+    for st in steps:
+        where = f"{fname}:session.{st.get('id')}"
+        check_text(rep, where, st.get("title"), "leader", "title")
+        check_text(rep, where, st.get("tip"), "leader", "tip", allow_agent=True)
+        if st.get("source") not in sources:
+            rep.err(where, f"unknown source '{st.get('source')}'")
+        for i, line in enumerate(st.get("say") or []):
+            check_text(rep, where, line, "leader", f"say[{i}]")
+            need_range(rep, where, f"say[{i}]", line, 6, 40)
+        if not st.get("say") and not st.get("source"):
+            rep.err(where, "needs model lines or a Builder source")
+    items = d.get("observe") or []
+    if not (8 <= len(items) <= 14):
+        rep.err(fname, "observe needs 8-14 items")
+    ids = set()
+    for it in items:
+        where = f"{fname}:observe.{it.get('id')}"
+        if it.get("id") in ids:
+            rep.err(where, "duplicate id")
+        ids.add(it.get("id"))
+        check_text(rep, where, it.get("title"), "leader", "title", allow_agent=True)
+        for k in ("good", "gap"):
+            # Written to the team leader, so "the agent" is the right way to refer to the person coached.
+            check_text(rep, where, it.get(k), "leader", k, allow_agent=True)
+            need_range(rep, where, k, it.get(k) or "", 8, 32)
+        if not re.search(r"\byou\b|\byour\b", it.get("good") or "", re.I):
+            rep.err(where, "'good' must be written to the leader in the second person")
+        for word in STRENGTH_BANNED:
+            if re.search(r"(?<![a-z])" + re.escape(word) + r"(?![a-z])", (it.get("good") or "").lower()):
+                rep.err(where, f"'good' contains '{word}'")
+
+
 def main(argv):
     strict = "--strict" in argv
     files = [a for a in argv if not a.startswith("--")]
@@ -732,6 +777,7 @@ def main(argv):
         files.append(os.path.join(DATA, "sales_toolkit.json"))
         files.append(os.path.join(DATA, "people_toolkit.json"))
         files.append(os.path.join(DATA, "call_reviews.json"))
+        files.append(os.path.join(DATA, "leader.json"))
         files = [f for f in files if os.path.exists(f)]
     rep = Report()
     all_sentences = defaultdict(list)
@@ -755,6 +801,8 @@ def main(argv):
             validate_sales_toolkit(f, meta, rep, opp_ids)
         elif os.path.basename(f) == "people_toolkit.json":
             validate_people_toolkit(f, meta, rep, opp_ids)
+        elif os.path.basename(f) == "leader.json":
+            validate_leader(f, meta, rep, opp_ids)
         elif os.path.basename(f) == "call_reviews.json":
             validate_call_reviews(f, meta, rep, opp_ids)
         else:

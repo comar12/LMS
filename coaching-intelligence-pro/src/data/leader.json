@@ -1,0 +1,24 @@
+{
+  "session": [
+    { "id": "open", "title": "Set the tone", "tip": "Meet somewhere private, have the call examples ready, and explain the purpose in one sentence.", "say": ["Thanks for making time. I'd like to go through a couple of calls with you, hear your view, and agree on one or two things to focus on.", "This is a conversation, so jump in any time."] },
+    { "id": "strength", "title": "Start with what went well", "tip": "Be specific and use only what you actually observed. If nothing was marked as observed, move to the next step.", "source": "strength" },
+    { "id": "ask", "title": "Ask before you tell", "tip": "Let the agent assess the call first. Listen more than you talk, and build on what they notice.", "say": ["Before I share what I noticed, how do you think that call went?"], "source": "questions" },
+    { "id": "observe", "title": "Share what you observed", "tip": "Describe the behavior and its impact on the customer, not the person. Pause after each point so the agent can respond.", "source": "challenges" },
+    { "id": "plan", "title": "Agree on the plan", "tip": "Ask the agent to say the plan back in their own words, and adjust it together if something does not fit.", "say": ["In your own words, what will you do differently on your next call?"], "source": "plan" },
+    { "id": "followup", "title": "Set the follow-up", "tip": "Name the date of the first review and explain how you will share what you find.", "source": "followup" },
+    { "id": "close", "title": "Close with confidence", "tip": "End on a specific, positive note and thank the agent for the conversation.", "say": ["I'm confident you can do this, and I'll be listening for it. Thank you for being open today.", "If anything gets in the way before our check-in, come and find me."] }
+  ],
+  "observe": [
+    { "id": "prepared", "title": "Prepared with examples", "good": "You came prepared with specific call examples, which kept the conversation focused on facts.", "gap": "Prepare one or two specific call examples before the session so the conversation stays on observed behavior." },
+    { "id": "purpose", "title": "Opened with a clear purpose", "good": "You explained the purpose of the session at the start, which helped the agent relax and engage.", "gap": "Open by explaining the purpose of the session in one sentence, so the agent knows what to expect." },
+    { "id": "strength", "title": "Started with a real strength", "good": "You opened with a specific strength you had observed, which made the agent more open to the feedback that followed.", "gap": "Start with one specific strength you observed before moving to the opportunity." },
+    { "id": "ask", "title": "Asked before telling", "good": "You asked the agent to assess the call before giving your view, which helped them own the change.", "gap": "Ask the agent how they think the call went before you share your view." },
+    { "id": "listen", "title": "Let the agent talk", "good": "You listened more than you talked and built on what the agent shared.", "gap": "Aim for the agent to do at least half of the talking, and use follow-up questions instead of filling the silence." },
+    { "id": "specific", "title": "Specific, behavior-based feedback", "good": "Your feedback described specific behaviors and their impact on the customer rather than the person.", "gap": "Describe the exact behavior you observed and its impact on the customer, rather than general statements." },
+    { "id": "smart", "title": "Measurable action plan", "good": "Your action plan was specific and measurable, with a clear target and review date.", "gap": "Make the action plan measurable by naming the behavior, the target, and when it will be reviewed." },
+    { "id": "restate", "title": "Agent restated the plan", "good": "You asked the agent to restate the plan in their own words, which confirmed understanding and agreement.", "gap": "Before closing, ask the agent to restate the plan in their own words to confirm understanding." },
+    { "id": "followup", "title": "Set the follow-up", "good": "You set a clear follow-up date and explained how you would review the results together.", "gap": "Set a specific follow-up date and explain how you will review progress before the session ends." },
+    { "id": "tone", "title": "Supportive, professional tone", "good": "Your tone stayed supportive and professional throughout, including when you discussed the opportunity.", "gap": "Keep a calm, supportive tone throughout, especially while discussing the opportunity." },
+    { "id": "documented", "title": "Documented accurately", "good": "Your coaching notes matched what was discussed and contained no names or identifiers.", "gap": "Document the session so it matches what was discussed, without names or identifiers." }
+  ]
+}

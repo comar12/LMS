@@ -86,6 +86,7 @@ function renderHome(main) {
         'div',
         { class: 'hero__actions' },
         h('a', { class: 'btn hero__cta', href: '#/call-review', 'data-fk': 'home-review' }, icon('checklist'), 'Start a call review'),
+        h('a', { class: 'btn hero__ghost', href: '#/today', 'data-fk': 'home-today' }, icon('pulse'), todayOpenCount() ? `My Day (${todayOpenCount()} left)` : 'My Day'),
         h('a', { class: 'btn hero__ghost', href: '#/builder', 'data-fk': 'home-builder' }, icon('clipboard'), bc ? `Coaching Builder (${bc})` : 'Coaching Builder')
       )
     )

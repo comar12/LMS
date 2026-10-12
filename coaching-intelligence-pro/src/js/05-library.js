@@ -25,6 +25,7 @@ function renderSidebar() {
   const customCount = state.custom.opps.length + state.custom.strengths.length + Object.keys(state.overrides.opps).length + Object.keys(state.overrides.strengths).length;
   const bc = builderCount();
   const dueN = trackerDueCount();
+  const openN = todayOpenCount();
   els.sidebar.replaceChildren(
     h(
       'div',
@@ -36,18 +37,23 @@ function renderSidebar() {
       'nav',
       { class: 'nav', 'aria-label': 'Coaching library' },
       navItem({ view: 'home', label: 'Home', iconName: 'home' }),
+      navItem({ view: 'today', label: 'My Day', iconName: 'pulse', badge: openN || null, badgeLabel: openN ? `${openN} routine items left today` : null }),
       navItem({ view: 'all', label: 'All Opportunities', iconName: 'layers', count: content.opps.length }),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Categories'),
       CATS.map((c) => navItem({ view: 'cat', cat: c.id, label: c.nav, iconName: CAT_ICON[c.id], count: counts[c.id] || 0 })),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Coaching'),
       navItem({ view: 'call-review', label: 'Call Review', iconName: 'checklist' }),
+      navItem({ view: 'builder', label: 'Coaching Builder', iconName: 'clipboard', badge: bc || null, count: bc ? null : 0 }),
+      navItem({ view: 'session', label: 'Run the Session', iconName: 'chat' }),
+      navItem({ view: 'tracker', label: 'Follow-Up Tracker', iconName: 'calendar', badge: dueN || null, badgeLabel: dueN ? `${dueN} due or overdue` : null, count: dueN ? null : state.tracker.plans.filter((p) => p.status === 'active').length }),
       navItem({ view: 'strengths', label: 'Things Went Well', iconName: 'thumb', count: content.strengths.length }),
+      navItem({ view: 'favorites', label: 'Favorites', iconName: 'star', count: state.favorites.size }),
       navItem({ view: 'sales-toolkit', label: 'Sales Toolkit', iconName: 'tag' }),
       navItem({ view: 'people-toolkit', label: 'ABS & Attrition Toolkit', iconName: 'users' }),
-      navItem({ view: 'favorites', label: 'Favorites', iconName: 'star', count: state.favorites.size }),
-      navItem({ view: 'builder', label: 'Coaching Builder', iconName: 'clipboard', badge: bc || null, count: bc ? null : 0 }),
+      h('div', { class: 'nav__section', role: 'presentation' }, 'Team'),
       navItem({ view: 'huddle', label: 'Team Huddle', iconName: 'megaphone' }),
-      navItem({ view: 'tracker', label: 'Follow-Up Tracker', iconName: 'calendar', badge: dueN || null, badgeLabel: dueN ? `${dueN} due or overdue` : null, count: dueN ? null : state.tracker.plans.filter((p) => p.status === 'active').length }),
+      navItem({ view: 'snapshot', label: 'Weekly Snapshot', iconName: 'trend' }),
+      navItem({ view: 'leader', label: 'Coach the Coach', iconName: 'award' }),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Personal'),
       navItem({ view: 'links', label: 'Quick Links', iconName: 'link', count: state.links.items.length }),
       navItem({ view: 'templates', label: 'My Templates', iconName: 'folder', count: customCount }),
@@ -416,6 +422,10 @@ function renderMain() {
   else if (v === 'people-toolkit') renderPeopleToolkit(main);
   else if (v === 'tracker') renderTracker(main);
   else if (v === 'huddle') renderHuddle(main);
+  else if (v === 'today') renderToday(main);
+  else if (v === 'session') renderSession(main);
+  else if (v === 'snapshot') renderSnapshot(main);
+  else if (v === 'leader') renderLeader(main);
   else if (v === 'links') renderLinks(main);
   else if (v === 'builder') renderBuilder(main);
   else if (v === 'templates') renderTemplates(main);
@@ -427,7 +437,7 @@ function renderMain() {
 function titleForView() {
   const v = state.ui.view;
   if (v === 'cat') return (CAT_MAP[state.ui.cat] || {}).nav || 'Category';
-  return { home: 'Home', all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', 'call-review': 'Call Review', 'people-toolkit': 'ABS & Attrition Toolkit', tracker: 'Follow-Up Tracker', huddle: 'Team Huddle Builder', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
+  return { home: 'Home', all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', 'call-review': 'Call Review', 'people-toolkit': 'ABS & Attrition Toolkit', tracker: 'Follow-Up Tracker', huddle: 'Team Huddle Builder', today: 'My Day', session: 'Run the Session', snapshot: 'Weekly Snapshot', leader: 'Coach the Coach', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
 }
 
 /** Re-render everything that depends on state, keeping focus and scroll where they were. */
