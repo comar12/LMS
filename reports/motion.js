@@ -1,14 +1,17 @@
 /* ---------------------------------------------------------------- motion layer: scroll reveal, deferred chart entrances, number morphing, day strip, standings race */
 const MOTION_OK = () => !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 const IO = ('IntersectionObserver' in window) ? new IntersectionObserver(entries => { for (const e of entries) { if (!e.isIntersecting) continue; IO.unobserve(e.target); revealNow(e.target); } }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }) : null;
-function revealNow(t){ t.classList.add('in'); if (t._anims){ const a=t._anims; t._anims=null; a.forEach(x=>{ try{ x.play(); }catch(e){} }); } if (t._onReveal){ const f=t._onReveal; t._onReveal=null; try{ f(); }catch(e){ console.error(e); } } }
+const PENDING=new Set();
+function revealNow(t){ PENDING.delete(t); t.classList.add('in'); if (t._anims){ const a=t._anims; t._anims=null; a.forEach(x=>{ try{ x.play(); }catch(e){} }); } if (t._onReveal){ const f=t._onReveal; t._onReveal=null; try{ f(); }catch(e){ console.error(e); } } }
 function inView(el){ const r=el.getBoundingClientRect(); return r.width>0 && r.height>0 && r.top < (window.innerHeight||800)-30 && r.bottom > 0; }
 /* pause a chart's WAAPI entrance until it scrolls into view */
-function deferAnims(host){ if (!host || !IO || !MOTION_OK() || !host.getAnimations) return; if (inView(host)) return; const a=host.getAnimations({subtree:true}); if (!a.length) return; a.forEach(x=>{ try{ x.pause(); }catch(e){} }); host._anims=a; IO.observe(host); }
+function deferAnims(host){ if (!host || !IO || !MOTION_OK() || !host.getAnimations) return; if (inView(host)) return; const a=host.getAnimations({subtree:true}); if (!a.length) return; a.forEach(x=>{ try{ x.pause(); }catch(e){} }); host._anims=a; PENDING.add(host); IO.observe(host); }
 /* run fn once el is on screen (immediately when it already is, or when motion is off) */
-function whenVisible(el, fn){ if (!el) return; if (!IO || !MOTION_OK() || inView(el)){ fn(); return; } el._onReveal=fn; IO.unobserve(el); IO.observe(el); }
+function whenVisible(el, fn){ if (!el) return; if (!IO || !MOTION_OK() || inView(el)){ fn(); return; } el._onReveal=fn; PENDING.add(el); IO.unobserve(el); IO.observe(el); }
 /* panels and tiles fade up the first time they enter the viewport */
-function armReveals(){ if (!IO || !MOTION_OK()) return; document.querySelectorAll('.view .panel, .view .grid-three > *, .view .kpis, .view .summary-row > *').forEach((p,k)=>{ if (p.dataset.rv) return; p.dataset.rv='1'; if (inView(p) && !p.closest('.view:not(.active)')){ p.classList.add('rvl'); requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.add('in'))); return; } p.classList.add('rvl'); IO.observe(p); }); }
+function armReveals(){ if (!IO || !MOTION_OK()) return; document.querySelectorAll('.view .panel, .view .grid-three > *, .view .kpis, .view .summary-row > *').forEach((p,k)=>{ if (p.dataset.rv) return; p.dataset.rv='1'; if (inView(p) && !p.closest('.view:not(.active)')){ p.classList.add('rvl'); requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.add('in'))); return; } p.classList.add('rvl'); PENDING.add(p); IO.observe(p); }); }
+function sweepReveals(){ for(const t of [...PENDING]){ if(!t.isConnected){ PENDING.delete(t); continue; } if(inView(t)){ if(IO) IO.unobserve(t); revealNow(t); } } }
+let _rvTick=false; window.addEventListener('scroll',()=>{ if(_rvTick) return; _rvTick=true; requestAnimationFrame(()=>{ _rvTick=false; sweepReveals(); }); },{passive:true}); window.addEventListener('resize',()=>sweepReveals()); setInterval(sweepReveals, 1500);
 window.addEventListener('beforeprint', ()=>document.querySelectorAll('.rvl').forEach(p=>p.classList.add('in')));
 /* numbers glide from their previous value instead of restarting at zero */
 const NUMPREV={};
@@ -69,7 +72,7 @@ function renderMotion(id, cfg){ const host=document.getElementById(id); if(!host
 
 /* ---- when in the shift sales are logged (Cairo time, shift 14:00 → 07:00, business day cut at noon) */
 const SHIFT_HOURS=[14,15,16,17,18,19,20,21,22,23,0,1,2,3,4,5,6,7];
-function shiftHours(rs){ const xm=SHIFT_HOURS.map(()=>0), gs=SHIFT_HOURS.map(()=>0); let ox=0,og=0; for(const r of rs){ const k=SHIFT_HOURS.indexOf(r.h); if(k<0){ ox+=r.xm; og+=r.gsr; } else { xm[k]+=r.xm; gs[k]+=r.gsr; } } return {xm,gs,ox,og}; }
+function shiftHours(rs){ const xm=SHIFT_HOURS.map(()=>0), gs=SHIFT_HOURS.map(()=>0); let ox=0,og=0; for(const r of rs){ if(r.h==null||r.h<0) continue; const k=SHIFT_HOURS.indexOf(r.h); if(k<0){ ox+=r.xm; og+=r.gsr; } else { xm[k]+=r.xm; gs[k]+=r.gsr; } } return {xm,gs,ox,og}; }
 function renderShift(figId, footId, rs){ const s=shiftHours(rs); const cats=SHIFT_HOURS.map(h=>String(h).padStart(2,'0')+':00'); const xm=s.xm.slice(), gs=s.gs.slice(); if(s.ox+s.og){ cats.push('08–13'); xm.push(s.ox); gs.push(s.og); }
   chart(figId,'columns',{cats, series:[{name:'XM Lines',values:xm,color:'s1'},{name:'GSR units',values:gs,color:'s2'}], stacked:true, valueLabels:'max', yFormat:n0, height:250});
   const tot=xm.reduce((a,b)=>a+b,0)+gs.reduce((a,b)=>a+b,0); const foot=document.getElementById(footId); if(!foot) return; if(!tot){ foot.innerHTML='<span>No sales in this scope and period.</span>'; return; }
