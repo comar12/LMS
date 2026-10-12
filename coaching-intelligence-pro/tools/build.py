@@ -10,6 +10,7 @@ Usage:
   python3 tools/build.py --check    # build, then syntax-check the generated JavaScript with Node
   python3 tools/build.py --links my-links.json --out My_Copy.html
                                     # personal copy with Quick Links preloaded (keep that JSON out of git)
+  python3 tools/build.py --team-size 16 ...   # also start Team Pulse with codes Agent 01 to Agent 16 (codes only)
 """
 import glob
 import json
@@ -45,7 +46,7 @@ def load_seed_links(path):
     return [{k: l[k] for k in keys if k in l} for l in links]
 
 
-def build_data(links_path=None):
+def build_data(links_path=None, team_size=0):
     meta = load_json("data/meta.json")
     opps = []
     for cat in meta["categories"]:
@@ -80,11 +81,12 @@ def build_data(links_path=None):
         "peopleToolkit": load_json("data/people_toolkit.json"),
         "leader": load_json("data/leader.json"),
         "seedLinks": load_seed_links(links_path),
+        "seedTeam": team_size,
     }
 
 
-def build(check=False, links_path=None, out=OUT):
-    data = build_data(links_path)
+def build(check=False, links_path=None, out=OUT, team_size=0):
+    data = build_data(links_path, team_size)
     data_js = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     # Never allow the inlined data to terminate the script element.
     data_js = data_js.replace("</", "<\\/").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
@@ -101,7 +103,7 @@ def build(check=False, links_path=None, out=OUT):
     with open(out, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(html)
     size = os.path.getsize(out)
-    extra = f", {len(data['seedLinks'])} preset links" if data["seedLinks"] else ""
+    extra = (f", {len(data['seedLinks'])} preset links" if data["seedLinks"] else "") + (f", {team_size} team codes" if team_size else "")
     print(f"Built {os.path.relpath(out, ROOT)}: {size / 1024:.1f} KB, {len(data['opps'])} opportunities, {len(data['strengths'])} strengths, {len(modules)} JS modules{extra}")
     if check:
         with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False, encoding="utf-8") as tmp:
@@ -127,4 +129,7 @@ def arg_value(flag):
 
 
 if __name__ == "__main__":
-    build(check="--check" in sys.argv, links_path=arg_value("--links"), out=arg_value("--out") or OUT)
+    size = sys.argv[sys.argv.index("--team-size") + 1] if "--team-size" in sys.argv else "0"
+    if not size.isdigit() or int(size) > 40:
+        raise SystemExit("--team-size needs a number from 0 to 40")
+    build(check="--check" in sys.argv, links_path=arg_value("--links"), out=arg_value("--out") or OUT, team_size=int(size))

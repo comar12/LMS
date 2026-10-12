@@ -431,7 +431,7 @@ async function test(name, fn) {
       await page.goto(URL + '#/home');
       await page.waitForSelector('.hero');
       await overflow('home');
-      for (const v of ['#/today', '#/snapshot', '#/leader']) {
+      for (const v of ['#/today', '#/snapshot', '#/leader', '#/team']) {
         await page.goto(URL + v);
         await page.waitForSelector('#pageTitle');
         await overflow(v);
@@ -1341,9 +1341,66 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Team Pulse: codes only, earned recognition from logged results, balance flags, and prompts', async () => {
+    const day = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+    const { page, context } = await newPage({ hash: '#/team' });
+    assert((await page.locator('.empty__title').innerText()) === 'Set up your team', 'Team Pulse should start empty in the shared copy');
+    await page.getByRole('button', { name: 'Add team members' }).click();
+    await page.fill('#tm-prefix', 'bp-abcdef123');
+    assert(/BP-ID/.test(await page.locator('.modal .pii').innerText()), 'A BP-ID in the code should be flagged');
+    await page.fill('#tm-prefix', 'Agent');
+    await page.fill('#tm-count', '4');
+    await page.getByRole('button', { name: 'Add codes' }).click();
+    assert((await page.locator('.pulse .plan__label').allInnerTexts()).sort().join() === 'Agent 01,Agent 02,Agent 03,Agent 04', 'Codes were not created');
+    // Agent 02 has met results logged; Agent 03 has two coaching plans and no recognition.
+    await page.evaluate((d) => localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [
+      { id: 'plan-p1', label: 'Agent 02', start: d.a, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air', 'com-missing-empathy'], logs: [{ id: 'log-p1', kind: 'call', date: d.a, results: { 'hold-dead-air': 'miss', 'com-missing-empathy': 'met' } }, { id: 'log-p2', kind: 'call', date: d.b, results: { 'hold-dead-air': 'met', 'com-missing-empathy': 'met' } }] },
+      { id: 'plan-p2', label: 'agent 03', start: d.b, duration: 14, calls: 5, followup: 7, focus: ['own-confirm-resolution'], logs: [] },
+      { id: 'plan-p3', label: 'Agent 03', start: d.a, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] } ] })), { a: day(-8), b: day(-2) });
+    await page.reload();
+    await page.waitForSelector('.pulse');
+    const card = (code) => page.locator('.pulse', { has: page.locator('.plan__label', { hasText: new RegExp('^' + code + '$') }) });
+    assert((await card('Agent 02').locator('.flag').first().innerText()) === 'Earned recognition ready', 'Earned recognition should be flagged');
+    assert((await card('Agent 03').locator('.flag').allInnerTexts()).includes('Coached 2 times, recognized 0 in 30 days'), 'Coaching balance flag is missing (codes should match regardless of case)');
+    assert((await page.locator('.needs .rt-row__title').first().innerText()) === 'Agent 02', 'Earned recognition should be first in Who needs a touchpoint');
+    await card('Agent 02').getByRole('button', { name: /Recognize/ }).click();
+    const expected = `You met the expected standard for ${oppById['hold-dead-air'].b.focus} on one of the two calls I reviewed since our coaching session. You met the expected standard for ${oppById['com-missing-empathy'].b.focus} on both calls I reviewed since our coaching session. That is exactly what we worked on together, and it makes a real difference for the customers and the team. Thank you.`;
+    assert((await page.locator('#rc-text').inputValue()) === expected, 'Earned recognition text is wrong:\n' + (await page.locator('#rc-text').inputValue()));
+    assertClean(expected, 'earned recognition');
+    await page.selectOption('#rc-source', 'strength');
+    await page.selectOption('#rc-strength', 's-empathy');
+    assert((await page.locator('#rc-text').inputValue()) === strengthById['s-empathy'].v[0], 'Strength-based message is wrong');
+    await page.selectOption('#rc-source', 'earned');
+    assert((await clickCopy(page, 'Copy recognition message')) === expected, 'Copied message is wrong');
+    await page.getByRole('button', { name: 'Log as recognized' }).click();
+    assert((await card('Agent 02').locator('.pulse__facts dd').first().innerText()) === 'today', 'Recognition date did not update');
+    assert((await card('Agent 02').locator('.flag', { hasText: 'Earned' }).count()) === 0, 'Earned flag should clear after recognizing');
+    const stored = await page.evaluate(() => localStorage.getItem('cip.v1.team'));
+    assert(!stored.includes('expected standard'), 'Message text must never be stored');
+    await card('Agent 01').getByRole('button', { name: 'Log one-on-one' }).click();
+    assert((await card('Agent 01').locator('.pulse__facts dd').nth(1).innerText()) === 'today', 'One-on-one was not logged');
+    // Logging a Met in the tracker offers recognition for that agent.
+    await page.goto(URL + '#/tracker');
+    await page.locator('.plan', { hasText: 'Agent 03' }).first().getByRole('button', { name: 'Log call review' }).click();
+    await page.locator('.tr-logrow').first().getByRole('button', { name: 'Met', exact: true }).click();
+    await page.getByRole('button', { name: 'Save call review' }).click();
+    await page.locator('.toast button', { hasText: 'Recognize it' }).click();
+    assert((await page.locator('#rc-member option:checked').innerText()) === 'Agent 03', 'Recognize prompt opened for the wrong agent');
+    await page.keyboard.press('Escape');
+    await page.goto(URL + '#/today');
+    assert((await page.locator('section[aria-labelledby="dayRec"] .rt-row__title').first().innerText()) === 'Agent 03', 'My Day should list earned recognition first');
+    // Team Pulse is in backups but never in a team pack.
+    await page.goto(URL + '#/settings');
+    const [d1] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export team pack' }).click()]);
+    assert(!('team' in JSON.parse(fs.readFileSync(await d1.path(), 'utf8')).data), 'Team pack must not include Team Pulse');
+    const [d2] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Export backup/ }).click()]);
+    assert(JSON.parse(fs.readFileSync(await d2.path(), 'utf8')).data.team.members.length === 4, 'Backup should include Team Pulse');
+    await finish(page, context);
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
-    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/links', '#/templates', '#/settings'];
+    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/links', '#/templates', '#/settings'];
     const sweep = async (label) => {
       for (const v of views) {
         await page.goto(URL + v);
@@ -1358,6 +1415,7 @@ async function test(name, fn) {
       localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-a1', label: 'Agent 1', start: '2026-01-05', duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }] }));
       localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['hold-dead-air'], strengths: [] }));
       localStorage.setItem('cip.v1.huddle', JSON.stringify({ opp: 'hold-dead-air', strength: 's-empathy', minutes: 10, history: [{ date: '2026-01-05', opp: 'hold-dead-air', minutes: 10 }] }));
+      localStorage.setItem('cip.v1.team', JSON.stringify({ members: [{ id: 'mem-a1', code: 'Agent 01' }], touches: [] }));
     });
     await page.reload();
     await sweep('with data');

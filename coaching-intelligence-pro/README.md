@@ -20,6 +20,12 @@ To see it working first, watch the one-minute walkthrough: [`docs-walkthrough.mp
   the last 7, 14, or 30 days, with **Copy summary**. Every number comes from what was logged; nothing is estimated.
 - **Coach the Coach**: an observation checklist for a team leader's coaching session that writes feedback to the
   leader, and side-by-side calibration of the same call with an agreement score and the differences to discuss.
+- **Team Pulse**: one card per agent code (for example Agent 01 to Agent 16, never names or IDs) showing the last
+  recognition, the last one-on-one, and the balance of coaching and recognition over 30 days. **Who needs a
+  touchpoint** lists who is due, and My Day reminds you. **Earned recognition**: when you log Met results in the
+  Follow-Up Tracker, the app offers a ready message built only from those results ("You met the expected standard
+  for dead-air management on both calls I reviewed since our coaching session..."). Only dates are saved, never the
+  message, and Team Pulse is never included in a team pack.
 - **Team pack** (Settings & Data): export custom templates, customized wording, quick links, routine items, and
   brand colors for your team leaders to import. Personal plans, drafts, and Builder content are never included.
 - **Home dashboard** with a quick start, coach-by-KPI tiles (QA, Repeat (aiCR), Transfer, ABS, Attrition), quick
@@ -121,7 +127,7 @@ tools/
 tests/
   e2e.cjs              browser tests (Playwright + Chromium): the ten QA scenarios plus copy, storage,
                        import, Builder, Home, Call Review, ABS & Attrition, Follow-Up Tracker, Team Huddle,
-                       My Day, Run the Session, Weekly Snapshot, Coach the Coach, team pack, Sales Toolkit,
+                       My Day, Run the Session, Weekly Snapshot, Coach the Coach, Team Pulse, team pack, Sales Toolkit,
                        Quick Links, and brand color checks
 ```
 
@@ -130,5 +136,7 @@ python3 tools/validate_content.py --strict # check all content (warnings count a
 python3 tools/build.py --check             # build the single HTML file and syntax-check the JavaScript
 python3 tools/build.py --links my-links.json --out My_Copy.html
                                            # personal copy with Quick Links preloaded (both files are git-ignored)
+python3 tools/build.py --links my-links.json --team-size 16 --out My_Copy.html
+                                           # same, and Team Pulse starts with codes Agent 01 to Agent 16
 NODE_PATH=$(npm root -g) node tests/e2e.cjs   # run the browser tests against the built file
 ```

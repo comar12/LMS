@@ -2,7 +2,7 @@
    11-init: hash routing, global events, startup
    ========================================================================== */
 
-const VIEWS = ['home', 'today', 'all', 'session', 'snapshot', 'leader', 'call-review', 'strengths', 'sales-toolkit', 'people-toolkit', 'favorites', 'builder', 'tracker', 'huddle', 'links', 'templates', 'settings'];
+const VIEWS = ['home', 'today', 'all', 'session', 'snapshot', 'leader', 'team', 'call-review', 'strengths', 'sales-toolkit', 'people-toolkit', 'favorites', 'builder', 'tracker', 'huddle', 'links', 'templates', 'settings'];
 
 function parseHash() {
   const raw = (window.location.hash || '').replace(/^#/, '');

@@ -211,6 +211,28 @@ function renderToday(main) {
           )
         : h('p', { class: 'day-empty' }, icon('check'), 'No follow-ups are due in the next two days.')
     ),
+    (() => {
+      const list = state.team.members.map((m) => ({ m, pu: memberPulse(m) })).filter((x) => x.pu.earned.length || x.pu.dRec === null || x.pu.dRec >= 14).sort((a, b) => b.pu.need - a.pu.need).slice(0, 3);
+      if (!state.team.members.length || !list.length) return null;
+      return h(
+        'section',
+        { class: 'card day-sec', 'aria-labelledby': 'dayRec' },
+        h('div', { class: 'card__head' }, h('h2', { class: 'card__title', id: 'dayRec' }, icon('award'), 'Recognition today'), h('a', { class: 'btn btn--sm btn--ghost', href: '#/team', 'data-fk': 'day-team' }, 'Team Pulse', icon('arrow-right'))),
+        h(
+          'ul',
+          { class: 'rt-list' },
+          list.map(({ m, pu }) =>
+            h(
+              'li',
+              { class: `rt-row rt-row--${pu.earned.length ? 'earned' : 'due'}` },
+              h('span', { class: 'rt-row__icon', 'aria-hidden': 'true' }, icon(pu.earned.length ? 'award' : 'heart')),
+              h('div', { class: 'rt-row__main' }, h('div', { class: 'rt-row__head' }, h('span', { class: 'rt-row__title' }, m.code), h('span', { class: `rt-due rt-due--${pu.earned.length ? 'done' : 'due'}` }, pu.flags[0].text))),
+              h('div', { class: 'rt-row__actions' }, h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `day-rec:${m.id}`, onclick: () => openRecognize(m.id) }, icon('award'), 'Recognize'))
+            )
+          )
+        )
+      );
+    })(),
     sugOpp
       ? h(
           'section',

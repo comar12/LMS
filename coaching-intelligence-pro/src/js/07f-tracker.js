@@ -115,7 +115,8 @@ function findPlan(id) {
 }
 
 function labelField(value) {
-  const input = h('input', { class: 'input', id: 'tr-label', type: 'text', value: value || '', maxlength: '40', autocomplete: 'off', placeholder: 'Agent 3, Seat 12, or another code' });
+  const input = h('input', { class: 'input', id: 'tr-label', type: 'text', value: value || '', maxlength: '40', autocomplete: 'off', placeholder: state.team.members.length ? `Choose a team code, such as ${state.team.members[0].code}` : 'Agent 3, Seat 12, or another code', list: 'tr-label-codes' });
+  const codes = h('datalist', { id: 'tr-label-codes' }, state.team.members.map((m) => h('option', { value: m.code })));
   const warn = h('div');
   const check = () => {
     warn.replaceChildren();
@@ -131,6 +132,7 @@ function labelField(value) {
       { class: 'field' },
       h('label', { class: 'field__label', for: 'tr-label' }, 'Who is this plan for?', h('span', { class: 'field__req', 'aria-hidden': 'true' }, '*')),
       input,
+      codes,
       h('p', { class: 'field__hint' }, 'Use a code you will recognize, not a name. Never enter BPIDs, HRIDs, Avaya IDs, or other identifiers.'),
       warn
     ),
@@ -263,7 +265,9 @@ function openLogDialog(planId, kind) {
     refresh({ panel: false });
     state.ui.flash = null;
     const c = planCounts(p);
-    toast(kind === 'call' ? `Call review logged (${Math.min(c.calls, c.callTarget)} of ${c.callTarget})` : 'Check-in logged');
+    const mem = memberByCode(p.label);
+    const anyMet = Object.values(picks).includes('met');
+    toast(kind === 'call' ? `Call review logged (${Math.min(c.calls, c.callTarget)} of ${c.callTarget})` : 'Check-in logged', mem && anyMet ? { duration: 6000, action: { label: 'Recognize it', fn: () => openRecognize(mem.id) } } : {});
   });
 }
 

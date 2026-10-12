@@ -23,6 +23,7 @@ function exportPayload() {
       tracker: state.tracker,
       huddle: state.huddle,
       today: state.today,
+      team: state.team,
     },
   };
 }
@@ -91,6 +92,7 @@ function parseImport(text) {
       tracker: d.tracker ? sanitizeTracker(d.tracker) : null,
       huddle: d.huddle ? sanitizeHuddle(d.huddle) : null,
       today: d.today ? sanitizeToday(d.today) : null,
+      team: d.team ? sanitizeTeam(d.team) : null,
     },
   };
 }
@@ -116,6 +118,7 @@ function applyImport(pack, mode) {
     if (pack.tracker) state.tracker = pack.tracker;
     if (pack.huddle) state.huddle = pack.huddle;
     if (pack.today) state.today = pack.today;
+    if (pack.team) state.team = pack.team;
   } else {
     if (pack.tracker) state.tracker = { plans: mergeById(state.tracker.plans, pack.tracker.plans) };
     if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items) };
@@ -291,6 +294,7 @@ async function clearAllData() {
   state.tracker = { plans: [] };
   state.huddle = defaultHuddle();
   state.today = defaultToday();
+  state.team = { members: [], touches: [] };
   state.observe = { label: '', marks: {} };
   state.calib = { type: 'tech', a: {}, b: {} };
   store.remove('brandcss');

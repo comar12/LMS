@@ -337,6 +337,7 @@ function piiWarnings(text) {
   if (/\b\d{6,}\b/.test(t) || /\b\d{3,}[-\s]\d{3,}[-\s]?\d{2,}\b/.test(t)) out.push('a long number (account, BPID, HRID, or other ID)');
   if (/\(?\b\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}\b/.test(t)) out.push('a phone number');
   if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(t)) out.push('an email address');
+  if (/\bbp-?[a-z]{2,}\d{2,}\b/i.test(t)) out.push('what looks like a BP-ID');
   if (/\b(bpid|hrid|avaya|employee id|interaction id|acct\.?\s*#|account\s*(?:number|#))\b/i.test(t)) out.push('an identifier label');
   if (/\b(mr|mrs|ms|miss|dr)\.?\s+[A-Z][a-z]+/.test(t)) out.push('what looks like a personal name');
   return dedupe(out);

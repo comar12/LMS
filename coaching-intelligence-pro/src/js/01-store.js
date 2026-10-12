@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const STORAGE_PREFIX = 'cip.v1.';
-const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle', 'today', 'observe', 'calib'];
+const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle', 'today', 'observe', 'calib', 'team'];
 
 const store = (() => {
   let ok = false;
@@ -148,6 +148,7 @@ const state = {
   today: defaultToday(),
   observe: { label: '', marks: {} },
   calib: { type: 'tech', a: {}, b: {} },
+  team: { members: [], touches: [] },
   ui: { view: 'all', cat: null, query: '', linkQuery: '', openId: null, sVersion: {}, visibleIds: [], returnFocusKey: null },
 };
 
@@ -330,6 +331,30 @@ function sanitizeCalib(o) {
   const ok = new Set(REVIEW_TYPES.find((t) => t.id === type).steps.concat(REVIEW_TYPES.find((t) => t.id === type).skills).map((x) => x.id));
   const clean = (m) => Object.fromEntries(Object.entries(m && typeof m === 'object' ? m : {}).filter(([k, v]) => ok.has(k) && ['met', 'gap', 'na'].includes(v)));
   return { type, a: clean(src.a), b: clean(src.b) };
+}
+
+/** Team Pulse: agent codes chosen by the supervisor (never names or IDs) and dated touchpoints. Message text is never stored. */
+const TOUCH_KINDS = ['recognition', 'oneonone', 'stay'];
+function sanitizeTeam(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const members = [];
+  const seen = new Set();
+  for (const m of Array.isArray(src.members) ? src.members.slice(0, 60) : []) {
+    if (!m || typeof m !== 'object') continue;
+    const code = str(m.code, 30).trim();
+    if (!code) continue;
+    let id = isId(m.id) ? m.id : uid('mem');
+    if (seen.has(id)) id = uid('mem');
+    seen.add(id);
+    members.push({ id, code, since: isIsoDate(m.since) ? m.since : '' });
+  }
+  const ids = new Set(members.map((m) => m.id));
+  const touches = [];
+  for (const t of Array.isArray(src.touches) ? src.touches.slice(-2000) : []) {
+    if (!t || typeof t !== 'object' || !ids.has(t.member) || !TOUCH_KINDS.includes(t.kind) || !isIsoDate(t.date)) continue;
+    touches.push({ id: isId(t.id) ? t.id : uid('touch'), member: t.member, kind: t.kind, date: t.date, earned: t.earned === true, strength: isId(t.strength) ? t.strength : null });
+  }
+  return { members, touches };
 }
 
 function sanitizeLinks(o) {
@@ -568,6 +593,13 @@ function loadSlice(key) {
     case 'combos': state.combos = sanitizeCombos(store.get('combos', [])); break;
     case 'drafts': state.drafts = sanitizeDrafts(store.get('drafts', [])); break;
     case 'review': state.review = sanitizeReview(store.get('review', null)); break;
+    case 'team': {
+      const raw = store.get('team', null);
+      // A personal copy can be built with a team size; it starts with numbered codes only.
+      const n = clampInt(DATA.seedTeam, 0, 40, 0);
+      state.team = raw == null && n ? sanitizeTeam({ members: Array.from({ length: n }, (_, i) => ({ id: `mem-seed-${i + 1}`, code: `Agent ${String(i + 1).padStart(2, '0')}` })) }) : sanitizeTeam(raw);
+      break;
+    }
     case 'today': state.today = sanitizeToday(store.get('today', null)); break;
     case 'observe': state.observe = sanitizeObserve(store.get('observe', null)); break;
     case 'calib': state.calib = sanitizeCalib(store.get('calib', null)); break;
