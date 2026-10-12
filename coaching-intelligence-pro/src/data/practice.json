@@ -1,0 +1,401 @@
+{
+  "intro": "Role-play real call moments in a huddle or a one-on-one. You play the customer, your agent handles the call, and you score it against the same steps you use in Call Review.",
+  "scenarios": [
+    {
+      "id": "pr-tech-repeat",
+      "type": "tech",
+      "title": "The third call this week",
+      "kpi": ["aiCR", "QA"],
+      "level": 2,
+      "minutes": 8,
+      "brief": "A customer calls because their internet keeps dropping. The account shows two earlier contacts about the same issue this week.",
+      "persona": "Play the customer as tired and doubtful, not rude. You have called twice and both times were told it was fixed. Calm down when the agent mentions the earlier calls without being asked and explains what will be different this time. If the agent jumps straight into the same reset as last time, get more frustrated.",
+      "lines": [
+        { "when": "Opening", "say": "This is the third time I'm calling. My internet keeps cutting out and nobody has fixed it." },
+        { "when": "If the agent starts troubleshooting right away", "say": "We already did all of this. Twice. Did anyone even look at what happened before?" },
+        { "when": "If the agent reviews the earlier calls", "say": "Yes. The last person said a reset would fix it. It didn't." },
+        { "when": "During any silence", "say": "Hello? Are you still there?" },
+        { "when": "Near the end", "say": "So how do I know I won't be calling again tomorrow?" }
+      ],
+      "rubric": [
+        { "step": "open", "look": "Acknowledges that this is a repeat contact and how it affects the customer before troubleshooting." },
+        { "step": "history", "look": "Checks the earlier contacts and says what was already tried, without making the customer repeat it." },
+        { "step": "fix", "look": "Looks for the cause of the drops instead of repeating the same reset." },
+        { "step": "inform", "look": "Explains what is happening during any wait, so there is no dead air." },
+        { "step": "confirm", "look": "Confirms the fix with the customer and says what to watch for next." }
+      ],
+      "model": [
+        "I can see you've called about this twice this week, and I'm sorry it's still happening. I'm going to look at what was already tried so we don't repeat it.",
+        "I'm running a check on the connection now. It takes about a minute, and I'll tell you what I find.",
+        "Before we finish, let's make sure it's holding. Can you run a speed test while I'm still with you?"
+      ],
+      "debrief": [
+        "What did the customer need to hear before they were ready to troubleshoot?",
+        "Which moment would have led to a fourth call if it had been skipped?",
+        "What will you say in the first thirty seconds of your next repeat call?"
+      ]
+    },
+    {
+      "id": "pr-tech-transfer",
+      "type": "tech",
+      "title": "Just transfer me",
+      "kpi": ["Transfer", "aiCR"],
+      "level": 2,
+      "minutes": 7,
+      "brief": "A customer's TV box shows an error since yesterday. They ask to be transferred to whoever handles this before explaining anything.",
+      "persona": "Play the customer as impatient. You assume the agent cannot help and ask for a transfer early. Give the agent a chance when they own the issue and explain what they can do. If the agent offers a transfer right away, accept it with a sigh.",
+      "lines": [
+        { "when": "Opening", "say": "My TV box shows an error since yesterday. Just transfer me to whoever handles this." },
+        { "when": "If the agent offers a transfer right away", "say": "Fine. Last time I got transferred I waited forever." },
+        { "when": "If the agent says they can help", "say": "Really? Okay, what do you need from me?" },
+        { "when": "Midway through the call", "say": "This is taking a while. Are you sure you're the right person for this?" },
+        { "when": "Near the end", "say": "So it's working now? Do I need to do anything else?" }
+      ],
+      "rubric": [
+        { "step": "open", "look": "Acknowledges the request and the frustration instead of starting the transfer." },
+        { "step": "own", "look": "Takes ownership and explains what they can do before thinking about routing the call." },
+        { "step": "discover", "look": "Asks what changed and when the error started." },
+        { "step": "inform", "look": "Keeps the customer informed while working, especially when the customer doubts them." },
+        { "step": "expect", "look": "Sets clear expectations about what happens next." }
+      ],
+      "model": [
+        "I can help with that error myself, so you won't have to wait in another line. Let's start with what you see on the screen.",
+        "That's a fair question. I'm the right person for this, and here's what I'm checking right now.",
+        "You're all set. If the error comes back, here's the first thing to try."
+      ],
+      "debrief": [
+        "At what moment could this call have become a transfer, and what kept it with you?",
+        "How did you earn the customer's trust when they doubted you?"
+      ]
+    },
+    {
+      "id": "pr-tech-plain",
+      "type": "tech",
+      "title": "Explain it in plain words",
+      "kpi": ["QA", "aiCR"],
+      "level": 1,
+      "minutes": 6,
+      "brief": "A customer who is not comfortable with technology calls because the Wi-Fi works in the kitchen but not in the bedroom.",
+      "persona": "Play the customer as polite, not technical, and a little embarrassed. Ask the agent to repeat whenever they use technical words. Relax when the agent uses plain words and checks that you are following.",
+      "lines": [
+        { "when": "Opening", "say": "I'm sorry, I'm not good with these things. The internet works in the kitchen but not in the bedroom." },
+        { "when": "If the agent uses a technical word", "say": "I'm sorry, what does that mean?" },
+        { "when": "If the agent explains simply", "say": "Oh, that makes sense now." },
+        { "when": "When asked to do a step", "say": "Which light? There are a few of them." },
+        { "when": "Near the end", "say": "Will I remember how to do this next time?" }
+      ],
+      "rubric": [
+        { "step": "open", "look": "Puts the customer at ease and acknowledges the issue." },
+        { "step": "explain", "look": "Uses plain words and checks that the customer is following each step." },
+        { "step": "discover", "look": "Asks simple questions to find out where and when the Wi-Fi drops." },
+        { "step": "tone", "look": "Stays patient and warm, without rushing the customer." },
+        { "step": "educate", "look": "Teaches the customer what to try next time, so they don't need to call." }
+      ],
+      "model": [
+        "No need to be sorry, this is exactly what I'm here for. We'll go one step at a time.",
+        "The box with the lights is what sends the internet around your home. Can you tell me what color the top light is?",
+        "Next time this happens, the first thing to try is the step we just did together. Would it help to write it down?"
+      ],
+      "debrief": [
+        "Which technical words did you replace with plain ones?",
+        "How did you check that the customer was following you?"
+      ]
+    },
+    {
+      "id": "pr-bill-higher",
+      "type": "billing",
+      "title": "Why is my bill higher?",
+      "kpi": ["QA", "aiCR"],
+      "level": 2,
+      "minutes": 7,
+      "brief": "A customer calls because this month's bill is higher than usual. A promotional price on the account ended in the last billing cycle.",
+      "persona": "Play the customer as upset and suspicious. You think you were overcharged. Calm down when the agent acknowledges it, explains the bill clearly line by line, and does not rush. If the agent only says the promotion ended, ask if they are just raising your price.",
+      "lines": [
+        { "when": "Opening", "say": "My bill went up and nobody told me. I want to know why I'm being overcharged." },
+        { "when": "If the agent explains too fast", "say": "Slow down. What does that line even mean?" },
+        { "when": "If the agent only says the promotion ended", "say": "So you're just raising my price?" },
+        { "when": "After the explanation", "say": "And what will my bill be next month, exactly?" },
+        { "when": "Near the end", "say": "Fine. But I don't want any more surprises." }
+      ],
+      "rubric": [
+        { "step": "empathize", "look": "Acknowledges the frustration of an unexpected bill before explaining it." },
+        { "step": "review", "look": "Reviews the account and any earlier commitments before answering." },
+        { "step": "explain", "look": "Explains each changed line in plain words, at the customer's pace." },
+        { "step": "options", "look": "Offers the options that fit the customer's situation." },
+        { "step": "accurate", "look": "Gives accurate expectations about the next bill, with no promises that might not happen." }
+      ],
+      "model": [
+        "I understand. Seeing a higher bill without warning is frustrating. Let's go through it together, line by line.",
+        "This line is the change. The promotional price on your plan ended, so the regular price started this cycle. Let me show you the options.",
+        "So you have the full picture, here's what your next bill will include and why."
+      ],
+      "debrief": [
+        "At which moment did the customer start to trust the explanation?",
+        "Did you promise anything you can't guarantee?"
+      ]
+    },
+    {
+      "id": "pr-bill-payment",
+      "type": "billing",
+      "title": "I can't pay this month",
+      "kpi": ["QA", "aiCR"],
+      "level": 1,
+      "minutes": 6,
+      "brief": "A customer calls because they can't pay the full bill this month and are worried about losing service.",
+      "persona": "Play the customer as anxious and a little embarrassed. Calm down when the agent is respectful and explains the payment options clearly. If the agent starts talking about new services or upgrades, get uncomfortable. Coach note: payment help is service, not a sales offer.",
+      "lines": [
+        { "when": "Opening", "say": "I lost some hours at work and I can't pay the whole bill this month. Are you going to cut me off?" },
+        { "when": "If the agent rushes", "say": "Wait, what happens if I can only pay part of it?" },
+        { "when": "If the agent mentions new services", "say": "I can't even afford what I have right now." },
+        { "when": "After the options", "say": "Okay. When do I have to pay the rest?" },
+        { "when": "Near the end", "say": "Thank you for not making me feel bad about this." }
+      ],
+      "rubric": [
+        { "step": "empathize", "look": "Responds to the worry with respect and without judgment." },
+        { "step": "options", "look": "Explains the payment options that apply, clearly and respectfully, without turning it into a sales pitch." },
+        { "step": "accurate", "look": "Gives clear dates and amounts, with nothing promised that the account does not allow." },
+        { "step": "confirm", "look": "Confirms the customer understands what happens next and when." },
+        { "step": "tone", "look": "Keeps a calm, kind tone and a steady pace." }
+      ],
+      "model": [
+        "Thank you for calling about this before the due date. Let's look at what we can do together.",
+        "Here's how this would work, step by step. Does that fit what you can do this month?",
+        "Just so we're on the same page, here's what you'll pay today and when the rest is due."
+      ],
+      "debrief": [
+        "How did you keep this conversation respectful?",
+        "Why is payment help not a sales offer, and why does that matter on this call?"
+      ]
+    },
+    {
+      "id": "pr-bill-cancel",
+      "type": "billing",
+      "title": "Fix it or I cancel",
+      "kpi": ["Transfer", "aiCR"],
+      "level": 3,
+      "minutes": 9,
+      "brief": "A customer calls about a credit they were told about last month that never appeared. They say they will cancel if it isn't fixed today.",
+      "persona": "Play the customer as angry and firm. You were told a credit was coming and it is not there. Threaten to cancel twice. Calm down when the agent takes ownership, checks the earlier call, and is honest about what they can do. If the agent offers to send you to cancellation, accept angrily.",
+      "lines": [
+        { "when": "Opening", "say": "Last month I was told I'd get a credit. It's not on my bill. If this isn't fixed today, I'm canceling." },
+        { "when": "If the agent offers to transfer", "say": "Fine. Send me to cancel then." },
+        { "when": "If the agent checks the earlier call", "say": "Yes, that's the call. They said it would be on this bill." },
+        { "when": "Midway through the call", "say": "I've been a customer for years and this is how I'm treated?" },
+        { "when": "Near the end", "say": "How do I know it will actually show up this time?" }
+      ],
+      "rubric": [
+        { "step": "deescalate", "look": "Lowers the temperature by acknowledging the broken promise without arguing." },
+        { "step": "review", "look": "Finds the earlier call and what was said before responding." },
+        { "step": "own", "look": "Takes ownership of fixing it instead of routing the customer away." },
+        { "step": "retain", "look": "Hears the cancellation risk and works to keep the relationship." },
+        { "step": "accurate", "look": "Is honest about what will happen and when, with no new promise that could also be broken." }
+      ],
+      "model": [
+        "I hear you, and I'd be upset too if something I was told didn't happen. I'm going to look at that call right now.",
+        "Here's what I can do today, and here's exactly when you'll see it.",
+        "You've been with us for years, and I want to keep it that way. Let's fix this now."
+      ],
+      "debrief": [
+        "What did you do the first time you heard the word cancel?",
+        "How did you avoid making a new promise that could also be broken?"
+      ]
+    },
+    {
+      "id": "pr-svc-escalate",
+      "type": "service",
+      "title": "Supervisor, now",
+      "kpi": ["Transfer", "QA"],
+      "level": 3,
+      "minutes": 7,
+      "brief": "A customer opens the call by asking for a supervisor before explaining what happened.",
+      "persona": "Play the customer as very frustrated. Ask for a supervisor right away, and once more later. Do not explain the issue until the agent acknowledges how you feel and asks a good question. The issue: a technician appointment was missed yesterday and you took the day off work.",
+      "lines": [
+        { "when": "Opening", "say": "I want a supervisor. Now." },
+        { "when": "If the agent asks why", "say": "Because nobody listens to me." },
+        { "when": "If the agent acknowledges you and offers help", "say": "Fine. My appointment was missed yesterday, and I took the day off work for it." },
+        { "when": "Midway through the call", "say": "I still want a supervisor." },
+        { "when": "Near the end", "say": "Okay. That actually helps." }
+      ],
+      "rubric": [
+        { "step": "open", "look": "Stays calm and opens with care, not with a script." },
+        { "step": "deescalate", "look": "Acknowledges the feeling in specific words before asking questions." },
+        { "step": "listen", "look": "Asks a question that gets the customer to share what happened, then listens fully." },
+        { "step": "resolve", "look": "Works on the actual problem right away." },
+        { "step": "route", "look": "Escalates only if it is still needed after trying to help." }
+      ],
+      "model": [
+        "I can hear how frustrated you are, and I want to help. Can you tell me what happened so I can start on it right away?",
+        "Taking a day off for an appointment that didn't happen is really frustrating. Let me see what I can do right now.",
+        "I want to make this right, and I can start on it with you now."
+      ],
+      "debrief": [
+        "What changed the customer's mind about talking with you?",
+        "Which words showed empathy that wasn't generic?"
+      ]
+    },
+    {
+      "id": "pr-svc-three",
+      "type": "service",
+      "title": "Three problems, one call",
+      "kpi": ["aiCR"],
+      "level": 2,
+      "minutes": 8,
+      "brief": "A customer calls about a remote that stopped working and a charge they don't recognize. A third need comes up only at the very end.",
+      "persona": "Play the customer as friendly but scattered. Bring up the issues in a random order. Mention that you are moving next month only if the agent asks if there is anything else, or as you are about to hang up. If the agent does not recap, say you have lost track.",
+      "lines": [
+        { "when": "Opening", "say": "Hi, a couple of things. My remote stopped working, and there's a charge I don't get." },
+        { "when": "Midway through the call", "say": "Oh, and also... no, never mind, it's not important." },
+        { "when": "If the agent asks if there is anything else", "say": "Well, we're moving next month. Do I need to do something?" },
+        { "when": "Near the end", "say": "Wait, what was the first thing we fixed?" }
+      ],
+      "rubric": [
+        { "step": "listen", "look": "Listens for every concern, including the one the customer almost didn't mention." },
+        { "step": "main", "look": "Finds the main concern and keeps track of the others." },
+        { "step": "resolve", "look": "Resolves each concern fully before moving on." },
+        { "step": "next", "look": "Sets clear next steps for the move." },
+        { "step": "close", "look": "Recaps everything that was done and confirms before closing." }
+      ],
+      "model": [
+        "Happy to help with both. Let's start with the charge, then we'll get your remote working.",
+        "You said never mind a moment ago. What was on your mind? I'm happy to help with that too.",
+        "Let me recap what we did today, so you have it all in one place."
+      ],
+      "debrief": [
+        "When did you notice the third concern?",
+        "How would a missing recap lead to a repeat call?"
+      ]
+    },
+    {
+      "id": "pr-svc-hold",
+      "type": "service",
+      "title": "Research without dead air",
+      "kpi": ["QA"],
+      "level": 1,
+      "minutes": 6,
+      "brief": "A customer asks about a charge that needs research in several tools. It will take a few minutes to find the answer.",
+      "persona": "Play the customer as patient at first, but anxious with silence. After about fifteen seconds of silence, ask if the agent is still there. If you are placed on hold without a time estimate, ask how much longer when the agent returns.",
+      "lines": [
+        { "when": "Opening", "say": "I see a charge on my account I don't recognize. Can you tell me what it is?" },
+        { "when": "During any silence", "say": "Hello? Are you still there?" },
+        { "when": "If placed on hold without a time estimate", "say": "That was a long time. How much longer?" },
+        { "when": "If the agent gives updates", "say": "Okay, thanks for letting me know." },
+        { "when": "Near the end", "say": "So what was it?" }
+      ],
+      "rubric": [
+        { "step": "assure", "look": "Assures the customer they will get an answer before starting the research." },
+        { "step": "research", "look": "Explains what they are doing, gives a time estimate before any hold, and checks back in." },
+        { "step": "control", "look": "Keeps control of the call while researching." },
+        { "step": "explain", "look": "Explains the charge clearly once it is found." },
+        { "step": "close", "look": "Confirms the customer understands and closes warmly." }
+      ],
+      "model": [
+        "I'll find out what that is for you. It may take two or three minutes while I check a few places. Is it okay if I place you on a short hold?",
+        "Thanks for waiting. I found where the charge comes from, and I'm checking one more detail. About one more minute.",
+        "Here's what that charge is and why it's on your bill."
+      ],
+      "debrief": [
+        "How long was your longest silence?",
+        "What did you say before and after the hold?"
+      ]
+    },
+    {
+      "id": "pr-sales-signal",
+      "type": "sales",
+      "title": "The hint in the middle of the call",
+      "kpi": [],
+      "level": 2,
+      "minutes": 8,
+      "brief": "A customer calls because streaming keeps buffering at night. During the call they mention that the whole family now works and studies from home.",
+      "persona": "Play the customer as friendly. Mention twice that everyone is home at the same time now. Be open to a better fit if it is tied to your problem, but not to a general pitch. If the agent pitches before fixing the buffering, ask to fix the problem first.",
+      "lines": [
+        { "when": "Opening", "say": "Our streaming keeps buffering at night. It's driving my kids crazy." },
+        { "when": "Midway through the call", "say": "Now that we all work and study from home, it's even worse." },
+        { "when": "If the agent pitches before fixing", "say": "Can we just fix my problem first?" },
+        { "when": "If the agent ties an option to the need", "say": "Oh. What would that cost me?" },
+        { "when": "Near the end", "say": "Let me think about it." }
+      ],
+      "rubric": [
+        { "step": "resolve", "look": "Fixes the buffering first." },
+        { "step": "confirm", "look": "Confirms the fix before talking about anything else." },
+        { "step": "signals", "look": "Notices the buying signals: more people and devices at home." },
+        { "step": "seed", "look": "Plants the seed by linking what the customer said to a better fit." },
+        { "step": "offer", "look": "Makes one relevant offer tied to the need, not a general pitch." }
+      ],
+      "model": [
+        "Let's get the buffering sorted first, then we'll make sure it holds up at night.",
+        "You mentioned everyone is home at the same time now. How many devices are usually online in the evening?",
+        "Based on what you told me, there's an option that fits how your family uses the internet. Would you like to hear about it?"
+      ],
+      "debrief": [
+        "What were the buying signals, and when did you hear them?",
+        "When was the right moment to plant the seed?"
+      ]
+    },
+    {
+      "id": "pr-sales-objection",
+      "type": "sales",
+      "title": "That's too expensive",
+      "kpi": [],
+      "level": 2,
+      "minutes": 6,
+      "brief": "The customer is interested in an offer that fits what they need, but says it is too expensive.",
+      "persona": "Play the customer as interested but careful with money. Say it is too expensive once. If the agent explains the value for your needs and the full price clearly, consider it. If the agent keeps pushing after a clear no, end the conversation politely.",
+      "lines": [
+        { "when": "After the offer", "say": "That sounds nice, but it's too expensive." },
+        { "when": "If the agent explains the value", "say": "Okay, but what would my total bill be?" },
+        { "when": "If the agent explains the full price", "say": "Hmm, that's less than I thought." },
+        { "when": "If the agent keeps pushing", "say": "I said no. Can we move on?" },
+        { "when": "Near the end", "say": "Let me talk it over at home first." }
+      ],
+      "rubric": [
+        { "step": "value", "look": "Explains the value in terms of what the customer said they need." },
+        { "step": "objections", "look": "Asks about the concern behind the objection instead of repeating the pitch." },
+        { "step": "pricing", "look": "Explains the full monthly price clearly, with nothing left out." },
+        { "step": "respect", "look": "Respects a clear no and moves on." },
+        { "step": "understanding", "look": "Confirms the customer understands the offer and the price before closing." }
+      ],
+      "model": [
+        "I understand, price matters. Can I ask what feels too expensive, the monthly amount or the total?",
+        "Here's the full monthly price, including everything, so there are no surprises.",
+        "That's completely fair. Take the time you need, and here's what to ask about if you decide to go ahead."
+      ],
+      "debrief": [
+        "How did you handle the objection without pressure?",
+        "Did you explain the full price clearly before asking for a decision?"
+      ]
+    },
+    {
+      "id": "pr-sales-retention",
+      "type": "sales",
+      "title": "I found a cheaper deal",
+      "kpi": [],
+      "level": 3,
+      "minutes": 8,
+      "brief": "A customer calls to cancel because they found a cheaper offer somewhere else.",
+      "persona": "Play the customer as polite but decided. Say you are leaving because it is cheaper. Stay only if the agent understands what you value and gives you a real reason. If the agent only asks if you are sure, insist on canceling.",
+      "lines": [
+        { "when": "Opening", "say": "I'd like to cancel. I found a cheaper deal." },
+        { "when": "If the agent asks why", "say": "It's just cheaper. Money is tight right now." },
+        { "when": "If the agent asks what you use", "say": "We mostly use it for streaming and work calls." },
+        { "when": "If the agent offers something relevant", "say": "And how much would that be?" },
+        { "when": "Near the end", "say": "Okay, let me think. Maybe." }
+      ],
+      "rubric": [
+        { "step": "understand", "look": "Acknowledges the request and the reason without arguing." },
+        { "step": "empathize", "look": "Shows real empathy for money being tight." },
+        { "step": "probe", "look": "Asks what the customer values and uses most." },
+        { "step": "retention", "look": "Gives a real reason to stay that is tied to what the customer values." },
+        { "step": "pricing", "look": "Explains any price clearly and completely." }
+      ],
+      "model": [
+        "I understand, and thank you for telling me why. Can I ask what matters most to you in your service?",
+        "It sounds like reliable internet for work calls is important. Let's look at what keeps that at a price that works for you.",
+        "If you still decide to go, I'll make it easy. I just want you to have the full picture first."
+      ],
+      "debrief": [
+        "What did the customer value most, and how did you find out?",
+        "How did you keep the call respectful, whatever the customer decided?"
+      ]
+    }
+  ]
+}

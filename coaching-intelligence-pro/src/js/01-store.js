@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const STORAGE_PREFIX = 'cip.v1.';
-const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle', 'today', 'observe', 'calib', 'team'];
+const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle', 'today', 'observe', 'calib', 'team', 'practice', 'listen'];
 
 const store = (() => {
   let ok = false;
@@ -335,6 +335,64 @@ function sanitizeCalib(o) {
   return { type, a: clean(src.a), b: clean(src.b) };
 }
 
+/** Practice Lab: the role-play in progress and a history of dates, scenarios, and scored steps. No notes are kept. */
+const PRACTICE_STAGES = ['brief', 'play', 'score', 'debrief'];
+function defaultPractice() {
+  return { filter: 'all', current: null, history: [] };
+}
+function sanitizePractice(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const p = defaultPractice();
+  const scen = Object.fromEntries(DATA.practice.scenarios.map((s) => [s.id, s]));
+  if (src.filter === 'all' || REVIEW_TYPE_IDS.includes(src.filter)) p.filter = src.filter;
+  const member = (v) => (isId(v) ? v : '');
+  const marks = (sc, m) => Object.fromEntries(Object.entries(m && typeof m === 'object' ? m : {}).filter(([k, v]) => sc.rubric.some((r) => r.step === k) && (v === 'met' || v === 'gap')));
+  const c = src.current;
+  if (c && typeof c === 'object' && scen[c.id]) {
+    const sc = scen[c.id];
+    p.current = {
+      id: c.id,
+      stage: PRACTICE_STAGES.includes(c.stage) ? c.stage : 'brief',
+      who: c.who === 'one' ? 'one' : 'team',
+      member: member(c.member),
+      marks: marks(sc, c.marks),
+      said: [...new Set(Array.isArray(c.said) ? c.said : [])].filter((i) => Number.isInteger(i) && i >= 0 && i < sc.lines.length),
+      acc: clampInt(c.acc, 0, 4 * 3600000, 0),
+      // A role-play is paused after a reload; the time so far is kept.
+      runAt: 0,
+      saved: c.saved === true,
+    };
+  }
+  for (const x of Array.isArray(src.history) ? src.history.slice(-500) : []) {
+    if (!x || typeof x !== 'object' || !scen[x.scenario] || !isIsoDate(x.date)) continue;
+    p.history.push({ id: isId(x.id) ? x.id : uid('prx'), date: x.date, scenario: x.scenario, member: member(x.member), marks: marks(scen[x.scenario], x.marks), secs: clampInt(x.secs, 0, 4 * 3600, 0) });
+  }
+  return p;
+}
+
+/** Live Listen: one call at a time. Moments are a time, a review step, good or a miss, and an optional short note. */
+const LISTEN_KINDS = ['good', 'gap', 'note'];
+function defaultListen() {
+  return { type: 'tech', member: '', acc: 0, runAt: 0, marks: [] };
+}
+function sanitizeListen(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const l = defaultListen();
+  if (REVIEW_TYPE_IDS.includes(src.type)) l.type = src.type;
+  const ok = new Set(reviewItems(l.type).map((x) => x.id));
+  l.member = isId(src.member) ? src.member : '';
+  l.acc = clampInt(src.acc, 0, 4 * 3600000, 0);
+  // A running timer keeps running across a reload, as long as it started in the last few hours.
+  const now = Date.now();
+  l.runAt = Number.isFinite(src.runAt) && src.runAt > now - 4 * 3600000 && src.runAt <= now ? src.runAt : 0;
+  for (const m of Array.isArray(src.marks) ? src.marks.slice(0, 400) : []) {
+    if (!m || typeof m !== 'object' || !LISTEN_KINDS.includes(m.kind)) continue;
+    if (m.kind !== 'note' && !ok.has(m.item)) continue;
+    l.marks.push({ id: isId(m.id) ? m.id : uid('mk'), t: clampInt(m.t, 0, 4 * 3600, 0), kind: m.kind, item: ok.has(m.item) ? m.item : '', note: str(m.note, 200).trim() });
+  }
+  return l;
+}
+
 /** Team Pulse: agent codes chosen by the supervisor (never names or IDs) and dated touchpoints. Message text is never stored. */
 const TOUCH_KINDS = ['recognition', 'oneonone', 'stay'];
 /** HRIDs and BP-IDs: letters, digits, and - _ . only. */
@@ -621,6 +679,8 @@ function loadSlice(key) {
     case 'today': state.today = sanitizeToday(store.get('today', null)); break;
     case 'observe': state.observe = sanitizeObserve(store.get('observe', null)); break;
     case 'calib': state.calib = sanitizeCalib(store.get('calib', null)); break;
+    case 'practice': state.practice = sanitizePractice(store.get('practice', null)); break;
+    case 'listen': state.listen = sanitizeListen(store.get('listen', null)); break;
     case 'huddle': state.huddle = sanitizeHuddle(store.get('huddle', null)); break;
     case 'tracker': state.tracker = sanitizeTracker(store.get('tracker', null)); break;
     case 'links': {

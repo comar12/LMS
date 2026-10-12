@@ -288,13 +288,13 @@ function confirmDialog({ title, message, confirmLabel = 'Confirm', danger = fals
   });
 }
 
-function promptDialog({ title, label, value = '', hint, confirmLabel = 'Save', maxLength = 80 }) {
+function promptDialog({ title, label, value = '', hint, confirmLabel = 'Save', maxLength = 80, emptyText = 'Enter a name.' }) {
   return new Promise((resolve) => {
     let result = null;
     const inputId = uid('prompt');
     const input = h('input', { class: 'input', id: inputId, type: 'text', value, maxlength: String(maxLength), autocomplete: 'off' });
     const warn = h('div');
-    const err = h('p', { class: 'field__error', hidden: true }, 'Enter a name.');
+    const err = h('p', { class: 'field__error', hidden: true }, emptyText);
     const update = () => {
       warn.replaceChildren();
       const note = piiNote(input.value);

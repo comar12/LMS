@@ -2,7 +2,7 @@
    11-init: hash routing, global events, startup
    ========================================================================== */
 
-const VIEWS = ['home', 'today', 'all', 'session', 'snapshot', 'leader', 'team', 'call-review', 'strengths', 'sales-toolkit', 'people-toolkit', 'favorites', 'builder', 'tracker', 'huddle', 'links', 'templates', 'settings'];
+const VIEWS = ['home', 'today', 'all', 'session', 'snapshot', 'leader', 'team', 'practice', 'listen', 'call-review', 'strengths', 'sales-toolkit', 'people-toolkit', 'favorites', 'builder', 'tracker', 'huddle', 'links', 'templates', 'settings'];
 
 function parseHash() {
   const raw = (window.location.hash || '').replace(/^#/, '');
@@ -171,6 +171,7 @@ function bindElements() {
 function bindEvents() {
   window.addEventListener('hashchange', route);
   document.addEventListener('keydown', onGlobalKeydown);
+  document.addEventListener('keydown', onListenKeys);
   els.searchInput.addEventListener('input', () => {
     els.search.classList.toggle('has-value', !!els.searchInput.value);
     onSearchInput();

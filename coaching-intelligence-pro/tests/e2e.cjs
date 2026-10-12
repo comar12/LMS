@@ -1529,9 +1529,118 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Practice Lab: scenarios, role-play with timer and lines, scoring, debrief, history, and Builder', async () => {
+    const practice = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/practice.json'), 'utf8'));
+    const { page, context } = await newPage({ hash: '#/practice' });
+    await page.evaluate(() => localStorage.setItem('cip.v1.team', JSON.stringify({ members: [{ id: 'mem-1', code: 'Agent 01' }, { id: 'mem-2', code: 'Agent 02', name: 'Sam Rivers' }], touches: [] })));
+    await page.reload();
+    assert((await page.locator('.pr-card').count()) === practice.scenarios.length, 'Every scenario should have a card');
+    await page.locator('.pr-filter').getByRole('button', { name: 'Billing' }).click();
+    assert((await page.locator('.pr-card').count()) === practice.scenarios.filter((x) => x.type === 'billing').length, 'Billing filter is wrong');
+    await page.locator('.pr-filter').getByRole('button', { name: 'All' }).click();
+    const sc = practice.scenarios.find((x) => x.id === 'pr-tech-repeat');
+    await page.getByRole('button', { name: `Start practice: ${sc.title}` }).click();
+    // Brief: what to read to the agent, and how to play the customer.
+    assert((await page.locator('.pr-quote').innerText()) === sc.brief, 'Brief text is wrong');
+    assert((await page.locator('.pr-persona').innerText()).includes(sc.persona.slice(0, 40)), 'Persona missing');
+    await page.getByRole('radio', { name: 'One agent' }).click();
+    await page.locator('.mp__opt', { hasText: 'Sam Rivers' }).click();
+    await page.getByRole('button', { name: 'Start the role-play' }).click();
+    // Role-play: the timer runs and lines can be marked as used.
+    await page.waitForTimeout(1300);
+    assert((await page.locator('[data-clock="practice"]').innerText()) !== '0:00', 'Role-play timer did not run');
+    assert((await page.locator('.pr-line').count()) === sc.lines.length, 'Customer lines missing');
+    await page.locator('[data-fk="pr-said:0"]').click();
+    assert((await page.locator('.pr-line').first().getAttribute('class')).includes('is-said'), 'Line was not marked as used');
+    assert((await page.locator('.pr-looks li').count()) === sc.rubric.length, 'Listen-for list is wrong');
+    await page.getByRole('button', { name: 'End and score' }).click();
+    // Score against the Call Review steps.
+    assert((await page.locator('.pr-rubric .rv-row').count()) === sc.rubric.length, 'Rubric rows are wrong');
+    await page.locator('[data-fk="pr-met:open"]').click();
+    await page.locator('[data-fk="pr-gap:history"]').click();
+    await page.locator('[data-fk="pr-met:fix"]').click();
+    assert((await page.locator('.pr-scorecard__big').innerText()) === '2 met, 1 to practice', 'Score summary is wrong');
+    await page.getByRole('button', { name: 'See the debrief' }).click();
+    assert((await page.locator('.pr-well').innerText()).includes('Open and acknowledge') && (await page.locator('.pr-more').innerText()).includes('Check history and outages'), 'Debrief lists are wrong');
+    assert((await page.locator('.pr-model').count()) === sc.model.length, 'Model lines missing');
+    // Copied debrief is plain text with no names.
+    const text = await clickCopy(page, 'Copy debrief');
+    assert(text.startsWith(`Practice: ${sc.title}`) && text.includes('Practice more\nCheck history and outages') && !text.includes('Sam'), 'Debrief copy is wrong: ' + text);
+    // Save to history (once) and send results to the Builder.
+    await page.getByRole('button', { name: 'Save to history' }).click();
+    assert(await page.getByRole('button', { name: 'Saved to history' }).isDisabled(), 'Save button should lock after saving');
+    const hist = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.practice')).history);
+    assert(hist.length === 1 && hist[0].member === 'mem-2' && hist[0].marks.history === 'gap' && hist[0].scenario === sc.id, 'History entry is wrong: ' + JSON.stringify(hist));
+    await page.getByRole('button', { name: 'Add to Builder' }).click();
+    const b = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.builder')));
+    assert(b.opps.includes('dis-contact-history') && b.strengths.some((x) => x.id === 's-acknowledgement') && b.strengths.some((x) => x.id === 's-diagnosis'), 'Builder did not get the practice results');
+    // The run survives a reload, and the landing page shows the history.
+    await page.reload();
+    assert((await page.locator('.pr-step.is-current .pr-step__label').innerText()) === 'Debrief', 'Stage was not remembered');
+    await page.getByRole('button', { name: 'All scenarios' }).click();
+    assert((await page.locator('.pr-recent').innerText()).includes(sc.title) && (await page.locator('.pr-recent').innerText()).includes('Sam Rivers'), 'Recent practice is wrong');
+    assert((await page.locator(`.pr-card[data-id="${sc.id}"] .pr-card__badge`).innerText()).includes('Practiced 1x'), 'Practiced badge missing');
+    // Surprise me opens a scenario (motion is skipped with reduced motion in other tests).
+    await page.getByRole('button', { name: 'Surprise me' }).click();
+    await page.locator('.pr-steps').waitFor({ timeout: 4000 });
+    await finish(page, context);
+  });
+
+  await test('Live Listen: time-stamped taps, notes, shortcuts, and hand-off to Call Review and the Builder', async () => {
+    const { page, context } = await newPage({ hash: '#/listen' });
+    const tech = callReviews.types.find((t) => t.id === 'tech');
+    assert((await page.locator('.ls-pad').count()) === tech.steps.length + tech.skills.length, 'Every review step should have a pad');
+    // The first tap starts the timer.
+    await page.getByRole('button', { name: 'Good: Open and acknowledge' }).click();
+    assert((await page.locator('.ls-live').innerText()).toLowerCase().includes('live'), 'Timer should start on the first tap');
+    assert((await page.locator('.nav__item', { hasText: 'Live Listen' }).innerText()).includes('Live'), 'Sidebar should show the call is live');
+    await page.waitForTimeout(1100);
+    await page.getByRole('button', { name: 'Miss: Keep the customer informed' }).click();
+    await page.getByRole('button', { name: /^Miss: Keep the customer informed/ }).click();
+    assert((await page.locator('.ls-stat--gap strong').innerText()) === '2', 'Miss count is wrong');
+    // N adds a note at the current time; K pauses.
+    await page.locator('h1').click();
+    await page.keyboard.press('n');
+    await page.locator('.modal input').fill('long silence while checking the account');
+    await page.keyboard.press('Enter');
+    assert((await page.locator('.ls-moment').count()) === 4, 'Note was not added');
+    await page.keyboard.press('k');
+    assert((await page.locator('[data-fk="ls-clock"]').innerText()).includes('Resume'), 'K should pause the timer');
+    const marks = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.listen')).marks);
+    assert(marks.some((m) => m.item === 'inform' && m.t >= 1), 'Taps should carry the time');
+    // Hand-off to Call Review and the Builder.
+    await page.getByRole('button', { name: 'Send to Call Review' }).click();
+    const rv = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.review')));
+    assert(rv.type === 'tech' && rv.byType.tech.marks.open === 'met' && rv.byType.tech.marks.inform === 'gap', 'Call Review did not get the marks');
+    await page.getByRole('button', { name: 'Add to Builder' }).click();
+    const b = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.builder')));
+    assert(b.opps.includes('hold-dead-air') && b.strengths.some((x) => x.id === 's-acknowledgement'), 'Builder did not get the results');
+    assert(b.notes.evidence.includes('missed step: Keep the customer informed') && b.notes.evidence.includes('long silence while checking the account'), 'Evidence is wrong: ' + b.notes.evidence);
+    const copied = await clickCopy(page, 'Copy moments');
+    assert(copied.startsWith('Live Listen: Technical Support call') && copied.includes('Opportunity: Keep the customer informed'), 'Moments copy is wrong');
+    // Remove and undo.
+    await page.locator('.ls-moment').first().getByRole('button', { name: /Remove moment/ }).click();
+    assert((await page.locator('.ls-moment').count()) === 3, 'Remove did not work');
+    await page.locator('.toast button', { hasText: 'Undo' }).click();
+    assert((await page.locator('.ls-moment').count()) === 4, 'Undo did not restore the moment');
+    // A running call survives a reload.
+    await page.keyboard.press('k');
+    await page.reload();
+    await page.waitForTimeout(600);
+    assert((await page.locator('.ls-live').innerText()).toLowerCase().includes('live'), 'A running timer should keep running after a reload');
+    // Switching call type keeps only notes; New call clears everything.
+    await page.locator('.ls-setup').getByRole('button', { name: 'Billing' }).click();
+    await page.locator('.modal').getByRole('button', { name: 'Switch call type' }).click();
+    assert((await page.locator('.ls-moment').count()) === 1, 'Switching type should keep only notes');
+    await page.getByRole('button', { name: 'New call' }).click();
+    await page.locator('.modal').getByRole('button', { name: 'Start a new call' }).click();
+    assert((await page.locator('.ls-moment').count()) === 0 && (await page.locator('[data-clock="listen"]').innerText()) === '0:00', 'New call should clear the timer and moments');
+    await finish(page, context);
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
-    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/links', '#/templates', '#/settings'];
+    const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/practice', '#/listen', '#/links', '#/templates', '#/settings'];
     const sweep = async (label) => {
       for (const v of views) {
         await page.goto(URL + v);

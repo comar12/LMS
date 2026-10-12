@@ -44,6 +44,7 @@ function renderSidebar() {
       CATS.map((c) => navItem({ view: 'cat', cat: c.id, label: c.nav, iconName: CAT_ICON[c.id], count: counts[c.id] || 0 })),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Coaching'),
       navItem({ view: 'call-review', label: 'Call Review', iconName: 'checklist' }),
+      navItem({ view: 'listen', label: 'Live Listen', iconName: 'pulse', badge: state.listen.runAt ? 'Live' : null, badgeLabel: state.listen.runAt ? 'A call timer is running' : null }),
       navItem({ view: 'builder', label: 'Coaching Builder', iconName: 'clipboard', badge: bc || null, count: bc ? null : 0 }),
       navItem({ view: 'session', label: 'Run the Session', iconName: 'chat' }),
       navItem({ view: 'tracker', label: 'Follow-Up Tracker', iconName: 'calendar', badge: dueN || null, badgeLabel: dueN ? `${dueN} due or overdue` : null, count: dueN ? null : state.tracker.plans.filter((p) => p.status === 'active').length }),
@@ -54,6 +55,7 @@ function renderSidebar() {
       h('div', { class: 'nav__section', role: 'presentation' }, 'Team'),
       navItem({ view: 'team', label: 'Team Pulse', iconName: 'heart', badge: teamN || null, badgeLabel: teamN ? `${teamN} agents need a touchpoint` : null, count: teamN ? null : state.team.members.length || null }),
       navItem({ view: 'huddle', label: 'Team Huddle', iconName: 'megaphone' }),
+      navItem({ view: 'practice', label: 'Practice Lab', iconName: 'chat', count: state.practice.history.length || null }),
       navItem({ view: 'snapshot', label: 'Weekly Snapshot', iconName: 'trend' }),
       navItem({ view: 'leader', label: 'Coach the Coach', iconName: 'award' }),
       h('div', { class: 'nav__section', role: 'presentation' }, 'Personal'),
@@ -429,6 +431,8 @@ function renderMain() {
   else if (v === 'snapshot') renderSnapshot(main);
   else if (v === 'leader') renderLeader(main);
   else if (v === 'team') renderTeam(main);
+  else if (v === 'practice') renderPractice(main);
+  else if (v === 'listen') renderListen(main);
   else if (v === 'links') renderLinks(main);
   else if (v === 'builder') renderBuilder(main);
   else if (v === 'templates') renderTemplates(main);
@@ -441,7 +445,7 @@ function renderMain() {
 function titleForView() {
   const v = state.ui.view;
   if (v === 'cat') return (CAT_MAP[state.ui.cat] || {}).nav || 'Category';
-  return { home: 'Home', all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', 'call-review': 'Call Review', 'people-toolkit': 'ABS & Attrition Toolkit', tracker: 'Follow-Up Tracker', huddle: 'Team Huddle Builder', today: 'My Day', session: 'Run the Session', snapshot: 'Weekly Snapshot', leader: 'Coach the Coach', team: 'Team Pulse', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
+  return { home: 'Home', all: 'All Opportunities', strengths: 'Things Went Well', 'sales-toolkit': 'Sales Toolkit', 'call-review': 'Call Review', 'people-toolkit': 'ABS & Attrition Toolkit', tracker: 'Follow-Up Tracker', huddle: 'Team Huddle Builder', today: 'My Day', session: 'Run the Session', snapshot: 'Weekly Snapshot', leader: 'Coach the Coach', team: 'Team Pulse', practice: 'Practice Lab', listen: 'Live Listen', links: 'Quick Links', favorites: 'Favorites', builder: 'Coaching Builder', templates: 'My Templates', settings: 'Settings & Data' }[v] || 'Library';
 }
 
 /** Re-render everything that depends on state, keeping focus and scroll where they were. */

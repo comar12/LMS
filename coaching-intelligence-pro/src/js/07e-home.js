@@ -123,6 +123,8 @@ function renderHome(main) {
     'div',
     { class: 'home-grid' },
     homeTile({ href: '#/call-review', iconName: 'checklist', title: 'Call Review', text: 'Technical, Billing, Service, and Sales checklists that feed the Builder', cat: 'tech', fk: 'home-t-review' }),
+    homeTile({ href: '#/listen', iconName: 'pulse', title: 'Live Listen', text: 'Tap behaviors as you hear them; every moment is time-stamped for coaching', cat: 'tech', badge: state.listen.runAt ? 'Live' : null, fk: 'home-t-listen' }),
+    homeTile({ href: '#/practice', iconName: 'chat', title: 'Practice Lab', text: 'Role-play real call moments in a huddle or one-on-one, then score and debrief', cat: 'people', fk: 'home-t-practice' }),
     homeTile({ href: '#/builder', iconName: 'clipboard', title: 'Coaching Builder', text: 'Combine behaviors into one ready-to-paste coaching entry', cat: 'own', badge: bc ? String(bc) : null, fk: 'home-t-builder' }),
     homeTile({ href: '#/tracker', iconName: 'calendar', title: 'Follow-Up Tracker', text: 'Log reviews and check-ins; progress is written from your results', cat: 'own', badge: trackerDueCount() ? `${trackerDueCount()} due` : null, fk: 'home-t-tracker' }),
     homeTile({ href: '#/team', iconName: 'heart', title: 'Team Pulse', text: 'Who needs recognition or a one-on-one, and earned praise ready to send', cat: 'people', badge: teamNeedsCount() ? `${teamNeedsCount()} to see` : null, fk: 'home-t-team' }),

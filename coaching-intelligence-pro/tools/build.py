@@ -83,6 +83,7 @@ def build_data(links_path=None, team_size=0):
         "callReviews": load_json("data/call_reviews.json"),
         "peopleToolkit": load_json("data/people_toolkit.json"),
         "leader": load_json("data/leader.json"),
+        "practice": load_json("data/practice.json"),
         "seedLinks": load_seed_links(links_path),
         "seedTeam": team_size,
     }

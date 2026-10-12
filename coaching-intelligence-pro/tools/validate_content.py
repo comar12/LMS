@@ -766,6 +766,74 @@ def validate_leader(path, meta, rep, opp_ids):
                 rep.err(where, f"'good' contains '{word}'")
 
 
+def validate_practice(path, meta, rep, opp_ids):
+    """Practice Lab role-play scenarios, scored against the Call Review steps."""
+    fname = os.path.basename(path)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except Exception as exc:  # noqa: BLE001
+        rep.err(fname, f"invalid JSON: {exc}")
+        return
+    with open(os.path.join(DATA, "call_reviews.json"), encoding="utf-8") as fh:
+        steps = {t["id"]: {i["id"] for i in t["steps"] + t["skills"]} for t in json.load(fh)["types"]}
+    with open(os.path.join(DATA, "sales_toolkit.json"), encoding="utf-8") as fh:
+        st = json.load(fh)
+        steps["sales"] = {i["id"] for i in st["steps"] + st["skills"]}
+    check_text(rep, fname, d.get("intro"), "practice", "intro")
+    scen = d.get("scenarios") or []
+    if not (8 <= len(scen) <= 30):
+        rep.err(fname, "needs 8-30 scenarios")
+    ids = set()
+    for sc in scen:
+        where = f"{fname}:{sc.get('id')}"
+        if not isinstance(sc.get("id"), str) or not sc["id"].startswith("pr-") or sc["id"] in ids:
+            rep.err(where, "ids must be unique and start with 'pr-'")
+        ids.add(sc.get("id"))
+        if sc.get("type") not in steps:
+            rep.err(where, f"unknown call type '{sc.get('type')}'")
+            continue
+        for k in sc.get("kpi") or []:
+            if k not in KPIS:
+                rep.err(where, f"unknown KPI '{k}'")
+        if sc.get("level") not in (1, 2, 3) or not isinstance(sc.get("minutes"), int) or not (3 <= sc["minutes"] <= 20):
+            rep.err(where, "level must be 1-3 and minutes 3-20")
+        check_text(rep, where, sc.get("title"), "practice", "title")
+        check_text(rep, where, sc.get("brief"), "practice", "brief")
+        need_range(rep, where, "brief", sc.get("brief") or "", 10, 45)
+        # Written to the team leader playing the customer, so "the agent" is right here.
+        check_text(rep, where, sc.get("persona"), "practice", "persona", allow_agent=True)
+        need_range(rep, where, "persona", sc.get("persona") or "", 20, 90)
+        lines = sc.get("lines") or []
+        if not (3 <= len(lines) <= 7):
+            rep.err(where, "needs 3-7 customer lines")
+        for i, ln in enumerate(lines):
+            check_text(rep, where, ln.get("when"), "practice", f"lines[{i}].when", allow_agent=True)
+            check_text(rep, where, ln.get("say"), "practice", f"lines[{i}].say")
+        rub = sc.get("rubric") or []
+        if not (3 <= len(rub) <= 6):
+            rep.err(where, "needs 3-6 rubric items")
+        seen = set()
+        for i, r in enumerate(rub):
+            if r.get("step") not in steps[sc["type"]]:
+                rep.err(where, f"rubric[{i}] step '{r.get('step')}' is not a {sc['type']} review step")
+            if r.get("step") in seen:
+                rep.err(where, f"rubric[{i}] repeats step '{r.get('step')}'")
+            seen.add(r.get("step"))
+            check_text(rep, where, r.get("look"), "practice", f"rubric[{i}].look", allow_agent=True)
+        for i, m in enumerate(sc.get("model") or []):
+            check_text(rep, where, m, "practice", f"model[{i}]")
+            need_range(rep, where, f"model[{i}]", m, 5, 40)
+        if not sc.get("model"):
+            rep.err(where, "needs model lines")
+        for i, q in enumerate(sc.get("debrief") or []):
+            check_text(rep, where, q, "practice", f"debrief[{i}]")
+            if not q.endswith("?"):
+                rep.err(where, f"debrief[{i}] must be a question")
+        if not sc.get("debrief"):
+            rep.err(where, "needs debrief questions")
+
+
 def main(argv):
     strict = "--strict" in argv
     files = [a for a in argv if not a.startswith("--")]
@@ -778,6 +846,7 @@ def main(argv):
         files.append(os.path.join(DATA, "people_toolkit.json"))
         files.append(os.path.join(DATA, "call_reviews.json"))
         files.append(os.path.join(DATA, "leader.json"))
+        files.append(os.path.join(DATA, "practice.json"))
         files = [f for f in files if os.path.exists(f)]
     rep = Report()
     all_sentences = defaultdict(list)
@@ -803,6 +872,8 @@ def main(argv):
             validate_people_toolkit(f, meta, rep, opp_ids)
         elif os.path.basename(f) == "leader.json":
             validate_leader(f, meta, rep, opp_ids)
+        elif os.path.basename(f) == "practice.json":
+            validate_practice(f, meta, rep, opp_ids)
         elif os.path.basename(f) == "call_reviews.json":
             validate_call_reviews(f, meta, rep, opp_ids)
         else:

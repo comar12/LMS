@@ -24,6 +24,7 @@ function exportPayload() {
       huddle: state.huddle,
       today: state.today,
       team: state.team,
+      practice: state.practice,
     },
   };
 }
@@ -93,6 +94,7 @@ function parseImport(text) {
       huddle: d.huddle ? sanitizeHuddle(d.huddle) : null,
       today: d.today ? sanitizeToday(d.today) : null,
       team: d.team ? sanitizeTeam(d.team) : null,
+      practice: d.practice ? sanitizePractice(d.practice) : null,
     },
   };
 }
@@ -119,8 +121,10 @@ function applyImport(pack, mode) {
     if (pack.huddle) state.huddle = pack.huddle;
     if (pack.today) state.today = pack.today;
     if (pack.team) state.team = pack.team;
+    if (pack.practice) state.practice = pack.practice;
   } else {
     if (pack.tracker) state.tracker = { plans: mergeById(state.tracker.plans, pack.tracker.plans) };
+    if (pack.practice) state.practice.history = mergeById(state.practice.history, pack.practice.history);
     if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items) };
     pack.favorites.forEach((id) => state.favorites.add(id));
     state.custom = { opps: mergeById(state.custom.opps, pack.custom.opps), strengths: mergeById(state.custom.strengths, pack.custom.strengths) };
@@ -237,6 +241,7 @@ function handleImportText(text) {
     plural(pack.drafts.length, 'draft'),
     plural(pack.links ? pack.links.items.length : 0, 'quick link'),
     plural(pack.tracker ? pack.tracker.plans.length : 0, 'follow-up plan'),
+    plural(pack.practice ? pack.practice.history.length : 0, 'practice session'),
   ];
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
   const replace = h('button', { type: 'button', class: 'btn btn--danger' }, 'Replace everything');
@@ -297,6 +302,8 @@ async function clearAllData() {
   state.team = { members: [], touches: [] };
   state.observe = { label: '', marks: {} };
   state.calib = { type: 'tech', a: {}, b: {} };
+  state.practice = defaultPractice();
+  state.listen = defaultListen();
   store.remove('brandcss');
   applyTheme();
   applyBrand();
