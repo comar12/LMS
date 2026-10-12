@@ -1696,6 +1696,53 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Operations Hub link: sales vs the 10% target by HRID, cautions, live updates, and Builder fill', async () => {
+    const { page, context } = await newPage({ hash: '#/team' });
+    assert((await page.locator('.hub-card').count()) === 0 || (await page.locator('.hub-card').innerText()).includes('Open the Operations Hub'), 'Without dashboard data, only setup help is shown');
+    // Fictional data shaped like the Sales Performance and AUX TSX dashboards save it.
+    await page.evaluate(async () => {
+      const d = (n) => { const x = new Date(); x.setDate(x.getDate() - n); return x.toISOString().slice(0, 10); };
+      const rows = [];
+      for (let i = 0; i < 6; i++) rows.push([d(i), '900111', 'TL', 'OM', 1, 1, 'N', 'N', '', '', 0, 1, 0, [], 'x' + i, -1, '']);
+      rows.push([d(1), '900222', 'TL', 'OM', 1, 0, 'N', 'N', '', '', 0, 1, 0, [], 'y1', -1, '']);
+      rows.push([d(2), '900222', 'TL', 'OM', 0, 1, 'N', 'N', '', '', 1, 1, 0, [], 'y2', -1, '']);
+      localStorage.setItem('tsxDashData', JSON.stringify({ meta: {}, rows, roster: [], tls: [], oms: [] }));
+      localStorage.setItem('cip.v1.team', JSON.stringify({ members: [{ id: 'mem-1', code: 'Agent 01', name: 'Sam Rivers', hrid: '900111' }, { id: 'mem-2', code: 'Agent 02', name: 'Lee Park', hrid: '900222' }, { id: 'mem-3', code: 'Agent 03' }], touches: [] }));
+      await new Promise((res) => { const r = indexedDB.open('aux-tsx-pulse', 1); r.onupgradeneeded = () => r.result.createObjectStore('datasets'); r.onsuccess = () => { const tx = r.result.transaction('datasets', 'readwrite'); tx.objectStore('datasets').put({ meta: { period_start: d(9), period_end: d(0), source: { kind: 'import', updatedAt: 'a' } }, daily: [], agents: [{ HRID: 900111, calls: 80, tr: 0.08, aht: 640, abs_pct: 0.02 }, { HRID: 900222, calls: 50, tr: 0.15, aht: 720, abs_pct: 0.06 }] }, 'dataset'); tx.oncomplete = () => { r.result.close(); res(); }; }; });
+    });
+    await page.reload();
+    await page.waitForSelector('.hub-table');
+    const rowsText = await page.locator('.hub-table tbody tr').allInnerTexts();
+    assert(rowsText.length === 2 && rowsText[0].startsWith('Lee Park') && rowsText[0].includes('2%') && rowsText[1].includes('15%'), 'Sales table is wrong: ' + JSON.stringify(rowsText));
+    assert((await page.locator('.hub-alert').innerText()).includes('1 agent is below the 10% sales target'), 'Below-target caution is missing');
+    const lee = page.locator('.pulse', { has: page.getByRole('heading', { name: 'Lee Park', exact: true }) });
+    assert((await lee.locator('.hub-strip').getAttribute('class')).includes('is-below') && (await lee.locator('.pulse__flags').innerText()).includes('below the 10% target'), 'Card caution is missing');
+    assert((await page.locator('.pulse', { has: page.getByRole('heading', { name: 'Agent 03', exact: true }) }).locator('.hub-strip').count()) === 0, 'Agents without an HRID show no numbers');
+    // Changing the target re-checks everyone.
+    await page.fill('#hub-target', '1.5');
+    await page.locator('#hub-target').press('Tab');
+    assert((await page.locator('.hub-alert').count()) === 0, 'Target change was not applied');
+    await page.fill('#hub-target', '10');
+    await page.locator('#hub-target').press('Tab');
+    // A new tracker file loaded in the hub (another page in the same browser) updates the numbers live.
+    const other = await context.newPage();
+    await other.goto(URL + '#/home');
+    await other.evaluate(() => { const s = JSON.parse(localStorage.getItem('tsxDashData')); const t = new Date().toISOString().slice(0, 10); for (let i = 0; i < 6; i++) s.rows.push([t, '900222', 'TL', 'OM', 1, 0, 'N', 'N', '', '', 0, 1, 0, [], 'n' + i, -1, '']); localStorage.setItem('tsxDashData', JSON.stringify(s)); });
+    await other.close();
+    await page.waitForFunction(() => !document.querySelector('.hub-alert'), null, { timeout: 4000 }).catch(() => {});
+    assert((await page.locator('.hub-alert').count()) === 0 && (await page.locator('.hub-table tbody tr').first().innerText()).includes('14%'), 'Live update did not reach the app');
+    // Coach fills the Builder with the real numbers and the 10% target.
+    await page.locator('[data-fk="hub-coach:mem-2"]').click();
+    await page.waitForSelector('.nums-card');
+    const nums = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.builder')).nums);
+    assert(nums.Sales.cur === 14 && nums.Sales.target === 10 && nums.Transfer.cur === 15 && nums.ABS.cur === 6, 'Builder numbers are wrong: ' + JSON.stringify(nums));
+    await page.evaluate(() => { const b = JSON.parse(localStorage.getItem('cip.v1.builder')); b.opps = ['sales-missing-offer']; localStorage.setItem('cip.v1.builder', JSON.stringify(b)); });
+    await page.reload();
+    await page.waitForSelector('#out-plan');
+    assert((await page.locator('#out-plan').inputValue()).includes('Sales conversion (XM and GSR per call): 14% as of'), 'Plan should state the sales conversion');
+    await finish(page, context);
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
     const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/practice', '#/listen', '#/links', '#/templates', '#/settings'];

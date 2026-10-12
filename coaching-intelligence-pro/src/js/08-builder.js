@@ -344,6 +344,27 @@ function numbersCard() {
         others.map((k) => h('option', { value: k }, KPI_MEASURE[k].name))
       )
     : null;
+  const matched = state.team.members.filter((x) => Object.keys(hubKpiValues(x)).length);
+  const fill = matched.length
+    ? h(
+        'div',
+        { class: 'field num-fill' },
+        h('label', { class: 'field__label', for: 'num-fill' }, 'Fill from your dashboards'),
+        h(
+          'select',
+          {
+            class: 'select',
+            id: 'num-fill',
+            'data-fk': 'num-fill',
+            onchange: (e) => {
+              if (e.target.value) hubBuilderFill(e.target.value);
+            },
+          },
+          h('option', { value: '' }, 'Choose an agent'),
+          matched.map((x) => h('option', { value: x.id }, memberLabel(x)))
+        )
+      )
+    : null;
   return h(
     'section',
     { class: 'card nums-card', 'aria-labelledby': 'bNumsTitle' },
@@ -351,7 +372,8 @@ function numbersCard() {
     h(
       'div',
       { class: 'card__body nums-body' },
-      h('p', { class: 'field__hint' }, 'Type the agent\'s numbers from your KPI dashboard. The action plan then states where they are today and the target by the end of the plan. Nothing is estimated.'),
+      h('p', { class: 'field__hint' }, 'Type the agent\'s numbers from your KPI dashboard, or fill them from the hub dashboards. The action plan then states where they are today and the target by the end of the plan. Nothing is estimated.'),
+      fill,
       keys.length ? keys.map(row) : h('p', { class: 'day-empty' }, icon('info'), 'Add opportunities to see the KPIs they affect, or add a KPI below.'),
       attrition ? h('p', { class: 'field__hint' }, icon('info', 'icon--sm'), ' Attrition is a team measure, so it has no agent number here.') : null,
       add ? h('div', { class: 'num-add' }, add) : null

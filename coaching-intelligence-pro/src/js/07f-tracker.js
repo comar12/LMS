@@ -440,7 +440,8 @@ function kpiBars(p) {
 function openNumbersDialog(planId) {
   const p = findPlan(planId);
   if (!p) return;
-  const keys = dedupe([...(p.kpis || []).map((x) => x.k), ...planFocus(p).flatMap((o) => o.kpi || []).filter((k) => KPI_MEASURE[k])]);
+  const liveMem = memberByCode(p.label);
+  const keys = dedupe([...(p.kpis || []).map((x) => x.k), ...planFocus(p).flatMap((o) => o.kpi || []).filter((k) => KPI_MEASURE[k]), ...(liveMem && hubKpiValues(liveMem).Sales !== undefined ? ['Sales'] : [])]);
   if (!keys.length) keys.push('QA');
   const date = h('input', { class: 'input', id: 'nd-date', type: 'date', value: todayDay(), min: p.start, max: todayDay() });
   const rows = keys.map((k) => {
@@ -458,6 +459,26 @@ function openNumbersDialog(planId) {
     };
   });
   const err = h('p', { class: 'field__error', hidden: true }, 'Numbers only, such as 12 or 12.5.');
+  const live = liveMem ? hubKpiValues(liveMem) : {};
+  const fillBtn = Object.keys(live).some((k) => keys.includes(k))
+    ? h(
+        'button',
+        {
+          type: 'button',
+          class: 'btn btn--sm',
+          onclick: () => {
+            keys.forEach((k) => {
+              if (live[k] !== undefined) m.el.querySelector(`#nd-${k}-now`).value = String(live[k]);
+            });
+            const d = (hub.aux && hub.aux.to) || (hub.sales && hub.sales.through);
+            if (d && d >= p.start && d <= todayDay()) date.value = d;
+            announce('Latest numbers filled from the dashboards');
+          },
+        },
+        icon('refresh'),
+        'Fill latest from dashboards'
+      )
+    : null;
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
   const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('check'), 'Save numbers');
   const m = openModal({
@@ -468,6 +489,7 @@ function openNumbersDialog(planId) {
       { class: 'tr-form' },
       h('p', { class: 'field__hint' }, 'Type the numbers exactly as your KPI dashboard shows them. Progress is written only from numbers you enter, never estimated.'),
       h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'nd-date' }, 'Date of the latest numbers'), date),
+      fillBtn ? h('div', { style: 'margin-top:10px' }, fillBtn) : null,
       rows.map((r) => r.node),
       err
     ),

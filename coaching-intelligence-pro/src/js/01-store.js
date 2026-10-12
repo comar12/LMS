@@ -93,6 +93,7 @@ function defaultPrefs() {
     trackerFilter: 'active',
     brand: null,
     hideIds: false,
+    salesTarget: 10,
   };
 }
 /** Call reviews are kept per call type, so a Technical review and a Sales review can be in progress together. */
@@ -199,6 +200,7 @@ function sanitizePrefs(o) {
   if (PEOPLE_TAB_IDS.includes(src.peopleTab)) p.peopleTab = src.peopleTab;
   if (['active', 'done', 'all'].includes(src.trackerFilter)) p.trackerFilter = src.trackerFilter;
   if (typeof src.hideIds === 'boolean') p.hideIds = src.hideIds;
+  if (typeof src.salesTarget === 'number' && src.salesTarget >= 0.5 && src.salesTarget <= 100) p.salesTarget = src.salesTarget;
   if (src.brand && typeof src.brand === 'object') {
     const hex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
     const primary = hex(src.brand.primary);

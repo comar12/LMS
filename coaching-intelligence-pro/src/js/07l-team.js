@@ -146,6 +146,8 @@ function memberPulse(m) {
   const dTalk = daysAgo(lastTalk);
   const flags = [];
   if (earned.length) flags.push({ level: 'good', text: 'Earned recognition ready' });
+  const sales = hubStats(m);
+  if (sales && sales.below) flags.push({ level: 'warn', text: `Sales ${pct1(sales.conv)} of calls, below the ${salesTargetPct()}% target` });
   if (dRec === null) flags.push({ level: 'alert', text: 'No recognition logged yet' });
   else if (dRec >= 14) flags.push({ level: 'alert', text: `No recognition in ${dRec} days` });
   if (coached30 >= 2 && rec30 < coached30) flags.push({ level: 'warn', text: `Coached ${coached30} times, recognized ${rec30} in 30 days` });
@@ -545,6 +547,7 @@ function memberCard(m, idx = 0) {
           [['HRID', m.hrid], ['BP-ID', m.bpid]].map(([k, v]) => (v ? h('button', { type: 'button', class: 'id-chip', 'aria-label': `Copy ${k} for ${memberLabel(m)}`, 'data-fk': `mem-${k}:${m.id}`, onclick: () => copyText(v, { label: k }) }, h('span', { class: 'id-chip__k' }, k), h('span', { class: 'id-chip__v' }, v), icon('copy', 'icon--sm')) : null))
         )
       : null,
+    hubStrip(m),
     h(
       'dl',
       { class: 'pulse__facts' },
@@ -657,6 +660,7 @@ function renderTeam(main) {
     }),
     h('p', { class: 'notice notice--privacy', role: 'note', style: 'margin-bottom:16px' }, icon('lock'), h('span', { class: 'notice__body' }, 'Names, HRIDs, and BP-IDs stay only in this browser. They are never copied into coaching text or a team pack. Use Hide IDs before sharing your screen. Only dates are saved, never message text.')),
     teamHealth(pulses),
+    hubTeamCard(),
     h('div', { class: 'stats' }, stat(members.length, 'agents', 'users'), stat(earnedN, 'with earned recognition ready', 'award', earnedN ? 'stat--good' : ''), stat(noRec, 'not recognized in 14 days', 'alert', noRec ? 'stat--alert' : ''), stat(rec30, `recognitions vs ${co30} coachings (30 days)`, 'heart')),
     needList.length
       ? h(

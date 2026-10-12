@@ -20,6 +20,7 @@ const KPI_MEASURE = {
   aiCR: { name: 'Repeat contact rate (aiCR)', dir: 'down', unit: '%' },
   Transfer: { name: 'Transfer rate', dir: 'down', unit: '%' },
   ABS: { name: 'Absenteeism (ABS)', dir: 'down', unit: '%' },
+  Sales: { name: 'Sales conversion (XM and GSR per call)', dir: 'up', unit: '%' },
 };
 function fmtNum(n, unit) {
   if (n === null || n === undefined) return '';

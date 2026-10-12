@@ -245,6 +245,7 @@ function init() {
   rebuildContent();
   bindEvents();
   initFx();
+  initHub();
   const r = parseHash();
   state.ui.view = r.view;
   state.ui.enterAnim = true;
