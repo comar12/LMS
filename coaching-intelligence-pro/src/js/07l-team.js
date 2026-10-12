@@ -171,37 +171,19 @@ function logTouch(memberId, kind, extra = {}) {
   const t = { id: uid('touch'), member: memberId, kind, date: todayDay(), earned: !!extra.earned, strength: extra.strength || null };
   state.team.touches.push(t);
   saveTeam();
-  const avatar = () => document.querySelector(`.pulse[aria-labelledby="mem-${memberId}"] .pulse__avatar`);
-  const before = avatar() ? avatar().getBoundingClientRect() : null;
+  const sel = `.pulse[aria-labelledby="mem-${memberId}"] .pulse__avatar`;
+  const el = document.querySelector(sel);
+  const before = el ? el.getBoundingClientRect() : null;
   state.ui.flash = `mem:${memberId}`;
   refresh({ panel: false });
   state.ui.flash = null;
-  if (kind === 'recognition') {
-    // Burst where the card is now, or where it was if it moved off screen.
-    const onScreen = (r) => r && r.bottom > 0 && r.top < window.innerHeight;
-    const after = avatar() ? avatar().getBoundingClientRect() : null;
-    celebrate(onScreen(after) ? after : onScreen(before) ? before : null);
-  }
+  // Burst where the card is now, or where it was if it moved off screen.
+  if (kind === 'recognition') celebrateAt(sel, before);
   const m = state.team.members.find((x) => x.id === memberId);
   const label = { recognition: 'Recognition', oneonone: 'One-on-one', stay: 'Stay conversation' }[kind];
   toast(`${label} logged for ${m ? memberLabel(m) : 'this agent'}`, {
     action: { label: 'Undo', fn: () => { state.team.touches = state.team.touches.filter((x) => x.id !== t.id); saveTeam(); refresh({ panel: false }); } },
   });
-}
-
-/** A short confetti burst from a screen rectangle (or the bottom of the screen). Skipped when motion is reduced. */
-function celebrate(rect) {
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const r = rect || { left: window.innerWidth / 2, top: window.innerHeight - 90, width: 0, height: 0 };
-  const colors = ['var(--accent)', 'var(--success)', 'var(--warning)', 'var(--indigo)', '#ffb020', '#ff6b8a'];
-  const box = h('div', { class: 'confetti', 'aria-hidden': 'true', style: `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px` });
-  for (let i = 0; i < 26; i++) {
-    const a = (i / 26) * Math.PI * 2 + Math.random() * 0.4;
-    const dist = 60 + Math.random() * 70;
-    box.appendChild(h('span', { class: `confetti__bit${i % 3 === 0 ? ' confetti__bit--round' : ''}`, style: `--x:${Math.cos(a) * dist}px;--y:${Math.sin(a) * dist - 30}px;--r:${Math.round(Math.random() * 540 - 270)}deg;--c:${colors[i % colors.length]};--t:${700 + Math.round(Math.random() * 400)}ms` }));
-  }
-  document.body.appendChild(box);
-  setTimeout(() => box.remove(), 1300);
 }
 
 /* ---------- Recognition dialog ---------- */
@@ -586,15 +568,6 @@ function memberCard(m, idx = 0) {
   );
 }
 
-/** Cards light up under the pointer. */
-function spotlight(e) {
-  const card = e.target.closest ? e.target.closest('.pulse') : null;
-  if (!card) return;
-  const r = card.getBoundingClientRect();
-  card.style.setProperty('--mx', `${e.clientX - r.left}px`);
-  card.style.setProperty('--my', `${e.clientY - r.top}px`);
-}
-
 const HEALTH = [
   { id: 'good', label: 'Earned praise ready', hint: 'Recognize first' },
   { id: 'alert', label: 'Needs recognition', hint: 'Not recognized in 14 days' },
@@ -602,8 +575,8 @@ const HEALTH = [
   { id: 'ok', label: 'In balance', hint: 'Recently recognized and talked with' },
 ];
 
-/** The team at a glance: a ring with one segment per agent, colored by what they need next. */
-function teamHealth(pulses) {
+/** The ring itself: one segment per agent, colored by what they need next. */
+function healthRing(pulses) {
   const ns = 'http://www.w3.org/2000/svg';
   const mk = (tag, attrs) => {
     const el = document.createElementNS(ns, tag);
@@ -630,11 +603,18 @@ function teamHealth(pulses) {
   svg.appendChild(orbit);
   const recent = pulses.filter((x) => x.pu.dRec !== null && x.pu.dRec < 14).length;
   const pct = total ? Math.round((recent / total) * 100) : 0;
+  const viz = h('div', { class: 'health__viz' }, svg, h('div', { class: 'health__center' }, h('span', { class: 'health__pct' }, h('span', { 'data-count': String(pct) }, String(pct)), '%'), h('span', { class: 'health__cap' }, 'recognized in 14 days')));
+  return { viz, groups };
+}
+
+/** The team at a glance: the ring, one line on where to start, and a legend. */
+function teamHealth(pulses) {
+  const { viz, groups } = healthRing(pulses);
   const lead = groups[0].n ? `${plural(groups[0].n, 'agent has', 'agents have')} earned praise waiting. Start there.` : groups[1].n ? `${plural(groups[1].n, 'agent has', 'agents have')} not been recognized in 14 days.` : groups[2].n ? `${plural(groups[2].n, 'agent is', 'agents are')} due a one-on-one.` : 'Everyone is recognized and talked with. Keep the rhythm going.';
   return h(
     'section',
     { class: 'card health', 'aria-labelledby': 'healthTitle' },
-    h('div', { class: 'health__viz' }, svg, h('div', { class: 'health__center' }, h('span', { class: 'health__pct' }, h('span', { 'data-count': String(pct) }, String(pct)), '%'), h('span', { class: 'health__cap' }, 'recognized in 14 days'))),
+    viz,
     h(
       'div',
       { class: 'health__body' },
@@ -699,7 +679,6 @@ function renderTeam(main) {
         )
       : null,
     h('h2', { class: 'sr-only' }, 'Team members'),
-    h('div', { class: 'pulse-grid', onpointermove: spotlight }, sorted.map(({ m }, i) => memberCard(m, i)))
+    h('div', { class: 'pulse-grid' }, sorted.map(({ m }, i) => memberCard(m, i)))
   );
-  if (main.classList.contains('anim-enter')) countUp(main);
 }

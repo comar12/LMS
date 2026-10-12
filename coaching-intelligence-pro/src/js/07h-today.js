@@ -41,10 +41,16 @@ function setRoutineCount(r, n) {
   const day = state.today.progress[key] || (state.today.progress[key] = {});
   day[r.id] = Math.max(0, Math.min(50, n));
   persist('today');
+  const sel = `[data-fk="rt-${r.kind === 'count' ? 'plus' : 'check'}:${r.id}"]`;
+  const el = document.querySelector(sel);
+  const before = el ? el.getBoundingClientRect() : null;
   state.ui.flash = `rt:${r.id}`;
   refresh({ panel: false });
   state.ui.flash = null;
-  if (n >= r.target && n - 1 < r.target) announce(`${r.title} done`);
+  if (n >= r.target && n - 1 < r.target) {
+    announce(`${r.title} done`);
+    celebrateAt(sel, before);
+  }
 }
 
 function openRoutineEditor(existing) {
@@ -153,11 +159,16 @@ function routineRow(r) {
   );
 }
 
+/** Today's list: routine items due today plus follow-ups due soon, and how many are done. */
+function dayProgress() {
+  const todayItems = state.today.routines.filter((r) => routineDue(r).level !== 'later' || r.freq === 'daily');
+  const plans = state.tracker.plans.filter((p) => p.status === 'active').map((p) => ({ p, due: planDue(p) })).filter((x) => ['overdue', 'due', 'soon'].includes(x.due.level));
+  return { todayItems, plans, finished: todayItems.filter(routineDone).length, total: todayItems.length + plans.length };
+}
+
 function renderToday(main) {
   const routines = state.today.routines;
-  const todayItems = routines.filter((r) => routineDue(r).level !== 'later' || r.freq === 'daily');
-  const doneN = todayItems.filter(routineDone).length;
-  const plans = state.tracker.plans.filter((p) => p.status === 'active').map((p) => ({ p, due: planDue(p) })).filter((x) => ['overdue', 'due', 'soon'].includes(x.due.level));
+  const { todayItems, plans, finished: doneN } = dayProgress();
   const sug = huddleSuggestions().items[0];
   const sugOpp = sug && getOpp(sug.id);
   const dateText = parseDay(todayDay()).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });

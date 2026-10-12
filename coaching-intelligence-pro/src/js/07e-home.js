@@ -156,10 +156,36 @@ function renderHome(main) {
         h('span', { class: 'due-strip__go' }, 'Open tracker', icon('arrow-right'))
       )
     : null;
+  const dp = dayProgress();
+  const pulses = state.team.members.map((m) => ({ m, pu: memberPulse(m) }));
+  const glance = h(
+    'div',
+    { class: 'glance' },
+    h(
+      'a',
+      { class: 'glance__card', href: '#/today', 'data-fk': 'home-glance-day' },
+      progressRing(dp.finished, Math.max(dp.total, 1), `${dp.finished} of ${dp.total} items done today`, 'home-day'),
+      h('span', { class: 'glance__text' }, h('span', { class: 'glance__title' }, 'My Day'), h('span', { class: 'glance__sub' }, dp.total ? (dp.finished >= dp.total ? 'Everything is done. Nice work.' : `${plural(dp.total - dp.finished, 'item')} left today`) : 'Add your daily routine')),
+      icon('arrow-right', 'home-tile__go')
+    ),
+    pulses.length
+      ? (() => {
+          const { viz, groups } = healthRing(pulses);
+          return h(
+            'a',
+            { class: 'glance__card glance__card--team', href: '#/team', 'data-fk': 'home-glance-team' },
+            viz,
+            h('span', { class: 'glance__text' }, h('span', { class: 'glance__title' }, 'Team health'), h('span', { class: 'glance__chips' }, groups.filter((g) => g.n).map((g) => h('span', { class: `glance__chip glance__chip--${g.id}` }, h('strong', null, String(g.n)), ` ${g.label.toLowerCase()}`)))),
+            icon('arrow-right', 'home-tile__go')
+          );
+        })()
+      : h('a', { class: 'glance__card', href: '#/team', 'data-fk': 'home-glance-team' }, h('span', { class: 'home-tile__icon cat-people', 'aria-hidden': 'true' }, icon('heart')), h('span', { class: 'glance__text' }, h('span', { class: 'glance__title' }, 'Team Pulse'), h('span', { class: 'glance__sub' }, 'Paste your roster to see who needs recognition')), icon('arrow-right', 'home-tile__go'))
+  );
   const parts = [
     hero,
     dueStrip,
     stats,
+    section('Today at a glance', 'pulse', glance),
     section('Coach by KPI', 'target', kpiTiles, h('span', { class: 'sec__sub' }, 'opens the library filtered to that KPI')),
     section('Quick actions', 'sparkle', actions),
     pinned.length
@@ -173,5 +199,4 @@ function renderHome(main) {
     section('Browse by category', 'layers', cats),
   ];
   put(main, ...parts.filter(Boolean));
-  if (main.classList.contains('anim-enter')) countUp(main);
 }

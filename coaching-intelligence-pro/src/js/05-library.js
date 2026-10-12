@@ -434,6 +434,7 @@ function renderMain() {
   else if (v === 'templates') renderTemplates(main);
   else if (v === 'settings') renderSettings(main);
   else renderLibrary(main);
+  if (main.classList.contains('anim-enter')) countUp(main);
   document.title = `${titleForView()} — Coaching Intelligence Pro — VXI`;
 }
 

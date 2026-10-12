@@ -243,6 +243,7 @@ function init() {
   applyBrand();
   rebuildContent();
   bindEvents();
+  initFx();
   const r = parseHash();
   state.ui.view = r.view;
   state.ui.enterAnim = true;

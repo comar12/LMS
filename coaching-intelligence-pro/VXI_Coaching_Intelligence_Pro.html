@@ -1746,6 +1746,118 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 .confetti__bit--round { width: 7px; height: 7px; border-radius: 50%; }
 @keyframes confetti { 0% { transform: translate(0, 0) rotate(0) scale(0.4); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(var(--x), calc(var(--y) + 40px)) rotate(var(--r)) scale(1); opacity: 0; } }
 
+/* ---------- App-wide motion ---------- */
+/* Light that follows the pointer across cards and rows. */
+:is(.stat, .home-tile, .cat-tile, .opp-card, .plan, .tk-step, .health__item, .snap-card, .rt-row, .lk-card, .pk-card):hover { background-image: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%); }
+/* Ripple from the click point on buttons and tiles. */
+.btn, .home-tile, .cat-tile, .type-card, .mp__opt { position: relative; }
+.ripple-host { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.ripple { position: absolute; border-radius: 50%; background: currentColor; opacity: 0.22; transform: scale(0); animation: ripple 0.6s var(--ease-out) forwards; }
+@keyframes ripple { to { transform: scale(1); opacity: 0; } }
+/* Page headers: the eyebrow icon pops and an accent line draws under the title. */
+.page-head .page-title::after { content: ""; display: block; width: 46px; height: 4px; margin-top: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--indigo)); transform-origin: left center; }
+.anim-enter .page-head .page-title::after { animation: tl-grow 0.8s var(--ease-out) 0.25s both; }
+.anim-enter .page-head .eyebrow > :first-child { animation: btn-pop 0.5s var(--ease-spring) 0.1s both; }
+.day-hero .page-title::after { content: ""; display: block; width: 46px; height: 4px; margin-top: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--indigo)); transform-origin: left center; }
+.anim-enter .day-hero .page-title::after { animation: tl-grow 0.8s var(--ease-out) 0.25s both; }
+/* Stat and tile icons bounce in, then lift on hover. */
+.anim-enter :is(.stat__icon, .home-tile__icon, .kpi-tile__icon, .cat-tile__icon) { animation: btn-pop 0.55s var(--ease-spring) both; animation-delay: calc(260ms + var(--d, 0ms)); }
+:is(.stat, .home-tile, .cat-tile):hover :is(.stat__icon, .home-tile__icon, .cat-tile__icon) { transform: translateY(-2px) rotate(-6deg) scale(1.06); }
+:is(.stat__icon, .home-tile__icon, .cat-tile__icon) { transition: transform 0.35s var(--ease-spring); }
+.home-tile:hover .home-tile__go { transform: translateX(4px); }
+.home-tile__go { transition: transform var(--t) var(--ease-out); }
+/* Toolkit tabs pop when chosen. */
+.tk-tab[aria-selected="true"] { animation: btn-pop 0.32s var(--ease-spring); }
+.tk-tab[aria-selected="true"] .icon { animation: twinkle 0.6s var(--ease-out) 1; }
+/* Progress rings: gradient stroke, a traveling marker, and a glow when full. */
+.ring__stop-a { stop-color: var(--accent); }
+.ring__stop-b { stop-color: var(--indigo); }
+.ring__orbit { transform-box: view-box; transform-origin: 32px 32px; animation: orbit 9s linear infinite; }
+.ring__moon { fill: var(--accent); }
+.anim-enter .ring-wrap { animation: btn-pop 0.6s var(--ease-spring) 0.15s both; }
+.ring-wrap.is-full .ring__bar { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 60%, transparent)); }
+.ring-wrap.is-full { animation: ring-glow 1.4s ease-out 2; border-radius: 50%; }
+/* Routine rows: done items settle with a pop, counters bump. */
+.rt-row.is-flash .rt-row__icon { animation: btn-pop 0.45s var(--ease-spring); }
+.rt-row.is-flash .rt-counter__num strong { display: inline-block; animation: btn-pop 0.4s var(--ease-spring); }
+.rt-bar > span { transition: width 0.6s var(--ease-spring); }
+.anim-enter .rt-bar > span { animation: tl-grow 0.8s var(--ease-out) 0.4s both; transform-origin: left center; }
+.anim-enter .day-hero { animation: rise 0.55s var(--ease-out) both; }
+.day-hero { position: relative; overflow: hidden; }
+.day-hero::after { content: ""; position: absolute; right: -50px; top: -70px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--indigo) 16%, transparent), transparent 70%); animation: float 7s ease-in-out infinite; pointer-events: none; }
+/* KPI tiles: icon floats gently on hover. */
+.kpi-tile:hover .kpi-tile__icon { animation: float 1.6s ease-in-out infinite; }
+
+/* Home: today at a glance */
+.glance { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+.glance__card { position: relative; display: flex; align-items: center; gap: 18px; padding: 16px 18px; border-radius: 18px; color: var(--text); text-decoration: none; background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 9%, var(--surface)), var(--surface) 60%); border: 1px solid var(--border); box-shadow: var(--shadow-xs); transition: transform var(--t) var(--ease-out), box-shadow var(--t) var(--ease), border-color var(--t) var(--ease); }
+.glance__card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+.glance__card:hover .home-tile__go { transform: translateX(4px); }
+.glance__card .health__viz { width: 104px; height: 104px; }
+.glance__card .health__pct { font-size: 22px; }
+.glance__card .health__cap { font-size: 9.5px; max-width: 64px; }
+.glance__card .ring-wrap { width: 92px; height: 92px; }
+.glance__card .ring__value { padding-top: 31px; }
+.glance__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.glance__title { font-family: var(--font-display); font-size: 16px; font-weight: 760; }
+.glance__sub { font-size: 13px; color: var(--text-2); }
+.glance__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.glance__chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); }
+.glance__chip strong { color: var(--text); }
+.glance__chip::before { content: ""; width: 8px; height: 8px; border-radius: 3px; background: var(--success); }
+.glance__chip--good::before { background: var(--indigo); }
+.glance__chip--alert::before { background: var(--danger); }
+.glance__chip--warn::before { background: var(--warning); }
+.anim-enter .glance__card { animation: rise 0.55s var(--ease-out) both; }
+.anim-enter .glance__card + .glance__card { animation-delay: 90ms; }
+
+/* ---------- Premium dropdown ---------- */
+.pick { position: relative; display: block; width: 100%; min-width: 0; }
+.pick--auto { display: inline-block; width: auto; }
+.pick__native { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; opacity: 0; pointer-events: none; }
+.pick__btn { display: flex; align-items: center; gap: 8px; width: 100%; height: 38px; padding: 0 10px 0 12px; border-radius: 10px; text-align: left; font-size: 14px; font-weight: 620; color: var(--text); background: linear-gradient(180deg, var(--surface), var(--surface-2)); border: 1px solid var(--border-strong); box-shadow: var(--shadow-xs); transition: border-color var(--t-fast) var(--ease), box-shadow var(--t) var(--ease), transform var(--t-fast) var(--ease-out); }
+.pick__btn:hover:not(:disabled) { border-color: color-mix(in srgb, var(--accent) 55%, var(--border-strong)); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.pick__btn:focus-visible, .pick.is-open .pick__btn { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+.pick__btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.pick__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pick.is-picked .pick__value { animation: pick-swap 0.35s var(--ease-out); }
+@keyframes pick-swap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.pick__chev { flex: none; width: 22px; height: 22px; padding: 4px; border-radius: 7px; color: var(--accent-text); background: var(--accent-soft); transition: transform 0.3s var(--ease-spring); }
+.pick.is-open .pick__chev { transform: rotate(180deg); }
+.pick__pop { position: fixed; inset: auto; margin: 0; padding: 6px; z-index: 10000; overflow: auto; overscroll-behavior: contain; color: var(--text); border: 1px solid var(--border); border-radius: 14px; background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); box-shadow: var(--shadow-lg); transform-origin: top center; animation: pick-in 0.2s var(--ease-out); }
+.pick__pop.is-up { transform-origin: bottom center; }
+.pick__pop.is-leaving { animation: pick-out 0.14s var(--ease) forwards; pointer-events: none; }
+@keyframes pick-in { from { opacity: 0; transform: translateY(-6px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes pick-out { to { opacity: 0; transform: translateY(-4px) scale(0.98); } }
+.pick__list { outline: none; display: flex; flex-direction: column; gap: 2px; }
+.pick__group { display: flex; flex-direction: column; gap: 2px; }
+.pick__group + .pick__group, .pick__opt + .pick__group { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border); }
+.pick__group-label { padding: 6px 10px 3px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+.pick__opt { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 7px 10px; border-radius: 9px; font-size: 13.5px; font-weight: 560; cursor: pointer; color: var(--text); animation: pick-opt 0.28s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 16ms); transition: background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease-out); }
+@keyframes pick-opt { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.pick__opt.is-active { background: var(--hover); transform: translateX(2px); }
+.pick__opt.is-selected { color: var(--accent-text); font-weight: 720; background: var(--accent-soft); }
+.pick__opt.is-disabled { opacity: 0.5; cursor: not-allowed; }
+.pick__opt-text { flex: 1; min-width: 0; }
+.pick__tick { flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; color: var(--accent-ink); background: var(--accent); opacity: 0; transform: scale(0.4); transition: opacity var(--t) var(--ease), transform 0.3s var(--ease-spring); }
+.pick__tick .icon { width: 12px; height: 12px; }
+.pick__opt.is-selected .pick__tick { opacity: 1; transform: none; }
+.pick__search-wrap { position: sticky; top: -6px; z-index: 1; display: flex; align-items: center; gap: 8px; margin: -6px -6px 6px; padding: 9px 12px; color: var(--text-3); background: var(--surface); border-bottom: 1px solid var(--border); border-radius: 14px 14px 0 0; }
+.pick__search { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-size: 13.5px; color: var(--text); }
+.pick__empty { padding: 10px; font-size: 13px; color: var(--text-3); }
+
+/* ---------- Premium checkboxes, dates, and numbers ---------- */
+input[type="checkbox"] { appearance: none; -webkit-appearance: none; flex: none; display: inline-grid; place-items: center; width: 18px; height: 18px; margin: 1px 0 0; border-radius: 6px; border: 1.5px solid var(--border-strong); background: var(--surface); cursor: pointer; transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), box-shadow var(--t) var(--ease); }
+input[type="checkbox"]::before { content: ""; width: 9px; height: 5px; border-left: 2.2px solid var(--accent-ink); border-bottom: 2.2px solid var(--accent-ink); transform: translateY(-1px) rotate(-45deg) scale(0); transition: transform 0.25s var(--ease-spring); }
+input[type="checkbox"]:hover { border-color: var(--accent); }
+input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); animation: btn-pop 0.3s var(--ease-spring); }
+input[type="checkbox"]:checked::before { transform: translateY(-1px) rotate(-45deg) scale(1); }
+input[type="checkbox"]:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent); }
+.check input { width: 18px; height: 18px; }
+input[type="date"], input[type="number"] { accent-color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; padding: 4px; border-radius: 7px; background-color: var(--accent-soft); transition: background-color var(--t-fast) var(--ease); }
+input[type="date"]::-webkit-calendar-picker-indicator:hover { background-color: color-mix(in srgb, var(--accent) 22%, transparent); }
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -4067,6 +4179,306 @@ function menuButton({ label, iconName = 'more', items, fk, iconOnly = false }) {
 }
 
 /* ==========================================================================
+   04b-fx: app-wide motion (pointer spotlight, button ripple, confetti) and
+   the premium dropdown that replaces every native <select class="select">
+   ========================================================================== */
+
+const reducedMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/** A short confetti burst from a screen rectangle (or the bottom of the screen). Skipped when motion is reduced. */
+function celebrate(rect) {
+  if (reducedMotion()) return;
+  const r = rect || { left: window.innerWidth / 2, top: window.innerHeight - 90, width: 0, height: 0 };
+  const colors = ['var(--accent)', 'var(--success)', 'var(--warning)', 'var(--indigo)', '#ffb020', '#ff6b8a'];
+  const box = h('div', { class: 'confetti', 'aria-hidden': 'true', style: `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px` });
+  for (let i = 0; i < 26; i++) {
+    const a = (i / 26) * Math.PI * 2 + Math.random() * 0.4;
+    const dist = 60 + Math.random() * 70;
+    box.appendChild(h('span', { class: `confetti__bit${i % 3 === 0 ? ' confetti__bit--round' : ''}`, style: `--x:${Math.cos(a) * dist}px;--y:${Math.sin(a) * dist - 30}px;--r:${Math.round(Math.random() * 540 - 270)}deg;--c:${colors[i % colors.length]};--t:${700 + Math.round(Math.random() * 400)}ms` }));
+  }
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 1300);
+}
+
+/** Confetti from wherever `selector` is on screen after a re-render, else from where `before` was. */
+function celebrateAt(selector, before) {
+  const onScreen = (r) => r && r.bottom > 0 && r.top < window.innerHeight && r.width > 0;
+  const el = document.querySelector(selector);
+  const after = el ? el.getBoundingClientRect() : null;
+  celebrate(onScreen(after) ? after : onScreen(before) ? before : null);
+}
+
+/* ---------- Pointer spotlight on cards ---------- */
+const SPOT_SEL = '.pulse, .stat, .home-tile, .kpi-tile, .cat-tile, .opp-card, .plan, .tk-step, .type-card, .health__item, .snap-card, .rt-row, .lk-card, .pk-card';
+let spotRaf = 0;
+let spotEvt = null;
+function onSpotMove(e) {
+  spotEvt = e;
+  if (spotRaf) return;
+  spotRaf = requestAnimationFrame(() => {
+    spotRaf = 0;
+    const t = spotEvt.target;
+    const card = t && t.closest ? t.closest(SPOT_SEL) : null;
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', `${spotEvt.clientX - r.left}px`);
+    card.style.setProperty('--my', `${spotEvt.clientY - r.top}px`);
+  });
+}
+
+/* ---------- Ripple on buttons ---------- */
+function onRipple(e) {
+  if (e.button !== 0 || reducedMotion()) return;
+  const btn = e.target.closest ? e.target.closest('.btn, .kpi-tile, .home-tile, .cat-tile, .type-card, .mp__opt, .pick__opt') : null;
+  if (!btn || btn.disabled) return;
+  const r = btn.getBoundingClientRect();
+  const size = Math.max(r.width, r.height) * 2.2;
+  const wave = h('span', { class: 'ripple', 'aria-hidden': 'true', style: `width:${size}px;height:${size}px;left:${e.clientX - r.left - size / 2}px;top:${e.clientY - r.top - size / 2}px` });
+  let host = btn.querySelector(':scope > .ripple-host');
+  if (!host) {
+    host = h('span', { class: 'ripple-host', 'aria-hidden': 'true' });
+    btn.appendChild(host);
+  }
+  host.appendChild(wave);
+  setTimeout(() => wave.remove(), 650);
+}
+
+/* ---------- Premium dropdown ---------- */
+const SEL_VALUE = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+const SEL_INDEX = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+const HAS_POPOVER = typeof HTMLElement.prototype.showPopover === 'function';
+let openPick = null;
+
+/**
+ * Replace a native select with a button and a styled list. The select stays in place
+ * (invisible) and keeps its value, so existing change handlers and labels still work.
+ */
+function enhanceSelect(sel) {
+  if (sel._pick || sel.multiple || !sel.isConnected) return;
+  // Moving the select into its wrapper drops focus, so remember it first.
+  const hadFocus = document.activeElement === sel;
+  const wrap = h('span', { class: 'pick' });
+  const valueEl = h('span', { class: 'pick__value' });
+  const btn = h('button', { type: 'button', class: 'pick__btn', id: uid('pick'), 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'data-fk': sel.getAttribute('data-fk') || undefined }, valueEl, icon('chev-down', 'pick__chev'));
+  if (sel.style.cssText) {
+    btn.style.cssText = sel.style.cssText;
+    if (sel.style.width === 'auto') wrap.classList.add('pick--auto');
+  }
+  const label = sel.id ? document.querySelector(`label[for="${CSS.escape(sel.id)}"]`) : null;
+  if (label) {
+    if (!label.id) label.id = uid('pick-label');
+    btn.setAttribute('aria-labelledby', `${label.id} ${btn.id}`);
+  }
+  sel.parentNode.insertBefore(wrap, sel);
+  wrap.append(sel, btn);
+  sel.classList.add('pick__native');
+  sel.setAttribute('tabindex', '-1');
+  sel.setAttribute('aria-hidden', 'true');
+
+  const sync = () => {
+    const opt = sel.options[sel.selectedIndex];
+    valueEl.textContent = opt ? opt.textContent : '';
+    btn.disabled = sel.disabled;
+    if (!label) btn.setAttribute('aria-label', `${sel.getAttribute('aria-label') || 'Choose'}: ${valueEl.textContent}`);
+  };
+  Object.defineProperty(sel, 'value', { configurable: true, get() { return SEL_VALUE.get.call(this); }, set(v) { SEL_VALUE.set.call(this, v); sync(); } });
+  Object.defineProperty(sel, 'selectedIndex', { configurable: true, get() { return SEL_INDEX.get.call(this); }, set(v) { SEL_INDEX.set.call(this, v); sync(); } });
+  sel.addEventListener('change', sync);
+  sel.addEventListener('input', sync);
+  // Clicking the label (or restoring focus after a re-render) lands on the button.
+  sel.addEventListener('focus', () => btn.focus());
+  new MutationObserver(sync).observe(sel, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'selected', 'label'] });
+
+  let pop = null;
+  let list = null;
+  let search = null;
+  let items = [];
+  let active = -1;
+  let typed = '';
+  let typedAt = 0;
+
+  const close = (focusBtn) => {
+    if (!pop) return;
+    const p = pop;
+    pop = null;
+    openPick = null;
+    btn.setAttribute('aria-expanded', 'false');
+    wrap.classList.remove('is-open');
+    document.removeEventListener('pointerdown', outside, true);
+    window.removeEventListener('resize', onWin);
+    window.removeEventListener('scroll', onWin, true);
+    p.classList.add('is-leaving');
+    setTimeout(() => {
+      if (HAS_POPOVER && p.matches(':popover-open')) p.hidePopover();
+      p.remove();
+    }, reducedMotion() ? 0 : 140);
+    if (focusBtn) btn.focus({ preventScroll: true });
+  };
+  const outside = (e) => {
+    if (!wrap.contains(e.target) && !(pop && pop.contains(e.target))) close(false);
+  };
+  // Follow the button while the page scrolls; close only when it leaves the screen.
+  const onWin = (e) => {
+    if (!pop || (e.type === 'scroll' && pop.contains(e.target))) return;
+    const r = btn.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) close(false);
+    else place();
+  };
+  const choose = (i) => {
+    const it = items[i];
+    if (!it || it.opt.disabled) return;
+    const changed = sel.value !== it.opt.value;
+    close(true);
+    if (!changed) return;
+    SEL_VALUE.set.call(sel, it.opt.value);
+    sync();
+    wrap.classList.remove('is-picked');
+    void wrap.offsetWidth;
+    wrap.classList.add('is-picked');
+    sel.dispatchEvent(new Event('input', { bubbles: true }));
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+  const setActive = (i, scroll = true) => {
+    const vis = items.filter((x) => !x.el.hidden);
+    if (!vis.length) return;
+    const idx = Math.max(0, Math.min(items.length - 1, i));
+    items.forEach((x, k) => x.el.classList.toggle('is-active', k === idx));
+    active = idx;
+    const focusEl = search || list;
+    focusEl.setAttribute('aria-activedescendant', items[idx].el.id);
+    if (scroll) items[idx].el.scrollIntoView({ block: 'nearest' });
+  };
+  const step = (dir) => {
+    const vis = items.map((x, k) => ({ x, k })).filter(({ x }) => !x.el.hidden && !x.opt.disabled);
+    if (!vis.length) return;
+    const pos = vis.findIndex(({ k }) => k === active);
+    const next = dir === 'first' ? 0 : dir === 'last' ? vis.length - 1 : Math.max(0, Math.min(vis.length - 1, (pos < 0 ? (dir > 0 ? -1 : vis.length) : pos) + dir));
+    setActive(vis[next].k);
+  };
+  const filter = () => {
+    const q = normalizeText(search.value);
+    let any = false;
+    items.forEach((x) => {
+      x.el.hidden = !!q && !normalizeText(x.opt.textContent).includes(q);
+      if (!x.el.hidden) any = true;
+    });
+    list.querySelectorAll('.pick__group').forEach((g) => {
+      g.hidden = ![...g.querySelectorAll('[role="option"]')].some((o) => !o.hidden);
+    });
+    empty.hidden = any;
+    if (items[active] && items[active].el.hidden) step('first');
+    else if (active < 0) step('first');
+  };
+  const empty = h('p', { class: 'pick__empty', hidden: true }, 'No matches');
+  const onKey = (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); step(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); step(-1); }
+    else if (e.key === 'Home' && !search) { e.preventDefault(); step('first'); }
+    else if (e.key === 'End' && !search) { e.preventDefault(); step('last'); }
+    else if (e.key === 'PageDown') { e.preventDefault(); for (let k = 0; k < 8; k++) step(1); }
+    else if (e.key === 'PageUp') { e.preventDefault(); for (let k = 0; k < 8; k++) step(-1); }
+    else if (e.key === 'Enter' || (e.key === ' ' && !search)) { e.preventDefault(); choose(active); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+    else if (e.key === 'Tab') { close(false); }
+    else if (!search && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      // Type to jump, like a native select.
+      const now = Date.now();
+      typed = now - typedAt > 700 ? e.key.toLowerCase() : typed + e.key.toLowerCase();
+      typedAt = now;
+      const from = typed.length === 1 ? active + 1 : active;
+      const order = items.map((x, k) => (k + Math.max(0, from)) % items.length);
+      const hit = order.find((k) => normalizeText(items[k].opt.textContent).startsWith(typed));
+      if (hit !== undefined) setActive(hit);
+    }
+  };
+  const place = () => {
+    const r = btn.getBoundingClientRect();
+    const width = Math.max(r.width, 220);
+    pop.style.minWidth = `${width}px`;
+    pop.style.maxWidth = `${Math.max(width, Math.min(420, window.innerWidth - 24))}px`;
+    const below = window.innerHeight - r.bottom - 12;
+    const above = r.top - 12;
+    const want = Math.min(pop.scrollHeight, 340);
+    const up = below < Math.min(want, 220) && above > below;
+    const room = Math.max(140, (up ? above : below) - 6);
+    pop.style.maxHeight = `${Math.min(340, room)}px`;
+    pop.classList.toggle('is-up', up);
+    const left = Math.min(Math.max(12, r.left), window.innerWidth - pop.offsetWidth - 12);
+    pop.style.left = `${Math.max(12, left)}px`;
+    pop.style.top = up ? `${Math.max(12, r.top - Math.min(want, room) - 6)}px` : `${r.bottom + 6}px`;
+  };
+  const open = () => {
+    if (pop || sel.disabled) return;
+    if (openPick) openPick.close(false);
+    const listId = uid('pick-list');
+    list = h('div', { class: 'pick__list', role: 'listbox', id: listId, tabindex: '-1', 'aria-labelledby': btn.getAttribute('aria-labelledby') || undefined, 'aria-label': label ? undefined : sel.getAttribute('aria-label') || 'Options' });
+    items = [];
+    const addOpt = (opt, parent) => {
+      const selected = opt.selected;
+      const el = h('div', { class: `pick__opt${selected ? ' is-selected' : ''}${opt.disabled ? ' is-disabled' : ''}`, role: 'option', id: uid('pick-opt'), 'aria-selected': String(selected), 'aria-disabled': opt.disabled ? 'true' : undefined }, h('span', { class: 'pick__opt-text' }, opt.textContent), h('span', { class: 'pick__tick', 'aria-hidden': 'true' }, icon('check', 'icon--sm')));
+      const k = items.length;
+      el.style.setProperty('--i', String(Math.min(k, 12)));
+      el.addEventListener('click', () => choose(k));
+      el.addEventListener('pointermove', () => { if (active !== k) setActive(k, false); });
+      items.push({ opt, el });
+      parent.appendChild(el);
+    };
+    [...sel.children].forEach((c) => {
+      if (c.tagName === 'OPTGROUP') {
+        const gid = uid('pick-g');
+        const g = h('div', { class: 'pick__group', role: 'group', 'aria-labelledby': gid }, h('div', { class: 'pick__group-label', id: gid }, c.label));
+        [...c.children].forEach((o) => addOpt(o, g));
+        list.appendChild(g);
+      } else if (c.tagName === 'OPTION') addOpt(c, list);
+    });
+    search = items.length > 10 ? h('input', { class: 'pick__search', type: 'text', role: 'combobox', 'aria-expanded': 'true', 'aria-controls': listId, 'aria-autocomplete': 'list', 'aria-label': 'Search options', placeholder: 'Type to search', autocomplete: 'off', spellcheck: 'false' }) : null;
+    pop = h('div', { class: 'pick__pop', popover: HAS_POPOVER ? 'manual' : undefined }, search ? h('div', { class: 'pick__search-wrap' }, icon('search', 'icon--sm'), search) : null, list, empty);
+    (search || list).addEventListener('keydown', onKey);
+    if (search) search.addEventListener('input', filter);
+    wrap.appendChild(pop);
+    if (HAS_POPOVER) pop.showPopover();
+    btn.setAttribute('aria-expanded', 'true');
+    btn.setAttribute('aria-controls', listId);
+    wrap.classList.add('is-open');
+    place();
+    const cur = items.findIndex((x) => x.opt.selected);
+    setActive(cur >= 0 ? cur : 0);
+    (search || list).focus({ preventScroll: true });
+    document.addEventListener('pointerdown', outside, true);
+    window.addEventListener('resize', onWin);
+    window.addEventListener('scroll', onWin, true);
+    openPick = { close };
+  };
+  btn.addEventListener('click', () => (pop ? close(true) : open()));
+  btn.addEventListener('keydown', (e) => {
+    if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key) && !pop) {
+      e.preventDefault();
+      open();
+    }
+  });
+  wrap.addEventListener('focusout', (e) => {
+    if (pop && e.relatedTarget && !wrap.contains(e.relatedTarget)) close(false);
+  });
+  sel._pick = { btn, close, sync };
+  sync();
+  if (hadFocus) btn.focus({ preventScroll: true });
+}
+
+function enhanceSelects(root) {
+  if (root.matches && root.matches('select.select')) enhanceSelect(root);
+  if (root.querySelectorAll) root.querySelectorAll('select.select').forEach(enhanceSelect);
+}
+
+function initFx() {
+  enhanceSelects(document.body);
+  new MutationObserver((muts) => {
+    for (const m of muts) m.addedNodes.forEach((n) => n.nodeType === 1 && enhanceSelects(n));
+  }).observe(document.body, { childList: true, subtree: true });
+  document.addEventListener('pointermove', onSpotMove, { passive: true });
+  document.addEventListener('pointerdown', onRipple, { passive: true });
+}
+
+/* ==========================================================================
    05-library: sidebar, topbar, library views, cards, reference cards
    ========================================================================== */
 
@@ -4502,6 +4914,7 @@ function renderMain() {
   else if (v === 'templates') renderTemplates(main);
   else if (v === 'settings') renderSettings(main);
   else renderLibrary(main);
+  if (main.classList.contains('anim-enter')) countUp(main);
   document.title = `${titleForView()} — Coaching Intelligence Pro — VXI`;
 }
 
@@ -5253,6 +5666,7 @@ async function clearReview(typeId) {
 
 /* ---------- Scorecard (progress ring, stacked bar, KPI risk) ---------- */
 const ringMemory = {};
+const ringSeen = {};
 function progressRing(value, total, label, key) {
   const r = 26;
   const c = 2 * Math.PI * r;
@@ -5270,6 +5684,27 @@ function progressRing(value, total, label, key) {
   });
   track.setAttribute('class', 'ring__track');
   bar.setAttribute('class', 'ring__bar');
+  // Gradient stroke, plus a small marker that travels around the ring.
+  const gid = uid('ring-g');
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+  grad.setAttribute('id', gid);
+  [['0%', 'ring__stop-a'], ['100%', 'ring__stop-b']].forEach(([off, cls]) => {
+    const st = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    st.setAttribute('offset', off);
+    st.setAttribute('class', cls);
+    grad.appendChild(st);
+  });
+  defs.appendChild(grad);
+  bar.style.stroke = `url(#${gid})`;
+  const orbit = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  orbit.setAttribute('class', 'ring__orbit');
+  const moon = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  moon.setAttribute('cx', '32');
+  moon.setAttribute('cy', String(32 - r - 6));
+  moon.setAttribute('r', '1.8');
+  moon.setAttribute('class', 'ring__moon');
+  orbit.appendChild(moon);
   bar.style.strokeDasharray = `${c}`;
   // Start from the previous value so the ring fills smoothly after each mark.
   const from = key in ringMemory ? ringMemory[key] : 0;
@@ -5278,8 +5713,13 @@ function progressRing(value, total, label, key) {
   if (from !== pct) {
     requestAnimationFrame(() => requestAnimationFrame(() => (bar.style.strokeDashoffset = `${c * (1 - pct)}`)));
   }
-  svg.append(track, bar);
-  return h('div', { class: 'ring-wrap', role: 'img', 'aria-label': label }, svg, h('span', { class: 'ring__value' }, h('strong', null, String(value)), h('span', null, `/${total}`)));
+  svg.append(defs, track, bar, orbit);
+  const full = total > 0 && value >= total;
+  const wrap = h('div', { class: `ring-wrap${full ? ' is-full' : ''}`, role: 'img', 'aria-label': label }, svg, h('span', { class: 'ring__value' }, h('strong', null, String(value)), h('span', null, `/${total}`)));
+  // Celebrate the moment a ring fills up (not when a full ring is simply shown again).
+  if (full && from < 1 && key in ringSeen) requestAnimationFrame(() => setTimeout(() => wrap.isConnected && celebrate(wrap.getBoundingClientRect()), 450));
+  ringSeen[key] = true;
+  return wrap;
 }
 
 function reviewScorecard(typeId) {
@@ -6385,10 +6825,36 @@ function renderHome(main) {
         h('span', { class: 'due-strip__go' }, 'Open tracker', icon('arrow-right'))
       )
     : null;
+  const dp = dayProgress();
+  const pulses = state.team.members.map((m) => ({ m, pu: memberPulse(m) }));
+  const glance = h(
+    'div',
+    { class: 'glance' },
+    h(
+      'a',
+      { class: 'glance__card', href: '#/today', 'data-fk': 'home-glance-day' },
+      progressRing(dp.finished, Math.max(dp.total, 1), `${dp.finished} of ${dp.total} items done today`, 'home-day'),
+      h('span', { class: 'glance__text' }, h('span', { class: 'glance__title' }, 'My Day'), h('span', { class: 'glance__sub' }, dp.total ? (dp.finished >= dp.total ? 'Everything is done. Nice work.' : `${plural(dp.total - dp.finished, 'item')} left today`) : 'Add your daily routine')),
+      icon('arrow-right', 'home-tile__go')
+    ),
+    pulses.length
+      ? (() => {
+          const { viz, groups } = healthRing(pulses);
+          return h(
+            'a',
+            { class: 'glance__card glance__card--team', href: '#/team', 'data-fk': 'home-glance-team' },
+            viz,
+            h('span', { class: 'glance__text' }, h('span', { class: 'glance__title' }, 'Team health'), h('span', { class: 'glance__chips' }, groups.filter((g) => g.n).map((g) => h('span', { class: `glance__chip glance__chip--${g.id}` }, h('strong', null, String(g.n)), ` ${g.label.toLowerCase()}`)))),
+            icon('arrow-right', 'home-tile__go')
+          );
+        })()
+      : h('a', { class: 'glance__card', href: '#/team', 'data-fk': 'home-glance-team' }, h('span', { class: 'home-tile__icon cat-people', 'aria-hidden': 'true' }, icon('heart')), h('span', { class: 'glance__text' }, h('span', { class: 'glance__title' }, 'Team Pulse'), h('span', { class: 'glance__sub' }, 'Paste your roster to see who needs recognition')), icon('arrow-right', 'home-tile__go'))
+  );
   const parts = [
     hero,
     dueStrip,
     stats,
+    section('Today at a glance', 'pulse', glance),
     section('Coach by KPI', 'target', kpiTiles, h('span', { class: 'sec__sub' }, 'opens the library filtered to that KPI')),
     section('Quick actions', 'sparkle', actions),
     pinned.length
@@ -6402,7 +6868,6 @@ function renderHome(main) {
     section('Browse by category', 'layers', cats),
   ];
   put(main, ...parts.filter(Boolean));
-  if (main.classList.contains('anim-enter')) countUp(main);
 }
 
 /* ==========================================================================
@@ -6931,7 +7396,6 @@ function renderTracker(main) {
           })
         )
   );
-  if (main.classList.contains('anim-enter')) countUp(main);
 }
 
 /* ==========================================================================
@@ -7314,10 +7778,16 @@ function setRoutineCount(r, n) {
   const day = state.today.progress[key] || (state.today.progress[key] = {});
   day[r.id] = Math.max(0, Math.min(50, n));
   persist('today');
+  const sel = `[data-fk="rt-${r.kind === 'count' ? 'plus' : 'check'}:${r.id}"]`;
+  const el = document.querySelector(sel);
+  const before = el ? el.getBoundingClientRect() : null;
   state.ui.flash = `rt:${r.id}`;
   refresh({ panel: false });
   state.ui.flash = null;
-  if (n >= r.target && n - 1 < r.target) announce(`${r.title} done`);
+  if (n >= r.target && n - 1 < r.target) {
+    announce(`${r.title} done`);
+    celebrateAt(sel, before);
+  }
 }
 
 function openRoutineEditor(existing) {
@@ -7426,11 +7896,16 @@ function routineRow(r) {
   );
 }
 
+/** Today's list: routine items due today plus follow-ups due soon, and how many are done. */
+function dayProgress() {
+  const todayItems = state.today.routines.filter((r) => routineDue(r).level !== 'later' || r.freq === 'daily');
+  const plans = state.tracker.plans.filter((p) => p.status === 'active').map((p) => ({ p, due: planDue(p) })).filter((x) => ['overdue', 'due', 'soon'].includes(x.due.level));
+  return { todayItems, plans, finished: todayItems.filter(routineDone).length, total: todayItems.length + plans.length };
+}
+
 function renderToday(main) {
   const routines = state.today.routines;
-  const todayItems = routines.filter((r) => routineDue(r).level !== 'later' || r.freq === 'daily');
-  const doneN = todayItems.filter(routineDone).length;
-  const plans = state.tracker.plans.filter((p) => p.status === 'active').map((p) => ({ p, due: planDue(p) })).filter((x) => ['overdue', 'due', 'soon'].includes(x.due.level));
+  const { todayItems, plans, finished: doneN } = dayProgress();
   const sug = huddleSuggestions().items[0];
   const sugOpp = sug && getOpp(sug.id);
   const dateText = parseDay(todayDay()).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
@@ -7817,7 +8292,6 @@ function renderSnapshot(main) {
       )
     )
   );
-  if (main.classList.contains('anim-enter')) countUp(main);
 }
 
 /* ==========================================================================
@@ -8165,37 +8639,19 @@ function logTouch(memberId, kind, extra = {}) {
   const t = { id: uid('touch'), member: memberId, kind, date: todayDay(), earned: !!extra.earned, strength: extra.strength || null };
   state.team.touches.push(t);
   saveTeam();
-  const avatar = () => document.querySelector(`.pulse[aria-labelledby="mem-${memberId}"] .pulse__avatar`);
-  const before = avatar() ? avatar().getBoundingClientRect() : null;
+  const sel = `.pulse[aria-labelledby="mem-${memberId}"] .pulse__avatar`;
+  const el = document.querySelector(sel);
+  const before = el ? el.getBoundingClientRect() : null;
   state.ui.flash = `mem:${memberId}`;
   refresh({ panel: false });
   state.ui.flash = null;
-  if (kind === 'recognition') {
-    // Burst where the card is now, or where it was if it moved off screen.
-    const onScreen = (r) => r && r.bottom > 0 && r.top < window.innerHeight;
-    const after = avatar() ? avatar().getBoundingClientRect() : null;
-    celebrate(onScreen(after) ? after : onScreen(before) ? before : null);
-  }
+  // Burst where the card is now, or where it was if it moved off screen.
+  if (kind === 'recognition') celebrateAt(sel, before);
   const m = state.team.members.find((x) => x.id === memberId);
   const label = { recognition: 'Recognition', oneonone: 'One-on-one', stay: 'Stay conversation' }[kind];
   toast(`${label} logged for ${m ? memberLabel(m) : 'this agent'}`, {
     action: { label: 'Undo', fn: () => { state.team.touches = state.team.touches.filter((x) => x.id !== t.id); saveTeam(); refresh({ panel: false }); } },
   });
-}
-
-/** A short confetti burst from a screen rectangle (or the bottom of the screen). Skipped when motion is reduced. */
-function celebrate(rect) {
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const r = rect || { left: window.innerWidth / 2, top: window.innerHeight - 90, width: 0, height: 0 };
-  const colors = ['var(--accent)', 'var(--success)', 'var(--warning)', 'var(--indigo)', '#ffb020', '#ff6b8a'];
-  const box = h('div', { class: 'confetti', 'aria-hidden': 'true', style: `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px` });
-  for (let i = 0; i < 26; i++) {
-    const a = (i / 26) * Math.PI * 2 + Math.random() * 0.4;
-    const dist = 60 + Math.random() * 70;
-    box.appendChild(h('span', { class: `confetti__bit${i % 3 === 0 ? ' confetti__bit--round' : ''}`, style: `--x:${Math.cos(a) * dist}px;--y:${Math.sin(a) * dist - 30}px;--r:${Math.round(Math.random() * 540 - 270)}deg;--c:${colors[i % colors.length]};--t:${700 + Math.round(Math.random() * 400)}ms` }));
-  }
-  document.body.appendChild(box);
-  setTimeout(() => box.remove(), 1300);
 }
 
 /* ---------- Recognition dialog ---------- */
@@ -8580,15 +9036,6 @@ function memberCard(m, idx = 0) {
   );
 }
 
-/** Cards light up under the pointer. */
-function spotlight(e) {
-  const card = e.target.closest ? e.target.closest('.pulse') : null;
-  if (!card) return;
-  const r = card.getBoundingClientRect();
-  card.style.setProperty('--mx', `${e.clientX - r.left}px`);
-  card.style.setProperty('--my', `${e.clientY - r.top}px`);
-}
-
 const HEALTH = [
   { id: 'good', label: 'Earned praise ready', hint: 'Recognize first' },
   { id: 'alert', label: 'Needs recognition', hint: 'Not recognized in 14 days' },
@@ -8596,8 +9043,8 @@ const HEALTH = [
   { id: 'ok', label: 'In balance', hint: 'Recently recognized and talked with' },
 ];
 
-/** The team at a glance: a ring with one segment per agent, colored by what they need next. */
-function teamHealth(pulses) {
+/** The ring itself: one segment per agent, colored by what they need next. */
+function healthRing(pulses) {
   const ns = 'http://www.w3.org/2000/svg';
   const mk = (tag, attrs) => {
     const el = document.createElementNS(ns, tag);
@@ -8624,11 +9071,18 @@ function teamHealth(pulses) {
   svg.appendChild(orbit);
   const recent = pulses.filter((x) => x.pu.dRec !== null && x.pu.dRec < 14).length;
   const pct = total ? Math.round((recent / total) * 100) : 0;
+  const viz = h('div', { class: 'health__viz' }, svg, h('div', { class: 'health__center' }, h('span', { class: 'health__pct' }, h('span', { 'data-count': String(pct) }, String(pct)), '%'), h('span', { class: 'health__cap' }, 'recognized in 14 days')));
+  return { viz, groups };
+}
+
+/** The team at a glance: the ring, one line on where to start, and a legend. */
+function teamHealth(pulses) {
+  const { viz, groups } = healthRing(pulses);
   const lead = groups[0].n ? `${plural(groups[0].n, 'agent has', 'agents have')} earned praise waiting. Start there.` : groups[1].n ? `${plural(groups[1].n, 'agent has', 'agents have')} not been recognized in 14 days.` : groups[2].n ? `${plural(groups[2].n, 'agent is', 'agents are')} due a one-on-one.` : 'Everyone is recognized and talked with. Keep the rhythm going.';
   return h(
     'section',
     { class: 'card health', 'aria-labelledby': 'healthTitle' },
-    h('div', { class: 'health__viz' }, svg, h('div', { class: 'health__center' }, h('span', { class: 'health__pct' }, h('span', { 'data-count': String(pct) }, String(pct)), '%'), h('span', { class: 'health__cap' }, 'recognized in 14 days'))),
+    viz,
     h(
       'div',
       { class: 'health__body' },
@@ -8693,9 +9147,8 @@ function renderTeam(main) {
         )
       : null,
     h('h2', { class: 'sr-only' }, 'Team members'),
-    h('div', { class: 'pulse-grid', onpointermove: spotlight }, sorted.map(({ m }, i) => memberCard(m, i)))
+    h('div', { class: 'pulse-grid' }, sorted.map(({ m }, i) => memberCard(m, i)))
   );
-  if (main.classList.contains('anim-enter')) countUp(main);
 }
 
 /* ==========================================================================
@@ -10831,6 +11284,7 @@ function init() {
   applyBrand();
   rebuildContent();
   bindEvents();
+  initFx();
   const r = parseHash();
   state.ui.view = r.view;
   state.ui.enterAnim = true;

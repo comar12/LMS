@@ -524,5 +524,4 @@ function renderTracker(main) {
           })
         )
   );
-  if (main.classList.contains('anim-enter')) countUp(main);
 }

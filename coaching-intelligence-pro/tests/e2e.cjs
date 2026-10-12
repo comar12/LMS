@@ -1479,6 +1479,56 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Premium dropdowns: every select is replaced, works by mouse, keyboard, and search, and keeps its value', async () => {
+    const { page, context } = await newPage({ hash: '#/settings' });
+    // Every visible select on the page is behind a styled button.
+    assert((await page.locator('select.select').count()) > 0 && (await page.locator('select.select').count()) === (await page.locator('.pick__btn').count()), 'Every select should get a premium dropdown');
+    const btn = page.locator('#settings-duration + .pick__btn');
+    assert((await btn.getAttribute('aria-haspopup')) === 'listbox', 'Dropdown button should announce a listbox');
+    // Mouse: open, pick, and the app sees a normal change.
+    await btn.click();
+    assert((await page.locator('.pick__pop [role="option"]').count()) === (await page.locator('#settings-duration option').count()), 'All options should be listed');
+    assert((await page.locator('.pick__pop [aria-selected="true"]').count()) === 1, 'The current value should be marked');
+    await page.locator('.pick__pop [role="option"]', { hasText: '21' }).first().click();
+    await page.locator('.pick__pop').waitFor({ state: 'detached' });
+    assert((await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.settings')).duration)) === 21, 'Picking an option should save it');
+    assert((await btn.innerText()).includes('21'), 'Button should show the new value');
+    // Keyboard: open with Arrow Down, move, choose with Enter; focus returns to the button.
+    await btn.focus();
+    await page.keyboard.press('ArrowDown');
+    await page.locator('.pick__pop').waitFor();
+    await page.keyboard.press('Home');
+    await page.keyboard.press('Enter');
+    await page.locator('.pick__pop').waitFor({ state: 'detached' });
+    const first = await page.locator('#settings-duration option').first().getAttribute('value');
+    assert(String(await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.settings')).duration)) === first, 'Keyboard choice was not saved');
+    assert(await page.evaluate(() => document.activeElement && document.activeElement.classList.contains('pick__btn')), 'Focus should return to the dropdown');
+    // Programmatic changes (and selectOption) keep the button in sync.
+    await page.selectOption('#settings-duration', '21');
+    assert((await btn.innerText()).includes('21'), 'Button did not follow the select value');
+    // Long lists get search; Escape closes the list but not the dialog around it.
+    await page.goto(URL + '#/team');
+    await page.evaluate(() => localStorage.setItem('cip.v1.team', JSON.stringify({ members: [{ id: 'mem-1', code: 'Agent 01' }], touches: [] })));
+    await page.reload();
+    await page.locator('.pulse').first().getByRole('button', { name: /Recognize/ }).click();
+    await page.getByRole('radio', { name: 'A strength' }).click();
+    await page.locator('#rc-strength + .pick__btn').click();
+    await page.locator('.pick__search').fill('empathy');
+    const shown = await page.locator('.pick__pop [role="option"]:not([hidden])').allInnerTexts();
+    assert(shown.length >= 1 && shown.every((t) => /empath/i.test(t)), 'Search should filter the options: ' + shown.join(' | '));
+    await page.keyboard.press('Escape');
+    await page.locator('.pick__pop').waitFor({ state: 'detached' });
+    assert((await page.locator('.modal').count()) === 1, 'Escape in a dropdown should not close the dialog');
+    await page.locator('#rc-strength + .pick__btn').click();
+    await page.locator('.pick__search').fill('empathy');
+    await page.keyboard.press('Enter');
+    assert((await page.locator('#rc-text').inputValue()).length > 20 && (await page.locator('#rc-strength').inputValue()).length > 0, 'Choosing a strength should update the message');
+    // Clicking the label lands on the dropdown button.
+    await page.locator('label[for="rc-strength"]').click();
+    assert(await page.evaluate(() => document.activeElement && document.activeElement.classList.contains('pick__btn')), 'Label click should focus the dropdown');
+    await finish(page, context);
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
     const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/links', '#/templates', '#/settings'];

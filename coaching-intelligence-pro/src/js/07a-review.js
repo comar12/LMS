@@ -157,6 +157,7 @@ async function clearReview(typeId) {
 
 /* ---------- Scorecard (progress ring, stacked bar, KPI risk) ---------- */
 const ringMemory = {};
+const ringSeen = {};
 function progressRing(value, total, label, key) {
   const r = 26;
   const c = 2 * Math.PI * r;
@@ -174,6 +175,27 @@ function progressRing(value, total, label, key) {
   });
   track.setAttribute('class', 'ring__track');
   bar.setAttribute('class', 'ring__bar');
+  // Gradient stroke, plus a small marker that travels around the ring.
+  const gid = uid('ring-g');
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+  grad.setAttribute('id', gid);
+  [['0%', 'ring__stop-a'], ['100%', 'ring__stop-b']].forEach(([off, cls]) => {
+    const st = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    st.setAttribute('offset', off);
+    st.setAttribute('class', cls);
+    grad.appendChild(st);
+  });
+  defs.appendChild(grad);
+  bar.style.stroke = `url(#${gid})`;
+  const orbit = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  orbit.setAttribute('class', 'ring__orbit');
+  const moon = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  moon.setAttribute('cx', '32');
+  moon.setAttribute('cy', String(32 - r - 6));
+  moon.setAttribute('r', '1.8');
+  moon.setAttribute('class', 'ring__moon');
+  orbit.appendChild(moon);
   bar.style.strokeDasharray = `${c}`;
   // Start from the previous value so the ring fills smoothly after each mark.
   const from = key in ringMemory ? ringMemory[key] : 0;
@@ -182,8 +204,13 @@ function progressRing(value, total, label, key) {
   if (from !== pct) {
     requestAnimationFrame(() => requestAnimationFrame(() => (bar.style.strokeDashoffset = `${c * (1 - pct)}`)));
   }
-  svg.append(track, bar);
-  return h('div', { class: 'ring-wrap', role: 'img', 'aria-label': label }, svg, h('span', { class: 'ring__value' }, h('strong', null, String(value)), h('span', null, `/${total}`)));
+  svg.append(defs, track, bar, orbit);
+  const full = total > 0 && value >= total;
+  const wrap = h('div', { class: `ring-wrap${full ? ' is-full' : ''}`, role: 'img', 'aria-label': label }, svg, h('span', { class: 'ring__value' }, h('strong', null, String(value)), h('span', null, `/${total}`)));
+  // Celebrate the moment a ring fills up (not when a full ring is simply shown again).
+  if (full && from < 1 && key in ringSeen) requestAnimationFrame(() => setTimeout(() => wrap.isConnected && celebrate(wrap.getBoundingClientRect()), 450));
+  ringSeen[key] = true;
+  return wrap;
 }
 
 function reviewScorecard(typeId) {
