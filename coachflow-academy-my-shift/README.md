@@ -92,7 +92,8 @@ only their own calls. Download CSV asks for the name and HR ID first if they
 are missing.
 
 The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id`,
-`warmup`, `next_steps`, `qa_check` and `what_worked` columns, and the file is named
+`warmup`, `next_steps`, `qa_check`, `what_worked`, `holds`, `hold_secs`,
+`longest_hold_secs` and `long_holds` columns, and the file is named
 `my-shift-<name>-<hr id>-<date>.csv`.
 
 ### Warm-up, goals, "Customer said" and My week
@@ -141,6 +142,28 @@ and where to practise them.
   that worked, in the customer's own words. Their lines, and any the leader
   shares, show under "Customer said" when a few words match. "Add team lines"
   reads the file the leader downloads from the board.
+
+### Hold timer and the account note
+
+- **Hold timer.** "Customer on hold" (or the H key) starts a timer above the
+  form with a reminder to ask first and say why. At 0:45 it turns amber and
+  says to go back and thank the customer; past 1:30 it turns red and counts
+  as a long hold. The browser tab title shows the time, and an agent can let
+  My Shift send a desktop reminder when they are in another window. "Back
+  with customer" ends the hold; every hold is counted on the call being
+  logged (a hold still running when the call is logged is ended and counted).
+  The numbers are `HOLD_CHECK` and `HOLD_LONG` at the top of `my-shift.js`,
+  to match the QA form.
+- **Copy account note.** Turns the call into a few plain lines to paste into
+  the account: call type and outcome, repeat contact, what happened, the
+  ticket or reference number and next steps for unresolved calls, what the
+  customer approved or declined (and why), and any call back the customer
+  asked for. Blanks (`____`) mark what to fill in. Internal answers (not
+  offered, satisfied, the QA self-check) stay out of the note. After a call
+  is logged, "Copy its account note" copies the same note.
+
+Holds are counted in the rail, the summary, the CSV and on the board, which
+adds a "Holds over 1:30" column per agent and the team total.
 
 The team board adds shout-outs (each agent's best wins, with a copy button)
 and a "What worked" list of the team's lines, with "Download for the team"

@@ -200,6 +200,26 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 .ms-lines-add{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem 1rem;margin:.25rem 0 0!important}
 .ms-lines-add .sl-link-button{padding:0;min-height:2.25rem}
 #ms-w-worked{margin-top:.75rem}
+/* Hold timer and the account note. */
+.ms-hold{margin:0 0 1rem;max-width:var(--sl-measure,68ch);border:1px solid var(--color-line);border-left:4px solid var(--color-insight,#2b8fd6);border-radius:var(--radius-control-md);background:var(--color-surface);padding:.5rem 1rem .6rem}
+.ms-hold[hidden]{display:none}
+.ms-hold p{margin:0}
+.ms-hold[data-state="idle"]{border:0;background:none;padding:0;font-size:.8125rem;color:var(--color-muted)}
+.ms-hold[data-state="due"]{border-left-color:var(--color-attention);background:var(--color-attention-soft)}
+.ms-hold[data-state="long"]{border-left-color:var(--color-risk);background:var(--color-risk-soft)}
+.ms-hold-row{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem}
+.ms-hold-dot{flex:none;width:.65rem;height:.65rem;border-radius:999px;background:var(--color-insight,#2b8fd6)}
+.ms-hold[data-state="due"] .ms-hold-dot{background:var(--color-attention)}
+.ms-hold[data-state="long"] .ms-hold-dot{background:var(--color-risk)}
+.ms-hold-time{font-size:.875rem;font-weight:600;color:var(--color-body)}
+.ms-hold-time b{margin-left:.25rem;font-family:var(--sl-font-signal,inherit);font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--color-ink)}
+.ms-hold[data-state="due"] .ms-hold-time b{color:var(--color-attention-text)}
+.ms-hold[data-state="long"] .ms-hold-time b{color:var(--color-risk-text)}
+.ms-hold-row .ms-btn-sm{margin-left:auto}
+.ms-hold-tip{margin-top:.3rem!important;font-size:.8125rem;color:var(--color-body)}
+.ms-hold[data-state="due"] .ms-hold-tip,.ms-hold[data-state="long"] .ms-hold-tip{font-weight:600;color:var(--color-ink)}
+.ms-hold-tip .sl-link-button{padding:0;min-height:2rem;font-size:.8125rem}
+.ms-msg .sl-link-button{min-height:1.75rem;margin-left:.75rem;padding:0;font-size:.875rem}
 /* Team board. */
 .tb-drop{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.5rem 1rem;padding:1.25rem 1rem;border:2px dashed var(--color-line-strong);border-radius:var(--radius-card);background:var(--color-canvas);text-align:center;transition:border-color var(--m-hover,.18s) var(--e-out,ease-out),background-color var(--m-hover,.18s) var(--e-out,ease-out)}
 .tb-drop[data-over]{border-color:var(--sl-signal);background:var(--color-action-soft)}
@@ -279,7 +299,9 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 .ms-ring[data-pulse]:after{animation:sl-ring var(--m-segment,.32s) var(--e-out,ease-out)}
 .ms-bar[data-state="run"] .ms-ring:before{animation:vxi-ring-glow 4.5s ease-in-out infinite}
 .ms-msg{transition:color var(--m-hover,.18s) var(--e-out,ease-out)}
-#my-shift .ms-reset,#my-shift .ms-streak{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
+#my-shift .ms-hold:not([data-state="idle"]) .ms-hold-dot{animation:ms-blink 1.6s ease-in-out infinite}
+@keyframes ms-blink{50%{opacity:.3}}
+#my-shift .ms-hold,#my-shift .ms-reset,#my-shift .ms-streak{animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}
 #my-shift .ms-reset[data-state="run"] .ms-breath{animation:ms-breathe 8s ease-in-out infinite}
 @keyframes ms-breathe{0%,100%{transform:scale(.62)}50%{transform:scale(1)}}
 @keyframes ms-settle{0%{background-color:var(--color-success-soft)}to{background-color:transparent}}
