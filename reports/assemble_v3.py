@@ -24,7 +24,7 @@ def rep(s,a,b):
 pickers = rep(pickers, "  for(const id of ['from','to']){ const e=document.getElementById(id); if(e){ e.min=META.minDate; e.max=META.maxDate; } }\n}",
  "  for(const id of ['from','to']){ const e=document.getElementById(id); if(e){ e.min=META.minDate; e.max=META.maxDate; } }\n  const lOpts=TLS.map(t=>({v:t,l:t,s:`HC ${roster.filter(a=>a.tl===t).length}`})); if(!state.leader||!TLS.includes(state.leader)) state.leader=TLS.includes('Omar Mansour')?'Omar Mansour':TLS[0]; if(PICKERS['pk-leader']){ PICKERS['pk-leader'].setOptions(lOpts); PICKERS['pk-leader'].setValue(state.leader); } else makePicker('pk-leader',{icon:'people',options:lOpts,value:state.leader,onChange:v=>{ state.leader=v; renderLeader(); }});\n}")
 wiring = rep(wiring, "function showTab(k){ state.tab=k; document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.t===k)); document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='v-'+k)); renderAll(); }",
- "function showTab(k){ state.tab=k; document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.t===k)); document.querySelectorAll('.view').forEach(x=>{ const on=x.id==='v-'+k; x.classList.toggle('active',on); if(on){ x.classList.remove('active'); void x.offsetWidth; x.classList.add('active'); } }); if(C) (VIEWS[k]||renderExec)(); else renderAll(); window.scrollTo({top:Math.max(0,document.querySelector('.control-panel').offsetTop-70),behavior:'smooth'}); }")
+ "function showTab(k){ state.tab=k; document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.t===k)); document.querySelectorAll('.view').forEach(x=>{ const on=x.id==='v-'+k; x.classList.toggle('active',on); if(on){ x.classList.remove('active'); void x.offsetWidth; x.classList.add('active'); } }); dvSetView(); if(C) (VIEWS[k]||renderExec)(); else renderAll(); window.scrollTo({top:Math.max(0,document.querySelector('.control-panel').offsetTop-70),behavior:'smooth'}); }")
 wiring = rep(wiring, "document.getElementById('leaderSel').innerHTML=''; document.getElementById('agentList').innerHTML='';", "document.getElementById('agentList').innerHTML='';")
 wiring = rep(wiring, "document.getElementById('leaderSel').addEventListener('change',e=>{ state.leader=e.target.value; renderLeaderTrend(); }); document.getElementById('agentSel').addEventListener('change',e=>{ state.agent=e.target.value; renderAgentTrend(); });",
  "document.getElementById('agentSel').addEventListener('change',e=>{ state.agent=e.target.value; renderAgentTrend(); });")
@@ -35,7 +35,7 @@ wiring = rep(wiring, "document.getElementById('v-overview').classList.add('activ
 data = rep(data, "tab:'overview'", "tab:'exec'")
 charts = open(SP+'charts/charts.js').read()
 engine = open(SP+'engine.js').read()
-render = open(SP+'motion.js').read() + '\n' + open(SP+'render_products.js').read() + '\n' + open(SP+'render_v3.js').read()
+render = open(SP+'motion.js').read() + '\n' + open(SP+'hero.js').read() + '\n' + open(SP+'render_products.js').read() + '\n' + open(SP+'render_v3.js').read()
 script = "<script>\n" + data + compute + helpers + "\n" + hist + "\n/* ---------------------------------------------------------------- chart library */\n" + charts + "\n" + engine + "\n" + render + "\n" + xlsx + upload + pickers + wiring + "init();\n</script>\n</body>\n</html>\n"
 out = head + body + script
 assert out.count('__DATA__')==1

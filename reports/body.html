@@ -11,21 +11,19 @@
     <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
   </section>
 
-  <section class="panel hero">
-    <div class="hero-top">
-      <div><span class="eyebrow">VXI | TSX · Cairo Repair · Sales performance</span><h1>Sales Performance</h1><p id="heroSub">XM lines and GSR units per business day (14:00 Cairo → 07:00 next morning) · attributed to ops managers, team leaders and agents through the roster</p></div>
-      <div class="hero-period"><span class="period-label">Summary period</span><div class="segmented" id="presets"></div><span class="period-label" id="periodLabel"></span></div>
+  <section class="hero" id="hero" aria-label="Sales performance summary">
+    <div class="dv-glow" aria-hidden="true"></div>
+    <div class="dv-top">
+      <div class="dv-eyebrow"><span class="dv-pill" id="dvView">Executive view</span><span class="dv-scope" id="dvScope"></span></div>
+      <div class="segmented" id="presets" role="group" aria-label="Summary period"></div>
     </div>
-    <div class="daystrip">
-      <div class="daystrip-label"><b>Reporting day</b><span id="stripRange"></span><small><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:4px"></i>up vs previous day · <i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--bad);margin-right:4px"></i>down</small></div>
-      <div class="days" id="days"></div>
-      <div class="pacing" id="pacing"></div>
+    <div class="dv-main">
+      <div class="dv-copy"><h1 class="dv-h" id="dvHead">Sales performance</h1><p class="dv-sub" id="dvSub"></p><div class="dv-delta" id="dvDelta"></div></div>
+      <div class="dv-ring"><div id="dvRing"></div><div class="dv-cap" id="dvCap"></div></div>
     </div>
-    <div class="hero-body">
-      <div class="hero-gauge"><figure id="gauge"></figure><div class="hero-comparison" id="heroCmp"></div><div class="hero-comparison" id="heroTarget"></div></div>
-      <div class="hero-metrics" id="heroMetrics"></div>
-    </div>
-    <div class="hero-foot"><span id="footScope"></span><span id="footData"></span></div>
+    <div class="dv-cards" id="dvCards"></div>
+    <div class="dv-strip"><div class="daystrip-label"><b>Reporting day</b><span id="stripRange"></span><small><i style="background:var(--dgood)"></i>up vs previous day · <i style="background:var(--dbad)"></i>down<br>business day 14:00 → 07:00 Cairo</small></div><div class="days" id="days"></div></div>
+    <div class="dv-foot"><span id="footScope"></span><span id="footData"></span><span id="periodLabel" hidden></span></div>
   </section>
 
   <section class="panel control-panel">

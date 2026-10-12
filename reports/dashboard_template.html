@@ -224,6 +224,88 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
 #agentCards{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:900px){#agentCards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* phones: the top bar scrolls away instead of covering a third of the screen */
 @media(max-width:760px){.topbar{position:static}.hero-period{justify-content:flex-start}.hero-period .segmented{max-width:100%;overflow-x:auto}}
+
+/* ================= director-style hero ================= */
+#hero.hero{--dx:#5ccfe0;--dg:#f6a56b;--dgood:#8be3b4;--dbad:#f4909f;--dwarn:#f3c969;--dm:rgba(208,224,234,.76);position:relative;overflow:hidden;isolation:isolate;margin-top:20px;padding:26px 32px 18px;border-radius:26px;color:#eef5f9;border:1px solid rgba(255,255,255,.07);background:linear-gradient(135deg,#0a2232 0%,#0d3043 36%,#11404f 62%,#1a3b47 84%,#283f47 100%);box-shadow:0 34px 70px -34px rgba(6,24,36,.6),inset 0 1px 0 rgba(255,255,255,.05)}
+#hero.hero:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:58px 58px;-webkit-mask-image:radial-gradient(ellipse 75% 70% at 42% 22%,#000 15%,transparent 72%);mask-image:radial-gradient(ellipse 75% 70% at 42% 22%,#000 15%,transparent 72%)}
+#hero .dv-glow{position:absolute;inset:-25%;z-index:-2;pointer-events:none;background:radial-gradient(520px 300px at 36% 16%,rgba(56,178,190,.32),transparent 62%),radial-gradient(460px 320px at 84% 20%,rgba(127,231,207,.16),transparent 62%),radial-gradient(660px 360px at 62% 112%,rgba(246,165,107,.11),transparent 60%);animation:dvDrift 26s ease-in-out infinite alternate}
+@keyframes dvDrift{from{transform:translate3d(-2.5%,-1.5%,0) scale(1)}to{transform:translate3d(2.5%,2%,0) scale(1.06)}}
+#hero .dv-top{display:flex;justify-content:space-between;align-items:center;gap:14px 24px;flex-wrap:wrap}
+#hero .dv-eyebrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-width:0}
+#hero .dv-pill{display:inline-flex;align-items:center;height:30px;padding:0 14px;border-radius:999px;border:1px solid rgba(127,231,207,.55);background:rgba(8,36,48,.55);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;box-shadow:0 0 0 4px rgba(127,231,207,.06);white-space:nowrap}
+#hero .dv-scope{font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(214,229,238,.8)}
+#hero .segmented{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);box-shadow:none;border-radius:999px;padding:3px}
+#hero .segmented button{color:rgba(226,238,245,.8);border-radius:999px;padding:6px 13px;background:transparent;transition:background .2s,color .2s}
+#hero .segmented button:hover{color:#fff;background:rgba(255,255,255,.08)}
+#hero .segmented button.active{background:rgba(127,231,207,.2);color:#fff;box-shadow:inset 0 0 0 1px rgba(127,231,207,.65)}
+#hero .dv-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:center;margin-top:20px}
+#hero .dv-h{margin:0;font-size:42px;line-height:1.1;font-weight:800;letter-spacing:-1.3px;color:#fff}
+#hero .dv-h .ln{display:block}#hero .dv-h em{font-style:normal}#hero .dv-h em.x{color:var(--dx)}#hero .dv-h em.g{color:var(--dg)}
+#hero .dv-sub{margin-top:14px;font-size:16px;line-height:1.55;color:var(--dm);max-width:940px}#hero .dv-sub b{color:#fff;font-weight:650}
+#hero .dv-delta{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:20px;padding:10px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(6,30,42,.45);font-size:14.5px;font-weight:750;color:#fff}
+#hero .dv-delta.up{border-color:rgba(139,227,180,.5)}#hero .dv-delta.down{border-color:rgba(244,144,159,.55)}
+#hero .dv-delta .ar{font-size:13px}#hero .dv-delta.up .ar{color:var(--dgood)}#hero .dv-delta.down .ar{color:var(--dbad)}#hero .dv-delta .dim{font-weight:500;color:var(--dm)}
+#hero .dv-ring{display:flex;flex-direction:column;align-items:center;gap:10px}
+#dvRing{position:relative;width:232px;height:232px}#dvRing svg{display:block;width:100%;height:100%;overflow:visible}
+#dvRing .ticks line{stroke:rgba(255,255,255,.17);stroke-width:1.2;stroke-linecap:round}#dvRing .ticks line.mj{stroke:rgba(255,255,255,.4);stroke-width:1.7}
+#dvRing .trk{fill:none;stroke:rgba(255,255,255,.08);stroke-width:13}
+#dvRing .arc{fill:none;stroke:url(#dvRG);stroke-width:13;stroke-linecap:round;filter:drop-shadow(0 0 7px rgba(127,231,207,.45));transition:stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1),opacity .25s}
+#dvRing .cap,#dvRing .base{transform-box:view-box;transform-origin:50% 50%;transition:transform 1.2s cubic-bezier(.22,1,.36,1),opacity .3s}
+#dvRing .cap circle{fill:#effffa;stroke:#7fe7cf;stroke-width:3;filter:drop-shadow(0 0 6px rgba(127,231,207,.85))}
+#dvRing .base line{stroke:var(--dwarn);stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(243,201,105,.6))}
+#dvRing .dv-ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+#dvRing .dv-ring-c b{font-size:44px;font-weight:800;letter-spacing:-1.4px;color:#fff;line-height:1}
+#dvRing .dv-ring-c span{margin-top:9px;font-size:10.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:rgba(222,236,243,.88)}
+#dvRing .dv-ring-c em{margin-top:6px;font-style:normal;font-size:13.5px;font-weight:750;color:var(--dwarn)}
+#hero .dv-cap{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12.5px;color:var(--dm);text-align:center}#hero .dv-cap .tk{display:inline-block;width:10px;height:3px;border-radius:2px;background:var(--dwarn);margin-right:6px;vertical-align:3px}
+#dvRing.intro .ticks line{animation:dvTick .5s ease both;animation-delay:calc(var(--k)*9ms)}
+#dvRing.intro .arc{transition:stroke-dashoffset 1.7s cubic-bezier(.65,.05,.25,1) .3s,opacity .25s .3s}#dvRing.intro .cap{transition:transform 1.7s cubic-bezier(.65,.05,.25,1) .3s,opacity .25s .3s}
+#dvRing.intro .base line{animation:dvBase .6s cubic-bezier(.2,.7,.2,1) 1.5s both}
+@keyframes dvTick{from{opacity:0}to{opacity:1}}@keyframes dvBase{from{opacity:0;stroke-width:0}to{opacity:1;stroke-width:4}}
+#hero .dv-cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;margin-top:28px}
+#hero .dv-card{position:relative;min-width:0;min-height:156px;padding:16px 18px 12px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:transform .25s cubic-bezier(.22,1,.36,1),border-color .25s,background .25s}
+#hero .dv-card:hover{transform:translateY(-3px);border-color:rgba(127,231,207,.4);background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.05))}
+#hero .dv-l{font-size:14px;font-weight:650;color:rgba(236,244,248,.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hero .dv-v{margin-top:6px;font-size:34px;font-weight:800;letter-spacing:-1px;line-height:1.05;color:#fff}#hero .dv-v small{margin-left:3px;font-size:15px;font-weight:600;letter-spacing:0;color:var(--dm)}
+#hero .dv-v.x{color:var(--dx)}#hero .dv-v.g{color:var(--dg)}#hero .dv-v.good{color:var(--dgood)}#hero .dv-v.bad{color:var(--dbad)}
+#hero .dv-s{margin-top:6px;font-size:13px;line-height:1.45;color:var(--dm)}#hero .dv-s .up,#hero .dv-s .good{color:var(--dgood);font-weight:700;font-style:normal}#hero .dv-s .down,#hero .dv-s .bad{color:var(--dbad);font-weight:700;font-style:normal}#hero .dv-s .flat{color:var(--dm);font-weight:700}
+#hero .dv-sp{margin-top:8px;min-height:46px}#hero .dv-nospark{font-size:11.5px;color:var(--dm);padding-top:14px}
+#hero .dv-spark{display:block;width:100%;height:auto;overflow:visible}
+#hero .dv-spark .ln{stroke-dasharray:1;stroke-dashoffset:1;animation:sparkDraw 1.15s cubic-bezier(.45,0,.2,1) forwards;animation-delay:calc(var(--i,0)*70ms + .5s)}
+#hero .dv-spark .ar{animation:dvFade .8s ease both;animation-delay:calc(var(--i,0)*70ms + .95s)}
+#hero .dv-spark .dt{transform-box:fill-box;transform-origin:center;animation:dotPop .45s cubic-bezier(.2,.7,.25,1.5) both;animation-delay:calc(var(--i,0)*70ms + 1.55s)}
+#hero .dv-spark .hl{transform-box:fill-box;transform-origin:center;opacity:0;animation:dvHalo 1.15s ease-out 2;animation-delay:calc(var(--i,0)*70ms + 1.85s)}
+#hero .dv-cards.upd .dv-spark .ln{animation-delay:calc(var(--i,0)*40ms)}#hero .dv-cards.upd .dv-spark .ar{animation-delay:calc(var(--i,0)*40ms + .4s)}#hero .dv-cards.upd .dv-spark .dt{animation-delay:calc(var(--i,0)*40ms + 1s)}#hero .dv-cards.upd .dv-spark .hl{animation:none}
+@keyframes dvHalo{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(3.4)}}@keyframes dvFade{from{opacity:0}to{opacity:1}}
+#hero .dv-meter{position:relative;height:8px;margin-top:16px;border-radius:5px;background:rgba(255,255,255,.1)}
+#hero .dv-meter i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:5px;background:linear-gradient(90deg,#2fb0c2,#8af0d6);box-shadow:0 0 10px rgba(127,231,207,.35);transition:width 1.2s cubic-bezier(.22,1,.36,1)}#hero .dv-meter i.bad{background:linear-gradient(90deg,#c25467,#f4909f);box-shadow:0 0 10px rgba(244,144,159,.3)}
+#hero .dv-meter em{position:absolute;top:-5px;bottom:-5px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--dwarn);box-shadow:0 0 6px rgba(243,201,105,.6)}
+#hero .dv-mk{display:flex;justify-content:space-between;gap:6px;margin-top:9px;font-size:11px;color:var(--dm);white-space:nowrap}#hero .dv-mk b{color:#fff;font-weight:650}
+#hero .dv-strip{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
+#hero .daystrip-label{min-width:150px;font-size:13px;color:#fff}#hero .daystrip-label span{color:var(--dm)}#hero .daystrip-label small{color:var(--dm)}#hero .daystrip-label i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+#hero .day{color:rgba(214,229,238,.72)}#hero .day b{color:#fff}#hero .day .xg b:first-child{color:var(--dx)}#hero .day .xg b:last-child{color:var(--dg)}#hero .day .v.up{color:var(--dgood)}#hero .day .v.down{color:var(--dbad)}
+#hero .day:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}#hero .day.latest{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.16)}#hero .day.sel{background:rgba(127,231,207,.14);border-color:rgba(127,231,207,.65);box-shadow:0 0 0 3px rgba(127,231,207,.12)}#hero .day.sel b{color:#fff}
+#hero .mcol{border-bottom-color:rgba(255,255,255,.2)}#hero .mcol .x{background:#3fc0cc}#hero .mcol .g{background:#f0925c}#hero .day.latest .mcol{border-bottom-color:var(--dwarn)}
+#hero .dv-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:rgba(200,218,229,.62)}
+/* intro choreography (first load only) */
+#hero.intro{animation:dvUp .7s cubic-bezier(.22,1,.36,1) both}
+#hero.intro .dv-eyebrow{animation:dvIn .6s cubic-bezier(.22,1,.36,1) .08s both}#hero.intro .dv-top .segmented{animation:dvFade .6s ease .15s both}
+#hero.intro .dv-h .ln{animation:dvUp .8s cubic-bezier(.22,1,.36,1) both}#hero.intro .dv-h .ln:nth-child(1){animation-delay:.12s}#hero.intro .dv-h .ln:nth-child(2){animation-delay:.24s}
+#hero.intro .dv-sub{animation:dvUp .75s cubic-bezier(.22,1,.36,1) .36s both}#hero.intro .dv-delta{animation:dvUp .75s cubic-bezier(.22,1,.36,1) .48s both}
+#hero.intro .dv-ring{animation:dvFade .8s ease .1s both}
+#hero.intro .dv-card{animation:dvUp .75s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*70ms + .32s)}
+#hero.intro .dv-strip{animation:dvFade .8s ease .7s both}
+@keyframes dvUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}@keyframes dvIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+[data-theme=dark] #hero.hero{border-color:rgba(127,231,207,.14);box-shadow:0 34px 70px -34px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03)}
+@media(max-width:1250px){#hero .dv-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:920px){#hero .dv-main{grid-template-columns:1fr}#hero .dv-ring{margin-top:6px}#hero .dv-h{font-size:34px}}
+@media(max-width:600px){#hero.hero{padding:20px 16px 14px;border-radius:20px}#hero .dv-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#hero .dv-h{font-size:27px;letter-spacing:-.7px}#hero .dv-sub{font-size:14px}#hero .dv-v{font-size:27px}#hero .dv-card{min-height:0;padding:12px 12px 10px}#hero .dv-l{font-size:12.5px}#hero .dv-scope{font-size:11px;letter-spacing:.06em}#dvRing{width:200px;height:200px}#dvRing .dv-ring-c b{font-size:36px}#hero .dv-delta{font-size:13px}}
+@media (prefers-reduced-motion: reduce){#hero .dv-glow{animation:none}#hero.intro,#hero.intro *{animation:none!important}#dvRing .arc,#dvRing .cap,#dvRing .base,#hero .dv-meter i{transition:none}#hero .dv-spark .ln{stroke-dasharray:none;stroke-dashoffset:0;animation:none}#hero .dv-spark .ar,#hero .dv-spark .dt{animation:none}#hero .dv-spark .hl{display:none}}
+/* hero on phones: presets scroll sideways, the day strip stacks under its label */
+#hero .segmented{max-width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}#hero .segmented::-webkit-scrollbar{display:none}#hero .segmented button{white-space:nowrap;flex:none}
+@media(max-width:600px){#hero .dv-strip{flex-direction:column;gap:12px}#hero .days{width:100%}#hero .dv-mk{white-space:normal;flex-wrap:wrap}}
+/* secondary buttons readable in dark theme */
+[data-theme=dark] .secondary{background:var(--soft);border-color:var(--line);color:var(--text);box-shadow:none}[data-theme=dark] .secondary:hover{background:var(--teal-soft)}[data-theme=dark] .topbar .secondary{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.35);color:#fff}
 </style>
 </head>
 <body>
@@ -240,21 +322,19 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
     <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
   </section>
 
-  <section class="panel hero">
-    <div class="hero-top">
-      <div><span class="eyebrow">VXI | TSX · Cairo Repair · Sales performance</span><h1>Sales Performance</h1><p id="heroSub">XM lines and GSR units per business day (14:00 Cairo → 07:00 next morning) · attributed to ops managers, team leaders and agents through the roster</p></div>
-      <div class="hero-period"><span class="period-label">Summary period</span><div class="segmented" id="presets"></div><span class="period-label" id="periodLabel"></span></div>
+  <section class="hero" id="hero" aria-label="Sales performance summary">
+    <div class="dv-glow" aria-hidden="true"></div>
+    <div class="dv-top">
+      <div class="dv-eyebrow"><span class="dv-pill" id="dvView">Executive view</span><span class="dv-scope" id="dvScope"></span></div>
+      <div class="segmented" id="presets" role="group" aria-label="Summary period"></div>
     </div>
-    <div class="daystrip">
-      <div class="daystrip-label"><b>Reporting day</b><span id="stripRange"></span><small><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:4px"></i>up vs previous day · <i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--bad);margin-right:4px"></i>down</small></div>
-      <div class="days" id="days"></div>
-      <div class="pacing" id="pacing"></div>
+    <div class="dv-main">
+      <div class="dv-copy"><h1 class="dv-h" id="dvHead">Sales performance</h1><p class="dv-sub" id="dvSub"></p><div class="dv-delta" id="dvDelta"></div></div>
+      <div class="dv-ring"><div id="dvRing"></div><div class="dv-cap" id="dvCap"></div></div>
     </div>
-    <div class="hero-body">
-      <div class="hero-gauge"><figure id="gauge"></figure><div class="hero-comparison" id="heroCmp"></div><div class="hero-comparison" id="heroTarget"></div></div>
-      <div class="hero-metrics" id="heroMetrics"></div>
-    </div>
-    <div class="hero-foot"><span id="footScope"></span><span id="footData"></span></div>
+    <div class="dv-cards" id="dvCards"></div>
+    <div class="dv-strip"><div class="daystrip-label"><b>Reporting day</b><span id="stripRange"></span><small><i style="background:var(--dgood)"></i>up vs previous day · <i style="background:var(--dbad)"></i>down<br>business day 14:00 → 07:00 Cairo</small></div><div class="days" id="days"></div></div>
+    <div class="dv-foot"><span id="footScope"></span><span id="footData"></span><span id="periodLabel" hidden></span></div>
   </section>
 
   <section class="panel control-panel">
@@ -1337,7 +1417,7 @@ function renderDayStrip(){ const {dy}=C; const iMax=DI[META.maxDate]; const k0=M
     b.querySelector('.x').style.height=(H*x/mx).toFixed(1)+'px'; b.querySelector('.g').style.height=(H*g/mx).toFixed(1)+'px'; b.querySelector('.mcol').classList.toggle('nog', g===0);
     morphNum(b.querySelector('.nx'), x, n0, 500); morphNum(b.querySelector('.ng'), g, n0, 500); const ve=b.querySelector('.v'); ve.textContent=p==null?'':(dir>0?'▲':dir<0?'▼':'→')+n0(Math.abs(dir)); ve.className='v '+(dir>0?'up':dir<0?'down':'');
     b.className=`day ${i===iMax?'latest':''} ${single===DATES[i]?'sel':''}`; b.title=`${fd(DATES[i])}: XM ${x} · GSR ${g}${p==null?'':` · ${dir>=0?'+':''}${dir} vs the day before`} · click to focus the dashboard on this day`; });
-  document.getElementById('stripRange').textContent=`${fds(DATES[k0])} – ${fdl(DATES[iMax])} · click a day to focus`; }
+  document.getElementById('stripRange').textContent=`${fds(DATES[k0])} – ${fdl(DATES[iMax])} · click a day to focus`; if(host.scrollWidth>host.clientWidth+4) requestAnimationFrame(()=>{ host.scrollLeft=host.scrollWidth; }); }
 
 /* ---- standings race + products on the day, one shared clock that plays through the period when it scrolls into view */
 const MOTION={};
@@ -1389,6 +1469,69 @@ function renderShift(figId, footId, rs){ const s=shiftHours(rs); const cats=SHIF
   let b3=0, b3s=0; for(let k=0;k+2<SHIFT_HOURS.length;k++){ const v=xm[k]+gs[k]+xm[k+1]+gs[k+1]+xm[k+2]+gs[k+2]; if(v>b3){ b3=v; b3s=k; } }
   foot.innerHTML=`<span>Peak hour <b>${peak[0]}</b> (${n0(peak[1])} · ${pct0(peak[1]/tot)}) · busiest 3-hour window <b>${cats[b3s]}–${String((SHIFT_HOURS[b3s+2]+1)%24).padStart(2,'0')}:00</b> with ${pct0(b3/tot)} of sales · <b>${pct0(am/tot)}</b> logged after midnight · ${pct0(ev/tot)} in the first four hours (14:00–18:00)${s.ox+s.og?` · ${n0(s.ox+s.og)} outside shift hours`:''}</span>`; }
 
+/* ---------------------------------------------------------------- director-style hero: insight headline, attainment ring, glass KPI cards */
+const VIEWNAME={exec:'Executive view', om:'Ops manager view', leader:'Team leader view', agents:'Agent view', insights:'Insights', data:'Data & settings'};
+let DVSEQ=0;
+function dvSetView(){ const el=document.getElementById('dvView'); if(el) el.textContent=VIEWNAME[state.tab]||VIEWNAME.exec; }
+function dvScope(){ const p=[]; if(state.tl&&state.tl!=='All') p.push(`${state.tl}'s team`); else if(state.om&&state.om!=='All') p.push(`${state.om}'s teams`); else p.push('Whole floor'); if(state.phase&&state.phase!=='All') p.push(`${state.phase} agents`); if(state.tenure&&state.tenure!=='All') p.push(`tenure ${state.tenure}`); return p; }
+const dvArrow = v => v>0?'▲':v<0?'▼':'→';
+const dvChip = (v,f=n0) => `<span class="${v>0?'up':v<0?'down':'flat'}">${dvArrow(v)} ${sgn(v,f)}</span>`;
+/* area sparkline sized to its card: gradient wash, a line that draws in, an end dot with a halo */
+function dvSpark(vals, color, w){ w=Math.max(120,Math.round(w||220)); const h=46, pad=5; const vs=vals.map(v=>v==null||!isFinite(v)?null:+v); const nn=vs.filter(v=>v!=null); if(nn.length<2) return '<div class="dv-nospark">not enough days yet</div>';
+  const lo=Math.min(...nn), hi=Math.max(...nn); const x=i=>pad+i*(w-2*pad)/Math.max(1,vs.length-1), y=v=>h-pad-(v-lo)/((hi-lo)||1)*(h-2*pad-4);
+  let d='', pen=false; vs.forEach((v,i)=>{ if(v==null){ pen=false; return; } d+=(pen?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1); pen=true; });
+  const full=vs.every(v=>v!=null); const area=full?`M${x(0).toFixed(1)},${h}`+vs.map((v,i)=>`L${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')+`L${x(vs.length-1).toFixed(1)},${h}Z`:'';
+  let li=vs.length-1; while(li>0&&vs[li]==null) li--; const gid='dvg'+(++DVSEQ); const cx=x(li).toFixed(1), cy=y(vs[li]).toFixed(1);
+  return `<svg class="dv-spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".30"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>${area?`<path class="ar" d="${area}" fill="url(#${gid})"/>`:''}<path class="ln" d="${d}" pathLength="1" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle class="hl" cx="${cx}" cy="${cy}" r="4" fill="none" stroke="${color}" stroke-width="1.5"/><circle class="dt" cx="${cx}" cy="${cy}" r="4" fill="${color}" stroke="#0e2d3d" stroke-width="2"/></svg>`; }
+/* attainment ring: bezel ticks, gradient arc with a glowing end cap, a yellow reference tick */
+function dvRingBuild(host){ if(host.querySelector('svg')) return; const S=232, c=S/2, r=90, C2=2*Math.PI*r; let t='';
+  for(let k=0;k<72;k++){ const mj=k%6===0, r1=mj?101:104, r2=mj?112:109, a=(k*5-90)*Math.PI/180; t+=`<line class="${mj?'mj':''}" style="--k:${k}" x1="${(c+r1*Math.cos(a)).toFixed(2)}" y1="${(c+r1*Math.sin(a)).toFixed(2)}" x2="${(c+r2*Math.cos(a)).toFixed(2)}" y2="${(c+r2*Math.sin(a)).toFixed(2)}"/>`; }
+  host.innerHTML=`<svg viewBox="0 0 ${S} ${S}" role="img" aria-labelledby="dvRingT"><title id="dvRingT">Target attainment</title><defs><linearGradient id="dvRG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8af0d6"/><stop offset=".55" stop-color="#5fd6d0"/><stop offset="1" stop-color="#2fb0c2"/></linearGradient></defs><g class="ticks">${t}</g><circle class="trk" cx="${c}" cy="${c}" r="${r}"/><circle class="arc" cx="${c}" cy="${c}" r="${r}" stroke-dasharray="${C2.toFixed(2)}" stroke-dashoffset="${C2.toFixed(2)}" transform="rotate(-90 ${c} ${c})"/><g class="base"><line x1="${c}" y1="${c-r-13}" x2="${c}" y2="${c-r+13}"/></g><g class="cap"><circle cx="${c}" cy="${c-r}" r="7"/></g></svg><div class="dv-ring-c"><b id="dvRV">0%</b><span>Target attainment</span><em id="dvRB"></em></div>`;
+  host._C=C2; }
+function dvRingSet(v, base, baseLabel){ const host=document.getElementById('dvRing'); dvRingBuild(host); const C2=host._C, f=Math.max(0,Math.min(1,v||0)); const arc=host.querySelector('.arc'), cap=host.querySelector('.cap'), bs=host.querySelector('.base');
+  const go=()=>{ arc.style.strokeDashoffset=(C2*(1-f)).toFixed(2); cap.style.transform=`rotate(${(360*f).toFixed(2)}deg)`; const on=f>0.001; arc.style.opacity=on?'1':'0'; cap.style.opacity=on?'1':'0'; };
+  if(!host._init){ host._init=true; if(MOTION_OK()){ host.classList.add('intro'); setTimeout(()=>host.classList.remove('intro'),2400); requestAnimationFrame(()=>requestAnimationFrame(go)); } else go(); } else go();
+  if(base!=null){ bs.style.transform=`rotate(${(360*Math.max(0,Math.min(1,base))).toFixed(2)}deg)`; bs.style.opacity='1'; } else bs.style.opacity='0';
+  morphNum(document.getElementById('dvRV'), (v||0)*100, x=>x.toFixed(1)+'%', 1150); document.getElementById('dvRB').textContent=baseLabel||'';
+  host.querySelector('title').textContent=`Target attainment ${((v||0)*100).toFixed(1)}%${base!=null?`; ${baseLabel}`:''}`; }
+
+function renderHero(){ const {cur,prev,dy,i1,len,target}=C; const hero=document.getElementById('hero'); if(!hero.dataset.ready){ hero.dataset.ready='1'; if(MOTION_OK()){ hero.classList.add('intro'); setTimeout(()=>hero.classList.remove('intro'),2800); } }
+  dvSetView(); const pt=target*len, ratio=pt?cur.u/pt:0, hasPrior=C.p1>=0, pratio=pt&&hasPrior?prev.u/pt:null; const dx=cur.xm-prev.xm, dg=cur.gsr-prev.gsr; const PT=prodTotals(C.perRows); const fm=String(C.fiscal||'').split(' ')[0];
+  // eyebrow: scope · period · dates
+  const per = state.preset==='mtd' ? `Fiscal month to date · ${C.fiscal} (${fds(C.fs)} – ${fds(C.fe)})` : state.preset==='today' ? `Latest business day · ${fd(state.from)}` : state.preset==='all' ? `Whole tracker · ${fds(state.from)} – ${fds(state.to)}` : ['7','14','30'].includes(state.preset) ? `Last ${state.preset} days · ${fds(state.from)} – ${fds(state.to)}` : len===1 ? `Focused day · ${fd(state.from)}` : `Custom range · ${fds(state.from)} – ${fds(state.to)}`;
+  document.getElementById('dvScope').textContent=[...dvScope(), per].join(' · ');
+  // headline: the result in one sentence
+  const when = len===1 ? `on ${fd(state.from)}` : state.preset==='mtd' ? `in fiscal ${fm} so far` : `in ${len} business days`;
+  document.getElementById('dvHead').innerHTML=`<span class="ln"><em class="x"><b id="dvHX"></b> XM line${cur.xm===1?'':'s'}</em> and <em class="g"><b id="dvHG"></b> GSR</em></span><span class="ln">sold ${when}</span>`;
+  morphNum(document.getElementById('dvHX'), cur.xm, n0, 1100); morphNum(document.getElementById('dvHG'), cur.gsr, n0, 1100);
+  const types=[['Speed Upgrade',PT.speed],['X-PRO',PT.xpro],['Adding LOB',PT.lob],['Mobile Plus',PT.mplus],['XMC',PT.xmcG]].sort((a,b)=>b[1]-a[1]); const top=types[0]; const es=cur.xm?PT.esimL/cur.xm:null;
+  const bits=[]; if(pt) bits.push(`<b>${pct0(ratio)}</b> of the ${n0(pt)} target`); if(cur.gsr&&top[1]) bits.push(`top GSR type <b>${esc(top[0])}</b> (${pct0(top[1]/cur.gsr)} of GSR)`); if(es!=null) bits.push(`e‑SIM on ${pct0(es)} of XM lines`); bits.push(`${n0(cur.active)} of ${n0(C.hcScope)} agents sold`);
+  document.getElementById('dvSub').innerHTML=bits.join(' · ');
+  // change vs the prior period
+  const de=document.getElementById('dvDelta'); const vs=len===1?'the day before':`the prior ${len} days`;
+  if(hasPrior){ const t=cur.u-prev.u, pc=prev.u?t/prev.u:null; de.className='dv-delta '+(t>0?'up':t<0?'down':''); de.innerHTML=`<span class="ar">${dvArrow(t)}</span><span>XM ${sgn(dx)} · GSR ${sgn(dg)} vs ${vs}</span><span class="dim">(${n0(prev.xm)} XM · ${n0(prev.gsr)} GSR before${pc!=null?`, ${sgn(pc*100,x=>x.toFixed(0)+'%')} combined`:''})</span>`; }
+  else { de.className='dv-delta'; de.innerHTML='<span class="dim">No earlier period in the tracker to compare with</span>'; }
+  // ring
+  dvRingSet(pt?ratio:0, pratio, pratio!=null?`prior ${pct(pratio)}`:(pt?'no prior period':'no target'));
+  document.getElementById('dvCap').innerHTML = pt ? `${pratio!=null?`<span><i class="tk"></i>Yellow tick = ${len===1?'the day before':`prior ${len} days`} · ${pct(pratio)}</span>`:''}<span>Target = ${state.perAgent} per agent × ${n0(C.hcTarget)} agents × ${len} day${len>1?'s':''}</span>` : '<span>No agents in scope, so no target</span>';
+  // glass KPI cards
+  const s0=Math.max(0,i1-13), s14=a=>a.slice(s0,i1+1); const perHead=len&&C.hcTarget?cur.u/len/C.hcTarget:0, pPerHead=len&&C.hcTarget?prev.u/len/C.hcTarget:0; const part=C.hcScope?cur.active/C.hcScope:0; const xr=cur.xmcRate, pxr=prev.xmcRate, xt=state.xmcTarget;
+  const att=s14(dy.xy).map((v,k)=>{ const i=s0+k, d=dy.xy[i]+dy.xn[i]; return d?dy.xy[i]/d:null; });
+  const to=state.to, dim=C.dim, ms=DI[C.fs]!=null?DI[C.fs]:0, mtd=sum(dy.u,ms,DI[to]), elapsed=daysBetween(C.fs,to)+1, remain=Math.max(0,dim-elapsed), monthTarget=state.perAgent*C.hcTarget*dim, need=remain>0?Math.max(0,(monthTarget-mtd)/remain):0, pace=elapsed?mtd/elapsed:0, proj=mtd+pace*remain;
+  const cards=[
+    {k:'xm', l:'XM Lines', v:cur.xm, f:n0, c:'x', s:`${dvChip(dx)} vs prior${es!=null?` · ${pct0(es)} e‑SIM`:''}`, sp:s14(dy.xm), col:'#5ccfe0'},
+    {k:'gsr', l:'GSR units', v:cur.gsr, f:n0, c:'g', s:`${dvChip(dg)} vs prior${cur.gsr&&top[1]?` · ${esc(top[0])} ${pct0(top[1]/cur.gsr)}`:''}`, sp:s14(dy.gsr), col:'#f6a56b'},
+    {k:'ph', l:'Sales / agent / day', v:perHead, f:n2, c:perHead>=state.perAgent?'good':'bad', s:`target ${state.perAgent} · ${dvChip(perHead-pPerHead,n2)}`, sp:s14(dy.u).map(v=>C.hcTarget?v/C.hcTarget:0), col:'#e6f0f5'},
+    {k:'pa', l:'Participation', v:part, f:pct0, c:'', s:`${n0(cur.active)} of ${n0(C.hcScope)} agents · <em class="bad">${n0(Math.max(0,C.hcScope-cur.active))} with no sale</em>`, sp:s14(dy.act).map(a=>C.hcScope?a/C.hcScope:0), col:'#e6f0f5'},
+    {k:'xa', l:'XMC attach', v:xr==null?NaN:xr, f:xr==null?(()=>'—'):pct, c:xt==null||xr==null?'':(xr>=xt/100?'good':'bad'), s:xr==null?'no answered XM entries':`${n0(cur.xy)} of ${n0(cur.xy+cur.xn)} entries${pxr==null?'':` · ${dvChip((xr-pxr)*100,x=>x.toFixed(1)+' pts')}`}`, sp:att, col:'#e6f0f5'},
+    {k:'fi', l:`Fiscal ${fm} pace`, v:pace, f:n1, suf:'/day', c:target?(pace>=target?'good':'bad'):'', s:target?`<em class="${need>pace?'bad':'good'}">${n0(need)}/day needed</em> · ${remain} day${remain===1?'':'s'} left`:'no target in scope', meter:target?{f:Math.min(1,mtd/Math.max(1,monthTarget)), t:Math.min(1,elapsed/Math.max(1,dim)), mtd, proj, monthTarget}:null}
+  ];
+  const host=document.getElementById('dvCards'); if(host.children.length!==cards.length) host.innerHTML=cards.map((c,i)=>`<div class="dv-card" data-k="${c.k}" style="--i:${i}"><div class="dv-l"></div><div class="dv-v"><b id="dvc-${c.k}"></b><small></small></div><div class="dv-s"></div><div class="dv-sp"></div></div>`).join(''); else host.classList.add('upd');
+  cards.forEach((c,i)=>{ const el=host.children[i]; el.querySelector('.dv-l').textContent=c.l; el.querySelector('.dv-v').className='dv-v '+(c.c||''); morphNum(el.querySelector('b'), c.v, c.f, 1000); el.querySelector('small').textContent=c.suf||''; el.querySelector('.dv-s').innerHTML=c.s; const sp=el.querySelector('.dv-sp');
+    if(c.meter){ sp.innerHTML=`<div class="dv-meter"><i class="${c.c==='bad'?'bad':''}"></i><em style="left:${(100*c.meter.t).toFixed(1)}%" title="days elapsed"></em></div><div class="dv-mk"><span>MTD <b>${n0(c.meter.mtd)}</b> / ${n0(c.meter.monthTarget)}</span><span>proj. <b>${n0(c.meter.proj)}</b></span></div>`; const bar=sp.querySelector('i'); const wv=(100*c.meter.f).toFixed(1)+'%'; if(MOTION_OK()) requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.width=wv; })); else bar.style.width=wv; }
+    else sp.innerHTML=dvSpark(c.sp, c.col, sp.clientWidth); });
+  renderDayStrip(); }
+
 /* ---------------------------------------------------------------- product layer: XM lines by type, GSR by type, day-over-day replay */
 const PRODUCTS=[{k:'xm',name:'XM Lines',color:'s1'},{k:'speed',name:'Speed Upgrade',color:'s2'},{k:'xpro',name:'X-PRO',color:'s3'},{k:'lob',name:'Adding LOB (Internet/TV)',color:'s4'},{k:'mplus',name:'Mobile Plus Plan',color:'s5'},{k:'xmcG',name:'XMC (GSR)',color:'other'}];
 const cvar = c => c.startsWith('var(')?c:`var(--${c})`;
@@ -1437,18 +1580,6 @@ function renderAll(){ document.body.classList.add('refreshing'); C=extendCompute
   renderHero(); (VIEWS[state.tab]||renderExec)(); armReveals(); requestAnimationFrame(()=>document.body.classList.remove('refreshing')); }
 
 /* ---- hero */
-function renderHero(){ const {cur,prev,dy,i0,i1,len,target}=C; const d=cur.u-prev.u; const pt=target*len; const ratio=pt?cur.u/pt:0; const dx=cur.xm-prev.xm, dg=cur.gsr-prev.gsr; const PT=prodTotals(C.perRows), PP=prodTotals(C.priorRows||[]); const dcol=v=>v>0?'var(--good)':v<0?'var(--bad)':'var(--muted)';
-  chart('gauge','donutGauge',{value:cur.u, max:Math.max(pt,cur.u,1), label:`XM + GSR · of ${n0(pt)} period target`, color: pt? (ratio>=1?'good':ratio>=0.95?'warn':'bad') : 's1', format:n0, height:170});
-  document.getElementById('heroCmp').innerHTML=`<b style="color:var(--s1)">XM ${n0(cur.xm)}</b> <b style="color:${dcol(dx)}">${arrow(dx)}${sgn(dx)}</b> · <b style="color:var(--s2)">GSR ${n0(cur.gsr)}</b> <b style="color:${dcol(dg)}">${arrow(dg)}${sgn(dg)}</b> <span style="color:var(--muted)">vs prior ${len} days</span>`;
-  document.getElementById('heroTarget').innerHTML=pt?`${targetStatus(cur.u,pt)} <span>${pct0(ratio)} of target · ${state.perAgent} per agent × ${n0(C.hcTarget)} ${state.targetProd?'Production ':''}agents × ${len} day${len>1?'s':''}</span>`:'<span class="target-status na">no agents in scope</span>';
-  const perHead=len&&C.hcTarget?cur.u/len/C.hcTarget:0, pPerHead=len&&C.hcTarget?prev.u/len/C.hcTarget:0; const xr=cur.xmcRate, pxr=prev.xmcRate; const xt=state.xmcTarget;
-  const gTop=[['Speed',PT.speed],['X-PRO',PT.xpro],['LOB',PT.lob],['Mobile+',PT.mplus],['XMC',PT.xmcG]].sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} ${n0(v)}`).join(' · ');
-  const mets=[['XM Lines',`<span style="color:var(--s1)" id="hmx" data-count="${cur.xm}">${n0(cur.xm)}</span>`,`${n0(PT.esimL)} e-SIM · ${n0(PT.physL)} physical · ${sgn(dx)} vs prior`,''],['GSR units',`<span style="color:var(--s2)" id="hmg" data-count="${cur.gsr}">${n0(cur.gsr)}</span>`,`${gTop} · ${sgn(dg)} vs prior`,''],['Active sellers',`<span id="hma" data-count="${cur.active}">${n0(cur.active)}</span><small style="font-size:14px;color:var(--muted);font-weight:500"> / ${n0(C.hcScope)}</small>`,`${pct0(C.hcScope?cur.active/C.hcScope:0)} participation · ${sgn(cur.active-prev.active)} vs prior`,''],['XMC attach %',xr==null?pct(xr):`<span id="hmr" data-count="${xr}" data-fmt="pct">${pct(xr)}</span>`,xr==null?'no answered entries':`${xt==null?'':(xr>=xt/100?'✓ at target · ':'↓ below '+xt+'% · ')}${pxr==null?'':sgn((xr-pxr)*100,v=>v.toFixed(1)+' pts')} vs prior`,xt==null?'':(xr>=xt/100?'good':'bad')]];
-  document.getElementById('heroMetrics').innerHTML=mets.map(([l,v,s,k])=>`<div class="hero-metric"><div class="hero-metric-label">${l}</div><div class="hero-metric-value" style="${k==='good'?'color:var(--good)':k==='bad'?'color:var(--bad)':''}">${v}</div><div class="hero-metric-sub">${s}</div></div>`).join(''); document.querySelectorAll('#heroMetrics [data-count]').forEach(el=>morphNum(el, +el.dataset.count, el.dataset.fmt==='pct'?pct:n0, 700));
-  renderDayStrip();
-  const to=state.to; const dim=C.dim; const mStart=C.fs; const ms=DI[mStart]!=null?DI[mStart]:0; const mtd=sum(dy.u,ms,i1); const elapsed=daysBetween(C.fs,to)+1; const remain=dim-elapsed; const monthTarget=state.perAgent*C.hcTarget*dim; const need=remain>0?Math.max(0,(monthTarget-mtd)/remain):0; const pace=elapsed?mtd/elapsed:0; const fm=C.fiscal.split(' ')[0];
-  document.getElementById('pacing').innerHTML = target? `<div class="pt">Pacing to target<span>Fiscal ${fm} · ${fds(C.fs)} – ${fds(C.fe)} · ${remain} of ${dim} days left</span></div><div class="big"><span id="paceNeed">${n1(need)}</span><small>sales (XM + GSR) per day needed for the rest of fiscal ${fm} to finish at ${n0(monthTarget)}</small></div><div class="track"><span class="${pace>=target?'good':pace>=target*.95?'':'bad'}" style="width:${Math.min(100,100*mtd/Math.max(1,monthTarget)).toFixed(1)}%"></span><em style="left:${Math.min(100,100*elapsed/dim).toFixed(1)}%"></em></div><div class="keys"><span>MTD <b>${n0(mtd)}</b></span><span>pace <b>${n1(pace)}/day</b></span><span>target <b>${n0(target)}/day</b></span><span>projected at MTD pace <b>${n0(mtd+pace*remain)}</b></span></div>` : `<div class="pt">Pacing to target</div><div class="panel-meta" style="margin-top:8px">No agents in the current scope.</div>`; }
-
 /* ---- attention (rule list) */
 function attention(){ const {leaders,agents,cur,dy,i0,i1,target,nrCur}=C; const L=[]; const last=dy.u[i1], prevD=i1>0?dy.u[i1-1]:0;
   if (target && last<target*0.8 && last>0) L.push({c:'red',t:`<b>${fd(DATES[i1])}</b> closed at ${ns(last)}, ${pct0(1-last/target)} below the ${n0(target)} daily target for this scope`});
@@ -1657,7 +1788,7 @@ function buildPickers(){
 /* ---------------------------------------------------------------- wiring */
 function setPreset(p){ state.preset=p; const max=META.maxDate; if(p==='all') state.from=META.minDate; else if(p==='mtd') state.from=fiscalStart(max); else if(p==='today') state.from=max; else state.from=addDays(max,-(+p-1)); state.to=max; if(DI[state.from]==null) state.from=META.minDate; syncInputs(); renderAll(); }
 function syncInputs(){ const f=document.getElementById('from'), t2=document.getElementById('to'); if(f) f.value=state.from; if(t2) t2.value=state.to; document.querySelectorAll('#presets button').forEach(c=>c.classList.toggle('active',c.dataset.p===state.preset)); const dp=PICKERS['pk-date']; if(dp){ dp.customLabel=true; dp.setValue(state.preset); const len=DI[state.to]-DI[state.from]+1; dp.setLabel(`${fds(state.from)} – ${fds(state.to)} · ${len} day${len>1?'s':''}`); } }
-function showTab(k){ state.tab=k; document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.t===k)); document.querySelectorAll('.view').forEach(x=>{ const on=x.id==='v-'+k; x.classList.toggle('active',on); if(on){ x.classList.remove('active'); void x.offsetWidth; x.classList.add('active'); } }); if(C) (VIEWS[k]||renderExec)(); else renderAll(); window.scrollTo({top:Math.max(0,document.querySelector('.control-panel').offsetTop-70),behavior:'smooth'}); }
+function showTab(k){ state.tab=k; document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.t===k)); document.querySelectorAll('.view').forEach(x=>{ const on=x.id==='v-'+k; x.classList.toggle('active',on); if(on){ x.classList.remove('active'); void x.offsetWidth; x.classList.add('active'); } }); dvSetView(); if(C) (VIEWS[k]||renderExec)(); else renderAll(); window.scrollTo({top:Math.max(0,document.querySelector('.control-panel').offsetTop-70),behavior:'smooth'}); }
 function rebuildForData(){ const today=new Date().toISOString().slice(0,10); const age=Math.round((new Date(today+'T00:00:00Z')-new Date(META.maxDate+'T00:00:00Z'))/86400000);
   document.getElementById('snapshotBadge').textContent=`Data through ${fdl(META.maxDate)}`; const fp=document.getElementById('freshPill'); fp.className='status-pill'+(age<=1?' ok':''); document.getElementById('freshText').textContent= age<=1? 'Up to date' : `Data is ${age} days old · load today's export`;
   document.getElementById('fileLine').textContent=`${META.uploaded?META.uploaded.name:'built-in tracker ('+META.built+')'} · ${n0(rows.length)} entries · ${roster.length} roster rows`; const unm=rows.filter(r=>!r.inr).length; document.getElementById('naLine').innerHTML=`<b>${n0(unm)}</b> entries not matched to the roster · <b>${n0(rows.filter(r=>r.dup).length)}</b> duplicates`;

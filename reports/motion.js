@@ -25,7 +25,7 @@ function renderDayStrip(){ const {dy}=C; const iMax=DI[META.maxDate]; const k0=M
     b.querySelector('.x').style.height=(H*x/mx).toFixed(1)+'px'; b.querySelector('.g').style.height=(H*g/mx).toFixed(1)+'px'; b.querySelector('.mcol').classList.toggle('nog', g===0);
     morphNum(b.querySelector('.nx'), x, n0, 500); morphNum(b.querySelector('.ng'), g, n0, 500); const ve=b.querySelector('.v'); ve.textContent=p==null?'':(dir>0?'▲':dir<0?'▼':'→')+n0(Math.abs(dir)); ve.className='v '+(dir>0?'up':dir<0?'down':'');
     b.className=`day ${i===iMax?'latest':''} ${single===DATES[i]?'sel':''}`; b.title=`${fd(DATES[i])}: XM ${x} · GSR ${g}${p==null?'':` · ${dir>=0?'+':''}${dir} vs the day before`} · click to focus the dashboard on this day`; });
-  document.getElementById('stripRange').textContent=`${fds(DATES[k0])} – ${fdl(DATES[iMax])} · click a day to focus`; }
+  document.getElementById('stripRange').textContent=`${fds(DATES[k0])} – ${fdl(DATES[iMax])} · click a day to focus`; if(host.scrollWidth>host.clientWidth+4) requestAnimationFrame(()=>{ host.scrollLeft=host.scrollWidth; }); }
 
 /* ---- standings race + products on the day, one shared clock that plays through the period when it scrolls into view */
 const MOTION={};
