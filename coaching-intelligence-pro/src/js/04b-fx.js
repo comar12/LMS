@@ -284,9 +284,11 @@ function enhanceSelect(sel) {
   if (hadFocus) btn.focus({ preventScroll: true });
 }
 
+/** Every picker in a new piece of the page gets the app's own look: dropdowns, dates, numbers, and colors. */
 function enhanceSelects(root) {
   if (root.matches && root.matches('select.select')) enhanceSelect(root);
   if (root.querySelectorAll) root.querySelectorAll('select.select').forEach(enhanceSelect);
+  enhancePickers(root);
 }
 
 function initFx() {

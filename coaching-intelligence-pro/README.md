@@ -140,3 +140,16 @@ python3 tools/build.py --links my-links.json --team-size 16 --out My_Copy.html
                                            # same, and Team Pulse starts with codes Agent 01 to Agent 16
 NODE_PATH=$(npm root -g) node tests/e2e.cjs   # run the browser tests against the built file
 ```
+
+### Pickers and controls
+
+Use the standard elements and the app styles them for you; never build a one-off picker:
+
+- `<select class="select">` becomes the app dropdown (animated list, search for long lists, keyboard support)
+- `<input type="date">` becomes the app calendar (min and max are respected; Today and Yesterday shortcuts)
+- `<input type="number">` gets minus and plus buttons that respect min, max, and step
+- `<input type="color">` becomes the color picker (color square, hue, presets, hex, eyedropper)
+- checkboxes are styled globally
+
+The native element stays in the page with its value, events, and `<label for>`, so code reads it as usual.
+A browser test fails if any page shows a native select, date, number, or color picker.

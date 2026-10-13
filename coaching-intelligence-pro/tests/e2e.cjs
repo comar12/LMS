@@ -1890,6 +1890,91 @@ async function test(name, fn) {
     fs.rmSync(dir, { recursive: true, force: true });
   });
 
+  await test('App pickers: calendar, number steppers, and color picker replace every native picker', async () => {
+    const { page, context } = await newPage({ hash: '#/today' });
+    const iso = (n) => page.evaluate((k) => { const d = new Date(); d.setDate(d.getDate() + k); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }, n);
+    const today = await iso(0);
+    const yday = await iso(-1);
+    // Calendar: opens on the chosen date, today is marked, future days are disabled, and a day can be picked.
+    const btn = page.locator('.dpick__btn[data-fk="eod-date"]');
+    assert((await btn.getAttribute('aria-haspopup')) === 'dialog', 'Date button should open a dialog');
+    await btn.click();
+    const pop = page.locator('.dpick__pop');
+    await pop.waitFor();
+    assert((await pop.locator('.dpick__day[aria-current="date"]').getAttribute('data-iso')) === today, 'Today should be marked');
+    assert(await pop.locator(`.dpick__day[data-iso="${today}"]`).evaluate((b) => b.classList.contains('is-sel') && document.activeElement === b), 'Selected day should have focus');
+    const tomorrow = await iso(1);
+    if (await pop.locator(`.dpick__day[data-iso="${tomorrow}"]`).count()) assert(await pop.locator(`.dpick__day[data-iso="${tomorrow}"]`).isDisabled(), 'Days after the latest allowed date are disabled');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('Enter');
+    await pop.waitFor({ state: 'detached' });
+    assert((await page.inputValue('#eod-date')) === yday && (await page.locator('[data-fk="eod-today"]').count()) === 1, 'Keyboard choice did not change the date');
+    // Quick buttons, month arrows, and Escape.
+    await btn.click();
+    await page.locator('.dpick__pop').getByRole('button', { name: 'Previous month' }).click();
+    assert((await page.locator('.dpick__title').innerText()) !== '', 'Month title missing');
+    await page.locator('.dpick__pop').getByRole('button', { name: 'Today' }).click();
+    assert((await page.inputValue('#eod-date')) === today, 'Today button did not work');
+    await btn.click();
+    await page.keyboard.press('Escape');
+    await page.locator('.dpick__pop').waitFor({ state: 'detached' });
+    assert(await page.evaluate(() => document.activeElement && document.activeElement.classList.contains('dpick__btn')), 'Escape should return focus to the date button');
+    // Number stepper in a dialog: plus and minus respect the limits.
+    await page.getByRole('button', { name: 'Add item' }).click();
+    await page.locator('#rt-kind + .pick__btn').click();
+    await page.locator('.pick__pop [role="option"]', { hasText: 'Count' }).click();
+    const target = page.locator('#rt-target');
+    await page.getByRole('button', { name: 'Increase Target' }).click();
+    await page.getByRole('button', { name: 'Increase Target' }).click();
+    assert((await target.inputValue()) === '3', 'Plus did not step up');
+    await page.getByRole('button', { name: 'Decrease Target' }).click();
+    await page.getByRole('button', { name: 'Decrease Target' }).click();
+    assert((await target.inputValue()) === '1' && (await page.getByRole('button', { name: 'Decrease Target' }).isDisabled()), 'Minus should stop at the minimum');
+    assert(await page.evaluate(() => document.activeElement && document.activeElement.id === 'rt-target'), 'Focus should stay in the field at the limit');
+    await page.keyboard.press('Escape');
+    await page.locator('.modal').waitFor({ state: 'detached' });
+    // Color picker: a preset swatch and the hex box set the brand color.
+    await page.goto(URL + '#/settings');
+    const cbtn = page.locator('.cpick__btn').first();
+    await cbtn.scrollIntoViewIfNeeded();
+    await cbtn.click();
+    await page.locator('.cpick__pop').getByRole('button', { name: 'Use #1D4ED8' }).click();
+    assert((await page.locator('.cpick__native').first().inputValue()) === '#1d4ed8', 'Swatch did not set the color');
+    await page.locator('.cpick__hexin').fill('#C8102E');
+    await page.locator('.cpick__pop').getByRole('button', { name: 'Done' }).click();
+    await page.waitForTimeout(400);
+    const brand = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.prefs')).brand);
+    assert(brand && brand.primary === '#c8102e', 'Brand color was not saved: ' + JSON.stringify(brand));
+    await finish(page, context);
+  });
+
+  await test('Every page uses the app pickers: no native select, date, number, or color pickers are left', async () => {
+    const { page, context } = await newPage({ hash: '#/home' });
+    await page.evaluate(() => {
+      localStorage.setItem('cip.v1.team', JSON.stringify({ members: [{ id: 'mem-1', code: 'Agent 01', hrid: '900111' }], touches: [] }));
+      localStorage.setItem('tsxDashData', JSON.stringify({ meta: {}, rows: [[new Date().toISOString().slice(0, 10), '900111', 'TL', 'OM', 1, 0, 'N', 'N', '', '', 0, 1, 0, [], 'a', -1, '']], roster: [], tls: [], oms: [] }));
+    });
+    const views = ['#/home', '#/all', '#/call-review', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/practice', '#/listen', '#/links', '#/templates', '#/settings', '#/sales-toolkit', '#/people-toolkit'];
+    const bare = () => page.evaluate(() => [
+      ...[...document.querySelectorAll('select')].filter((x) => !x.classList.contains('pick__native')).map((x) => 'select#' + x.id),
+      ...[...document.querySelectorAll('input[type="date"]')].filter((x) => !x.classList.contains('dpick__native')).map((x) => 'date#' + x.id),
+      ...[...document.querySelectorAll('input[type="number"]')].filter((x) => !x.classList.contains('nstep__input') && !x.closest('.stepper')).map((x) => 'number#' + x.id),
+      ...[...document.querySelectorAll('input[type="color"]')].filter((x) => !x.classList.contains('cpick__native')).map((x) => 'color#' + x.id),
+    ]);
+    for (const v of views) {
+      await page.goto(URL + v);
+      await page.waitForTimeout(250);
+      const left = await bare();
+      assert(!left.length, `${v} has native pickers: ${left.join(', ')}`);
+    }
+    // Pickers inside dialogs too.
+    await page.goto(URL + '#/today');
+    await page.getByRole('button', { name: 'Add item' }).click();
+    await page.waitForTimeout(200);
+    assert(!(await bare()).length, 'Routine dialog has native pickers: ' + (await bare()).join(', '));
+    await finish(page, context);
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
     const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/practice', '#/listen', '#/links', '#/templates', '#/settings'];
