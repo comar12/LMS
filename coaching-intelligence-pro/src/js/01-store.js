@@ -358,27 +358,45 @@ function sanitizeCalib(o) {
   return { type, a: clean(src.a), b: clean(src.b) };
 }
 
-/** End-of-day summary for the manager: today's values (reset each day), lines switched off, extra lines, and tomorrow's plan. */
-const EOD_TEXT_FIELDS = 30;
+/**
+ * End-of-day summary for the manager. Each date keeps its own values (the last 45 days);
+ * the setup (lines switched off and extra line names) is shared by every day.
+ */
+const EOD_KEEP_DAYS = 45;
 function defaultEod() {
-  return { day: todayDay(), v: {}, off: {}, custom: [], tomorrow: '' };
+  return { day: todayDay(), off: {}, lines: [], days: {} };
+}
+function sanitizeEodDay(d, lineIds) {
+  const src = d && typeof d === 'object' ? d : {};
+  const out = { v: {}, cv: {}, tomorrow: str(src.tomorrow, 1200) };
+  const v = src.v && typeof src.v === 'object' ? src.v : {};
+  for (const [k, x] of Object.entries(v).slice(0, 60)) if (/^[a-z]+\.[a-z]+$/.test(k) && (typeof x === 'string' || typeof x === 'number') && String(x).trim()) out.v[k] = str(String(x), 120).trim();
+  const cv = src.cv && typeof src.cv === 'object' ? src.cv : {};
+  for (const [k, x] of Object.entries(cv)) if (lineIds.has(k) && typeof x === 'string' && x.trim()) out.cv[k] = str(x, 160).trim();
+  return out;
 }
 function sanitizeEod(o) {
   const src = o && typeof o === 'object' ? o : {};
   const e = defaultEod();
-  const fresh = src.day === todayDay();
-  const v = src.v && typeof src.v === 'object' ? src.v : {};
-  // Values belong to one day; the setup (lines switched off, extra line labels) carries over.
-  if (fresh) for (const [k, x] of Object.entries(v).slice(0, 60)) if (/^[a-z]+\.[a-z]+$/.test(k) && (typeof x === 'string' || typeof x === 'number')) e.v[k] = str(String(x), 120).trim();
   const off = src.off && typeof src.off === 'object' ? src.off : {};
   for (const [k, x] of Object.entries(off).slice(0, 40)) if (/^[a-z0-9-]{1,40}$/.test(k) && x === true) e.off[k] = true;
-  for (const c of Array.isArray(src.custom) ? src.custom.slice(0, 12) : []) {
+  // Earlier versions kept one day with extra lines as {id, label, value}.
+  const legacy = !src.days && Array.isArray(src.custom);
+  for (const c of (legacy ? src.custom : Array.isArray(src.lines) ? src.lines : []).slice(0, 12)) {
     if (!c || typeof c !== 'object') continue;
     const label = str(c.label, 80).trim();
-    if (!label) continue;
-    e.custom.push({ id: isId(c.id) ? c.id : uid('eod'), label, value: fresh ? str(c.value, 160).trim() : '' });
+    if (label) e.lines.push({ id: isId(c.id) ? c.id : uid('eod'), label });
   }
-  e.tomorrow = fresh ? str(src.tomorrow, 1200) : '';
+  const ids = new Set(e.lines.map((l) => l.id));
+  const days = legacy && isIsoDate(src.day) ? { [src.day]: { v: src.v, cv: Object.fromEntries((src.custom || []).filter((c) => c && isId(c.id)).map((c) => [c.id, c.value || ''])), tomorrow: src.tomorrow } } : src.days && typeof src.days === 'object' ? src.days : {};
+  const oldest = addDays(todayDay(), -EOD_KEEP_DAYS);
+  for (const [d, x] of Object.entries(days)) {
+    if (!isIsoDate(d) || d < oldest || d > todayDay()) continue;
+    const day = sanitizeEodDay(x, ids);
+    if (Object.keys(day.v).length || Object.keys(day.cv).length || day.tomorrow.trim()) e.days[d] = day;
+  }
+  // The summary opens on today; another date is chosen with the date picker.
+  e.day = todayDay();
   return e;
 }
 

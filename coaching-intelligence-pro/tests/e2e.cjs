@@ -1804,23 +1804,50 @@ async function test(name, fn) {
     await page.reload();
     await page.waitForSelector('#eod');
     assert((await page.inputValue('#eod-alerts-closed')) === '5' && !(await page.locator('[data-fk="eod-inc-ztps"]').isChecked()), 'Summary was not kept');
-    // Fill from app: coaching plans started today and the AICR routine count.
+    // Clearing: one line with its x, live tick updates, and the whole day with Clear.
+    assert(await page.locator('.eod-row[data-id="alerts"]').evaluate((el) => el.classList.contains('is-filled')), 'Filled line should show a tick');
+    await page.fill('#eod-detractors-left', '');
+    await page.fill('#eod-detractors-pct', '');
+    assert(!(await page.locator('.eod-row[data-id="detractors"]').evaluate((el) => el.classList.contains('is-filled'))), 'Tick should go away as soon as a line is emptied');
+    await page.getByRole('button', { name: 'Clear Closed Alerts' }).click();
+    assert((await page.inputValue('#eod-alerts-closed')) === '' && !(await page.locator('.eod-bubble__text').innerText()).includes('Closed Alerts'), 'Line clear did not work');
+    // Each date keeps its own summary.
+    const yday = await page.evaluate(() => { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; });
+    await page.fill('#eod-date', yday);
+    await page.locator('#eod-date').dispatchEvent('change');
+    await page.waitForSelector('[data-fk="eod-today"]');
+    assert((await page.inputValue('#eod-abs-mtd')) === '' && (await page.locator('.eod-bubble__text').innerText()).startsWith('Fill in'), 'Another date should start empty');
+    await page.fill('#eod-abs-mtd', '7');
+    const yHead = await page.evaluate((d) => { const x = new Date(d + 'T00:00:00'); return `EOD Summary | ${x.toLocaleDateString('en-US', { weekday: 'long' })} | ${String(x.getDate()).padStart(2, '0')}-${x.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}`; }, yday);
+    assert((await page.locator('.eod-bubble__text').innerText()).startsWith(yHead), 'Header should use the chosen date');
+    await page.getByRole('button', { name: 'Back to today' }).click();
+    assert((await page.inputValue('#eod-abs-mtd')) === '9' && (await page.locator('.eod-daychip').count()) === 1, "Today's values should come back, with yesterday saved");
+    // Clear the whole day.
+    await page.getByRole('button', { name: 'Clear', exact: true }).click();
+    await page.locator('.modal').getByRole('button', { name: 'Clear summary' }).click();
+    assert((await page.inputValue('#eod-abs-mtd')) === '' && (await page.locator('.eod-bubble__text').innerText()).startsWith('Fill in') && !(await page.locator('[data-fk="eod-inc-ztps"]').isChecked()), 'Clear should empty the day but keep the setup');
+    // Fill from app leaves zeros blank, then uses the tracker and the routine.
+    await page.getByRole('button', { name: 'Fill from app' }).click();
+    assert((await page.inputValue('#eod-coaching-n')) === '' && (await page.inputValue('#eod-scrub-aicr')) === '', 'Zeros should be left blank');
     await page.evaluate(() => {
-      const d = new Date().toISOString().slice(0, 10);
-      localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-1', label: 'Agent 1', start: d, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }, { id: 'plan-2', label: 'Agent 2', start: d, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }] }));
+      const d = new Date(); const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-1', label: 'Agent 1', start: k, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }, { id: 'plan-2', label: 'Agent 2', start: k, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }] }));
       const t = JSON.parse(localStorage.getItem('cip.v1.today') || '{}');
-      const key = new Date(); const k = `${key.getFullYear()}-${String(key.getMonth() + 1).padStart(2, '0')}-${String(key.getDate()).padStart(2, '0')}`;
       localStorage.setItem('cip.v1.today', JSON.stringify({ ...t, progress: { [k]: { 'rt-aicr': 4 } } }));
     });
     await page.reload();
     await page.waitForSelector('#eod');
     await page.getByRole('button', { name: 'Fill from app' }).click();
     assert((await page.inputValue('#eod-coaching-n')) === '2' && (await page.inputValue('#eod-scrub-aicr')) === '4', 'Fill from app did not use the tracker and routine');
-    // Values reset on a new day; switched-off lines and extra line names stay.
-    await page.evaluate(() => { const e = JSON.parse(localStorage.getItem('cip.v1.eod')); e.day = '2020-01-01'; localStorage.setItem('cip.v1.eod', JSON.stringify(e)); });
+    // A summary saved by the earlier version moves into the new format.
+    await page.evaluate(() => {
+      const d = new Date(); const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      localStorage.setItem('cip.v1.eod', JSON.stringify({ day: k, v: { 'gsr.today': '5' }, off: { ztps: true }, custom: [{ id: 'eod-x1', label: 'Floor walk', value: 'Done' }], tomorrow: 'Calibrate' }));
+    });
     await page.reload();
     await page.waitForSelector('#eod');
-    assert((await page.inputValue('#eod-alerts-closed')) === '' && !(await page.locator('[data-fk="eod-inc-ztps"]').isChecked()) && (await page.locator('.eod-custom__row input').first().inputValue()) === 'Floor walk', 'New day should reset values but keep the setup');
+    const t3 = await page.locator('.eod-bubble__text').innerText();
+    assert(t3.includes('GSR : 5 GSR Submitted for today') && t3.includes(B + 'Floor walk : Done') && t3.endsWith(B + 'Calibrate') && !(await page.locator('[data-fk="eod-inc-ztps"]').isChecked()), 'Old summary did not move over:\n' + t3);
     await finish(page, context);
   });
 
