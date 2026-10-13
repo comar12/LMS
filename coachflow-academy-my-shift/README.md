@@ -18,6 +18,14 @@ offline copy of the My Shift page and its team board with the Academy's
 header, footer, navigation sheet and stylesheet inlined, for review without a
 server; its practice links open the live preview in a new tab.
 
+`coachflow-academy-offline.html` is the whole Academy in one file: Home,
+Knowledge, Call Flow, Scenario Lab, the Sales Integrity Gate, My Shift and its
+team board, Sources and About, with the motion layer. It is the deployed
+`index.html` with every stylesheet, script and the icon written into the page,
+so it opens by double-click with no server and no internet, and every link
+stays inside the file. Progress, calls and goals are kept in that browser for
+that file, as on the site.
+
 ## The call log
 
 Every call records: account number, call type (Internet, TV, Mobile,
