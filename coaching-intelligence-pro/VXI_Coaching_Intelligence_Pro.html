@@ -2081,6 +2081,8 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .eod-bubble { background: #202c33; color: #e9edef; border-color: #2a3942; } :root:not([data-theme="light"]) .eod-bubble::before { border-right-color: #202c33; } }
 .eod-bubble__text { white-space: pre-wrap; font-size: 14px; line-height: 1.5; font-family: "Segoe UI", system-ui, sans-serif; }
 .eod-bubble__time { position: absolute; right: 10px; bottom: 5px; font-size: 11px; color: #667781; }
+:root[data-theme="dark"] .eod-bubble__time { color: #aebac1; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .eod-bubble__time { color: #aebac1; } }
 .eod-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* ---------- Premium dropdown ---------- */
