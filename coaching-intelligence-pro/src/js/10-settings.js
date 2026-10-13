@@ -125,7 +125,7 @@ function applyImport(pack, mode) {
   } else {
     if (pack.tracker) state.tracker = { plans: mergeById(state.tracker.plans, pack.tracker.plans) };
     if (pack.practice) state.practice.history = mergeById(state.practice.history, pack.practice.history);
-    if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items) };
+    if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items), seedStamp: state.links.seedStamp };
     pack.favorites.forEach((id) => state.favorites.add(id));
     state.custom = { opps: mergeById(state.custom.opps, pack.custom.opps), strengths: mergeById(state.custom.strengths, pack.custom.strengths) };
     state.overrides = { opps: { ...state.overrides.opps, ...pack.overrides.opps }, strengths: { ...state.overrides.strengths, ...pack.overrides.strengths } };

@@ -40,8 +40,10 @@ def load_json(rel):
 def load_seed_links(path):
     """A personal list of Quick Links: [{"name", "url", "group", "tag", "note", "pinned", "replaces"}].
 
-    "replaces" lists old addresses this link takes over: a browser that still has a link
-    at one of those addresses gets the new link instead, once, the next time it opens.
+    "replaces" lists old addresses (or old link names) this link takes over: a browser that
+    still has one of them gets this link instead the next time it opens.
+    "added" (YYYY-MM-DD) marks a link as new or changed on that date: browsers that saved their
+    links before then get it once, without bringing back links that were deleted.
     """
     if not path:
         return []
@@ -49,11 +51,13 @@ def load_seed_links(path):
         links = json.load(fh)
     if not isinstance(links, list) or not all(isinstance(l, dict) and str(l.get("name", "")).strip() for l in links):
         raise SystemExit(f"{path}: expected a list of links, each with a name")
-    keys = ("name", "url", "group", "tag", "note", "pinned", "replaces")
+    keys = ("name", "url", "group", "tag", "note", "pinned", "replaces", "added")
     out = [{k: l[k] for k in keys if k in l} for l in links]
     for l in out:
         if "replaces" in l and not (isinstance(l["replaces"], list) and all(isinstance(u, str) for u in l["replaces"])):
-            raise SystemExit(f"{path}: 'replaces' on {l['name']!r} must be a list of addresses")
+            raise SystemExit(f"{path}: 'replaces' on {l['name']!r} must be a list of addresses or names")
+        if "added" in l and not (isinstance(l["added"], str) and re.match(r"^\d{4}-\d{2}-\d{2}$", l["added"])):
+            raise SystemExit(f"{path}: 'added' on {l['name']!r} must be a date like 2026-10-14")
     return out
 
 

@@ -1851,6 +1851,45 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Personal copy: dated presets rename and add links once, without bringing back deleted ones', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cip-links2-'));
+    const linksFile = path.join(dir, 'links.json');
+    const out = path.join(dir, 'copy.html');
+    fs.writeFileSync(linksFile, JSON.stringify([
+      { name: 'Report A: Full Title', group: 'KPI', tag: 'A', url: 'https://example.com/a', replaces: ['https://example.com/a'], added: '2026-10-13' },
+      { name: 'Report B: Summary', group: 'KPI', tag: 'B', url: '', added: '2026-10-13' },
+      { name: 'Report C', group: 'KPI', url: 'https://example.com/c' },
+      { name: 'Report D', group: 'KPI', url: 'https://example.com/d' },
+    ]));
+    require('child_process').execFileSync('python3', [path.join(ROOT, 'tools/build.py'), '--links', linksFile, '--out', out], { cwd: ROOT });
+    const { page, context } = await newPage({ hash: '#/links' });
+    await page.goto('file://' + out + '#/links');
+    // This browser saved links from an older copy: Report A under a short name, Report C, and it deleted Report D.
+    await page.evaluate(() => localStorage.setItem('cip.v1.links', JSON.stringify({ items: [{ id: 'link-a', name: 'Report A', url: 'https://example.com/a', group: 'KPI', pinned: true }, { id: 'link-c', name: 'Report C', url: 'https://example.com/c', group: 'KPI' }] })));
+    await page.reload();
+    await page.waitForSelector('.lk-row, .lk-card, .page-title');
+    let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.links')));
+    assert(saved.items.map((l) => l.name).join('|') === 'Report A: Full Title|Report B: Summary|Report C', 'Links are wrong: ' + saved.items.map((l) => l.name).join('|'));
+    assert(saved.items[0].id === 'link-a' && saved.items[0].pinned && saved.items[0].tag === 'A', 'Rename should keep the link, its pin, and update its tag');
+    assert(saved.items[1].url === '' && saved.seedStamp === '2026-10-13', 'New link without an address, and the stamp');
+    assert((await page.locator('.banner').innerText()).includes('1 link has no address yet'), 'Missing address should be flagged');
+    // The supervisor renames A again and deletes B: the next open changes nothing.
+    await page.evaluate(() => { const l = JSON.parse(localStorage.getItem('cip.v1.links')); l.items[0].name = 'My name for A'; l.items.splice(1, 1); localStorage.setItem('cip.v1.links', JSON.stringify(l)); });
+    await page.reload();
+    await page.waitForSelector('.page-title');
+    saved = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.links')));
+    assert(saved.items.map((l) => l.name).join('|') === 'My name for A|Report C', 'Presets must apply only once: ' + saved.items.map((l) => l.name).join('|'));
+    // A fresh browser gets the full list and the stamp, with nothing to apply again.
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    await page.waitForSelector('.page-title');
+    saved = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.links') || 'null'));
+    const names = await page.locator('.lk-row__name').allInnerTexts();
+    assert(names.join('|') === 'Report A: Full Title|Report B: Summary|Report C|Report D', 'Fresh browser list is wrong: ' + names.join('|'));
+    await finish(page, context);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
     const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/practice', '#/listen', '#/links', '#/templates', '#/settings'];

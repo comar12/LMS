@@ -2742,8 +2742,10 @@ function defaultHuddle() {
   return { opp: null, strength: null, minutes: 10, history: [] };
 }
 /** Quick Links start from the preset built into this copy of the app (empty in the shared copy). */
+/** The newest "added" date among the preset links: links dated after a browser's stamp are new to it. */
+const seedStampOf = () => (DATA.seedLinks || []).map((l) => l.added).filter(isIsoDate).sort().pop() || '';
 function initialLinks() {
-  return sanitizeLinks({ items: DATA.seedLinks || [] });
+  return sanitizeLinks({ items: DATA.seedLinks || [], seedStamp: seedStampOf() });
 }
 function emptyEdits() {
   return { progress: null, challenges: null, plan: null, followup: null };
@@ -3134,7 +3136,7 @@ function sanitizeLinks(o) {
       pinned: l.pinned === true,
     });
   }
-  return { items };
+  return { items, seedStamp: isIsoDate(src.seedStamp) ? src.seedStamp : '' };
 }
 
 function sanitizeExample(v) {
@@ -3414,32 +3416,59 @@ function loadState() {
 }
 
 /**
- * A personal copy can retire old addresses: a saved link at a retired address becomes the new
- * link (keeping its place and pin), duplicates are removed, and My Day routines follow it.
+ * Keeps a browser's saved Quick Links in step with the personal copy, once per change:
+ * - a preset with "replaces" takes over saved links at those addresses or names (keeping their
+ *   place and pin), removes duplicates, and moves My Day routines to it
+ * - a preset dated with "added" after this browser's stamp is added if it is not there yet,
+ *   so links the supervisor deleted earlier do not come back
  */
 function applyLinkReplacements() {
   const norm = (u) => String(u || '').trim().replace(/\/+$/, '').toLowerCase();
+  const stamp = state.links.seedStamp || '';
+  let newest = stamp;
   let changed = false;
   for (const seed of Array.isArray(DATA.seedLinks) ? DATA.seedLinks : []) {
-    const old = new Set((Array.isArray(seed.replaces) ? seed.replaces : []).map(norm).filter(Boolean));
-    if (!old.size || !seed.url) continue;
+    const dated = isIsoDate(seed.added);
+    if (dated && seed.added <= stamp) continue;
+    if (dated && seed.added > newest) newest = seed.added;
+    const reps = Array.isArray(seed.replaces) ? seed.replaces : [];
+    const oldUrls = new Set(reps.filter((r) => /^[a-z]+:\/\//i.test(r)).map(norm));
+    const oldNames = new Set(reps.filter((r) => !/^[a-z]+:\/\//i.test(r)).map((r) => normalizeText(r)));
     const items = state.links.items;
-    const hits = items.filter((l) => old.has(norm(l.url)));
-    if (!hits.length) continue;
-    const retiredNames = hits.map((l) => normalizeText(l.name));
-    let keep = items.find((l) => norm(l.url) === norm(seed.url));
-    if (!keep) {
-      keep = hits[0];
-      Object.assign(keep, { name: str(seed.name, 80).trim(), url: str(seed.url, 1000).trim(), group: str(seed.group, 40).trim() || keep.group, tag: str(seed.tag, 30).trim(), note: str(seed.note, 300).trim(), pinned: keep.pinned || seed.pinned === true });
+    const hits = items.filter((l) => (l.url && oldUrls.has(norm(l.url))) || oldNames.has(normalizeText(l.name)));
+    const fields = { name: str(seed.name, 80).trim(), group: str(seed.group, 40).trim(), tag: str(seed.tag, 30).trim(), note: str(seed.note, 300).trim() };
+    if (hits.length) {
+      const retiredNames = hits.map((l) => normalizeText(l.name));
+      let keep = seed.url ? items.find((l) => l.url && norm(l.url) === norm(seed.url)) : null;
+      // A renamed link: the same address with a new name. Undated replacements only retire old addresses.
+      if (!keep || dated) {
+        keep = keep || hits[0];
+        Object.assign(keep, { ...fields, group: fields.group || keep.group, url: str(seed.url, 1000).trim() || keep.url, pinned: keep.pinned || seed.pinned === true });
+      }
+      const gone = new Set(hits.filter((l) => l !== keep).map((l) => l.id));
+      state.links.items = items.filter((l) => !gone.has(l.id));
+      state.today.routines.forEach((r) => {
+        if (!r.link) return;
+        const n = normalizeText(r.link);
+        if (gone.has(r.link) || retiredNames.some((x) => x.includes(n))) r.link = keep.id;
+      });
+      changed = true;
+    } else if (dated) {
+      const present = items.some((l) => (seed.url && l.url && norm(l.url) === norm(seed.url)) || normalizeText(l.name) === normalizeText(fields.name));
+      if (!present && fields.name) {
+        // A new link goes right after the preset it follows in the personal copy, else at the end of its group.
+        const link = sanitizeLinks({ items: [{ ...seed, id: uid('link') }] }).items[0];
+        const seeds = DATA.seedLinks;
+        const prev = seeds[seeds.indexOf(seed) - 1];
+        let at = prev ? items.findIndex((l) => (prev.url && l.url && norm(l.url) === norm(prev.url)) || normalizeText(l.name) === normalizeText(prev.name)) : -1;
+        if (at < 0) at = items.map((l) => l.group).lastIndexOf(link.group);
+        items.splice(at < 0 ? items.length : at + 1, 0, link);
+        changed = true;
+      }
     }
-    const gone = new Set(hits.filter((l) => l !== keep).map((l) => l.id));
-    state.links.items = items.filter((l) => !gone.has(l.id));
-    // Routines that opened one of the retired links now open the new one.
-    state.today.routines.forEach((r) => {
-      if (!r.link) return;
-      const n = normalizeText(r.link);
-      if (gone.has(r.link) || r.link === keep.id || retiredNames.some((x) => x.includes(n))) r.link = keep.id;
-    });
+  }
+  if (newest !== stamp) {
+    state.links.seedStamp = newest;
     changed = true;
   }
   if (changed) persist('links', 'today');
@@ -12767,7 +12796,7 @@ function applyImport(pack, mode) {
   } else {
     if (pack.tracker) state.tracker = { plans: mergeById(state.tracker.plans, pack.tracker.plans) };
     if (pack.practice) state.practice.history = mergeById(state.practice.history, pack.practice.history);
-    if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items) };
+    if (pack.links) state.links = { items: mergeById(state.links.items, pack.links.items), seedStamp: state.links.seedStamp };
     pack.favorites.forEach((id) => state.favorites.add(id));
     state.custom = { opps: mergeById(state.custom.opps, pack.custom.opps), strengths: mergeById(state.custom.strengths, pack.custom.strengths) };
     state.overrides = { opps: { ...state.overrides.opps, ...pack.overrides.opps }, strengths: { ...state.overrides.strengths, ...pack.overrides.strengths } };
