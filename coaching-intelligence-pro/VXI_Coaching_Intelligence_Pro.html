@@ -2668,8 +2668,8 @@ function defaultReview() {
 /** The daily routine. Defaults come from a supervisor's own list and can all be edited or removed. */
 function defaultRoutines() {
   return [
-    { id: 'rt-aicr', title: 'AICR scrubbing', kind: 'count', target: 4, freq: 'daily', day: 4, note: '4 calls per day', link: 'AICR Scrubbing' },
-    { id: 'rt-nps', title: 'NPS scrubbing', kind: 'check', target: 1, freq: 'daily', day: 4, note: 'Submit at least 70% of detractors', link: 'NPS Scrubbing' },
+    { id: 'rt-aicr', title: 'AICR scrubbing', kind: 'count', target: 4, freq: 'daily', day: 4, note: '4 calls per day', link: 'Scrubbing' },
+    { id: 'rt-nps', title: 'NPS scrubbing', kind: 'check', target: 1, freq: 'daily', day: 4, note: 'Submit at least 70% of detractors', link: 'Scrubbing' },
     { id: 'rt-calib', title: 'Internal calibration form', kind: 'check', target: 1, freq: 'weekly', day: 4, note: 'Every Thursday by 9:00 PM', link: 'Calibration' },
   ];
 }
@@ -3305,6 +3305,39 @@ function loadSlice(key) {
 
 function loadState() {
   STATE_KEYS.forEach(loadSlice);
+  applyLinkReplacements();
+}
+
+/**
+ * A personal copy can retire old addresses: a saved link at a retired address becomes the new
+ * link (keeping its place and pin), duplicates are removed, and My Day routines follow it.
+ */
+function applyLinkReplacements() {
+  const norm = (u) => String(u || '').trim().replace(/\/+$/, '').toLowerCase();
+  let changed = false;
+  for (const seed of Array.isArray(DATA.seedLinks) ? DATA.seedLinks : []) {
+    const old = new Set((Array.isArray(seed.replaces) ? seed.replaces : []).map(norm).filter(Boolean));
+    if (!old.size || !seed.url) continue;
+    const items = state.links.items;
+    const hits = items.filter((l) => old.has(norm(l.url)));
+    if (!hits.length) continue;
+    const retiredNames = hits.map((l) => normalizeText(l.name));
+    let keep = items.find((l) => norm(l.url) === norm(seed.url));
+    if (!keep) {
+      keep = hits[0];
+      Object.assign(keep, { name: str(seed.name, 80).trim(), url: str(seed.url, 1000).trim(), group: str(seed.group, 40).trim() || keep.group, tag: str(seed.tag, 30).trim(), note: str(seed.note, 300).trim(), pinned: keep.pinned || seed.pinned === true });
+    }
+    const gone = new Set(hits.filter((l) => l !== keep).map((l) => l.id));
+    state.links.items = items.filter((l) => !gone.has(l.id));
+    // Routines that opened one of the retired links now open the new one.
+    state.today.routines.forEach((r) => {
+      if (!r.link) return;
+      const n = normalizeText(r.link);
+      if (gone.has(r.link) || r.link === keep.id || retiredNames.some((x) => x.includes(n))) r.link = keep.id;
+    });
+    changed = true;
+  }
+  if (changed) persist('links', 'today');
 }
 
 function serialize(key) {

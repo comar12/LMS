@@ -38,15 +38,23 @@ def load_json(rel):
 
 
 def load_seed_links(path):
-    """A personal list of Quick Links: [{"name", "url", "group", "tag", "note", "pinned"}]."""
+    """A personal list of Quick Links: [{"name", "url", "group", "tag", "note", "pinned", "replaces"}].
+
+    "replaces" lists old addresses this link takes over: a browser that still has a link
+    at one of those addresses gets the new link instead, once, the next time it opens.
+    """
     if not path:
         return []
     with open(path, encoding="utf-8") as fh:
         links = json.load(fh)
     if not isinstance(links, list) or not all(isinstance(l, dict) and str(l.get("name", "")).strip() for l in links):
         raise SystemExit(f"{path}: expected a list of links, each with a name")
-    keys = ("name", "url", "group", "tag", "note", "pinned")
-    return [{k: l[k] for k in keys if k in l} for l in links]
+    keys = ("name", "url", "group", "tag", "note", "pinned", "replaces")
+    out = [{k: l[k] for k in keys if k in l} for l in links]
+    for l in out:
+        if "replaces" in l and not (isinstance(l["replaces"], list) and all(isinstance(u, str) for u in l["replaces"])):
+            raise SystemExit(f"{path}: 'replaces' on {l['name']!r} must be a list of addresses")
+    return out
 
 
 def build_data(links_path=None, team_size=0):

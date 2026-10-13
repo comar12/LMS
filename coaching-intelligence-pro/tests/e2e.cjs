@@ -1743,6 +1743,30 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('Personal copy: a new link replaces retired addresses once, and routines follow it', async () => {
+    // Build a throwaway personal copy with fictional links.
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cip-links-'));
+    const linksFile = path.join(dir, 'links.json');
+    const out = path.join(dir, 'copy.html');
+    fs.writeFileSync(linksFile, JSON.stringify([{ name: 'Scrubbing form', group: 'Daily', url: 'https://example.com/new-form', pinned: true, replaces: ['https://example.com/old-a', 'https://example.com/old-b'] }, { name: 'Dashboard', url: 'https://example.com/dash' }]));
+    require('child_process').execFileSync('python3', [path.join(ROOT, 'tools/build.py'), '--links', linksFile, '--out', out], { cwd: ROOT });
+    const { page, context } = await newPage({ hash: '#/today' });
+    await page.goto('file://' + out + '#/today');
+    await page.evaluate(() => {
+      localStorage.setItem('cip.v1.links', JSON.stringify({ items: [{ id: 'link-a', name: 'AICR Scrubbing form', url: 'https://example.com/old-a', group: 'Daily', pinned: true }, { id: 'link-b', name: 'NPS Scrubbing form', url: 'https://example.com/old-b/', group: 'Daily' }, { id: 'link-c', name: 'Dashboard', url: 'https://example.com/dash' }] }));
+      localStorage.setItem('cip.v1.today', JSON.stringify({ routines: [{ id: 'rt-aicr', title: 'AICR scrubbing', kind: 'check', link: 'AICR Scrubbing' }, { id: 'rt-nps', title: 'NPS scrubbing', kind: 'check', link: 'link-b' }, { id: 'rt-dash', title: 'Dashboard check', kind: 'check', link: 'link-c' }], progress: {} }));
+    });
+    await page.reload();
+    await page.waitForSelector('.rt-row');
+    const links = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.links')).items);
+    assert(links.length === 2 && links[0].url === 'https://example.com/new-form' && links[0].name === 'Scrubbing form' && links[0].pinned, 'Old links were not replaced: ' + JSON.stringify(links));
+    const routines = await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.today')).routines);
+    assert(routines[0].link === links[0].id && routines[1].link === links[0].id && routines[2].link === 'link-c', 'Routines did not follow the new link: ' + JSON.stringify(routines));
+    assert((await page.getByRole('link', { name: 'Open Scrubbing form (new tab)' }).count()) === 2, 'Both scrubbing routines should open the new form');
+    await finish(page, context);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
     const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/practice', '#/listen', '#/links', '#/templates', '#/settings'];
