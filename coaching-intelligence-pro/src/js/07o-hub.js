@@ -62,7 +62,7 @@ function readHubAux() {
             const hr = normHr(x.HRID);
             if (hr) agents[hr] = { calls: Number(x.calls) || 0, tr: typeof x.tr === 'number' ? x.tr : null, aht: typeof x.aht === 'number' ? x.aht : null, abs: typeof x.abs_pct === 'number' ? x.abs_pct : null };
           });
-          resolve({ agents, from: D.meta.period_start, to: D.meta.period_end, updated: (D.meta.source && D.meta.source.updatedAt) || D.meta.generated || '' });
+          resolve({ agents, from: D.meta.period_start, to: D.meta.period_end, fiscal: isIsoDate(D.meta.fiscal_start) ? D.meta.fiscal_start : D.meta.period_start, updated: (D.meta.source && D.meta.source.updatedAt) || D.meta.generated || '' });
         };
         q.onerror = () => {
           db.close();
@@ -145,6 +145,21 @@ function hubKpiValues(m) {
   if (st.tr !== null) out.Transfer = Math.round(st.tr * 1000) / 10;
   if (st.abs !== null) out.ABS = Math.round(st.abs * 1000) / 10;
   return out;
+}
+
+/** Team sales from the Sales Performance data: GSR submitted on a day, and the share of agents with any sale since a date. */
+function hubTeamSales(day, since) {
+  if (!hub.sales) return null;
+  const ids = new Set(state.team.members.map((m) => normHr(m.hrid)).filter(Boolean));
+  if (!ids.size) return null;
+  let gsrDay = 0;
+  const sold = new Set();
+  for (const r of hub.sales.rows) {
+    if (!ids.has(r.hr) || r.dup) continue;
+    if (r.d === day) gsrDay += r.gsr;
+    if (r.d >= since && r.d <= day && r.xm + r.gsr > 0) sold.add(r.hr);
+  }
+  return { gsrDay, participation: Math.round((sold.size / ids.size) * 100), agents: ids.size, sold: sold.size };
 }
 
 function hubSourceLine() {

@@ -1002,7 +1002,7 @@ async function test(name, fn) {
   });
 
   await test('Call Review: every call type reviews, feeds the Builder, and keeps its own marks', async () => {
-    const { page, context } = await newPage({ hash: '#/call-review', init: () => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('cip.v1.review', JSON.stringify({ marks: { understand: 'met' }, picks: {} })); } } });
+    const { page, context } = await newPage({ hash: '#/call-review', init: () => { if (!localStorage.getItem('test.review-seeded')) { localStorage.setItem('test.review-seeded', '1'); localStorage.setItem('cip.v1.review', JSON.stringify({ marks: { understand: 'met' }, picks: {} })); } } });
     assert((await page.getByRole('tab').count()) === 4, 'Expected four call types');
     const row = (title) => page.locator('.rv-row', { has: page.locator('.rv-row__title', { hasText: new RegExp('^' + title + '$') }) });
     // Older saved Sales reviews still load.
@@ -1101,7 +1101,7 @@ async function test(name, fn) {
     const day = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
     const { page, context } = await newPage({
       hash: '#/builder',
-      init: () => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['dis-insufficient-probing', 'own-unnecessary-transfer', 'people-late-login'], strengths: [] })); } },
+      init: () => { if (!localStorage.getItem('test.tracker-seeded')) { localStorage.setItem('test.tracker-seeded', '1'); localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['dis-insufficient-probing', 'own-unnecessary-transfer', 'people-late-login'], strengths: [] })); } },
     });
     await page.reload();
     await page.waitForSelector('.builder');
@@ -1171,7 +1171,7 @@ async function test(name, fn) {
   await test('Team Huddle Builder: suggestions from the tracker, timed agenda, copy, present mode, private topics left out', async () => {
     const { page, context } = await newPage({
       hash: '#/huddle',
-      init: () => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); const d = new Date(); d.setDate(d.getDate() - 2); const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-h1', label: 'Agent 1', start: day, duration: 14, calls: 5, followup: 7, focus: ['own-confirm-resolution', 'people-no-call-no-show'], logs: [{ id: 'log-h1', kind: 'call', date: day, results: { 'own-confirm-resolution': 'miss' } }, { id: 'log-h2', kind: 'checkin', date: day, results: { 'people-no-call-no-show': 'miss' } }] }] })); } },
+      init: () => { if (!localStorage.getItem('test.huddle-seeded')) { localStorage.setItem('test.huddle-seeded', '1'); const d = new Date(); d.setDate(d.getDate() - 2); const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-h1', label: 'Agent 1', start: day, duration: 14, calls: 5, followup: 7, focus: ['own-confirm-resolution', 'people-no-call-no-show'], logs: [{ id: 'log-h1', kind: 'call', date: day, results: { 'own-confirm-resolution': 'miss' } }, { id: 'log-h2', kind: 'checkin', date: day, results: { 'people-no-call-no-show': 'miss' } }] }] })); } },
     });
     await page.waitForSelector('.hd-sug');
     const sugs = await page.locator('.hd-sug__title').allInnerTexts();
@@ -1765,6 +1765,63 @@ async function test(name, fn) {
     assert((await page.getByRole('link', { name: 'Open Scrubbing form (new tab)' }).count()) === 2, 'Both scrubbing routines should open the new form');
     await finish(page, context);
     fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  await test('My Day: end-of-day summary in the manager\'s WhatsApp format, with fill from app, extra lines, and tomorrow', async () => {
+    const { page, context } = await newPage({ hash: '#/today' });
+    await page.waitForSelector('#eod');
+    const type = async (id, v) => { await page.fill(id, v); };
+    await page.locator('[data-fk="eod-shared-ans-Yes"]').click();
+    await type('#eod-alerts-closed', '5'); await type('#eod-alerts-total', '6'); await type('#eod-alerts-owner', 'Sara');
+    await type('#eod-detractors-pct', '90'); await type('#eod-detractors-left', '2');
+    await type('#eod-abs-mtd', '9%'); await type('#eod-abs-today', '2');
+    await type('#eod-participation-mtd', '40');
+    await type('#eod-gsr-rate', '3'); await type('#eod-gsr-today', '7');
+    await type('#eod-ztps-pct', '100');
+    await type('#eod-breaks-pct', '85'); await type('#eod-breaks-note', 'Pending HR Actions ( EXP )');
+    await type('#eod-coaching-n', '3'); await page.locator('[data-fk="eod-coaching-st-Done"]').click();
+    await type('#eod-scrub-aicr', '2'); await type('#eod-scrub-ob', '1'); await page.locator('[data-fk="eod-scrub-st-Done"]').click();
+    await page.locator('[data-fk="eod-attendance-st-Updated"]').click();
+    await page.locator('[data-fk="eod-integrity-st-Done"]').click();
+    const head = await page.evaluate(() => { const d = new Date(); return `EOD Summary | ${d.toLocaleDateString('en-US', { weekday: 'long' })} | ${String(d.getDate()).padStart(2, '0')}-${d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}`; });
+    const B = '\u30FB';
+    const expected = [head, '', 'Performance shared on WhatsApp : Yes', 'Closed Alerts : 5 closed out of 6 > Pending 1 Sara will close it', 'Detractors attainment : 90% 2 Detractors left', 'ABS Performance : 9% MTD Vs 2% Today', 'Sales Participation : 40% MTD', 'GSR : 3% Vs 7 GSR Submitted for today', 'QA ZTPS Action VS Incident : 100%', 'Action Vs Incident Breaks & Lateness : 85% - Pending HR Actions ( EXP )', '3 Coaching sessions : Done', '2 aICR & 1 Outbound : Done', 'Expected Attendance : Updated', 'Integrity Report : Done'].map((l, i) => (i < 2 ? l : B + l)).join('\n');
+    assert((await page.locator('.eod-bubble__text').innerText()) === expected, 'Preview does not match the format:\n' + (await page.locator('.eod-bubble__text').innerText()));
+    assert((await clickCopy(page, 'Copy end-of-day summary')) === expected, 'Copied summary is wrong');
+    assert(decodeURIComponent((await page.locator('[data-fk="eod-wa"]').getAttribute('href')).replace('https://wa.me/?text=', '')) === expected, 'WhatsApp link does not carry the summary');
+    // Lines can be switched off, extra lines added, and tomorrow's plan follows.
+    await page.locator('[data-fk="eod-inc-ztps"]').uncheck();
+    assert(!(await page.locator('.eod-bubble__text').innerText()).includes('ZTPS'), 'Switched-off line still shows');
+    await page.getByRole('button', { name: 'Add a line' }).click();
+    await page.locator('.modal input').fill('Floor walk');
+    await page.keyboard.press('Enter');
+    await page.locator('.eod-custom__row input').nth(1).fill('Done twice');
+    await page.fill('#eod-tomorrow', 'Close the last alert\nCalibration with QA');
+    await page.waitForTimeout(400);
+    const t2 = await page.locator('.eod-bubble__text').innerText();
+    assert(t2.includes(B + 'Floor walk : Done twice') && t2.endsWith(['', 'Tomorrow:', B + 'Close the last alert', B + 'Calibration with QA'].join('\n')), 'Extra line or tomorrow is wrong:\n' + t2);
+    // Values survive a reload today; the setup is kept.
+    await page.reload();
+    await page.waitForSelector('#eod');
+    assert((await page.inputValue('#eod-alerts-closed')) === '5' && !(await page.locator('[data-fk="eod-inc-ztps"]').isChecked()), 'Summary was not kept');
+    // Fill from app: coaching plans started today and the AICR routine count.
+    await page.evaluate(() => {
+      const d = new Date().toISOString().slice(0, 10);
+      localStorage.setItem('cip.v1.tracker', JSON.stringify({ plans: [{ id: 'plan-1', label: 'Agent 1', start: d, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }, { id: 'plan-2', label: 'Agent 2', start: d, duration: 14, calls: 5, followup: 7, focus: ['hold-dead-air'], logs: [] }] }));
+      const t = JSON.parse(localStorage.getItem('cip.v1.today') || '{}');
+      const key = new Date(); const k = `${key.getFullYear()}-${String(key.getMonth() + 1).padStart(2, '0')}-${String(key.getDate()).padStart(2, '0')}`;
+      localStorage.setItem('cip.v1.today', JSON.stringify({ ...t, progress: { [k]: { 'rt-aicr': 4 } } }));
+    });
+    await page.reload();
+    await page.waitForSelector('#eod');
+    await page.getByRole('button', { name: 'Fill from app' }).click();
+    assert((await page.inputValue('#eod-coaching-n')) === '2' && (await page.inputValue('#eod-scrub-aicr')) === '4', 'Fill from app did not use the tracker and routine');
+    // Values reset on a new day; switched-off lines and extra line names stay.
+    await page.evaluate(() => { const e = JSON.parse(localStorage.getItem('cip.v1.eod')); e.day = '2020-01-01'; localStorage.setItem('cip.v1.eod', JSON.stringify(e)); });
+    await page.reload();
+    await page.waitForSelector('#eod');
+    assert((await page.inputValue('#eod-alerts-closed')) === '' && !(await page.locator('[data-fk="eod-inc-ztps"]').isChecked()) && (await page.locator('.eod-custom__row input').first().inputValue()) === 'Floor walk', 'New day should reset values but keep the setup');
+    await finish(page, context);
   });
 
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {

@@ -304,6 +304,7 @@ async function clearAllData() {
   state.calib = { type: 'tech', a: {}, b: {} };
   state.practice = defaultPractice();
   state.listen = defaultListen();
+  state.eod = defaultEod();
   store.remove('brandcss');
   applyTheme();
   applyBrand();

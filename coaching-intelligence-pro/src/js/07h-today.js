@@ -185,7 +185,8 @@ function renderToday(main) {
         { class: 'day-hero__text' },
         h('p', { class: 'day-hero__date' }, dateText),
         h('h1', { class: 'page-title', id: 'pageTitle' }, 'My Day'),
-        h('p', { class: 'day-hero__sub' }, total ? (finished >= total ? 'Everything on your list is done. Nice work today.' : `${plural(total - finished, 'item')} left: your routine, plus the follow-ups that are due.`) : 'Add your daily routine below to start your day here.')
+        h('p', { class: 'day-hero__sub' }, total ? (finished >= total ? 'Everything on your list is done. Nice work today.' : `${plural(total - finished, 'item')} left: your routine, plus the follow-ups that are due.`) : 'Add your daily routine below to start your day here.'),
+        h('button', { type: 'button', class: 'btn btn--sm day-hero__eod', 'data-fk': 'day-eod', onclick: () => { const t = document.getElementById('eod'); if (t) { t.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' }); focusByKey('eod-fill'); } } }, icon('megaphone'), 'End-of-day summary')
       )
     ),
     h(
@@ -266,6 +267,8 @@ function renderToday(main) {
             icon('arrow-right')
           )
         )
-      : null
+      : null,
+    eodCard()
   );
+  syncEodPreview();
 }

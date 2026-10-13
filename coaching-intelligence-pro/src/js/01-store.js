@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const STORAGE_PREFIX = 'cip.v1.';
-const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle', 'today', 'observe', 'calib', 'team', 'practice', 'listen'];
+const STATE_KEYS = ['settings', 'prefs', 'favorites', 'custom', 'overrides', 'builder', 'combos', 'drafts', 'review', 'links', 'tracker', 'huddle', 'today', 'observe', 'calib', 'team', 'practice', 'listen', 'eod'];
 
 const store = (() => {
   let ok = false;
@@ -356,6 +356,30 @@ function sanitizeCalib(o) {
   const ok = new Set(REVIEW_TYPES.find((t) => t.id === type).steps.concat(REVIEW_TYPES.find((t) => t.id === type).skills).map((x) => x.id));
   const clean = (m) => Object.fromEntries(Object.entries(m && typeof m === 'object' ? m : {}).filter(([k, v]) => ok.has(k) && ['met', 'gap', 'na'].includes(v)));
   return { type, a: clean(src.a), b: clean(src.b) };
+}
+
+/** End-of-day summary for the manager: today's values (reset each day), lines switched off, extra lines, and tomorrow's plan. */
+const EOD_TEXT_FIELDS = 30;
+function defaultEod() {
+  return { day: todayDay(), v: {}, off: {}, custom: [], tomorrow: '' };
+}
+function sanitizeEod(o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const e = defaultEod();
+  const fresh = src.day === todayDay();
+  const v = src.v && typeof src.v === 'object' ? src.v : {};
+  // Values belong to one day; the setup (lines switched off, extra line labels) carries over.
+  if (fresh) for (const [k, x] of Object.entries(v).slice(0, 60)) if (/^[a-z]+\.[a-z]+$/.test(k) && (typeof x === 'string' || typeof x === 'number')) e.v[k] = str(String(x), 120).trim();
+  const off = src.off && typeof src.off === 'object' ? src.off : {};
+  for (const [k, x] of Object.entries(off).slice(0, 40)) if (/^[a-z0-9-]{1,40}$/.test(k) && x === true) e.off[k] = true;
+  for (const c of Array.isArray(src.custom) ? src.custom.slice(0, 12) : []) {
+    if (!c || typeof c !== 'object') continue;
+    const label = str(c.label, 80).trim();
+    if (!label) continue;
+    e.custom.push({ id: isId(c.id) ? c.id : uid('eod'), label, value: fresh ? str(c.value, 160).trim() : '' });
+  }
+  e.tomorrow = fresh ? str(src.tomorrow, 1200) : '';
+  return e;
 }
 
 /** Practice Lab: the role-play in progress and a history of dates, scenarios, and scored steps. No notes are kept. */
@@ -727,6 +751,7 @@ function loadSlice(key) {
     case 'calib': state.calib = sanitizeCalib(store.get('calib', null)); break;
     case 'practice': state.practice = sanitizePractice(store.get('practice', null)); break;
     case 'listen': state.listen = sanitizeListen(store.get('listen', null)); break;
+    case 'eod': state.eod = sanitizeEod(store.get('eod', null)); break;
     case 'huddle': state.huddle = sanitizeHuddle(store.get('huddle', null)); break;
     case 'tracker': state.tracker = sanitizeTracker(store.get('tracker', null)); break;
     case 'links': {
