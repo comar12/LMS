@@ -9,7 +9,7 @@ function daysBetween(a,b){ return Math.round((new Date(b+'T00:00:00Z')-new Date(
 function weekKey(d){ const dt=new Date(d+'T00:00:00Z'); const day=(dt.getUTCDay()+6)%7; dt.setUTCDate(dt.getUTCDate()-day); return dt.toISOString().slice(0,10); }
 function weeklySeries(rs, i0, i1){ // weekly buckets (Mon-start) covering [i0,i1]
   const buckets={}; for(const r of rs){ const i=DI[r.d]; if(i==null||i<i0||i>i1) continue; const k=weekKey(r.d); const b=(buckets[k] ||= {k, xm:0, speed:0, xpro:0, lob:0, mplus:0, xmc:0, otherG:0, u:0, days:new Set()}); b.u+=r.u; b.xm+=r.xm; b.days.add(r.d);
-    if(r.gsr){ const n=r.ty.length; for(const t of (n?r.ty:['Other'])){ const u=n===1?r.gsr:1; if(t==='Speed Upgrade') b.speed+=u; else if(t==='X-PRO') b.xpro+=u; else if(t.startsWith('Adding LOB')) b.lob+=u; else if(t.startsWith('Adding Mobile')) b.mplus+=u; else if(t==='XMC') b.xmc+=u; else b.otherG+=u; } } }
+    b.xmG=(b.xmG||0)+r.xm; if(r.gsr0){ const n=r.ty.length; for(const t of (n?r.ty:['Other'])){ const u=n===1?r.gsr0:1; if(t==='Speed Upgrade') b.speed+=u; else if(t==='X-PRO') b.xpro+=u; else if(t.startsWith('Adding LOB')) b.lob+=u; else if(t.startsWith('Adding Mobile')) b.mplus+=u; else if(t==='XMC') b.xmc+=u; else b.otherG+=u; } } }
   return Object.values(buckets).sort((a,b)=>a.k<b.k?-1:1).map(b=>({...b, days:b.days.size})); }
 function linreg(ys){ const n=ys.length; if(n<2) return {slope:0,intercept:ys[0]||0}; let sx=0,sy=0,sxy=0,sxx=0; ys.forEach((y,i)=>{ sx+=i; sy+=y; sxy+=i*y; sxx+=i*i; }); const slope=(n*sxy-sx*sy)/(n*sxx-sx*sx||1); return {slope, intercept:(sy-slope*sx)/n}; }
 function stdev(a){ const n=a.length; if(!n) return 0; const m=a.reduce((x,y)=>x+y,0)/n; return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/n); }

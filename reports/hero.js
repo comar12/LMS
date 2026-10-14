@@ -33,7 +33,7 @@ function renderHero(){ const {cur,prev,dy,i1,len,target}=C; const hero=document.
   const when = len===1 ? `on ${fd(state.from)}` : state.preset==='mtd' ? `in fiscal ${fm} so far` : `in ${len} business days`;
   document.getElementById('dvHead').innerHTML=`<span class="ln"><em class="x"><b id="dvHX"></b> XM line${cur.xm===1?'':'s'}</em> and <em class="g"><b id="dvHG"></b> GSR</em></span><span class="ln">sold ${when}</span>`;
   morphNum(document.getElementById('dvHX'), cur.xm, n0, 1100); morphNum(document.getElementById('dvHG'), cur.gsr, n0, 1100);
-  const types=[['Speed Upgrade',PT.speed],['X-PRO',PT.xpro],['Adding LOB',PT.lob],['Mobile Plus',PT.mplus],['XMC',PT.xmcG]].sort((a,b)=>b[1]-a[1]); const top=types[0]; const es=cur.xm?PT.esimL/cur.xm:null;
+  const types=[['XM Lines',PT.xmG],['Speed Upgrade',PT.speed],['X-PRO',PT.xpro],['Adding LOB',PT.lob],['Mobile Plus',PT.mplus],['XMC',PT.xmcG]].sort((a,b)=>b[1]-a[1]); const top=types[0]; const es=cur.xm?PT.esimL/cur.xm:null;
   const bits=[]; if(pt) bits.push(`<b>${pct0(ratio)}</b> of the ${n0(pt)} target`); if(cur.gsr&&top[1]) bits.push(`top GSR type <b>${esc(top[0])}</b> (${pct0(top[1]/cur.gsr)} of GSR)`); if(es!=null) bits.push(`e‑SIM on ${pct0(es)} of XM lines`); bits.push(`${n0(cur.active)} of ${n0(C.hcScope)} agents sold`);
   document.getElementById('dvSub').innerHTML=bits.join(' · ');
   // change vs the prior period
