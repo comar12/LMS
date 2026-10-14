@@ -275,7 +275,7 @@ let numsExtra = [];
 function numbersCard() {
   const b = state.builder;
   const opps = builderOpps();
-  const fromOpps = dedupe(opps.flatMap((o) => o.kpi || [])).filter((k) => KPI_MEASURE[k]);
+  const fromOpps = relevantKpis(opps);
   const keys = Object.keys(KPI_MEASURE).filter((k) => fromOpps.includes(k) || numsExtra.includes(k) || (b.nums[k] && (b.nums[k].cur !== null || b.nums[k].target !== null)));
   const others = Object.keys(KPI_MEASURE).filter((k) => !keys.includes(k));
   const attrition = opps.some((o) => (o.kpi || []).includes('Attrition'));
@@ -288,6 +288,12 @@ function numbersCard() {
     const cur = b.nums[k] || { cur: null, target: null, unit: KPI_MEASURE[k].unit, asOf: todayDay() };
     cur[field] = v;
     if (field === 'cur') cur.asOf = todayDay();
+    // The team target fills in by itself when the current number is typed.
+    if (field === 'cur' && v !== null && cur.target === null && kpiTarget(k) !== null) {
+      cur.target = kpiTarget(k);
+      const t = document.getElementById(`num-${k}-target`);
+      if (t && !t.value) t.value = String(cur.target);
+    }
     if (cur.cur === null && cur.target === null) delete b.nums[k];
     else b.nums[k] = cur;
     persistBuilderSoon();
@@ -298,7 +304,7 @@ function numbersCard() {
     const v = b.nums[k] || { cur: null, target: null, unit: m.unit };
     const field = (f, label) => {
       const id = `num-${k}-${f}`;
-      const input = h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', 'data-fk': id, value: v[f] === null || v[f] === undefined ? '' : String(v[f]), placeholder: f === 'cur' ? 'From dashboard' : m.dir === 'down' ? 'Lower is better' : 'Higher is better' });
+      const input = h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', 'data-fk': id, value: v[f] === null || v[f] === undefined ? '' : String(v[f]), placeholder: f === 'cur' ? 'Now' : kpiTarget(k) !== null ? `Team target ${kpiTarget(k)}` : 'Optional' });
       input.addEventListener('input', () => setVal(k, f, input.value, input));
       return h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), input);
     };
@@ -316,7 +322,7 @@ function numbersCard() {
           updateBuilderOutputs();
         },
       },
-      NUM_UNITS.map((u) => h('option', { value: u, selected: (v.unit || m.unit) === u }, u === '%' ? 'Percent (%)' : capFirst(u)))
+      NUM_UNITS.map((u) => h('option', { value: u, selected: (v.unit || m.unit) === u }, u === '%' ? '%' : capFirst(u)))
     );
     return h(
       'div',

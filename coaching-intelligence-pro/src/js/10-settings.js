@@ -358,6 +358,47 @@ function renderSettings(main) {
         planSettingsControls('settings'),
         h('p', { class: 'hint' }, icon('info'), `Plans currently read: "For the next ${durationPhrase(s.duration)} ... We will review ${numWord(s.calls)} applicable calls within ${followupPhrase(s.followup)}." The heading becomes "${planHeading()}".`),
       ]),
+      card('KPI targets', 'target', [
+        h('p', { class: 'hint', style: 'margin-top:0' }, icon('info'), 'Used as the target when you enter an agent\'s numbers in the Coaching Builder and the Follow-Up Tracker. Leave a target empty if there is none.'),
+        h(
+          'ul',
+          { class: 'kt-list' },
+          Object.keys(KPI_MEASURE).map((k) => {
+            const m = KPI_MEASURE[k];
+            const id = `kt-${k}`;
+            const t = kpiTarget(k);
+            const input = h('input', {
+              class: 'input',
+              id,
+              type: 'number',
+              min: '0',
+              max: m.unit === '%' ? '100' : '1000',
+              step: m.unit === '%' ? '0.5' : '1',
+              value: t === null ? '' : String(t),
+              'data-fk': id,
+              onchange: (e) => {
+                const raw = e.target.value.trim();
+                const v = raw === '' ? null : Number(raw);
+                if (raw !== '' && !Number.isFinite(v)) return;
+                if (k === 'Sales') {
+                  if (v !== null && v >= 0.5) state.prefs.salesTarget = v;
+                } else if (v === null) state.prefs.kpiTargets = { ...state.prefs.kpiTargets, [k]: undefined };
+                else state.prefs.kpiTargets = { ...state.prefs.kpiTargets, [k]: v };
+                if (v === null && k !== 'Sales') delete state.prefs.kpiTargets[k];
+                persist('prefs');
+                toast(`${m.name} target ${v === null ? 'cleared' : `set to ${fmtNum(v, m.unit)}`}`);
+              },
+            });
+            return h(
+              'li',
+              { class: 'kt-row' },
+              h('label', { class: 'kt-row__name', for: id }, m.name),
+              h('span', { class: `num-row__dir num-row__dir--${m.dir}` }, icon(m.dir === 'down' ? 'arrow-down' : 'arrow-up', 'icon--sm'), m.dir === 'down' ? 'Lower is better' : 'Higher is better'),
+              h('span', { class: 'kt-row__input' }, input, h('span', { class: 'kt-row__unit' }, m.unit === '%' ? '%' : m.unit === 'count' ? '' : m.unit))
+            );
+          })
+        ),
+      ]),
       card('Copy Full Coaching includes', 'copy', [
         h(
           'div',

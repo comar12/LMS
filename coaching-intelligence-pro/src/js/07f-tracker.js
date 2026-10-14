@@ -441,11 +441,11 @@ function openNumbersDialog(planId) {
   const p = findPlan(planId);
   if (!p) return;
   const liveMem = memberByCode(p.label);
-  const keys = dedupe([...(p.kpis || []).map((x) => x.k), ...planFocus(p).flatMap((o) => o.kpi || []).filter((k) => KPI_MEASURE[k]), ...(liveMem && hubKpiValues(liveMem).Sales !== undefined ? ['Sales'] : [])]);
+  const keys = dedupe([...(p.kpis || []).map((x) => x.k), ...relevantKpis(planFocus(p)), ...(liveMem && hubKpiValues(liveMem).Sales !== undefined ? ['Sales'] : [])]);
   if (!keys.length) keys.push('QA');
   const date = h('input', { class: 'input', id: 'nd-date', type: 'date', value: todayDay(), min: p.start, max: todayDay() });
   const rows = keys.map((k) => {
-    const x = (p.kpis || []).find((y) => y.k === k) || { k, base: null, target: null, unit: KPI_MEASURE[k].unit };
+    const x = (p.kpis || []).find((y) => y.k === k) || { k, base: null, target: kpiTarget(k), unit: KPI_MEASURE[k].unit };
     const inp = (id, label, value) => h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', value: value === null || value === undefined ? '' : String(value), placeholder: x.unit === '%' ? 'e.g. 12.5' : '' }));
     return {
       k,
@@ -510,7 +510,9 @@ function openNumbersDialog(planId) {
       const target = read(`nd-${r.k}-target`);
       const cur = read(`nd-${r.k}-now`);
       if (!base.ok || !target.ok || !cur.ok) bad = true;
-      if (base.v !== null || target.v !== null) kpis.push({ k: r.k, base: base.v, target: target.v, unit: r.x.unit, asOf: r.x.asOf || p.start });
+      // A pre-filled team target alone does not add a KPI; a start or latest number does.
+      const known = (p.kpis || []).some((y) => y.k === r.k);
+      if (known ? base.v !== null || target.v !== null : base.v !== null || cur.v !== null) kpis.push({ k: r.k, base: base.v, target: target.v, unit: r.x.unit, asOf: r.x.asOf || p.start });
       if (cur.v !== null) now[r.k] = cur.v;
     });
     err.hidden = !bad;

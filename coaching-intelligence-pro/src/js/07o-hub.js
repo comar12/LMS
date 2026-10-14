@@ -144,6 +144,10 @@ function hubKpiValues(m) {
   if (st.conv !== null) out.Sales = Math.round(st.conv * 1000) / 10;
   if (st.tr !== null) out.Transfer = Math.round(st.tr * 1000) / 10;
   if (st.abs !== null) out.ABS = Math.round(st.abs * 1000) / 10;
+  if (st.hasSales) {
+    out.XM = st.xm;
+    out.GSR = st.gsr;
+  }
   return out;
 }
 
@@ -192,9 +196,9 @@ function hubBuilderFill(memberId) {
   Object.entries(v).forEach(([k, val]) => {
     const cur = state.builder.nums[k] || { cur: null, target: null, unit: '%', asOf: todayDay() };
     cur.cur = val;
-    cur.unit = '%';
+    cur.unit = KPI_MEASURE[k].unit;
     cur.asOf = (hub.aux && hub.aux.to) || (hub.sales && hub.sales.through) || todayDay();
-    if (k === 'Sales' && cur.target === null) cur.target = salesTargetPct();
+    if (cur.target === null && kpiTarget(k) !== null) cur.target = kpiTarget(k);
     state.builder.nums[k] = cur;
   });
   persist('builder');

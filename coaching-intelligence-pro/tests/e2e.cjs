@@ -1975,6 +1975,40 @@ async function test(name, fn) {
     await finish(page, context);
   });
 
+  await test('KPI targets: aiCR 62%, tNPS 30, XM 4 lines, GSR 8 fill in by themselves and can be changed in Settings', async () => {
+    const { page, context } = await newPage({ hash: '#/builder' });
+    const end = await page.evaluate(() => { const d = new Date(); d.setDate(d.getDate() + 14); return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }); });
+    await page.evaluate(() => localStorage.setItem('cip.v1.builder', JSON.stringify({ opps: ['own-confirm-resolution', 'sales-missing-offer'], strengths: [] })));
+    await page.reload();
+    await page.waitForSelector('.nums-card');
+    // A resolution entry and a sales entry bring aiCR, tNPS, XM lines, and GSR.
+    for (const k of ['aiCR', 'tNPS', 'XM', 'GSR']) assert((await page.locator(`#num-${k}-cur`).count()) === 1, `${k} row missing`);
+    assert((await page.locator('#num-aiCR-target').getAttribute('placeholder')) === 'Team target 62', 'Target hint missing');
+    await page.fill('#num-aiCR-cur', '55');
+    await page.fill('#num-tNPS-cur', '22');
+    await page.fill('#num-XM-cur', '2');
+    await page.fill('#num-GSR-cur', '5');
+    await page.waitForTimeout(400);
+    assert((await page.inputValue('#num-aiCR-target')) === '62' && (await page.inputValue('#num-GSR-target')) === '8', 'Targets should fill in when the current number is typed');
+    const plan = await page.locator('#out-plan').inputValue();
+    for (const line of [`aiCR: 55% as of`, `target 62% or higher by ${end}.`, 'tNPS: 22 as of', 'target 30 or higher', 'XM lines: 2 as of', 'target 4 or higher', 'GSR: 5 as of', 'target 8 or higher']) assert(plan.includes(line), `Plan is missing "${line}":\n` + plan);
+    // A target changed in Settings is used next time.
+    await page.goto(URL + '#/settings');
+    const kt = page.locator('#kt-aiCR');
+    assert((await kt.inputValue()) === '62' && (await page.locator('#kt-XM').inputValue()) === '4', 'Settings should show the team targets');
+    await kt.fill('65');
+    await kt.press('Tab');
+    await page.waitForTimeout(200);
+    assert((await page.evaluate(() => JSON.parse(localStorage.getItem('cip.v1.prefs')).kpiTargets.aiCR)) === 65, 'Target change was not saved');
+    await page.goto(URL + '#/builder');
+    await page.fill('#num-aiCR-target', '');
+    await page.fill('#num-aiCR-cur', '');
+    await page.fill('#num-aiCR-cur', '50');
+    await page.waitForTimeout(300);
+    assert((await page.inputValue('#num-aiCR-target')) === '65', 'The new target should be used');
+    await finish(page, context);
+  });
+
   await test('No page shows stray "null" or "undefined" text, empty or full', async () => {
     const { page, context } = await newPage({ hash: '#/home' });
     const views = ['#/home', '#/all', '#/cat/people', '#/call-review', '#/people-toolkit', '#/sales-toolkit', '#/strengths', '#/favorites', '#/builder', '#/tracker', '#/huddle', '#/today', '#/session', '#/snapshot', '#/leader', '#/team', '#/practice', '#/listen', '#/links', '#/templates', '#/settings'];

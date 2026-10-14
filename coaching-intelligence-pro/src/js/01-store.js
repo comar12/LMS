@@ -94,6 +94,7 @@ function defaultPrefs() {
     brand: null,
     hideIds: false,
     salesTarget: 10,
+    kpiTargets: {},
   };
 }
 /** Call reviews are kept per call type, so a Technical review and a Sales review can be in progress together. */
@@ -203,6 +204,7 @@ function sanitizePrefs(o) {
   if (['active', 'done', 'all'].includes(src.trackerFilter)) p.trackerFilter = src.trackerFilter;
   if (typeof src.hideIds === 'boolean') p.hideIds = src.hideIds;
   if (typeof src.salesTarget === 'number' && src.salesTarget >= 0.5 && src.salesTarget <= 100) p.salesTarget = src.salesTarget;
+  if (src.kpiTargets && typeof src.kpiTargets === 'object') for (const [k, v] of Object.entries(src.kpiTargets)) if (KPI_MEASURE[k] && typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100000) p.kpiTargets[k] = v;
   if (src.brand && typeof src.brand === 'object') {
     const hex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
     const primary = hex(src.brand.primary);

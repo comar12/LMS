@@ -1978,7 +1978,8 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 .num-row__name { display: inline-flex; align-items: center; gap: 6px; font-weight: 750; font-size: 14px; color: var(--text); }
 .num-row__name .icon { color: var(--accent-text); }
 .num-row__dir { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; color: var(--text-2); background: var(--surface); border: 1px solid var(--border); }
-.num-row__grid { display: grid; grid-template-columns: 1fr 1fr 1.1fr; gap: 10px; }
+.num-row__grid { display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 10px; align-items: end; }
+.num-row__grid .field { margin: 0; }
 @media (max-width: 520px) { .num-row__grid { grid-template-columns: 1fr 1fr; } }
 .input.is-invalid { border-color: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
 .num-add { max-width: 260px; }
@@ -2095,6 +2096,14 @@ mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; pad
 :root[data-theme="dark"] .eod-bubble__time { color: #aebac1; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .eod-bubble__time { color: #aebac1; } }
 .eod-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* KPI targets (Settings) */
+.kt-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.kt-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.kt-row__name { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.kt-row__input { display: inline-flex; align-items: center; gap: 6px; }
+.kt-row__unit { min-width: 40px; font-size: 12.5px; font-weight: 700; color: var(--text-2); }
+@media (max-width: 520px) { .kt-row { grid-template-columns: 1fr auto; } .kt-row .num-row__dir { display: none; } }
 
 /* ---------- Premium dropdown ---------- */
 .pick { position: relative; display: block; width: 100%; min-width: 0; }
@@ -2799,6 +2808,7 @@ function defaultPrefs() {
     brand: null,
     hideIds: false,
     salesTarget: 10,
+    kpiTargets: {},
   };
 }
 /** Call reviews are kept per call type, so a Technical review and a Sales review can be in progress together. */
@@ -2908,6 +2918,7 @@ function sanitizePrefs(o) {
   if (['active', 'done', 'all'].includes(src.trackerFilter)) p.trackerFilter = src.trackerFilter;
   if (typeof src.hideIds === 'boolean') p.hideIds = src.hideIds;
   if (typeof src.salesTarget === 'number' && src.salesTarget >= 0.5 && src.salesTarget <= 100) p.salesTarget = src.salesTarget;
+  if (src.kpiTargets && typeof src.kpiTargets === 'object') for (const [k, v] of Object.entries(src.kpiTargets)) if (KPI_MEASURE[k] && typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100000) p.kpiTargets[k] = v;
   if (src.brand && typeof src.brand === 'object') {
     const hex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
     const primary = hex(src.brand.primary);
@@ -3864,11 +3875,28 @@ const planHeading = (settings) => `${durationTitle((settings || state.settings).
 /** How each KPI is named in coaching text, and which direction is better. Attrition is a team measure, so it has no agent number. */
 const KPI_MEASURE = {
   QA: { name: 'QA score', dir: 'up', unit: '%' },
-  aiCR: { name: 'Repeat contact rate (aiCR)', dir: 'down', unit: '%' },
+  aiCR: { name: 'aiCR', dir: 'up', unit: '%', target: 62 },
+  tNPS: { name: 'tNPS', dir: 'up', unit: 'count', target: 30 },
   Transfer: { name: 'Transfer rate', dir: 'down', unit: '%' },
   ABS: { name: 'Absenteeism (ABS)', dir: 'down', unit: '%' },
+  XM: { name: 'XM lines', dir: 'up', unit: 'count', target: 4 },
+  GSR: { name: 'GSR', dir: 'up', unit: 'count', target: 8 },
   Sales: { name: 'Sales conversion (XM and GSR per call)', dir: 'up', unit: '%' },
 };
+/** The supervisor's target for a KPI (Settings), else the site default; null when there is none. */
+function kpiTarget(k) {
+  const t = state.prefs.kpiTargets && state.prefs.kpiTargets[k];
+  if (typeof t === 'number') return t;
+  if (k === 'Sales') return state.prefs.salesTarget;
+  return KPI_MEASURE[k] && typeof KPI_MEASURE[k].target === 'number' ? KPI_MEASURE[k].target : null;
+}
+/** KPIs a coaching moves: the entries' own KPI tags, sales entries move XM and GSR, and call behaviors move tNPS. */
+function relevantKpis(opps) {
+  const out = new Set(opps.flatMap((o) => o.kpi || []).filter((k) => KPI_MEASURE[k]));
+  if (opps.some((o) => o.cat === 'sales')) ['XM', 'GSR'].forEach((k) => out.add(k));
+  if (opps.some((o) => !isPeopleOpp(o))) out.add('tNPS');
+  return Object.keys(KPI_MEASURE).filter((k) => out.has(k));
+}
 function fmtNum(n, unit) {
   if (n === null || n === undefined) return '';
   return unit === '%' ? `${n}%` : unit === 'count' ? String(n) : `${n} ${unit}`;
@@ -8524,11 +8552,11 @@ function openNumbersDialog(planId) {
   const p = findPlan(planId);
   if (!p) return;
   const liveMem = memberByCode(p.label);
-  const keys = dedupe([...(p.kpis || []).map((x) => x.k), ...planFocus(p).flatMap((o) => o.kpi || []).filter((k) => KPI_MEASURE[k]), ...(liveMem && hubKpiValues(liveMem).Sales !== undefined ? ['Sales'] : [])]);
+  const keys = dedupe([...(p.kpis || []).map((x) => x.k), ...relevantKpis(planFocus(p)), ...(liveMem && hubKpiValues(liveMem).Sales !== undefined ? ['Sales'] : [])]);
   if (!keys.length) keys.push('QA');
   const date = h('input', { class: 'input', id: 'nd-date', type: 'date', value: todayDay(), min: p.start, max: todayDay() });
   const rows = keys.map((k) => {
-    const x = (p.kpis || []).find((y) => y.k === k) || { k, base: null, target: null, unit: KPI_MEASURE[k].unit };
+    const x = (p.kpis || []).find((y) => y.k === k) || { k, base: null, target: kpiTarget(k), unit: KPI_MEASURE[k].unit };
     const inp = (id, label, value) => h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', value: value === null || value === undefined ? '' : String(value), placeholder: x.unit === '%' ? 'e.g. 12.5' : '' }));
     return {
       k,
@@ -8593,7 +8621,9 @@ function openNumbersDialog(planId) {
       const target = read(`nd-${r.k}-target`);
       const cur = read(`nd-${r.k}-now`);
       if (!base.ok || !target.ok || !cur.ok) bad = true;
-      if (base.v !== null || target.v !== null) kpis.push({ k: r.k, base: base.v, target: target.v, unit: r.x.unit, asOf: r.x.asOf || p.start });
+      // A pre-filled team target alone does not add a KPI; a start or latest number does.
+      const known = (p.kpis || []).some((y) => y.k === r.k);
+      if (known ? base.v !== null || target.v !== null : base.v !== null || cur.v !== null) kpis.push({ k: r.k, base: base.v, target: target.v, unit: r.x.unit, asOf: r.x.asOf || p.start });
       if (cur.v !== null) now[r.k] = cur.v;
     });
     err.hidden = !bad;
@@ -11500,6 +11530,10 @@ function hubKpiValues(m) {
   if (st.conv !== null) out.Sales = Math.round(st.conv * 1000) / 10;
   if (st.tr !== null) out.Transfer = Math.round(st.tr * 1000) / 10;
   if (st.abs !== null) out.ABS = Math.round(st.abs * 1000) / 10;
+  if (st.hasSales) {
+    out.XM = st.xm;
+    out.GSR = st.gsr;
+  }
   return out;
 }
 
@@ -11548,9 +11582,9 @@ function hubBuilderFill(memberId) {
   Object.entries(v).forEach(([k, val]) => {
     const cur = state.builder.nums[k] || { cur: null, target: null, unit: '%', asOf: todayDay() };
     cur.cur = val;
-    cur.unit = '%';
+    cur.unit = KPI_MEASURE[k].unit;
     cur.asOf = (hub.aux && hub.aux.to) || (hub.sales && hub.sales.through) || todayDay();
-    if (k === 'Sales' && cur.target === null) cur.target = salesTargetPct();
+    if (cur.target === null && kpiTarget(k) !== null) cur.target = kpiTarget(k);
     state.builder.nums[k] = cur;
   });
   persist('builder');
@@ -12316,7 +12350,7 @@ let numsExtra = [];
 function numbersCard() {
   const b = state.builder;
   const opps = builderOpps();
-  const fromOpps = dedupe(opps.flatMap((o) => o.kpi || [])).filter((k) => KPI_MEASURE[k]);
+  const fromOpps = relevantKpis(opps);
   const keys = Object.keys(KPI_MEASURE).filter((k) => fromOpps.includes(k) || numsExtra.includes(k) || (b.nums[k] && (b.nums[k].cur !== null || b.nums[k].target !== null)));
   const others = Object.keys(KPI_MEASURE).filter((k) => !keys.includes(k));
   const attrition = opps.some((o) => (o.kpi || []).includes('Attrition'));
@@ -12329,6 +12363,12 @@ function numbersCard() {
     const cur = b.nums[k] || { cur: null, target: null, unit: KPI_MEASURE[k].unit, asOf: todayDay() };
     cur[field] = v;
     if (field === 'cur') cur.asOf = todayDay();
+    // The team target fills in by itself when the current number is typed.
+    if (field === 'cur' && v !== null && cur.target === null && kpiTarget(k) !== null) {
+      cur.target = kpiTarget(k);
+      const t = document.getElementById(`num-${k}-target`);
+      if (t && !t.value) t.value = String(cur.target);
+    }
     if (cur.cur === null && cur.target === null) delete b.nums[k];
     else b.nums[k] = cur;
     persistBuilderSoon();
@@ -12339,7 +12379,7 @@ function numbersCard() {
     const v = b.nums[k] || { cur: null, target: null, unit: m.unit };
     const field = (f, label) => {
       const id = `num-${k}-${f}`;
-      const input = h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', 'data-fk': id, value: v[f] === null || v[f] === undefined ? '' : String(v[f]), placeholder: f === 'cur' ? 'From dashboard' : m.dir === 'down' ? 'Lower is better' : 'Higher is better' });
+      const input = h('input', { class: 'input', id, type: 'text', inputmode: 'decimal', autocomplete: 'off', 'data-fk': id, value: v[f] === null || v[f] === undefined ? '' : String(v[f]), placeholder: f === 'cur' ? 'Now' : kpiTarget(k) !== null ? `Team target ${kpiTarget(k)}` : 'Optional' });
       input.addEventListener('input', () => setVal(k, f, input.value, input));
       return h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), input);
     };
@@ -12357,7 +12397,7 @@ function numbersCard() {
           updateBuilderOutputs();
         },
       },
-      NUM_UNITS.map((u) => h('option', { value: u, selected: (v.unit || m.unit) === u }, u === '%' ? 'Percent (%)' : capFirst(u)))
+      NUM_UNITS.map((u) => h('option', { value: u, selected: (v.unit || m.unit) === u }, u === '%' ? '%' : capFirst(u)))
     );
     return h(
       'div',
@@ -13605,6 +13645,47 @@ function renderSettings(main) {
       card('Action plan defaults', 'calendar', [
         planSettingsControls('settings'),
         h('p', { class: 'hint' }, icon('info'), `Plans currently read: "For the next ${durationPhrase(s.duration)} ... We will review ${numWord(s.calls)} applicable calls within ${followupPhrase(s.followup)}." The heading becomes "${planHeading()}".`),
+      ]),
+      card('KPI targets', 'target', [
+        h('p', { class: 'hint', style: 'margin-top:0' }, icon('info'), 'Used as the target when you enter an agent\'s numbers in the Coaching Builder and the Follow-Up Tracker. Leave a target empty if there is none.'),
+        h(
+          'ul',
+          { class: 'kt-list' },
+          Object.keys(KPI_MEASURE).map((k) => {
+            const m = KPI_MEASURE[k];
+            const id = `kt-${k}`;
+            const t = kpiTarget(k);
+            const input = h('input', {
+              class: 'input',
+              id,
+              type: 'number',
+              min: '0',
+              max: m.unit === '%' ? '100' : '1000',
+              step: m.unit === '%' ? '0.5' : '1',
+              value: t === null ? '' : String(t),
+              'data-fk': id,
+              onchange: (e) => {
+                const raw = e.target.value.trim();
+                const v = raw === '' ? null : Number(raw);
+                if (raw !== '' && !Number.isFinite(v)) return;
+                if (k === 'Sales') {
+                  if (v !== null && v >= 0.5) state.prefs.salesTarget = v;
+                } else if (v === null) state.prefs.kpiTargets = { ...state.prefs.kpiTargets, [k]: undefined };
+                else state.prefs.kpiTargets = { ...state.prefs.kpiTargets, [k]: v };
+                if (v === null && k !== 'Sales') delete state.prefs.kpiTargets[k];
+                persist('prefs');
+                toast(`${m.name} target ${v === null ? 'cleared' : `set to ${fmtNum(v, m.unit)}`}`);
+              },
+            });
+            return h(
+              'li',
+              { class: 'kt-row' },
+              h('label', { class: 'kt-row__name', for: id }, m.name),
+              h('span', { class: `num-row__dir num-row__dir--${m.dir}` }, icon(m.dir === 'down' ? 'arrow-down' : 'arrow-up', 'icon--sm'), m.dir === 'down' ? 'Lower is better' : 'Higher is better'),
+              h('span', { class: 'kt-row__input' }, input, h('span', { class: 'kt-row__unit' }, m.unit === '%' ? '%' : m.unit === 'count' ? '' : m.unit))
+            );
+          })
+        ),
       ]),
       card('Copy Full Coaching includes', 'copy', [
         h(

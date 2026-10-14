@@ -17,11 +17,28 @@ const planHeading = (settings) => `${durationTitle((settings || state.settings).
 /** How each KPI is named in coaching text, and which direction is better. Attrition is a team measure, so it has no agent number. */
 const KPI_MEASURE = {
   QA: { name: 'QA score', dir: 'up', unit: '%' },
-  aiCR: { name: 'Repeat contact rate (aiCR)', dir: 'down', unit: '%' },
+  aiCR: { name: 'aiCR', dir: 'up', unit: '%', target: 62 },
+  tNPS: { name: 'tNPS', dir: 'up', unit: 'count', target: 30 },
   Transfer: { name: 'Transfer rate', dir: 'down', unit: '%' },
   ABS: { name: 'Absenteeism (ABS)', dir: 'down', unit: '%' },
+  XM: { name: 'XM lines', dir: 'up', unit: 'count', target: 4 },
+  GSR: { name: 'GSR', dir: 'up', unit: 'count', target: 8 },
   Sales: { name: 'Sales conversion (XM and GSR per call)', dir: 'up', unit: '%' },
 };
+/** The supervisor's target for a KPI (Settings), else the site default; null when there is none. */
+function kpiTarget(k) {
+  const t = state.prefs.kpiTargets && state.prefs.kpiTargets[k];
+  if (typeof t === 'number') return t;
+  if (k === 'Sales') return state.prefs.salesTarget;
+  return KPI_MEASURE[k] && typeof KPI_MEASURE[k].target === 'number' ? KPI_MEASURE[k].target : null;
+}
+/** KPIs a coaching moves: the entries' own KPI tags, sales entries move XM and GSR, and call behaviors move tNPS. */
+function relevantKpis(opps) {
+  const out = new Set(opps.flatMap((o) => o.kpi || []).filter((k) => KPI_MEASURE[k]));
+  if (opps.some((o) => o.cat === 'sales')) ['XM', 'GSR'].forEach((k) => out.add(k));
+  if (opps.some((o) => !isPeopleOpp(o))) out.add('tNPS');
+  return Object.keys(KPI_MEASURE).filter((k) => out.has(k));
+}
 function fmtNum(n, unit) {
   if (n === null || n === undefined) return '';
   return unit === '%' ? `${n}%` : unit === 'count' ? String(n) : `${n} ${unit}`;
