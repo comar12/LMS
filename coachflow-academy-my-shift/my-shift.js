@@ -59,6 +59,12 @@ function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){}
 function q(id){ return root.querySelector("#"+id); }
 function pad(n){ return (n<10?"0":"")+n; }
 function dkey(t){ var d=new Date(t); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+/* Operating hours run overnight (14:00 to 07:00 Cairo time), so a work day runs from WORKDAY_START to the same hour the next day and is named by the date it starts. A call belongs to the shift it was logged in, and the shift keeps counting until End shift, whatever the clock says. */
+var WORKDAY_START=10, LONG_SHIFT_H=13;
+function wkey(t){ return dkey(t-WORKDAY_START*3600000); }
+function shiftOf(id){ if(!id) return null; if(st.shift&&st.shift.id===id) return st.shift; for(var i=st.history.length-1;i>=0;i--) if(st.history[i].id===id) return st.history[i]; return null; }
+function callDay(c){ if(c.date) return c.date; var sh=shiftOf(c.shiftId); return wkey(sh&&c.ts>=sh.startedAt&&(!sh.endedAt||c.ts<=sh.endedAt+60000)?sh.startedAt:c.ts); }
+function curDay(){ var sh=st.shift; return wkey(sh&&!sh.endedAt?sh.startedAt:Date.now()); }
 function hm(t){ var d=new Date(t); return pad(d.getHours())+":"+pad(d.getMinutes()); }
 function dur(ms){ ms=Math.max(0,ms); var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60); return h+":"+pad(m)+":"+pad(s%60); }
 function durShort(ms){ var m=Math.round(Math.max(0,ms)/60000); return Math.floor(m/60)+"h "+pad(m%60)+"m"; }
@@ -69,7 +75,7 @@ function cap(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):s; }
 function plural(n,w,ws){ return n+" "+(n===1?w:(ws||w+"s")); }
 function ordinal(n){ var s=["th","st","nd","rd"], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
 function pct(a,b){ return b?Math.round(100*a/b)+"%":"–"; }
-function todayStr(){ return new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"}); }
+function todayStr(){ return new Date(noon(curDay())).toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"}); }
 function shortDay(t){ return new Date(t).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"}); }
 function dayName(t){ var d=new Date(t), n=new Date(), diff=Math.round((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/DAY);
   return diff===0?"today":diff===1?"yesterday":diff<7?d.toLocaleDateString(undefined,{weekday:"long"}):d.toLocaleDateString(undefined,{day:"numeric",month:"short"}); }
@@ -179,13 +185,13 @@ function build(){
   q("ms-reset").addEventListener("click",function(e){ var b=e.target.closest("[data-reset]"); if(!b) return; if(b.getAttribute("data-reset")==="start") startReset(); else { hideReset(); focusAcct(true); } });
   q("ms-lines-add").addEventListener("click",function(){ q("ms-lines-file").click(); });
   q("ms-lines-file").addEventListener("change",function(){ var f=this.files&&this.files[0], inp=this; if(f) addTeamLines(f).then(function(){ inp.value=""; }); });
-  q("ms-warm").addEventListener("click",function(e){ var b=e.target.closest("[data-warm]"); if(!b) return; var a=b.getAttribute("data-warm"), w=warmToday(), p=warmPick(); if(a==="undo"){ st.warmups=st.warmups.filter(function(x){ return x!==w; }); } else if(!w){ st.warmups.push({date:dkey(Date.now()),hrId:st.hrId||null,href:p.href,title:p.title,done:a==="done",at:Date.now()}); } save(); renderWarm(true); renderSummary(); renderWins(); var nw=newWins(); if(nw.length) say("New win: "+nw.join(", ")); });
+  q("ms-warm").addEventListener("click",function(e){ var b=e.target.closest("[data-warm]"); if(!b) return; var a=b.getAttribute("data-warm"), w=warmToday(), p=warmPick(); if(a==="undo"){ st.warmups=st.warmups.filter(function(x){ return x!==w; }); } else if(!w){ st.warmups.push({date:curDay(),hrId:st.hrId||null,href:p.href,title:p.title,done:a==="done",at:Date.now()}); } save(); renderWarm(true); renderSummary(); renderWins(); var nw=newWins(); if(nw.length) say("New win: "+nw.join(", ")); });
   q("ms-goals").addEventListener("click",function(e){ var b=e.target.closest("[data-goal]"); if(!b) return; var a=b.getAttribute("data-goal");
     if(a==="save"){ var g={}; ["gsr","xm","sales"].forEach(function(k){ var v=q("ms-g-"+k).value.replace(/\D/g,""); if(v!=="") g[k]=Math.min(k==="sales"?50:100,+v); }); st.goalsBy[st.hrId||"_"]=g; save(); goalEdit=false; }
     else goalEdit=a==="edit"; renderGoals(); if(goalEdit) q("ms-g-gsr").focus(); });
   q("ms-goals").addEventListener("keydown",function(e){ if(e.key==="Enter"&&e.target.tagName==="INPUT"){ e.preventDefault(); q("ms-goals").querySelector('[data-goal="save"]').click(); } });
   q("ms-csv").addEventListener("click",function(){ if(!st.hrId){ whoEdit=true; renderWho("Add your name and HR ID first, so your team leader knows the file is yours."); scrollToEl(q("ms-who")); q("ms-name").focus(); return; }
-    var name=(st.agent||"").replace(/[\\\/:*?"<>|]+/g,"").trim().replace(/\s+/g,"-").slice(0,40); download(csvText(),"my-shift-"+(name?name+"-":"")+st.hrId+"-"+dkey(Date.now())+".csv"); });
+    var name=(st.agent||"").replace(/[\\\/:*?"<>|]+/g,"").trim().replace(/\s+/g,"-").slice(0,40); download(csvText(),"my-shift-"+(name?name+"-":"")+st.hrId+"-"+curDay()+".csv"); });
   q("ms-clear").addEventListener("click",function(){ var cut=Date.now()-30*86400000, n=st.calls.filter(function(c){ return c.ts<cut; }).length, self=this, reset=function(t){ setTimeout(function(){ self.textContent="Clear calls older than 30 days"; },t); };
     if(!n){ self.textContent="Nothing older than 30 days"; reset(1500); return; } if(self.textContent.indexOf("Really")!==0){ self.textContent="Really clear "+n+"?"; reset(4000); return; } st.calls=st.calls.filter(function(c){ return c.ts>=cut; }); save(); self.textContent="Cleared"; reset(1500); renderList(); });
   q("ms-date").textContent=todayStr(); renderWho();
@@ -224,8 +230,8 @@ function saveWho(){ var n=q("ms-name").value.trim(), id=q("ms-hrid").value.repla
   if(old&&old!==id){ resetForm(); setMsg(""); }
   renderWho(); renderBar(); renderList(); say("Logging as "+n+", HR ID "+id+"."); }
 /* Warm-up: five minutes before the shift, the practice call for the reason that came up most on the agent's last working day. */
-function warmToday(){ var k=dkey(Date.now()), id=st.hrId||null; for(var i=st.warmups.length-1;i>=0;i--){ var w=st.warmups[i]; if(w.date===k&&(w.hrId||null)===id) return w; } return null; }
-function warmPick(){ var k=dkey(Date.now()), days={}; mine().forEach(function(c){ var d=dkey(c.ts); if(d<k) (days[d]=days[d]||[]).push(c); }); var last=Object.keys(days).sort().pop();
+function warmToday(){ var k=curDay(), id=st.hrId||null; for(var i=st.warmups.length-1;i>=0;i--){ var w=st.warmups[i]; if(w.date===k&&(w.hrId||null)===id) return w; } return null; }
+function warmPick(){ var k=curDay(), days={}; mine().forEach(function(c){ var d=callDay(c); if(d<k) (days[d]=days[d]||[]).push(c); }); var last=Object.keys(days).sort().pop();
   var p=last?nextPractice(myCounts(days[last]).coach):null; return p?{href:p.href,title:p.title,why:practiceWhy(p,"on your last shift")}:{href:EVERY_CALL[0],title:EVERY_CALL[1],why:last?"Nothing stood out on your last shift, so start with the practice for every call.":"Start with the practice for every call."}; }
 function renderWarm(changed){ var el=q("ms-warm"), w=warmToday();
   if(w){ el.setAttribute("data-state","done"); el.innerHTML='<p>'+(w.done?SEAL+'Warm-up done: <a class="ms-inline" href="'+href(w.href)+'"'+ext()+'>'+esc(w.title)+'</a>':'Warm-up skipped today.')+' <button type="button" class="sl-link-button" data-warm="undo">'+(w.done?"Undo":"Show it again")+'</button></p>'; if(changed) say(w.done?"Warm-up marked as done.":"Warm-up skipped."); return; }
@@ -258,8 +264,8 @@ function renderSaid(){ var list=q("ms-said-list"), card=q("ms-said-card"), all=c
   var hits=all.filter(function(c){ var t=(c.said+" "+c.clarify+" "+c.ask).toLowerCase(); return words.every(function(w){ return t.indexOf(w)>=0; }); }).sort(function(a,b){ return (b.family===fam)-(a.family===fam); });
   list.innerHTML=hits.length?hits.map(function(c){ return '<li><button type="button" class="ms-said-item" data-said="'+esc(c.id)+'">“'+esc(c.said)+'”</button></li>'; }).join(""):'<li class="tb-empty">Nothing matches. Try one word, such as bill, phone or contract.</li>'; renderLines(words); }
 /* My week: the agent's own last 7 days against the 7 before. */
-function renderWeek(){ var k=dkey(Date.now()), d6=addDays(k,-6), d13=addDays(k,-13), all=mine(), idx=byAccount(), cur=[], prev=[];
-  all.forEach(function(c){ var d=dkey(c.ts); if(d>=d6&&d<=k) cur.push(c); else if(d>=d13&&d<d6) prev.push(c); });
+function renderWeek(){ var k=curDay(), d6=addDays(k,-6), d13=addDays(k,-13), all=mine(), idx=byAccount(), cur=[], prev=[];
+  all.forEach(function(c){ var d=callDay(c); if(d>=d6&&d<=k) cur.push(c); else if(d>=d13&&d<d6) prev.push(c); });
   var sig=k+"|"+all.map(function(c){ return c.id+(c.edited||""); }).join(","); if(q("ms-week").getAttribute("data-key")===sig) return; q("ms-week").setAttribute("data-key",sig);
   var a=counts(cur,{rep:function(x){ return isRepeat(x,idx); }}), b=counts(prev,{rep:function(x){ return isRepeat(x,idx); }}), wk=q("ms-week"), days=q("ms-days");
   q("ms-t5").textContent=plural(cur.length,"call")+" in 7 days";
@@ -271,7 +277,7 @@ function renderWeek(){ var k=dkey(Date.now()), d6=addDays(k,-6), d13=addDays(k,-
     return '<div class="tb-tile"><p class="tb-k">'+esc(label)+'</p><p class="tb-v">'+esc(isPct?fmt(v):String(v))+'</p><p class="tb-s">'+line+'</p></div>'; };
   wk.innerHTML=t("Calls",a.n,prev.length?b.n:null,false,true)+t("GSR offered",r(a.gO,a.n),r(b.gO,b.n),true,true)+t("XM offered",r(a.xmO,a.n),r(b.xmO,b.n),true,true)+t("Sales",a.gG+a.xmG,prev.length?b.gG+b.xmG:null,false,true)+t("Resolved",r(a.res,a.n),r(b.res,b.n),true,true)+t("Repeat callers",a.rep,prev.length?b.rep:null,false,false)+t("Transferred",r(a.tr,a.n),r(b.tr,b.n),true,false);
   countUp(wk);
-  var per={}, max=1; cur.forEach(function(c){ var d=dkey(c.ts); per[d]=per[d]||{n:0,o:0}; per[d].n++; if(c.gsrOffered==="yes"||c.xmOffered==="yes") per[d].o++; });
+  var per={}, max=1; cur.forEach(function(c){ var d=callDay(c); per[d]=per[d]||{n:0,o:0}; per[d].n++; if(c.gsrOffered==="yes"||c.xmOffered==="yes") per[d].o++; });
   Object.keys(per).forEach(function(d){ if(per[d].n>max) max=per[d].n; });
   var html=""; for(var i=6;i>=0;i--){ var d=addDays(k,-i), x=per[d]||{n:0,o:0}, p=d.split("-"), dt=new Date(+p[0],+p[1]-1,+p[2]), wd=dt.toLocaleDateString(undefined,{weekday:"short"});
     html+='<div class="ms-day'+(i===0?" today":"")+'" title="'+esc(dt.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"})+": "+plural(x.n,"call")+(x.n?", an offer on "+x.o:""))+'"><b class="tabular">'+(x.n||"")+'</b><span class="ms-day-bar"><span class="ms-day-fill" data-h="'+Math.round(100*x.n/max)+'"></span></span><span class="ms-day-d">'+esc(wd)+'</span></div>'; }
@@ -291,7 +297,7 @@ function lc(t){ return t&&!/^[A-Z]{2}/.test(t)?t.charAt(0).toLowerCase()+t.slice
 function noon(d){ var p=d.split("-"); return new Date(+p[0],+p[1]-1,+p[2],12).getTime(); }
 function computeWins(list,warm){ var L=list.slice().sort(function(a,b){ return a.ts-b.ts; }), ev=[], run={offer:0,steps:0,qa:0}, start={}, sales=0, first={}, day={}, best=0, cur=null, bests={};
   var step=function(k,ok,id,lv,text,ts){ if(!ok){ run[k]=0; return; } if(!run[k]) start[k]=id; run[k]++; if(lv.indexOf(run[k])>=0) ev.push({key:k+":"+run[k]+":"+start[k],text:text(run[k]),ts:ts}); };
-  L.forEach(function(c){ var d=c.date||dkey(c.ts); if(d!==cur){ if(cur&&(day[cur]||0)>best) best=day[cur]; cur=d; }
+  L.forEach(function(c){ var d=callDay(c); if(d!==cur){ if(cur&&(day[cur]||0)>best) best=day[cur]; cur=d; }
     step("offer",c.gsrOffered==="yes"||c.xmOffered==="yes",c.id,OFFER_LV,function(n){ return "Offered on "+n+" calls in a row"; },c.ts);
     if(Array.isArray(c.close)) step("steps",c.close.length>=CLOSE.length,c.id,RUN_LV,function(n){ return "Next steps given in full on "+n+" unresolved calls in a row"; },c.ts);
     if(Array.isArray(c.qa)) step("qa",c.qa.length>=QA.length,c.id,RUN_LV,function(n){ return "QA self-check fully ticked on "+n+" sales in a row"; },c.ts);
@@ -301,7 +307,7 @@ function computeWins(list,warm){ var L=list.slice().sort(function(a,b){ return a
     [g,x].forEach(function(on){ if(!on) return; sales++; day[d]=(day[d]||0)+1; if(SALES_LV.indexOf(sales)>=0) ev.push({key:"sales:"+sales,text:sales+" sales logged",ts:c.ts});
       if(best>=2&&day[d]===best+1){ bests[d]={key:"best:"+d,text:"",ts:c.ts}; ev.push(bests[d]); } }); });
   Object.keys(bests).forEach(function(d){ bests[d].text="Personal best: "+day[d]+" sales in one day"; });
-  var days={}, wr=0, ws=null; L.forEach(function(c){ days[c.date||dkey(c.ts)]=1; }); Object.keys(warm||{}).forEach(function(d){ days[d]=1; });
+  var days={}, wr=0, ws=null; L.forEach(function(c){ days[callDay(c)]=1; }); Object.keys(warm||{}).forEach(function(d){ days[d]=1; });
   Object.keys(days).sort().forEach(function(d){ if(warm&&warm[d]){ if(!wr) ws=d; wr++; if(RUN_LV.indexOf(wr)>=0) ev.push({key:"warm:"+wr+":"+ws,text:"Warm-up done "+wr+" working days in a row",ts:noon(d)}); } else wr=0; });
   ev.sort(function(a,b){ return a.ts-b.ts; });
   return {streak:{offer:run.offer,steps:run.steps,qa:run.qa,warm:wr},events:ev}; }
@@ -313,11 +319,11 @@ function newWins(){ var id=st.hrId||"_", seen=st.winsSeen[id], ev=computeWins(mi
 function renderWins(){ var w=computeWins(mine(),myWarm()), id=st.hrId||"_", el=q("ms-streaks"), ws=q("ms-wins"), lines=streakLines(w.streak), ev=w.events.slice().reverse().slice(0,6);
   if(!st.winsSeen[id]){ st.winsSeen[id]={}; w.events.forEach(function(e){ st.winsSeen[id][e.key]=1; }); save(); }
   var sk=lines.join("|"); if(el.getAttribute("data-key")!==sk){ el.setAttribute("data-key",sk); el.innerHTML=lines.length?'<p class="ms-next-k">Going strong</p><ul class="ms-streak-list">'+lines.map(function(t){ return '<li class="ms-streak">'+STAR+'<span>'+esc(t)+'</span></li>'; }).join("")+'</ul>':""; el.hidden=!lines.length; }
-  var wk=ev.map(function(e){ return e.key+e.text; }).join("|")+dkey(Date.now()); if(ws.getAttribute("data-key")===wk) return; ws.setAttribute("data-key",wk);
+  var wk=ev.map(function(e){ return e.key+e.text; }).join("|")+curDay(); if(ws.getAttribute("data-key")===wk) return; ws.setAttribute("data-key",wk);
   ws.innerHTML='<p class="ms-rh">Wins</p>'+(ev.length?'<ul class="ms-win-list">'+ev.map(function(e){ return '<li><span class="ms-win-dot" aria-hidden="true"></span><span>'+esc(e.text)+'</span><span class="ms-win-when">'+esc(cap(dayName(e.ts)))+'</span></li>'; }).join("")+'</ul>':'<p class="tb-empty">Your wins show here: first sales, streaks and personal bests.</p>'); }
 /* Lines that worked: the agent's own, and the ones their team leader shares. */
 function saleLabel(c){ var p=[]; if(c.gsrResult==="completed") p.push("GSR"+(c.gsrWhich?" · "+c.gsrWhich:"")); if(c.xmResult==="completed") p.push("XM"); return p.join(" + "); }
-function allLines(){ var seen={}, out=[]; mine().filter(function(c){ return c.worked; }).sort(function(a,b){ return b.ts-a.ts; }).forEach(function(c){ var k=c.worked.toLowerCase(); if(seen[k]) return; seen[k]=1; out.push({t:c.worked,p:saleLabel(c),by:"You",d:dkey(c.ts)}); });
+function allLines(){ var seen={}, out=[]; mine().filter(function(c){ return c.worked; }).sort(function(a,b){ return b.ts-a.ts; }).forEach(function(c){ var k=c.worked.toLowerCase(); if(seen[k]) return; seen[k]=1; out.push({t:c.worked,p:saleLabel(c),by:"You",d:callDay(c)}); });
   st.teamLines.slice().reverse().forEach(function(l){ var k=l.t.toLowerCase(); if(seen[k]) return; seen[k]=1; out.push(l); }); return out; }
 function renderLines(words){ var el=q("ms-said-lines"), all=allLines(); el.hidden=false;
   if(!all.length){ el.innerHTML='<p class="ms-rh">Lines that worked</p><p class="tb-empty">When you log a sale, add the line that got the yes. It shows up here, with any lines your team leader shares.</p>'; return; }
@@ -357,7 +363,7 @@ function renderBar(){
     q("ms-note").textContent="Shift complete · "+hm(sh.startedAt)+" to "+hm(sh.endedAt)+" · breaks "+durShort(breakMs(sh,sh.endedAt)); q("ms-t1").textContent="complete"; btns.appendChild(mk(BTN_S,"Start a new shift",startShift)); return; }
   var e=elapsed(sh,now); q("ms-clock").textContent=dur(e); setRing(e/(PLANNED_H*3600000));
   if(onBreak(sh)){ bar.setAttribute("data-state","paused"); q("ms-note").textContent="On break since "+hm(sh.breaks[sh.breaks.length-1].start)+" · started "+hm(sh.startedAt); q("ms-t1").textContent="on break"; btns.appendChild(mk(BTN_P,"Back from break",endBreak)); }
-  else { bar.setAttribute("data-state","run"); q("ms-note").textContent="Started "+hm(sh.startedAt)+" · ends about "+hm(sh.startedAt+PLANNED_H*3600000+breakMs(sh,now)); q("ms-t1").textContent="running"; btns.appendChild(mk(BTN_S,"Break",startBreak)); }
+  else { bar.setAttribute("data-state","run"); q("ms-note").textContent=e>LONG_SHIFT_H*3600000?"Started "+dayName(sh.startedAt)+" "+hm(sh.startedAt)+" · still counting. Finished? Press End shift.":"Started "+hm(sh.startedAt)+" · ends about "+hm(sh.startedAt+PLANNED_H*3600000+breakMs(sh,now)); q("ms-t1").textContent="running"; btns.appendChild(mk(BTN_S,"Break",startBreak)); }
   btns.appendChild(mk(BTN_S,"End shift",endShift));
   var c=counts(todayCalls()), T=tick?" data-tick":""; stats.innerHTML="<span"+T+"><b>"+c.n+"</b> call"+(c.n===1?"":"s")+"</span><span"+T+">XM <b>"+c.xmO+" / "+c.xmG+"</b></span><span"+T+">GSR <b>"+c.gO+" / "+c.gG+"</b></span><span"+T+"><b>"+c.fu+"</b> follow-up"+(c.fu===1?"":"s")+"</span>"; stats.hidden=false; q("ms-sep").hidden=false;
 }
@@ -365,7 +371,7 @@ function ring(){ return root.querySelector(".ms-ring"); }
 function startShift(){ st.shift={id:"s"+Date.now(),startedAt:Date.now(),breaks:[],endedAt:null,hrId:st.hrId||null}; save(); renderBar(); renderRail(); pulse(ring()); }
 function startBreak(){ st.shift.breaks.push({start:Date.now(),end:null}); save(); renderBar(); }
 function endBreak(){ var b=st.shift.breaks[st.shift.breaks.length-1]; if(b&&!b.end) b.end=Date.now(); save(); renderBar(); pulse(ring()); }
-function endShift(){ var sh=st.shift; if(onBreak(sh)) endBreak(); sh.endedAt=Date.now(); st.history.push({id:sh.id,date:dkey(sh.startedAt),startedAt:sh.startedAt,endedAt:sh.endedAt,breakMs:breakMs(sh,sh.endedAt),summary:summaryText()}); save(); renderBar(); renderList(); pulse(ring()); }
+function endShift(){ var sh=st.shift; if(onBreak(sh)) endBreak(); sh.endedAt=Date.now(); st.history.push({id:sh.id,date:wkey(sh.startedAt),startedAt:sh.startedAt,endedAt:sh.endedAt,breakMs:breakMs(sh,sh.endedAt),summary:summaryText()}); save(); renderBar(); renderList(); pulse(ring()); }
 
 /* ---------- form ---------- */
 var FIELDS=["callType","resolved","transferWhy","satisfied","gsrOffered","gsrNotWhy","gsrResult","gsrWhich","gsrWhy","xmOffered","xmNotWhy","xmResult","xmWhy"];
@@ -399,7 +405,7 @@ function validate(){ var a=q("ms-acct").value.replace(/\D/g,""), miss=[];
 function saveCall(){ var miss=validate(); if(miss.length){ setMsg("Still needed: "+miss.join(", ")+"."); return; } if(!editId) endHold(true);
   var rec={account:q("ms-acct").value.replace(/\D/g,""),note:q("ms-notein").value.trim()}, when; FIELDS.forEach(function(f){ rec[f]=form[f]||null; }); rec.close=form.close?form.close.slice():null; rec.qa=form.qa?form.qa.slice():null; rec.worked=form.qa?q("ms-worked").value.trim():""; var wasEdit=!!editId;
   if(editId){ var i=st.calls.findIndex(function(c){ return c.id===editId; }); if(i>=0){ rec.id=editId; rec.ts=st.calls[i].ts; rec.edited=Date.now(); rec.shiftId=st.calls[i].shiftId; rec.hrId=st.calls[i].hrId||null; rec.hold=st.calls[i].hold||null; st.calls[i]=rec; } newId=editId; setMsg("Call updated.",true); when="updated"; }
-  else { rec.id="c"+Date.now(); rec.ts=Date.now(); rec.shiftId=st.shift?st.shift.id:null; rec.hrId=st.hrId||null; rec.hold=hold.n?{n:hold.n,secs:Math.round(hold.ms/1000),max:Math.round(hold.max/1000),long:hold.long}:null; st.calls.push(rec); clearHold(); newId=rec.id; setMsg("Logged at "+hm(rec.ts)+".",true); when="logged "+hm(rec.ts); }
+  else { rec.id="c"+Date.now(); rec.ts=Date.now(); rec.shiftId=st.shift&&!st.shift.endedAt?st.shift.id:null; rec.hrId=st.hrId||null; rec.hold=hold.n?{n:hold.n,secs:Math.round(hold.ms/1000),max:Math.round(hold.max/1000),long:hold.long}:null; st.calls.push(rec); clearHold(); newId=rec.id; setMsg("Logged at "+hm(rec.ts)+".",true); when="logged "+hm(rec.ts); }
   save(); resetForm(); q("ms-t2").textContent=when; retick(q("ms-t2")); clearTimeout(loggedT); loggedT=setTimeout(function(){ if(!editId) q("ms-t2").textContent="under a minute"; },5000);
   tick=true; renderList(); renderBar(); tick=false;
   var nw=newWins(); if(nw.length){ setMsg((wasEdit?"Call updated.":"Logged at "+hm(rec.ts)+".")+" New win: "+nw.slice(0,2).join(" · ")+".",true); q("ms-msg").setAttribute("data-win",""); burst(q("ms-msg")); say("New win: "+nw.slice(0,2).join(", ")); } else q("ms-msg").removeAttribute("data-win");
@@ -488,7 +494,7 @@ function renderRepeat(){
 }
 
 /* ---------- list, counts, practice, summary ---------- */
-function todayCalls(){ var k=dkey(Date.now()); return mine().filter(function(c){ return dkey(c.ts)===k; }).sort(function(a,b){ return b.ts-a.ts; }); }
+function todayCalls(){ var k=curDay(); return mine().filter(function(c){ return callDay(c)===k; }).sort(function(a,b){ return b.ts-a.ts; }); }
 function bump(o,k){ if(k) o[k]=(o[k]||0)+1; }
 /* Counts for a list of calls. coach tallies every reason the Academy can practise: declines, no opening, transfers, and repeats (or, on the board, calls that came back). */
 function counts(list,opt){ opt=opt||{}; var c={n:list.length,res:0,sat:0,gO:0,gG:0,xmO:0,xmG:0,fu:0,tr:0,rep:0,back:0,types:{},gNot:{},xNot:{},gWhy:{},xWhy:{},which:{},trWhy:{},coach:{},clN:0,clAll:0,clMiss:{},qaN:0,qaAll:0,qaMiss:{},hN:0,hLong:0};
@@ -554,7 +560,7 @@ function renderRail(){ var c=myCounts(todayCalls()), rc=q("ms-railcount"), rcT=c
   var sh=st.shift; q("ms-railnote").textContent=sh&&!sh.endedAt?"Shift started "+hm(sh.startedAt)+". Counts come from the calls you log today.":"Counts come from the calls you log today."; }
 function missKey(k){ return CLOSE.some(function(t){ return t[2]===k; })?"close":"qa"; }
 function reasons(head,o,keyOf){ var ks=top(o,3); if(!ks.length) return ""; return '<p class="ms-rh">'+esc(head)+'</p><ul class="ms-rl">'+ks.map(function(k){ return '<li><span>'+esc(k)+'</span><b>'+o[k]+'</b>'+pracLink(keyOf(k),k)+'</li>'; }).join("")+'</ul>'; }
-function summaryText(){ var c=myCounts(todayCalls()); var sh=st.shift&&dkey(st.shift.startedAt)===dkey(Date.now())?st.shift:null, p=nextPractice(c.coach);
+function summaryText(){ var c=myCounts(todayCalls()); var sh=st.shift&&wkey(st.shift.startedAt)===curDay()?st.shift:null, p=nextPractice(c.coach);
   var parts=[(st.agent?st.agent+(st.hrId?" (HR ID "+st.hrId+")":"")+" · ":"")+todayStr()+(sh?" · "+durShort(elapsed(sh,Date.now())):""), c.n+" call"+(c.n===1?"":"s")+(Object.keys(c.types).length?" ("+listStr(c.types)+")":""), c.res+" resolved", c.sat+" satisfied",
     "GSR not offered "+(c.n-c.gO)+(Object.keys(c.gNot).length?" ("+listStr(c.gNot)+")":"")+", offered "+c.gO+", got "+c.gG+(Object.keys(c.which).length?" ("+listStr(c.which)+")":"")+(Object.keys(c.gWhy).length?", no's: "+listStr(c.gWhy):""),
     "XM not offered "+(c.n-c.xmO)+(Object.keys(c.xNot).length?" ("+listStr(c.xNot)+")":"")+", offered "+c.xmO+", got "+c.xmG+(Object.keys(c.xWhy).length?", no's: "+listStr(c.xWhy):""), "follow-ups "+c.fu,
@@ -568,8 +574,8 @@ function summaryText(){ var c=myCounts(todayCalls()); var sh=st.shift&&dkey(st.s
 function tickCell(a){ return Array.isArray(a)?(a.length?a.join(" "):"none"):""; }
 function tickParse(v){ return v===undefined||v===""?null:v==="none"?[]:v.split(/\s+/); }
 function csvCell(v){ v=String(v==null?"":v); return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
-function csvText(){ var warm={}, me=st.hrId||null; st.warmups.forEach(function(w){ if(w.done&&(w.hrId||null)===me) warm[w.date]=w.title; }); var idx=byAccount(), head=["date","time","account","call_type","issue","satisfied","gsr_offered","gsr_not_offered_why","gsr_result","gsr_which","gsr_why","xm_offered","xm_not_offered_why","xm_result","xm_why","what_happened","transfer_reason","repeat_7d","agent","hr_id","call_id","warmup","next_steps","qa_check","what_worked","holds","hold_secs","longest_hold_secs","long_holds"];
-  var rows=mine().sort(function(a,b){ return a.ts-b.ts; }).map(function(c){ return [dkey(c.ts),hm(c.ts),c.account,c.callType||"",c.resolved,c.satisfied,c.gsrOffered,c.gsrNotWhy||"",c.gsrResult||"",c.gsrWhich||"",c.gsrWhy||"",c.xmOffered,c.xmNotWhy||"",c.xmResult||"",c.xmWhy||c.xmReason||"",c.note||"",c.transferWhy||"",isRepeat(c,idx)?"yes":"",st.agent||"",c.hrId||st.hrId||"",c.id,warm[dkey(c.ts)]||"",tickCell(c.close),tickCell(c.qa),c.worked||"",c.hold?c.hold.n:"",c.hold?c.hold.secs:"",c.hold?c.hold.max:"",c.hold?c.hold.long:""]; });
+function csvText(){ var warm={}, me=st.hrId||null; st.warmups.forEach(function(w){ if(w.done&&(w.hrId||null)===me) warm[w.date]=w.title; }); var idx=byAccount(), head=["date","time","account","call_type","issue","satisfied","gsr_offered","gsr_not_offered_why","gsr_result","gsr_which","gsr_why","xm_offered","xm_not_offered_why","xm_result","xm_why","what_happened","transfer_reason","repeat_7d","agent","hr_id","call_id","warmup","next_steps","qa_check","what_worked","holds","hold_secs","longest_hold_secs","long_holds","shift_day"];
+  var rows=mine().sort(function(a,b){ return a.ts-b.ts; }).map(function(c){ return [dkey(c.ts),hm(c.ts),c.account,c.callType||"",c.resolved,c.satisfied,c.gsrOffered,c.gsrNotWhy||"",c.gsrResult||"",c.gsrWhich||"",c.gsrWhy||"",c.xmOffered,c.xmNotWhy||"",c.xmResult||"",c.xmWhy||c.xmReason||"",c.note||"",c.transferWhy||"",isRepeat(c,idx)?"yes":"",st.agent||"",c.hrId||st.hrId||"",c.id,warm[callDay(c)]||"",tickCell(c.close),tickCell(c.qa),c.worked||"",c.hold?c.hold.n:"",c.hold?c.hold.secs:"",c.hold?c.hold.max:"",c.hold?c.hold.long:"",callDay(c)]; });
   return [head].concat(rows).map(function(r){ return r.map(csvCell).join(","); }).join("\r\n"); }
 
 /* ---------- team board: reads My Shift CSV files in this browser, keeps nothing ---------- */
@@ -587,7 +593,7 @@ function parseShiftCsv(text,name,i){ var rows=parseCsv(text); if(!rows.length) r
   var get=function(r,k){ var j=h.indexOf(k); return j<0||r[j]==null?"":String(r[j]).trim(); }, out=[], names={}, ids={}, skipped=0, damaged=0;
   rows.slice(1).forEach(function(r){ var d=get(r,"date"), tm=get(r,"time"), raw=get(r,"account"); if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!/^\d{1,2}:\d{2}$/.test(tm)){ skipped++; return; }
     var p=d.split("-"), hh=tm.split(":"), bad=/e\+/i.test(raw); if(bad) damaged++; bump(names,get(r,"agent")); bump(ids,get(r,"hr_id").replace(/\D/g,""));
-    out.push({ts:new Date(+p[0],+p[1]-1,+p[2],+hh[0],+hh[1]).getTime(),date:d,account:bad?"":raw.replace(/\D/g,""),callType:get(r,"call_type"),resolved:get(r,"issue"),satisfied:get(r,"satisfied"),gsrOffered:get(r,"gsr_offered"),gsrNotWhy:get(r,"gsr_not_offered_why"),gsrResult:get(r,"gsr_result"),gsrWhich:get(r,"gsr_which"),gsrWhy:get(r,"gsr_why"),xmOffered:get(r,"xm_offered"),xmNotWhy:get(r,"xm_not_offered_why"),xmResult:get(r,"xm_result"),xmWhy:get(r,"xm_why"),transferWhy:get(r,"transfer_reason"),warmup:get(r,"warmup"),close:tickParse(h.indexOf("next_steps")<0?undefined:get(r,"next_steps")),qa:tickParse(h.indexOf("qa_check")<0?undefined:get(r,"qa_check")),worked:get(r,"what_worked"),hold:h.indexOf("holds")<0||get(r,"holds")===""?null:{n:+get(r,"holds")||0,secs:+get(r,"hold_secs")||0,max:+get(r,"longest_hold_secs")||0,long:+get(r,"long_holds")||0},id:get(r,"call_id")||d+" "+tm+" "+get(r,"account")}); });
+    var sd=get(r,"shift_day"); out.push({ts:new Date(+p[0],+p[1]-1,+p[2],+hh[0],+hh[1]).getTime(),date:/^\d{4}-\d{2}-\d{2}$/.test(sd)?sd:d,account:bad?"":raw.replace(/\D/g,""),callType:get(r,"call_type"),resolved:get(r,"issue"),satisfied:get(r,"satisfied"),gsrOffered:get(r,"gsr_offered"),gsrNotWhy:get(r,"gsr_not_offered_why"),gsrResult:get(r,"gsr_result"),gsrWhich:get(r,"gsr_which"),gsrWhy:get(r,"gsr_why"),xmOffered:get(r,"xm_offered"),xmNotWhy:get(r,"xm_not_offered_why"),xmResult:get(r,"xm_result"),xmWhy:get(r,"xm_why"),transferWhy:get(r,"transfer_reason"),warmup:get(r,"warmup"),close:tickParse(h.indexOf("next_steps")<0?undefined:get(r,"next_steps")),qa:tickParse(h.indexOf("qa_check")<0?undefined:get(r,"qa_check")),worked:get(r,"what_worked"),hold:h.indexOf("holds")<0||get(r,"holds")===""?null:{n:+get(r,"holds")||0,secs:+get(r,"hold_secs")||0,max:+get(r,"longest_hold_secs")||0,long:+get(r,"long_holds")||0},id:get(r,"call_id")||d+" "+tm+" "+get(r,"account")}); });
   var ff=fromFile(name,i); return {name:name,agent:top(names,1)[0]||ff.agent,hrId:top(ids,1)[0]||ff.hrId,rows:out,skipped:skipped,damaged:damaged}; }
 function readFile(f){ if(f.text) return f.text().catch(function(){ return ""; }); return new Promise(function(res){ var r=new FileReader(); r.onload=function(){ res(String(r.result||"")); }; r.onerror=function(){ res(""); }; r.readAsText(f); }); }
 function addFiles(list){ var fs=Array.prototype.slice.call(list||[]); if(!fs.length) return;
@@ -612,7 +618,7 @@ function mergeRows(){ var seen={}, rows=[], shown={}, spelt={};
 function addDays(d,n){ var p=d.split("-"); return dkey(new Date(+p[0],+p[1]-1,+p[2]+n).getTime()); }
 function periodRows(){ var rows=bd.rows; if(!rows.length) return []; var last=rows[rows.length-1].date, from=bd.period==="latest"?last:bd.period==="week"?addDays(last,-6):"";
   return rows.filter(function(r){ return r.date>=from; }); }
-function periodLabel(list){ if(!list.length) return ""; var a=list[0].ts, b=list[list.length-1].ts; return dkey(a)===dkey(b)?shortDay(a):shortDay(a)+" to "+shortDay(b); }
+function periodLabel(list){ if(!list.length) return ""; var a=list[0].date, b=list[list.length-1].date; return a===b?shortDay(noon(a)):shortDay(noon(a))+" to "+shortDay(noon(b)); }
 function agentsOf(list){ var o={}; list.forEach(function(r){ (o[r.key]=o[r.key]||[]).push(r); }); return o; }
 function boardCounts(list){ return counts(list,{rep:function(x){ return x.rep; },back:function(x){ return x.back; }}); }
 function warmDays(list){ var d={}, w={}; list.forEach(function(r){ d[r.date]=1; if(r.warmup) w[r.date]=1; }); return [Object.keys(w).length,Object.keys(d).length]; }
@@ -650,7 +656,7 @@ function renderBoard(opening){
 function renderShout(list){ var keys={}, out=[], from=list.length?list[0].date:"", to=list.length?list[list.length-1].date:"", el=q("tb-shout");
   list.forEach(function(r){ keys[r.key]=1; });
   Object.keys(keys).sort(function(a,b){ return a.localeCompare(b); }).forEach(function(k){ var rows=bd.rows.filter(function(r){ return r.key===k; }), warm={}; rows.forEach(function(r){ if(r.warmup) warm[r.date]=1; });
-    var w=computeWins(rows,warm), got=streakLines(w.streak); w.events.forEach(function(e){ var d=dkey(e.ts); if(d>=from&&d<=to&&/^(best|sales):/.test(e.key)) got.push(e.text); });
+    var w=computeWins(rows,warm), got=streakLines(w.streak); w.events.forEach(function(e){ var d=wkey(e.ts); if(d>=from&&d<=to&&/^(best|sales):/.test(e.key)) got.push(e.text); });
     got.slice(0,2).forEach(function(t){ out.push({who:rows[0].agent,t:t}); }); });
   out.sort(function(a,b){ return a.who.localeCompare(b.who); }); bd.shout=out;
   el.innerHTML='<h3 class="tb-shout-h">Shout-outs</h3>'+(out.length?'<ul class="tb-shout-list">'+out.slice(0,12).map(function(x){ return '<li>'+STAR+'<span><b>'+esc(x.who)+'</b>: '+esc(lc(x.t))+'</span></li>'; }).join("")+'</ul><button type="button" class="sl-link-button" id="tb-shout-copy">Copy shout-outs</button>':'<p class="tb-empty">No streaks or personal bests in these days yet.</p>'); }

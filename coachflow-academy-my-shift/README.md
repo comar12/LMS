@@ -90,6 +90,20 @@ Both are counted in the rail, the summary and the CSV (`next_steps` and
 `qa_check`: the ticked items, `none` when nothing was ticked, empty when the
 check did not apply). Calls logged before this change are not counted.
 
+### Overnight shifts
+
+Operating hours run overnight (14:00 to 07:00 Cairo time), so nothing in My
+Shift follows the calendar date at midnight. A shift counts from Start shift
+until End shift, whatever the clock says; every call belongs to the shift it
+was logged in; and a work day runs from 10:00 to 10:00 the next morning, named
+by the date it starts (`WORKDAY_START` in `my-shift.js`). The list, the rail,
+goals, the warm-up, the summary, My week and wins all use that day. A shift
+left running for more than 13 hours (`LONG_SHIFT_H`) keeps counting and asks
+"Finished? Press End shift." The CSV keeps each call's real `date` and `time`
+and adds `shift_day`; the board groups by `shift_day`, so a night is one day
+in "Latest day" and in the shout-outs. Older files without the column are
+grouped by date as before.
+
 ### Who is logging
 
 The top of My Shift asks once for the agent's name and HR ID (numbers only)
@@ -101,7 +115,7 @@ are missing.
 
 The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id`,
 `warmup`, `next_steps`, `qa_check`, `what_worked`, `holds`, `hold_secs`,
-`longest_hold_secs` and `long_holds` columns, and the file is named
+`longest_hold_secs`, `long_holds` and `shift_day` columns, and the file is named
 `my-shift-<name>-<hr id>-<date>.csv`.
 
 ### Warm-up, goals, "Customer said" and My week
