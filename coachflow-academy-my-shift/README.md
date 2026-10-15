@@ -104,6 +104,24 @@ and adds `shift_day`; the board groups by `shift_day`, so a night is one day
 in "Latest day" and in the shout-outs. Older files without the column are
 grouped by date as before.
 
+### End-of-shift check-in
+
+When the agent presses End shift, My Shift asks "How did tonight feel?" from
+1 (really hard) to 5 (great), with optional reasons: tough customers, systems
+or tools, call volume, no time between calls, breaks, unclear process,
+support from my team, something outside work. The agent chooses whether to
+share it with their team leader (on by default); a check-in kept private stays
+on that computer. One check-in per shift day; it can be changed. The agent
+sees their last seven check-ins, and after three hard nights in a row is told
+it is worth a word with their team leader. A shared check-in goes into the
+summary line and into the CSV (`checkin`, `checkin_why`).
+
+The team board adds a Check-in column (average, nights, hard nights) and a
+"Worth a check-in" list: agents whose last two or more shared check-ins were
+hard (1 or 2), or with three hard nights in their last seven, with what they
+said got in the way, plus the team's average and top reasons. The supervisor
+line names them.
+
 ### Who is logging
 
 The top of My Shift asks once for the agent's name and HR ID (numbers only)
@@ -115,7 +133,7 @@ are missing.
 
 The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id`,
 `warmup`, `next_steps`, `qa_check`, `what_worked`, `holds`, `hold_secs`,
-`longest_hold_secs`, `long_holds` and `shift_day` columns, and the file is named
+`longest_hold_secs`, `long_holds`, `shift_day`, `checkin` and `checkin_why` columns, and the file is named
 `my-shift-<name>-<hr id>-<date>.csv`.
 
 ### Warm-up, goals, "Customer said" and My week
