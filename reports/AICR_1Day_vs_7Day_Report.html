@@ -1,0 +1,577 @@
+<title>AICR 1-Day vs 7-Day</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: navy masthead with live gauges → sticky section nav → KPI strip → one section per question. Motion: count-ups, line draw, bar grow, day explorer autoplay. */
+:root{
+  --bg:#f3f6fa; --surface:#ffffff; --surface-2:#e9eef5; --ink:#0f1b2d; --muted:#56637a; --line:#d3dbe7; --grid:#e3e9f1;
+  --navy:#0b1f3a; --navy-2:#122b4f; --navy-ink:#ffffff; --navy-soft:#b9c9e3; --teal:#0e9c96; --teal-bright:#2fd1c8; --teal-soft:#d7f1ef;
+  --s1:#3b64d9; --s2:#0e9c96; --s3:#d9672a; --s1-soft:#e1e7fa; --s2-soft:#d7f1ef; --s3-soft:#fbe4d7;
+  --good:#1e7b4f; --good-soft:#dcf3e6; --bad:#c0392b; --bad-soft:#fbe2de; --warn:#a9661a; --warn-soft:#fdeed6;
+  --shadow:0 10px 30px rgba(11,31,58,.10); --font:"Calibri","Carlito","Segoe UI",system-ui,sans-serif;
+  --h1:#e6f4f3; --h2:#bfece9; --h3:#8bd9d3; --h4:#43bfb7; --h5:#0e9c96; --h6:#0a6f6a;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0b1626; --surface:#122039; --surface-2:#1a2b48; --ink:#ecf2fb; --muted:#a6b5cc; --line:#2a3d5e; --grid:#22344f;
+  --navy:#07101f; --navy-2:#0d1b33; --navy-ink:#ffffff; --navy-soft:#aabdd9; --teal:#17a48e; --teal-bright:#2fd1c8; --teal-soft:#153c3e;
+  --s1:#3987e5; --s2:#17a48e; --s3:#d9672a; --s1-soft:#1d3461; --s2-soft:#153c3e; --s3-soft:#48291a;
+  --good:#4fcf92; --good-soft:#163b2a; --bad:#f28b7d; --bad-soft:#4a2320; --warn:#e6b25f; --warn-soft:#45351a;
+  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark;
+  --h1:#163c3e; --h2:#1a5553; --h3:#1b7470; --h4:#1b958d; --h5:#2fc1b6; --h6:#7ee8df; }}
+:root[data-theme="dark"]{
+  --bg:#0b1626; --surface:#122039; --surface-2:#1a2b48; --ink:#ecf2fb; --muted:#a6b5cc; --line:#2a3d5e; --grid:#22344f;
+  --navy:#07101f; --navy-2:#0d1b33; --navy-ink:#ffffff; --navy-soft:#aabdd9; --teal:#17a48e; --teal-bright:#2fd1c8; --teal-soft:#153c3e;
+  --s1:#3987e5; --s2:#17a48e; --s3:#d9672a; --s1-soft:#1d3461; --s2-soft:#153c3e; --s3-soft:#48291a;
+  --good:#4fcf92; --good-soft:#163b2a; --bad:#f28b7d; --bad-soft:#4a2320; --warn:#e6b25f; --warn-soft:#45351a;
+  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark;
+  --h1:#163c3e; --h2:#1a5553; --h3:#1b7470; --h4:#1b958d; --h5:#2fc1b6; --h6:#7ee8df; }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15.5px;line-height:1.45;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--navy)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+/* ---------- masthead ---------- */
+.mast{position:relative;background:var(--navy);color:var(--navy-ink);overflow:hidden;isolation:isolate}
+.mast .mesh{position:absolute;inset:-20%;z-index:-1;background:
+  radial-gradient(40% 50% at 20% 30%,rgba(47,209,200,.35),transparent 60%),
+  radial-gradient(35% 45% at 80% 20%,rgba(59,100,217,.35),transparent 60%),
+  radial-gradient(45% 50% at 60% 90%,rgba(14,156,150,.28),transparent 60%);
+  filter:blur(20px);animation:mesh 18s ease-in-out infinite alternate}
+.mast .gridlines{position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent)}
+@keyframes mesh{0%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(4%,-3%) rotate(3deg)}100%{transform:translate(-3%,4%) rotate(-2deg)}}
+.mast .inner{padding-block:34px 30px;display:grid;grid-template-columns:1.2fr 1fr;gap:28px 40px;align-items:center}
+@media (max-width:860px){.mast .inner{grid-template-columns:1fr}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-bright);font-weight:700}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--teal-bright);box-shadow:0 0 0 0 rgba(47,209,200,.6);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(47,209,200,.6)}70%{box-shadow:0 0 0 10px rgba(47,209,200,0)}100%{box-shadow:0 0 0 0 rgba(47,209,200,0)}}
+h1{font-size:clamp(30px,4.6vw,46px);margin:8px 0 8px;line-height:1.05;text-wrap:balance;font-weight:700;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--teal-bright)}
+.mast p{margin:0 0 16px;color:var(--navy-soft);max-width:62ch;font-size:16px}
+.targets{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.targets label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--navy-soft);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.targets input{font:inherit;font-size:15px;width:120px;padding:7px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:var(--navy-ink)}
+.targets input:focus{outline:2px solid var(--teal-bright);outline-offset:1px}
+.gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gauge{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 10px 10px;text-align:center;backdrop-filter:blur(4px)}
+.gauge svg{width:100%;max-width:150px;height:auto;display:block;margin:0 auto}
+.gauge .ring{fill:none;stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1.6s cubic-bezier(.22,.8,.3,1)}
+.gauge .track{fill:none;stroke:rgba(255,255,255,.12);stroke-width:10}
+.gauge .num{font-size:clamp(20px,2.6vw,28px);font-weight:700;fill:#fff;font-variant-numeric:tabular-nums}
+.gauge .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--navy-soft);font-weight:700;margin-top:4px}
+.gauge .sub{font-size:12.5px;color:#dbe6f6;margin-top:2px}
+/* ---------- sticky nav ---------- */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--navy-2);color:var(--navy-ink);box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.nav .inner{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-block:0}
+.nav .inner::-webkit-scrollbar{display:none}
+.nav a{color:var(--navy-soft);text-decoration:none;font-size:13px;font-weight:700;padding:11px 12px;white-space:nowrap;border-bottom:3px solid transparent}
+.nav a.active,.nav a:hover{color:#fff;border-bottom-color:var(--teal-bright)}
+.progress{height:3px;background:rgba(255,255,255,.08)}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--teal-bright));transition:width .1s linear}
+/* ---------- content ---------- */
+main{padding-block:26px 60px;display:grid;gap:34px}
+section{min-width:0;scroll-margin-top:70px}
+h2{font-size:23px;margin:0 0 4px;font-weight:700;text-wrap:balance;letter-spacing:-.01em}
+h2 .tag{display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);font-weight:700;margin-right:10px;vertical-align:middle}
+h3{font-size:16px;margin:0 0 8px;font-weight:700}
+.lede{margin:0 0 14px;color:var(--muted);max-width:78ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.kpi{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px 12px;display:grid;gap:4px;overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(11,31,58,.16)}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c,var(--navy))}
+.kpi .lab{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;min-height:30px}
+.kpi:has(.spark) .lab{padding-right:92px}
+.kpi .val{font-size:32px;font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums;color:var(--ink)}
+.kpi .sub{font-size:13px;color:var(--muted)}
+.kpi .spark{position:absolute;right:10px;top:10px;width:84px;height:30px;opacity:.9}
+.spark path{fill:none;stroke:var(--c,var(--navy));stroke-width:2;stroke-linejoin:round}
+.spark .area{fill:var(--c,var(--navy));opacity:.15;stroke:none}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip.good{background:var(--good-soft);color:var(--good)}.chip.bad{background:var(--bad-soft);color:var(--bad)}.chip.warn{background:var(--warn-soft);color:var(--warn)}.chip.neutral{background:var(--surface-2);color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted);margin:0 0 8px;align-items:center}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.legend .l-line::before{height:3px;border-radius:2px;vertical-align:3px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-left:auto}
+.seg button{font:inherit;font-size:12.5px;font-weight:700;padding:5px 12px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;box-shadow:var(--shadow);min-width:170px;z-index:5;display:none}
+.tip b{display:block;margin-bottom:4px}
+.tip .row{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.tip .row i{font-style:normal;color:var(--muted)}
+.tip .row i::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;background:var(--c)}
+details{margin-top:8px} summary{cursor:pointer;color:var(--s1);font-weight:700;font-size:13px}
+.tbl{overflow-x:auto;margin-top:8px;border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:var(--navy);color:#fff;font-weight:700;position:sticky;top:0;cursor:pointer;user-select:none}
+th.sorted::after{content:" ▾";color:var(--teal-bright)} th.sorted.asc::after{content:" ▴"}
+th:first-child,td:first-child{text-align:left}
+tbody tr{transition:background .2s} tbody tr:nth-child(even) td{background:var(--surface-2)}
+tbody tr:hover td{background:var(--teal-soft)}
+tbody tr.sel td{background:var(--s1-soft)!important;box-shadow:inset 0 0 0 1px var(--s1)}
+tr.hi-best td:first-child{box-shadow:inset 5px 0 0 var(--good)} tr.hi-worst td:first-child{box-shadow:inset 5px 0 0 var(--bad)}
+tfoot td{font-weight:700;border-top:2px solid var(--navy);background:var(--s2-soft)}
+.pos{color:var(--good);font-weight:700}.neg{color:var(--bad);font-weight:700}
+.cellbar{display:inline-grid;grid-template-columns:52px 70px;align-items:center;gap:6px}
+.cellbar i{display:block;height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.cellbar i b{display:block;height:100%;width:0;background:var(--c);border-radius:4px;transition:width 1s cubic-bezier(.22,.8,.3,1)}
+/* ---------- day explorer ---------- */
+.cal{display:grid;grid-template-columns:repeat(15,1fr);gap:6px;margin:8px 0 14px}
+@media (max-width:760px){.cal{grid-template-columns:repeat(8,1fr)}}
+.cal button{font:inherit;border:2px solid transparent;border-radius:10px;padding:8px 2px 6px;cursor:pointer;display:grid;gap:1px;text-align:center;background:var(--c);color:var(--ink);transition:transform .2s,border-color .2s}
+.cal button.dark{color:#fff}
+.cal button .d{font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.8;font-weight:700}
+.cal button .n{font-size:15px;font-weight:700}
+.cal button .v{font-size:11.5px;font-variant-numeric:tabular-nums}
+.cal button:hover{transform:translateY(-2px)} .cal button.sel{border-color:var(--s3);transform:translateY(-3px);box-shadow:var(--shadow)}
+.explorer{display:grid;grid-template-columns:1.15fr 1fr;gap:16px}
+@media (max-width:860px){.explorer{grid-template-columns:1fr}}
+.daycard{background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;border-radius:14px;padding:20px;display:grid;gap:14px;position:relative;overflow:hidden}
+.daycard::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(47,209,200,.35),transparent 70%);pointer-events:none}
+.daycard .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.daycard .date{font-size:30px;font-weight:700;line-height:1;letter-spacing:-.01em}
+.daycard .date small{display:block;font-size:13px;color:var(--navy-soft);font-weight:400;margin-top:4px;letter-spacing:.06em;text-transform:uppercase}
+.ctrls{display:flex;gap:6px}
+.ctrls button{font:inherit;font-weight:700;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer}
+.ctrls button:hover{background:rgba(255,255,255,.18)} .ctrls button.play{background:var(--teal);border-color:var(--teal)}
+.daycard .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.daycard .metric{background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;display:grid;gap:4px;border-left:4px solid var(--c)}
+.daycard .metric .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--navy-soft);font-weight:700}
+.daycard .metric .big{font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.daycard .metric .chips{display:flex;gap:6px;flex-wrap:wrap}
+.daycard .chip.good{background:rgba(79,207,146,.2);color:#9af0c3}.daycard .chip.bad{background:rgba(242,139,125,.2);color:#ffb3a8}.daycard .chip.neutral{background:rgba(255,255,255,.12);color:#dbe6f6}
+.daycard .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.daycard .fact{font-size:12px;color:var(--navy-soft)} .daycard .fact b{display:block;font-size:18px;color:#fff;font-variant-numeric:tabular-nums}
+.flow{display:grid;gap:6px}
+.flow .bar{display:flex;height:26px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.08)}
+.flow .bar i{display:block;height:100%;transition:width 1s cubic-bezier(.22,.8,.3,1);position:relative}
+.flow .bar i span{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden}
+.flow .keys{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--navy-soft)}
+.flow .keys span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;background:var(--c)}
+.compare{display:grid;gap:10px}
+.compare .row{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:10px;font-size:13px}
+.compare .row .t{height:14px;background:var(--surface-2);border-radius:7px;overflow:hidden;position:relative}
+.compare .row .t b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--c);border-radius:7px;transition:width 1s cubic-bezier(.22,.8,.3,1)}
+.compare .row .t s{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);text-decoration:none}
+.compare .row em{font-style:normal;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.rank{display:flex;gap:8px;flex-wrap:wrap}
+.rank .pill{background:var(--surface-2);border-radius:999px;padding:4px 12px;font-size:13px}
+.rank .pill b{color:var(--ink)}
+/* ---------- bridge ---------- */
+.bridge{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+/* ---------- weeks ---------- */
+.wk{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.wk .card{display:grid;gap:8px}
+.wk .big{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.meter{height:10px;background:var(--surface-2);border-radius:5px;overflow:hidden}
+.meter b{display:block;height:100%;width:0;background:var(--c);border-radius:5px;transition:width 1.1s cubic-bezier(.22,.8,.3,1)}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13.5px;margin:0}
+.dl dt{color:var(--muted)}.dl dd{margin:0;font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+/* ---------- insights ---------- */
+.insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+.ins{display:grid;grid-template-columns:auto 1fr;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);border-top:4px solid var(--teal)}
+.ins .n{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700}
+.ins h3{margin:4px 0 6px}.ins p{margin:0 0 6px}.ins p.act{color:var(--muted);font-size:14px}.ins p.act b{color:var(--teal)}
+.ins .num{font-size:24px;font-weight:700;color:var(--s1);font-variant-numeric:tabular-nums;margin-right:6px}
+.cad th{background:var(--teal)}
+.defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px 24px;font-size:14px}
+.defs div b{display:block;color:var(--teal)}
+.foot{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+/* ---------- motion ---------- */
+.reveal{opacity:1;transform:none}
+.reveal.in{animation:rise .7s cubic-bezier(.22,.8,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+svg .grow{transform-box:fill-box;transform-origin:50% 100%}
+svg .growx{transform-box:fill-box;transform-origin:0 50%}
+.play svg .grow{animation:growy .9s cubic-bezier(.22,.8,.3,1) both}
+.play svg .growx{animation:growx .9s cubic-bezier(.22,.8,.3,1) both}
+@keyframes growy{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.play svg .pop{animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+svg .pop{transform-box:fill-box;transform-origin:50% 50%}
+.play svg .draw{animation:draw 1.6s cubic-bezier(.4,0,.2,1) both}
+@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+.play svg .fadein{animation:fade 1.2s .9s both}
+@keyframes fade{from{opacity:0}to{opacity:var(--op,1)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important} .mast .mesh{animation:none}}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+@media (max-width:640px){ .kpi .val{font-size:26px} th,td{padding:6px 7px;font-size:12.5px} .gauges{grid-template-columns:repeat(3,1fr);gap:6px} .daycard .date{font-size:24px} .daycard .metric .big{font-size:24px}}
+</style>
+
+<header class="mast"><div class="mesh"></div><div class="gridlines"></div>
+<div class="wrap inner">
+  <div>
+    <div class="eyebrow"><span class="dot"></span>VXI Global · Cairo · Repair · Supervisor dashboard</div>
+    <h1>AICR <em>1-Day</em> vs <em>7-Day</em></h1>
+    <p>Day-over-day repeat-contact performance for 22 Sep – 6 Oct 2026. What the 1-day window shows, what the 7-day window adds, when customers call back, and where the three leaders should coach.</p>
+    <div class="targets">
+      <label for="t1">1-Day target %<input id="t1" type="number" step="0.1" min="0" max="100" placeholder="e.g. 75"></label>
+      <label for="t7">7-Day target %<input id="t7" type="number" step="0.1" min="0" max="100" placeholder="e.g. 65"></label>
+    </div>
+  </div>
+  <div class="gauges" id="gauges"></div>
+</div></header>
+
+<nav class="nav"><div class="wrap inner" id="nav">
+  <a href="#kpis">Headline</a><a href="#trend">Trend</a><a href="#dod">Day-over-day</a><a href="#gapsec">Gap</a><a href="#weeks">Weeks</a><a href="#channel">Channel</a><a href="#callback">Callbacks</a><a href="#score">Scorecard</a><a href="#actions">Actions</a>
+</div><div class="progress"><i id="prog"></i></div></nav>
+
+<main class="wrap">
+<section id="kpis" class="reveal">
+  <div class="kpis" id="kpi-grid"></div>
+</section>
+
+<section id="trend" class="reveal">
+  <h2><span class="tag">01</span>Daily trend: the 7-Day line sits a steady 10–13 pp below the 1-Day line</h2>
+  <p class="lede">Both measures move together (correlation 0.82). The best day on both was 22 Sep; the worst 1-Day was 1 Oct and the worst 7-Day was 2 Oct. Dashed lines are the volume-weighted period averages. The shaded band between the lines is the gap.</p>
+  <div class="card">
+    <div class="legend"><span class="l-line" style="--c:var(--s1)">1-Day AICR</span><span class="l-line" style="--c:var(--s2)">7-Day AICR</span><span style="--c:var(--s3-soft)">Gap band</span>
+      <div class="seg" id="trend-seg"><button class="on" data-v="both">Both</button><button data-v="a1">1-Day</button><button data-v="a7">7-Day</button></div></div>
+    <div class="chart" id="c-trend"></div>
+    <details><summary>Show data table</summary><div class="tbl" id="t-trend"></div></details>
+  </div>
+</section>
+
+<section id="dod" class="reveal">
+  <h2><span class="tag">02</span>Day-over-day explorer</h2>
+  <p class="lede">Pick a day on the strip (colour = 1-Day AICR, darker is better) or press Play to walk through all 15 days. The card shows that day against the previous day and the period average; the table below ranks and sorts every day.</p>
+  <div class="card">
+    <div class="cal" id="cal"></div>
+    <div class="explorer">
+      <div class="daycard" id="daycard"></div>
+      <div class="card" style="box-shadow:none" id="daycmp"></div>
+    </div>
+    <h3 style="margin-top:18px">All days, ranked (click a header to sort, click a row to select)</h3>
+    <div class="tbl" id="t-dod"></div>
+  </div>
+</section>
+
+<section id="gapsec" class="reveal">
+  <h2><span class="tag">03</span>Where the gap comes from</h2>
+  <p class="lede">Of every 100 contacts, 29 came back within a day and another 11 came back on day 2–7. The orange slice is invisible in a 1-Day view, and it is 24–32% of all repeats every single day.</p>
+  <div class="bridge">
+    <div class="card">
+      <h3>Period bridge: from 100% to 7-Day AICR</h3>
+      <div class="chart" id="c-bridge"></div>
+    </div>
+    <div class="card">
+      <h3>Repeat contacts per day</h3>
+      <div class="legend"><span style="--c:var(--s1)">Within 1 day</span><span style="--c:var(--s3)">Surfaced day 2–7</span></div>
+      <div class="chart" id="c-stack"></div>
+    </div>
+    <div class="card">
+      <h3>Gap per day (pp)</h3>
+      <div class="legend"><span style="--c:var(--s3)">1-Day minus 7-Day</span></div>
+      <div class="chart" id="c-gap"></div>
+    </div>
+  </div>
+</section>
+
+<section id="weeks" class="reveal">
+  <h2><span class="tag">04</span>Week-over-week and day-of-week</h2>
+  <p class="lede">Weeks run Tuesday to Monday because the data starts on a Tuesday. Week 2 was worse on both measures on identical volume. Weekends and weekdays perform the same, and volume has no relationship with the result (correlation with received −0.08 and 0.01).</p>
+  <div class="wk" id="wk-grid"></div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card"><h3>AICR by day of week (volume-weighted)</h3><div class="legend"><span style="--c:var(--s1)">1-Day</span><span style="--c:var(--s2)">7-Day</span></div><div class="chart" id="c-dow"></div></div>
+    <div class="card"><h3>Contacts received per day</h3><div class="legend"><span style="--c:var(--navy-soft)">Received</span></div><div class="chart" id="c-vol"></div></div>
+  </div>
+</section>
+
+<section id="channel" class="reveal">
+  <h2><span class="tag">05</span>Channel: chat repeats arrive late far more often than call repeats</h2>
+  <p class="lede">Calls are 94% of repeats, so calls drive the number. But 46% of chat repeats are invisible on day 1 versus 27% for calls, which points at chat follow-through (confirming the fix, closing the ticket, stating next steps) as a specific coaching gap.</p>
+  <div class="grid2">
+    <div class="card" id="chan-tiles"></div>
+    <div class="card"><h3>Late repeats by channel, per day</h3><div class="legend"><span style="--c:var(--s1)">Call, surfaced day 2–7</span><span style="--c:var(--s3)">Chat, surfaced day 2–7</span></div><div class="chart" id="c-chan"></div></div>
+  </div>
+</section>
+
+<section id="callback" class="reveal">
+  <h2><span class="tag">06</span>When do repeat calls come back?</h2>
+  <p class="lede">Callback-timeframe distribution of AICR fail calls from the Distribution export (VXI Global, 8,079 fail calls, all timeframes). Half of all repeat calls come back within two hours, and more than a quarter within 30 minutes: calls that ended without the issue resolved, or ended in a failed transfer or a disconnect.</p>
+  <div class="grid2">
+    <div class="card"><h3>Fail calls by callback timeframe</h3><div class="chart" id="c-cb"></div></div>
+    <div class="card"><h3>Roll-ups</h3><div class="tbl" id="t-cb"></div></div>
+  </div>
+</section>
+
+<section id="score" class="reveal">
+  <h2><span class="tag">07</span>Site scorecard</h2>
+  <p class="lede">From the Main_Data export (site total, Director: Shingy, Ahmed). The transfer rate and the resolution score sit next to the repeat picture: an 18% transfer rate feeds the 0–30 minute callbacks, and fewer than half of surveyed customers report their issue resolved.</p>
+  <div class="kpis" id="score-grid"></div>
+</section>
+
+<section id="actions" class="reveal">
+  <h2><span class="tag">08</span>What this means for the team, and what to do</h2>
+  <p class="lede">Written for a supervisor running 10 agents through three newly promoted leaders. Each card names the number behind it and one concrete action.</p>
+  <div class="insights" id="insights"></div>
+</section>
+
+<section class="cad reveal">
+  <h2><span class="tag">09</span>Suggested cadence for the three leaders</h2>
+  <div class="card"><div class="tbl">
+  <table>
+    <thead><tr><th style="cursor:default">Rhythm</th><th style="text-align:left;cursor:default">Look at</th><th style="text-align:left;cursor:default">Owner</th><th style="text-align:left;cursor:default">Output</th></tr></thead>
+    <tbody>
+      <tr><td>Daily (10 min)</td><td style="text-align:left">Yesterday's 1-Day AICR vs the 71.1% period average; which agents had the most same-day repeats</td><td style="text-align:left">Each leader, own 3–4 agents</td><td style="text-align:left">One named agent to side-by-side today; one call pulled from the 0–30 min bucket</td></tr>
+      <tr><td>Twice weekly</td><td style="text-align:left">Transfer rate by agent (site 18.2%) and chat follow-through on open tickets</td><td style="text-align:left">Leaders, with QA</td><td style="text-align:left">Transfer-avoidance and closing-script coaching notes</td></tr>
+      <tr><td>Weekly (30 min)</td><td style="text-align:left">7-Day AICR for the week that closed 7 days ago (the mature number), gap to 1-Day, late share by channel</td><td style="text-align:left">Supervisor + 3 leaders</td><td style="text-align:left">Week-over-week verdict (Wk1 72.5% → Wk2 69.8% on 1-Day), top 3 repeat reasons, actions carried to next week</td></tr>
+      <tr><td>Monthly</td><td style="text-align:left">7-Day AICR trend, CPR (48.6%), TNPS (7.87), AHT (21.4 min) together</td><td style="text-align:left">Supervisor</td><td style="text-align:left">KPI review with the three leaders; decide which repeat reasons need a process fix rather than coaching</td></tr>
+    </tbody>
+  </table></div></div>
+</section>
+
+<section class="reveal">
+  <h2><span class="tag">10</span>Definitions and method</h2>
+  <div class="defs">
+    <div><b>AICR</b>Share of contacts that did not generate a repeat contact within the window. AICR = 1 − repeat contacts ÷ contacts received.</div>
+    <div><b>1-Day vs 7-Day</b>Same contacts, different repeat windows. 7-Day is always lower because it catches more repeats; it is the mature number for KPI reporting.</div>
+    <div><b>Gap (pp)</b>1-Day AICR minus 7-Day AICR, in percentage points: the repeat problem hidden from a 1-day view.</div>
+    <div><b>Late repeats / late share</b>7-Day repeats minus 1-Day repeats, and that count divided by 7-Day repeats.</div>
+    <div><b>DoD Δ</b>Change versus the previous calendar day, in pp for rates and contacts for volumes.</div>
+    <div><b>Period average</b>Volume-weighted: total repeats ÷ total received over 15 days.</div>
+    <div><b>Callback timeframe</b>Time between the original call and the repeat call, from the Distribution export. A separate cut (includes 7+ days); it does not tie exactly to the daily tables.</div>
+    <div><b>Targets</b>None were supplied. Enter yours at the top to see gap-to-target on the gauges and KPI tiles.</div>
+  </div>
+  <p class="foot" style="margin-top:18px">Sources: Overall_Performance_WB.xlsx (1-Day AICR), Overall_Performance_WB.csv (7-Day AICR), Distribution.xlsx and Legend.xlsx (callback timeframe), Main_Data.csv (site scorecard). Group Repair, Selection VXI Global – Cairo, 2026-09-22 to 2026-10-06. Contacts received is identical in both AICR files for every day (23,231 total). Companion workbook: AICR_1Day_vs_7Day_Analysis.xlsx.</p>
+</section>
+</main>
+
+<script>
+const ROWS = [{"date":"2026-09-22","weekday":"Tue","received":1587,"rep1":415,"call1":404,"chat1":11,"rep7":587,"call7":554,"chat7":33},{"date":"2026-09-23","weekday":"Wed","received":1577,"rep1":458,"call1":442,"chat1":16,"rep7":659,"call7":624,"chat7":35},{"date":"2026-09-24","weekday":"Thu","received":1811,"rep1":495,"call1":472,"chat1":23,"rep7":698,"call7":661,"chat7":37},{"date":"2026-09-25","weekday":"Fri","received":1840,"rep1":526,"call1":514,"chat1":12,"rep7":759,"call7":731,"chat7":28},{"date":"2026-09-26","weekday":"Sat","received":1262,"rep1":347,"call1":327,"chat1":20,"rep7":485,"call7":454,"chat7":31},{"date":"2026-09-27","weekday":"Sun","received":918,"rep1":250,"call1":241,"chat1":9,"rep7":370,"call7":348,"chat7":22},{"date":"2026-09-28","weekday":"Mon","received":1804,"rep1":477,"call1":457,"chat1":20,"rep7":693,"call7":654,"chat7":39},{"date":"2026-09-29","weekday":"Tue","received":1498,"rep1":439,"call1":421,"chat1":18,"rep7":591,"call7":559,"chat7":32},{"date":"2026-09-30","weekday":"Wed","received":1696,"rep1":495,"call1":467,"chat1":28,"rep7":673,"call7":629,"chat7":44},{"date":"2026-10-01","weekday":"Thu","received":1672,"rep1":543,"call1":523,"chat1":20,"rep7":717,"call7":680,"chat7":37},{"date":"2026-10-02","weekday":"Fri","received":1693,"rep1":525,"call1":497,"chat1":28,"rep7":729,"call7":674,"chat7":55},{"date":"2026-10-03","weekday":"Sat","received":1199,"rep1":340,"call1":327,"chat1":13,"rep7":491,"call7":461,"chat7":30},{"date":"2026-10-04","weekday":"Sun","received":962,"rep1":297,"call1":278,"chat1":19,"rep7":394,"call7":369,"chat7":25},{"date":"2026-10-05","weekday":"Mon","received":2057,"rep1":620,"call1":587,"chat1":33,"rep7":835,"call7":780,"chat7":55},{"date":"2026-10-06","weekday":"Tue","received":1655,"rep1":484,"call1":459,"chat1":25,"rep7":661,"call7":622,"chat7":39}];
+const CB = [["0-30 Mins",2299],["30 Mins-1 Hour",933],["1-2 Hours",816],["2-4 Hours",604],["4-24 Hours",1479],["1-2 Days",701],["2-7 Days",1204],["7+ Days",43]];
+const SCORE = {fail:8079, aht:1281, xfr:1467, xfrp:0.1816, inv:8, invaht:1007, invp:0.001, rel60:0, tnps:7.87, cpr:0.4859};
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmtP=(x,d=2)=>(x*100).toFixed(d)+'%', fmtPP=(x,d=2)=>(x>0?'+':'')+x.toFixed(d)+' pp', fmtN=x=>Math.round(x).toLocaleString('en-US');
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dlab=d=>{const [y,m,dd]=d.split('-');return MON[+m-1]+' '+(+dd)};
+const dlong=d=>{const [y,m,dd]=d.split('-');return (+dd)+' '+MON[+m-1]+' '+y};
+const sign=x=>x>0?'pos':(x<0?'neg':'');
+const g=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+const el=(n,a,txt)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e};
+// ---- derive ----
+ROWS.forEach((r,i)=>{r.i=i;r.a1=1-r.rep1/r.received;r.a7=1-r.rep7/r.received;r.gap=(r.a1-r.a7)*100;r.late=r.rep7-r.rep1;r.lateShare=r.late/r.rep7;r.lateCall=r.call7-r.call1;r.lateChat=r.chat7-r.chat1;r.week=r.date<='2026-09-28'?'Wk1':(r.date<='2026-10-05'?'Wk2':'Wk3');
+  const p=ROWS[i-1];r.d1=p?(r.a1-p.a1)*100:null;r.d7=p?(r.a7-p.a7)*100:null;r.dv=p?r.received-p.received:null;});
+const T={rec:0,rep1:0,rep7:0,call1:0,call7:0,chat1:0,chat7:0};ROWS.forEach(r=>{T.rec+=r.received;T.rep1+=r.rep1;T.rep7+=r.rep7;T.call1+=r.call1;T.call7+=r.call7;T.chat1+=r.chat1;T.chat7+=r.chat7});
+T.a1=1-T.rep1/T.rec;T.a7=1-T.rep7/T.rec;T.gap=(T.a1-T.a7)*100;T.late=T.rep7-T.rep1;T.lateShare=T.late/T.rep7;
+const rank1=[...ROWS].sort((a,b)=>b.a1-a.a1), rank7=[...ROWS].sort((a,b)=>b.a7-a.a7);
+ROWS.forEach(r=>{r.rk1=rank1.indexOf(r)+1;r.rk7=rank7.indexOf(r)+1});
+const best1=rank1[0],worst1=rank1.at(-1),best7=rank7[0],worst7=rank7.at(-1);
+const WK=['Wk1','Wk2','Wk3'].map(w=>{const rs=ROWS.filter(r=>r.week==w);const rec=rs.reduce((s,r)=>s+r.received,0),r1=rs.reduce((s,r)=>s+r.rep1,0),r7=rs.reduce((s,r)=>s+r.rep7,0);return{w,n:rs.length,rec,r1,r7,a1:1-r1/rec,a7:1-r7/rec,late:r7-r1,lateShare:(r7-r1)/r7}});
+// ---- motion helpers ----
+function countUp(node,to,fmt,dur=1400){if(REDUCED){node.textContent=fmt(to);return}const t0=performance.now();const from=0;(function f(t){const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);node.textContent=fmt(from+(to-from)*e);if(k<1)requestAnimationFrame(f)})(t0)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in','play');e.target.querySelectorAll('[data-count]').forEach(n=>{if(!n.dataset.done){n.dataset.done=1;countUp(n,+n.dataset.count,eval(n.dataset.fmt))}});e.target.querySelectorAll('[data-w]').forEach(n=>{n.style.width=n.dataset.w});io.unobserve(e.target)}}),{threshold:.15});
+function tipFor(c){const t=document.createElement('div');t.className='tip';c.appendChild(t);return t}
+function showTip(tip,c,evt,html){tip.innerHTML=html;tip.style.display='block';const r=c.getBoundingClientRect();let x=evt.clientX-r.left+14,y=evt.clientY-r.top+14;if(x+tip.offsetWidth>r.width)x=evt.clientX-r.left-tip.offsetWidth-14;if(y+tip.offsetHeight>r.height)y=Math.max(0,evt.clientY-r.top-tip.offsetHeight-14);tip.style.left=x+'px';tip.style.top=y+'px'}
+function sparkSVG(vals,color,min,max){const W=84,H=30;const xs=i=>i/(vals.length-1)*W,ys=v=>H-2-(v-min)/(max-min)*(H-6);const d=vals.map((v,i)=>(i?'L':'M')+xs(i).toFixed(1)+' '+ys(v).toFixed(1)).join(' ');return `<svg class="spark" viewBox="0 0 ${W} ${H}" style="--c:${color}"><path class="area" d="${d} L${W} ${H} L0 ${H} Z"></path><path d="${d}"></path><circle cx="${W}" cy="${ys(vals.at(-1)).toFixed(1)}" r="2.5" fill="${color}"></circle></svg>`}
+
+// ---- gauges ----
+function renderGauges(){
+  const t1=parseFloat(g('t1').value),t7=parseFloat(g('t7').value);
+  const gauge=(id,val,lab,sub,col,max=1)=>{const r=52,C=2*Math.PI*r;return `<div class="gauge"><svg viewBox="0 0 130 130"><circle class="track" cx="65" cy="65" r="${r}"></circle><circle class="ring" id="${id}" cx="65" cy="65" r="${r}" stroke="${col}" stroke-dasharray="${C}" stroke-dashoffset="${C}"></circle><text class="num" x="65" y="72" text-anchor="middle" data-count="${val}" data-fmt="${id=='gg'?"v=>v.toFixed(2)+' pp'":"v=>(v*100).toFixed(1)+'%'"}">${id=='gg'?val.toFixed(2)+' pp':fmtP(val,1)}</text></svg><div class="lab">${lab}</div><div class="sub">${sub}</div></div>`};
+  const tg=(a,t)=>isNaN(t)?'no target set':(a*100>=t?`▲ ${fmtPP(a*100-t,1)} vs ${t}%`:`▼ ${fmtPP(a*100-t,1)} vs ${t}%`);
+  g('gauges').innerHTML=gauge('g1',T.a1,'1-Day AICR',tg(T.a1,t1),'#5b8cf0')+gauge('g7',T.a7,'7-Day AICR',tg(T.a7,t7),'#2fd1c8')+gauge('gg',T.gap,'Gap (pp)','hidden repeats: '+fmtP(T.lateShare,0),'#f0905a');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const C=2*Math.PI*52;g('g1').style.strokeDashoffset=C*(1-T.a1);g('g7').style.strokeDashoffset=C*(1-T.a7);g('gg').style.strokeDashoffset=C*(1-T.gap/20)}));
+  g('gauges').querySelectorAll('[data-count]').forEach(n=>countUp(n,+n.dataset.count,eval(n.dataset.fmt)));
+}
+renderGauges();
+// ---- KPIs ----
+function renderKPIs(){
+  const t1=parseFloat(g('t1').value),t7=parseFloat(g('t7').value);
+  const tgt=(a,t)=>isNaN(t)?'<span class="chip neutral">no target set</span>':(a*100>=t?`<span class="chip good">▲ ${fmtPP(a*100-t,1)} vs target</span>`:`<span class="chip bad">▼ ${fmtPP(a*100-t,1)} vs target</span>`);
+  const mn=Math.min(...ROWS.map(r=>r.a7))-.02,mx=Math.max(...ROWS.map(r=>r.a1))+.02;
+  g('kpi-grid').innerHTML=`
+  <div class="kpi" style="--c:var(--s1)">${sparkSVG(ROWS.map(r=>r.a1),'var(--s1)',mn,mx)}<div class="lab">1-Day AICR</div><div class="val" data-count="${T.a1}" data-fmt="v=>(v*100).toFixed(2)+'%'">${fmtP(T.a1)}</div><div class="sub">${fmtN(T.rep1)} repeats within 1 day · ${tgt(T.a1,t1)}</div></div>
+  <div class="kpi" style="--c:var(--s2)">${sparkSVG(ROWS.map(r=>r.a7),'var(--s2)',mn,mx)}<div class="lab">7-Day AICR</div><div class="val" data-count="${T.a7}" data-fmt="v=>(v*100).toFixed(2)+'%'">${fmtP(T.a7)}</div><div class="sub">${fmtN(T.rep7)} repeats within 7 days · ${tgt(T.a7,t7)}</div></div>
+  <div class="kpi" style="--c:var(--s3)">${sparkSVG(ROWS.map(r=>r.gap),'var(--s3)',9,14)}<div class="lab">Gap 1-Day → 7-Day</div><div class="val" data-count="${T.gap}" data-fmt="v=>v.toFixed(2)+' pp'">${T.gap.toFixed(2)} pp</div><div class="sub">daily range ${Math.min(...ROWS.map(r=>r.gap)).toFixed(1)}–${Math.max(...ROWS.map(r=>r.gap)).toFixed(1)} pp</div></div>
+  <div class="kpi" style="--c:var(--s3)">${sparkSVG(ROWS.map(r=>r.lateShare),'var(--s3)',.2,.35)}<div class="lab">Late repeats (day 2–7)</div><div class="val" data-count="${T.late}" data-fmt="v=>Math.round(v).toLocaleString('en-US')">${fmtN(T.late)}</div><div class="sub">${fmtP(T.lateShare,1)} of all 7-Day repeats</div></div>
+  <div class="kpi" style="--c:var(--navy)">${sparkSVG(ROWS.map(r=>r.received),'var(--navy-soft)',800,2200)}<div class="lab">Contacts received</div><div class="val" data-count="${T.rec}" data-fmt="v=>Math.round(v).toLocaleString('en-US')">${fmtN(T.rec)}</div><div class="sub">avg ${fmtN(T.rec/ROWS.length)} per day · 15 days</div></div>
+  <div class="kpi" style="--c:var(--good)"><div class="lab">Best / worst day (1-Day)</div><div class="val" style="font-size:24px"><span class="pos">${fmtP(best1.a1,1)}</span> <span style="color:var(--muted);font-weight:400">/</span> <span class="neg">${fmtP(worst1.a1,1)}</span></div><div class="sub">${dlab(best1.date)} best · ${dlab(worst1.date)} worst · ${ROWS.filter(r=>r.d1<0&&r.d7<0).length} days declined on both</div></div>`;
+  g('kpi-grid').querySelectorAll('[data-count]').forEach(n=>countUp(n,+n.dataset.count,eval(n.dataset.fmt)));
+}
+renderKPIs();
+['t1','t7'].forEach(k=>{try{const v=localStorage.getItem('aicr_'+k);if(v)g(k).value=v}catch(e){}g(k).addEventListener('input',()=>{try{localStorage.setItem('aicr_'+k,g(k).value)}catch(e){}renderGauges();renderKPIs()})});
+if(g('t1').value||g('t7').value){renderGauges();renderKPIs()}
+
+// ---- trend ----
+(function(){
+  const c=g('c-trend'),W=980,H=380,m={t:22,r:84,b:40,l:52};const xs=i=>m.l+(i/(ROWS.length-1))*(W-m.l-m.r);const y0=.5,y1=.8;const ys=v=>m.t+(1-(v-y0)/(y1-y0))*(H-m.t-m.b);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Daily 1-Day and 7-Day AICR'});
+  const defs=el('defs',{});defs.innerHTML=`<linearGradient id="ga1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--s1)" stop-opacity=".28"/><stop offset="1" stop-color="var(--s1)" stop-opacity="0"/></linearGradient><linearGradient id="ga7" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--s2)" stop-opacity=".3"/><stop offset="1" stop-color="var(--s2)" stop-opacity="0"/></linearGradient>`;svg.appendChild(defs);
+  for(let v=.5;v<=.801;v+=.05){svg.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:ys(v),y2:ys(v),stroke:'var(--grid)'}));svg.appendChild(el('text',{x:m.l-8,y:ys(v)+4,'text-anchor':'end','font-size':12,fill:'var(--muted)'},Math.round(v*100)+'%'))}
+  const i1=ROWS.findIndex(r=>r.week=='Wk2'),i2=ROWS.findIndex(r=>r.week=='Wk3');
+  svg.appendChild(el('rect',{x:xs(i1)-10,y:m.t,width:xs(i2-1)-xs(i1)+20,height:H-m.t-m.b,fill:'var(--surface-2)',opacity:.55,rx:6}));svg.appendChild(el('rect',{x:xs(0)-10,y:m.t,width:xs(i1-1)-xs(0)+20,height:H-m.t-m.b,fill:'none',stroke:'var(--line)','stroke-dasharray':'4 4',rx:6}));
+  svg.appendChild(el('text',{x:(xs(0)+xs(i1-1))/2,y:m.t+14,'text-anchor':'middle','font-size':12,'font-weight':700,fill:'var(--muted)'},'WEEK 1'));
+  svg.appendChild(el('text',{x:(xs(i1)+xs(i2-1))/2,y:m.t+14,'text-anchor':'middle','font-size':12,'font-weight':700,fill:'var(--muted)'},'WEEK 2'));
+  ROWS.forEach((r,i)=>{svg.appendChild(el('text',{x:xs(i),y:H-m.b+18,'text-anchor':'middle','font-size':11.5,fill:'var(--muted)'},i%2?'':dlab(r.date)));if(['Sat','Sun'].includes(r.weekday))svg.appendChild(el('text',{x:xs(i),y:H-m.b+32,'text-anchor':'middle','font-size':10,fill:'var(--muted)'},r.weekday))});
+  const band=el('path',{d:ROWS.map((r,i)=>(i?'L':'M')+xs(i)+' '+ys(r.a1)).join(' ')+' '+[...ROWS].reverse().map(r=>'L'+xs(r.i)+' '+ys(r.a7)).join(' ')+' Z',fill:'var(--s3)',opacity:.12,class:'fadein'});band.style.setProperty('--op',.12);svg.appendChild(band);
+  const layers={};
+  [['a1','var(--s1)','url(#ga1)',T.a1,'1-Day'],['a7','var(--s2)','url(#ga7)',T.a7,'7-Day']].forEach(([k,col,grad,avg,name])=>{
+    const gr=el('g',{});layers[k]=gr;
+    const line=ROWS.map((r,i)=>(i?'L':'M')+xs(i)+' '+ys(r[k])).join(' ');
+    gr.appendChild(el('path',{d:line+` L${xs(ROWS.length-1)} ${ys(y0)} L${xs(0)} ${ys(y0)} Z`,fill:grad,class:'fadein'}));
+    const al=el('line',{x1:m.l,x2:W-m.r,y1:ys(avg),y2:ys(avg),stroke:col,'stroke-width':1.5,'stroke-dasharray':'6 5',opacity:.8,class:'fadein'});al.style.setProperty('--op',.8);gr.appendChild(al);
+    gr.appendChild(el('text',{x:m.l+6,y:ys(avg)-6,'font-size':11.5,'font-weight':700,fill:col,class:'fadein'},'period avg '+fmtP(avg,1)));
+    const p=el('path',{d:line,fill:'none',stroke:col,'stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round',class:'draw'});gr.appendChild(p);
+    ROWS.forEach((r,i)=>{const cc=el('circle',{cx:xs(i),cy:ys(r[k]),r:4.5,fill:col,stroke:'var(--surface)','stroke-width':2,class:'pop'});cc.style.animationDelay=(0.1+i*0.09)+'s';gr.appendChild(cc)});
+    const last=ROWS.at(-1);gr.appendChild(el('text',{x:xs(ROWS.length-1)+10,y:ys(last[k])+(k=='a1'?-4:12),'font-size':13,'font-weight':700,fill:'var(--ink)',class:'fadein'},name+' '+fmtP(last[k],1)));
+    svg.appendChild(gr);
+  });
+  [[best1,'a1',-12],[worst1,'a1',22],[best7,'a7',22],[worst7,'a7',22]].forEach(([r,k,dy])=>svg.appendChild(el('text',{x:xs(r.i),y:ys(r[k])+dy,'text-anchor':'middle','font-size':12,'font-weight':700,fill:'var(--ink)',class:'fadein'},fmtP(r[k],1))));
+  const cross=el('line',{y1:m.t,y2:H-m.b,stroke:'var(--muted)','stroke-dasharray':'3 3',opacity:0});svg.appendChild(cross);
+  const hi=el('circle',{r:9,fill:'none',stroke:'var(--ink)','stroke-width':1.5,opacity:0});svg.appendChild(hi);
+  const hit=el('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:'transparent'});svg.appendChild(hit);
+  c.appendChild(svg);const tip=tipFor(c);
+  svg.querySelectorAll('.draw').forEach(p=>{const L=p.getTotalLength();p.style.setProperty('--len',L);p.setAttribute('stroke-dasharray',L)});
+  let mode='both';
+  hit.addEventListener('mousemove',e=>{const bb=svg.getBoundingClientRect();const px=(e.clientX-bb.left)/bb.width*W;let i=Math.round((px-m.l)/(W-m.l-m.r)*(ROWS.length-1));i=Math.max(0,Math.min(ROWS.length-1,i));const r=ROWS[i];cross.setAttribute('x1',xs(i));cross.setAttribute('x2',xs(i));cross.setAttribute('opacity',1);hi.setAttribute('cx',xs(i));hi.setAttribute('cy',ys(mode=='a7'?r.a7:r.a1));hi.setAttribute('opacity',1);
+    showTip(tip,c,e,`<b>${r.weekday} ${dlong(r.date)}</b><div class="row"><i style="--c:var(--s1)">1-Day</i><span>${fmtP(r.a1)}${r.d1==null?'':' ('+fmtPP(r.d1,1)+')'}</span></div><div class="row"><i style="--c:var(--s2)">7-Day</i><span>${fmtP(r.a7)}${r.d7==null?'':' ('+fmtPP(r.d7,1)+')'}</span></div><div class="row"><i style="--c:var(--s3)">Gap</i><span>${r.gap.toFixed(2)} pp</span></div><div class="row"><i style="--c:var(--line)">Received</i><span>${fmtN(r.received)}</span></div><div class="row"><i style="--c:var(--line)">Rank (1-Day)</i><span>#${r.rk1} of 15</span></div>`)});
+  hit.addEventListener('mouseleave',()=>{tip.style.display='none';cross.setAttribute('opacity',0);hi.setAttribute('opacity',0)});
+  hit.addEventListener('click',e=>{const bb=svg.getBoundingClientRect();const px=(e.clientX-bb.left)/bb.width*W;let i=Math.round((px-m.l)/(W-m.l-m.r)*(ROWS.length-1));selectDay(Math.max(0,Math.min(ROWS.length-1,i)));g('dod').scrollIntoView({behavior:'smooth'})});
+  g('trend-seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.v;[...g('trend-seg').children].forEach(x=>x.classList.toggle('on',x===b));layers.a1.style.opacity=mode=='a7'?.12:1;layers.a7.style.opacity=mode=='a1'?.12:1;band.style.setProperty('--op',mode=='both'?.12:0);band.style.opacity=mode=='both'?.12:0});
+  g('t-trend').innerHTML='<table><thead><tr><th>Date</th><th>Day</th><th>Received</th><th>1-Day repeats</th><th>1-Day AICR</th><th>7-Day repeats</th><th>7-Day AICR</th><th>Gap (pp)</th><th>Late repeats</th><th>Late share</th></tr></thead><tbody>'+ROWS.map(r=>`<tr><td>${dlab(r.date)}</td><td>${r.weekday}</td><td>${fmtN(r.received)}</td><td>${fmtN(r.rep1)}</td><td>${fmtP(r.a1)}</td><td>${fmtN(r.rep7)}</td><td>${fmtP(r.a7)}</td><td>${r.gap.toFixed(2)}</td><td>${fmtN(r.late)}</td><td>${fmtP(r.lateShare,1)}</td></tr>`).join('')+`</tbody><tfoot><tr><td>Period</td><td></td><td>${fmtN(T.rec)}</td><td>${fmtN(T.rep1)}</td><td>${fmtP(T.a1)}</td><td>${fmtN(T.rep7)}</td><td>${fmtP(T.a7)}</td><td>${T.gap.toFixed(2)}</td><td>${fmtN(T.late)}</td><td>${fmtP(T.lateShare,1)}</td></tr></tfoot></table>`;
+})();
+
+// ---- day explorer ----
+let SEL=ROWS.length-1, timer=null;
+const ramp=['--h1','--h2','--h3','--h4','--h5','--h6'];
+function rampFor(v){const mn=Math.min(...ROWS.map(r=>r.a1)),mx=Math.max(...ROWS.map(r=>r.a1));const k=Math.min(5,Math.floor((v-mn)/(mx-mn+1e-9)*6));return k}
+(function(){g('cal').innerHTML=ROWS.map(r=>{const k=rampFor(r.a1);return `<button data-i="${r.i}" class="${k>=3?'dark':''}" style="--c:var(${ramp[k]})" title="${r.weekday} ${dlong(r.date)}"><span class="d">${r.weekday}</span><span class="n">${r.date.slice(8)} ${MON[+r.date.slice(5,7)-1]}</span><span class="v">${fmtP(r.a1,1)}</span></button>`}).join('');
+  g('cal').addEventListener('click',e=>{const b=e.target.closest('button');if(b){stop();selectDay(+b.dataset.i)}})})();
+const chip=(v,d=2,u=' pp')=>v==null?'<span class="chip neutral">first day</span>':`<span class="chip ${v>0?'good':(v<0?'bad':'neutral')}">${v>0?'▲':(v<0?'▼':'•')} ${Math.abs(v).toFixed(d)}${u} DoD</span>`;
+const chipAvg=(v)=>`<span class="chip ${v>0?'good':(v<0?'bad':'neutral')}">${v>0?'▲':'▼'} ${Math.abs(v).toFixed(2)} pp vs avg</span>`;
+function selectDay(i){SEL=i;const r=ROWS[i],p=ROWS[i-1];
+  [...g('cal').children].forEach(b=>b.classList.toggle('sel',+b.dataset.i===i));
+  const first=r.received-r.rep7, w=x=>(x/r.received*100).toFixed(2)+'%';
+  g('daycard').innerHTML=`<div class="head"><div class="date">${r.weekday}, ${dlong(r.date)}<small>${r.week=='Wk1'?'Week 1':(r.week=='Wk2'?'Week 2':'Week 3 (partial)')} · day ${i+1} of 15</small></div><div class="ctrls"><button id="prev" aria-label="Previous day">◀</button><button id="play" class="${timer?'play':''}">${timer?'❚❚ Pause':'▶ Play'}</button><button id="next" aria-label="Next day">▶</button></div></div>
+  <div class="two"><div class="metric" style="--c:#5b8cf0"><div class="lab">1-Day AICR</div><div class="big" id="dc1">${fmtP(r.a1)}</div><div class="chips">${chip(r.d1)}${chipAvg((r.a1-T.a1)*100)}</div></div><div class="metric" style="--c:#2fd1c8"><div class="lab">7-Day AICR</div><div class="big" id="dc7">${fmtP(r.a7)}</div><div class="chips">${chip(r.d7)}${chipAvg((r.a7-T.a7)*100)}</div></div></div>
+  <div class="flow"><div class="bar"><i style="width:${w(first)};background:var(--teal)"><span>${fmtN(first)} resolved first time</span></i><i style="width:${w(r.rep1)};background:#5b8cf0"><span>${fmtN(r.rep1)}</span></i><i style="width:${w(r.late)};background:#f0905a"><span>${fmtN(r.late)}</span></i></div><div class="keys"><span style="--c:var(--teal)">No repeat within 7 days ${fmtP(r.a7,1)}</span><span style="--c:#5b8cf0">Repeat within 1 day ${fmtP(r.rep1/r.received,1)}</span><span style="--c:#f0905a">Repeat day 2–7 ${fmtP(r.late/r.received,1)}</span></div></div>
+  <div class="facts"><div class="fact">Received<b>${fmtN(r.received)}</b></div><div class="fact">Δ received<b class="${r.dv==null?'':(r.dv>0?'':'')}">${r.dv==null?'—':(r.dv>0?'+':'')+fmtN(r.dv)}</b></div><div class="fact">Gap<b>${r.gap.toFixed(2)} pp</b></div><div class="fact">Late share<b>${fmtP(r.lateShare,1)}</b></div><div class="fact">Call / chat late<b>${fmtN(r.lateCall)} / ${fmtN(r.lateChat)}</b></div></div>`;
+  g('prev').onclick=()=>{stop();selectDay((i+ROWS.length-1)%ROWS.length)};g('next').onclick=()=>{stop();selectDay((i+1)%ROWS.length)};g('play').onclick=()=>timer?stop():play();
+  if(!REDUCED){countUp(g('dc1'),r.a1,v=>fmtP(v),700);countUp(g('dc7'),r.a7,v=>fmtP(v),700)}
+  const rows=[['1-Day AICR',r.a1,p?p.a1:null,T.a1,'var(--s1)',.5,.8,v=>fmtP(v,1)],['7-Day AICR',r.a7,p?p.a7:null,T.a7,'var(--s2)',.5,.8,v=>fmtP(v,1)],['Late share',r.lateShare,p?p.lateShare:null,T.lateShare,'var(--s3)',0,.4,v=>fmtP(v,1)],['Received',r.received,p?p.received:null,T.rec/ROWS.length,'var(--navy-soft)',0,2200,v=>fmtN(v)]];
+  g('daycmp').innerHTML=`<h3>${dlab(r.date)} vs previous day and period average</h3><div class="compare">`+rows.map(([n,v,pv,av,col,mn,mx,f])=>{const pct=x=>((x-mn)/(mx-mn)*100).toFixed(1)+'%';return `<div class="row"><span style="color:var(--muted)">${n}</span><div class="t" style="--c:${col}"><b data-w="${pct(v)}" style="width:${pct(v)}"></b><s style="left:${pct(av)}" title="period average"></s>${pv==null?'':`<s style="left:${pct(pv)};background:var(--s3);width:2px" title="previous day"></s>`}</div><em>${f(v)}</em></div>`}).join('')+`</div><p style="font-size:12px;color:var(--muted);margin:6px 0 10px">Black tick = period average · orange tick = previous day${p?' ('+dlab(p.date)+')':''}</p><div class="rank"><span class="pill">1-Day rank <b>#${r.rk1}</b> of 15</span><span class="pill">7-Day rank <b>#${r.rk7}</b> of 15</span><span class="pill">${r.d1==null?'Baseline day':(r.d1>0&&r.d7>0?'<b class="pos">Improved on both</b>':(r.d1<0&&r.d7<0?'<b class="neg">Declined on both</b>':(r.d1>0?'1-Day up, 7-Day down':'1-Day down, 7-Day up')))}</span></div>`;
+  document.querySelectorAll('#t-dod tbody tr').forEach(tr=>tr.classList.toggle('sel',+tr.dataset.i===i));
+  const sr=document.querySelector(`#t-dod tbody tr[data-i="${i}"]`);
+}
+function play(){if(timer)return;timer=setInterval(()=>selectDay((SEL+1)%ROWS.length),1700);selectDay(SEL)}
+function stop(){if(timer){clearInterval(timer);timer=null}}
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='ArrowLeft'){stop();selectDay((SEL+ROWS.length-1)%ROWS.length)}if(e.key==='ArrowRight'){stop();selectDay((SEL+1)%ROWS.length)}});
+// DoD table (sortable)
+(function(){
+  const cols=[['Date',r=>r.i,r=>dlab(r.date)+' <span style="color:var(--muted)">'+r.weekday+'</span>'],['Received',r=>r.received,r=>fmtN(r.received)],['Δ received',r=>r.dv??-1e9,r=>r.dv==null?'—':`<span class="${sign(r.dv)}">${(r.dv>0?'+':'')+fmtN(r.dv)}</span>`],
+   ['1-Day AICR',r=>r.a1,r=>`<span class="cellbar" style="--c:var(--s1)"><b>${fmtP(r.a1)}</b><i><b data-w="${((r.a1-.5)/.3*100).toFixed(1)}%" style="width:${((r.a1-.5)/.3*100).toFixed(1)}%"></b></i></span>`],['DoD',r=>r.d1??-1e9,r=>r.d1==null?'<span class="chip neutral">—</span>':`<span class="chip ${r.d1>0?'good':'bad'}">${r.d1>0?'▲':'▼'} ${Math.abs(r.d1).toFixed(2)}</span>`],['vs avg',r=>r.a1-T.a1,r=>`<span class="${sign(r.a1-T.a1)}">${fmtPP((r.a1-T.a1)*100)}</span>`],['Rank',r=>-r.rk1,r=>'#'+r.rk1],
+   ['7-Day AICR',r=>r.a7,r=>`<span class="cellbar" style="--c:var(--s2)"><b>${fmtP(r.a7)}</b><i><b data-w="${((r.a7-.5)/.3*100).toFixed(1)}%" style="width:${((r.a7-.5)/.3*100).toFixed(1)}%"></b></i></span>`],['DoD',r=>r.d7??-1e9,r=>r.d7==null?'<span class="chip neutral">—</span>':`<span class="chip ${r.d7>0?'good':'bad'}">${r.d7>0?'▲':'▼'} ${Math.abs(r.d7).toFixed(2)}</span>`],['vs avg',r=>r.a7-T.a7,r=>`<span class="${sign(r.a7-T.a7)}">${fmtPP((r.a7-T.a7)*100)}</span>`],['Rank',r=>-r.rk7,r=>'#'+r.rk7],
+   ['Gap (pp)',r=>r.gap,r=>r.gap.toFixed(2)],['Late',r=>r.late,r=>fmtN(r.late)],['Late share',r=>r.lateShare,r=>fmtP(r.lateShare,1)],['Day trend',r=>(r.d1>0)+(r.d7>0),r=>r.d1==null?'Baseline':(r.d1>0&&r.d7>0?'<span class="pos">Improved on both</span>':(r.d1<0&&r.d7<0?'<span class="neg">Declined on both</span>':(r.d1>0?'1-Day up, 7-Day down':'1-Day down, 7-Day up')))]];
+  let sortCol=0,asc=true;
+  function render(){const data=[...ROWS].sort((a,b)=>{const va=cols[sortCol][1](a),vb=cols[sortCol][1](b);return asc?va-vb:vb-va});
+    g('t-dod').innerHTML='<table><thead><tr>'+cols.map((c,i)=>`<th data-c="${i}" class="${i===sortCol?'sorted'+(asc?' asc':''):''}" ${i==14?'style="text-align:left"':''}>${c[0]}</th>`).join('')+'</tr></thead><tbody>'+data.map(r=>`<tr data-i="${r.i}" class="${r===best1?'hi-best':(r===worst1?'hi-worst':'')} ${r.i===SEL?'sel':''}">`+cols.map((c,i)=>`<td ${i==14?'style="text-align:left"':''}>${c[2](r)}</td>`).join('')+'</tr>').join('')+
+    `</tbody><tfoot><tr><td>Period</td><td>${fmtN(T.rec)}</td><td></td><td>${fmtP(T.a1)}</td><td>${chip((ROWS.at(-1).a1-ROWS[0].a1)*100).replace(' DoD',' first→last')}</td><td></td><td></td><td>${fmtP(T.a7)}</td><td>${chip((ROWS.at(-1).a7-ROWS[0].a7)*100).replace(' DoD',' first→last')}</td><td></td><td></td><td>${T.gap.toFixed(2)}</td><td>${fmtN(T.late)}</td><td>${fmtP(T.lateShare,1)}</td><td style="text-align:left">${ROWS.filter(r=>r.d1<0&&r.d7<0).length} declined on both · ${ROWS.filter(r=>r.d1>0&&r.d7>0).length} improved on both</td></tr></tfoot></table>`;
+    g('t-dod').querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const c=+th.dataset.c;if(c===sortCol)asc=!asc;else{sortCol=c;asc=c===0}render()}));
+    g('t-dod').querySelectorAll('tbody tr').forEach(tr=>tr.addEventListener('click',()=>{stop();selectDay(+tr.dataset.i)}));
+    requestAnimationFrame(()=>g('t-dod').querySelectorAll('[data-w]').forEach(n=>n.style.width=n.dataset.w));
+  }
+  render();
+})();
+selectDay(SEL);
+
+// ---- bars helper ----
+function bars(id,series,o){
+  const c=g(id),W=600,H=300,m={t:18,r:12,b:40,l:48};const cats=o.cats||ROWS.map(r=>dlab(r.date));const N=cats.length,bw=(W-m.l-m.r)/N;const max=o.max||Math.max(...cats.map((_,i)=>series.reduce((s,q)=>s+q.v[i],0)))*1.12;const y0=o.min||0;const ys=v=>m.t+(1-(v-y0)/(max-y0))*(H-m.t-m.b);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':o.label});const ticks=o.ticks||5;
+  for(let k=0;k<=ticks;k++){const v=y0+(max-y0)*k/ticks;svg.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:ys(v),y2:ys(v),stroke:'var(--grid)'}));svg.appendChild(el('text',{x:m.l-6,y:ys(v)+4,'text-anchor':'end','font-size':11,fill:'var(--muted)'},o.fmt?o.fmt(v):fmtN(v)))}
+  cats.forEach((lab,i)=>{if(!o.every||i%o.every==0)svg.appendChild(el('text',{x:m.l+bw*(i+.5),y:H-m.b+16,'text-anchor':'middle','font-size':11,fill:'var(--muted)'},lab))});
+  if(o.avg!=null){svg.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:ys(o.avg),y2:ys(o.avg),stroke:'var(--ink)','stroke-dasharray':'5 4',opacity:.6}));svg.appendChild(el('text',{x:W-m.r,y:ys(o.avg)-5,'text-anchor':'end','font-size':11,fill:'var(--muted)'},'avg '+(o.fmt?o.fmt(o.avg):fmtN(o.avg))))}
+  const tip=tipFor(c);
+  cats.forEach((lab,i)=>{let acc=y0;const grpN=o.grouped?series.length:1,gw=bw*.68/grpN;
+    series.forEach((q,si)=>{const v=q.v[i];let x,y,h,w;if(o.grouped){x=m.l+bw*i+bw*.16+gw*si;w=gw-2;y=ys(v);h=ys(y0)-ys(v)}else{x=m.l+bw*i+bw*.16;w=bw*.68;y=ys(acc+v);h=ys(acc)-ys(acc+v);acc+=v}
+      const r=el('rect',{x,y,width:w,height:Math.max(0,h-(si>0&&!o.grouped?2:0)),fill:typeof q.c=='function'?q.c(i):q.c,rx:3,class:'grow'});r.style.animationDelay=(i*.05)+'s';svg.appendChild(r);
+      if(o.labels&&(o.grouped||si==series.length-1)){const t=el('text',{x:x+w/2,y:y-5,'text-anchor':'middle','font-size':10.5,fill:'var(--ink)',class:'fadein'},o.labels(i,si));svg.appendChild(t)}});
+    const hit=el('rect',{x:m.l+bw*i,y:m.t,width:bw,height:H-m.t-m.b,fill:'transparent'});svg.appendChild(hit);
+    hit.addEventListener('mousemove',e=>showTip(tip,c,e,`<b>${o.title?o.title(i):lab}</b>`+series.map(q=>`<div class="row"><i style="--c:${typeof q.c=='function'?q.c(i):q.c}">${q.n}</i><span>${q.f?q.f(q.v[i],i):fmtN(q.v[i])}</span></div>`).join('')+(o.extra?o.extra(i):'')));
+    hit.addEventListener('mouseleave',()=>tip.style.display='none');
+    if(o.click)hit.addEventListener('click',()=>o.click(i));});
+  c.appendChild(svg);
+}
+const clickDay=i=>{stop();selectDay(i);g('dod').scrollIntoView({behavior:'smooth'})};
+bars('c-stack',[{n:'Within 1 day',c:'var(--s1)',v:ROWS.map(r=>r.rep1)},{n:'Surfaced day 2–7',c:'var(--s3)',v:ROWS.map(r=>r.late)}],{label:'Repeat contacts per day',every:2,labels:i=>fmtP(ROWS[i].lateShare,0),extra:i=>`<div class="row"><i style="--c:var(--line)">Late share</i><span>${fmtP(ROWS[i].lateShare,1)}</span></div>`,click:clickDay});
+bars('c-gap',[{n:'Gap',c:i=>ROWS[i].gap>T.gap?'var(--s3)':'var(--s3-soft)',v:ROWS.map(r=>r.gap),f:v=>v.toFixed(2)+' pp'}],{label:'Gap per day',every:2,max:15,fmt:v=>v.toFixed(0)+' pp',labels:i=>ROWS[i].gap.toFixed(1),avg:T.gap,click:clickDay});
+bars('c-vol',[{n:'Received',c:i=>ROWS[i].i===SEL?'var(--s1)':'var(--navy-soft)',v:ROWS.map(r=>r.received)}],{label:'Contacts received per day',every:2,avg:T.rec/ROWS.length,extra:i=>`<div class="row"><i style="--c:var(--s1)">1-Day AICR</i><span>${fmtP(ROWS[i].a1)}</span></div>`,click:clickDay});
+bars('c-chan',[{n:'Call, late',c:'var(--s1)',v:ROWS.map(r=>r.lateCall)},{n:'Chat, late',c:'var(--s3)',v:ROWS.map(r=>r.lateChat)}],{label:'Late repeats by channel per day',every:2,click:clickDay});
+(function(){const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const agg=days.map(d=>{const rs=ROWS.filter(r=>r.weekday==d);const rec=rs.reduce((s,r)=>s+r.received,0);return{d,n:rs.length,rec,a1:1-rs.reduce((s,r)=>s+r.rep1,0)/rec,a7:1-rs.reduce((s,r)=>s+r.rep7,0)/rec}});
+  bars('c-dow',[{n:'1-Day AICR',c:'var(--s1)',v:agg.map(a=>a.a1),f:v=>fmtP(v)},{n:'7-Day AICR',c:'var(--s2)',v:agg.map(a=>a.a7),f:v=>fmtP(v)}],{label:'AICR by day of week',cats:days,grouped:true,min:.5,max:.8,ticks:6,fmt:v=>Math.round(v*100)+'%',labels:(i,si)=>fmtP(si?agg[i].a7:agg[i].a1,0),title:i=>`${days[i]} · ${agg[i].n} days · ${fmtN(agg[i].rec)} contacts`})})();
+
+// ---- bridge (waterfall) ----
+(function(){const c=g('c-bridge'),W=600,H=300,m={t:18,r:12,b:46,l:48};const steps=[['All contacts',1,1,'var(--navy-soft)'],['Repeat within 1 day',T.a1,1,'var(--s1)'],['1-Day AICR',T.a1,T.a1,'var(--teal)'],['Repeat day 2–7',T.a7,T.a1,'var(--s3)'],['7-Day AICR',T.a7,T.a7,'var(--s2)']];
+  const bw=(W-m.l-m.r)/steps.length;const ys=v=>m.t+(1-v)*(H-m.t-m.b);const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Bridge from all contacts to 7-day AICR'});
+  for(let v=0;v<=1.001;v+=.2){svg.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:ys(v),y2:ys(v),stroke:'var(--grid)'}));svg.appendChild(el('text',{x:m.l-6,y:ys(v)+4,'text-anchor':'end','font-size':11,fill:'var(--muted)'},Math.round(v*100)+'%'))}
+  const tip=tipFor(c);
+  steps.forEach(([lab,lo,hi,col],i)=>{const x=m.l+bw*i+bw*.15,w=bw*.7;const r=el('rect',{x,y:ys(hi),width:w,height:ys(lo)-ys(hi),fill:col,rx:4,class:'grow'});r.style.animationDelay=(i*.18)+'s';svg.appendChild(r);
+    const val=i==1||i==3?hi-lo:hi;svg.appendChild(el('text',{x:x+w/2,y:ys(hi)-6,'text-anchor':'middle','font-size':12,'font-weight':700,fill:'var(--ink)',class:'fadein'},(i==1||i==3?'−':'')+fmtP(val,1)));
+    lab.split(' ').reduce((acc,wd)=>{const last=acc.at(-1);if(last&&(last+' '+wd).length<14){acc[acc.length-1]=last+' '+wd}else acc.push(wd);return acc},[]).forEach((ln,k)=>svg.appendChild(el('text',{x:x+w/2,y:H-m.b+14+k*12,'text-anchor':'middle','font-size':10.5,fill:'var(--muted)'},ln)));
+    if(i<steps.length-1){svg.appendChild(el('line',{x1:x+w,x2:x+w+bw*.3,y1:ys(lo),y2:ys(lo),stroke:'var(--muted)','stroke-dasharray':'3 3',class:'fadein'}))}
+    const hit=el('rect',{x:m.l+bw*i,y:m.t,width:bw,height:H-m.t-m.b,fill:'transparent'});svg.appendChild(hit);
+    const cnt=[T.rec,T.rep1,T.rec-T.rep1,T.late,T.rec-T.rep7][i];
+    hit.addEventListener('mousemove',e=>showTip(tip,c,e,`<b>${lab}</b><div class="row"><i style="--c:${col}">Contacts</i><span>${fmtN(cnt)}</span></div><div class="row"><i style="--c:var(--line)">Share</i><span>${fmtP(cnt/T.rec,2)}</span></div>`));hit.addEventListener('mouseleave',()=>tip.style.display='none');});
+  c.appendChild(svg)})();
+
+// ---- weeks ----
+(function(){const names={Wk1:'Week 1 · 22–28 Sep',Wk2:'Week 2 · 29 Sep–5 Oct',Wk3:'6 Oct · partial week 3'};const ch=v=>`<span class="chip ${v>0?'good':(v<0?'bad':'neutral')}">${v>0?'▲':(v<0?'▼':'•')} ${fmtPP(v,2)} vs Wk1</span>`;
+  g('wk-grid').innerHTML=WK.map((k,i)=>`<div class="card"><div class="eyebrow" style="color:var(--teal)">${names[k.w]}</div><div class="big" style="color:var(--s1)" data-count="${k.a1}" data-fmt="v=>(v*100).toFixed(2)+'%'">${fmtP(k.a1)}</div><div class="meter" style="--c:var(--s1)"><b data-w="${((k.a1-.5)/.3*100).toFixed(1)}%"></b></div>${i?ch((k.a1-WK[0].a1)*100):'<span class="chip neutral">1-Day · baseline</span>'}<div class="big" style="color:var(--s2);margin-top:4px" data-count="${k.a7}" data-fmt="v=>(v*100).toFixed(2)+'%'">${fmtP(k.a7)}</div><div class="meter" style="--c:var(--s2)"><b data-w="${((k.a7-.5)/.3*100).toFixed(1)}%"></b></div>${i?ch((k.a7-WK[0].a7)*100):'<span class="chip neutral">7-Day · baseline</span>'}<dl class="dl" style="margin-top:6px"><dt>Days</dt><dd>${k.n}</dd><dt>Received</dt><dd>${fmtN(k.rec)}</dd><dt>Gap</dt><dd>${((k.a1-k.a7)*100).toFixed(2)} pp</dd><dt>Late share</dt><dd>${fmtP(k.lateShare,1)}</dd></dl></div>`).join('')+
+  `<div class="card"><div class="eyebrow" style="color:var(--teal)">Weekday vs weekend</div>${[['Weekdays',r=>!['Sat','Sun'].includes(r.weekday)],['Weekend',r=>['Sat','Sun'].includes(r.weekday)]].map(([n,f])=>{const rs=ROWS.filter(f);const rec=rs.reduce((s,r)=>s+r.received,0);const a1=1-rs.reduce((s,r)=>s+r.rep1,0)/rec,a7=1-rs.reduce((s,r)=>s+r.rep7,0)/rec;return `<div style="font-size:13px;color:var(--muted);margin-top:6px">${n} · ${rs.length} days · ${fmtN(rec/rs.length)}/day</div><div style="display:flex;gap:10px;align-items:center"><b style="color:var(--s1);width:64px">${fmtP(a1,1)}</b><div class="meter" style="--c:var(--s1);flex:1"><b data-w="${((a1-.5)/.3*100).toFixed(1)}%"></b></div></div><div style="display:flex;gap:10px;align-items:center"><b style="color:var(--s2);width:64px">${fmtP(a7,1)}</b><div class="meter" style="--c:var(--s2);flex:1"><b data-w="${((a7-.5)/.3*100).toFixed(1)}%"></b></div></div>`}).join('')}<p style="margin:10px 0 0;color:var(--muted);font-size:13px">Same result at 1,085 or 1,717 contacts a day: volume is not the driver.</p></div>`})();
+
+// ---- channel ----
+(function(){const cl={n:'Call',r1:T.call1,r7:T.call7},ch={n:'Chat',r1:T.chat1,r7:T.chat7};
+  const donut=(v,col,lab)=>{const r=34,C=2*Math.PI*r;return `<svg viewBox="0 0 90 90" style="width:92px;height:92px;flex:none"><circle cx="45" cy="45" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="10"/><circle cx="45" cy="45" r="${r}" fill="none" stroke="${col}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C*v} ${C}" transform="rotate(-90 45 45)" class="growx" style="transform-box:view-box"/><text x="45" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">${fmtP(v,0)}</text></svg>`};
+  g('chan-tiles').innerHTML=`<h3>Late share by channel</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div style="display:flex;gap:10px;align-items:center">${donut((cl.r7-cl.r1)/cl.r7,'var(--s1)')}<div><b style="font-size:18px">Call</b><div style="font-size:13px;color:var(--muted)">${fmtN(cl.r7-cl.r1)} of ${fmtN(cl.r7)} call repeats surfaced on day 2–7</div></div></div><div style="display:flex;gap:10px;align-items:center">${donut((ch.r7-ch.r1)/ch.r7,'var(--s3)')}<div><b style="font-size:18px">Chat</b><div style="font-size:13px;color:var(--muted)">${fmtN(ch.r7-ch.r1)} of ${fmtN(ch.r7)} chat repeats surfaced on day 2–7</div></div></div></div>
+  <div class="tbl"><table><thead><tr><th style="cursor:default">Channel</th><th style="cursor:default">1-Day repeats</th><th style="cursor:default">7-Day repeats</th><th style="cursor:default">Late (day 2–7)</th><th style="cursor:default">Late share</th><th style="cursor:default">Share of 7-Day repeats</th></tr></thead><tbody>`+[cl,ch].map(x=>`<tr><td>${x.n}</td><td>${fmtN(x.r1)}</td><td>${fmtN(x.r7)}</td><td>${fmtN(x.r7-x.r1)}</td><td><b class="${x.n=='Chat'?'neg':''}">${fmtP((x.r7-x.r1)/x.r7,1)}</b></td><td>${fmtP(x.r7/T.rep7,1)}</td></tr>`).join('')+`</tbody><tfoot><tr><td>Total</td><td>${fmtN(T.rep1)}</td><td>${fmtN(T.rep7)}</td><td>${fmtN(T.late)}</td><td>${fmtP(T.lateShare,1)}</td><td>100%</td></tr></tfoot></table></div><p style="color:var(--muted);font-size:13px;margin:10px 0 0">Chat is ${fmtP(T.chat1/T.rep1,1)} of repeats on day 1 but ${fmtP(T.chat7/T.rep7,1)} by day 7. The export does not split contacts received by channel, so a chat-only AICR cannot be computed.</p>`})();
+
+// ---- callback ----
+(function(){const c=g('c-cb'),tot=CB.reduce((s,x)=>s+x[1],0),W=600,H=340,m={t:8,r:70,b:8,l:110};const rh=(H-m.t-m.b)/CB.length,max=Math.max(...CB.map(x=>x[1]))*1.05,xs=v=>m.l+v/max*(W-m.l-m.r);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Fail calls by callback timeframe'});const tip=tipFor(c);let cum=0;
+  CB.forEach(([lab,v],i)=>{cum+=v;const y=m.t+rh*i+rh*.15,h=rh*.7,late=i>=5,col=late?'var(--s3)':'var(--s1)';
+    svg.appendChild(el('text',{x:m.l-8,y:y+h/2+4,'text-anchor':'end','font-size':12,fill:'var(--ink)'},lab));
+    const r=el('rect',{x:m.l,y,width:xs(v)-m.l,height:h,fill:col,rx:4,class:'growx'});r.style.animationDelay=(i*.08)+'s';svg.appendChild(r);
+    svg.appendChild(el('text',{x:xs(v)+6,y:y+h/2+4,'font-size':12,fill:'var(--ink)','font-weight':700,class:'fadein'},fmtP(v/tot,1)+(i<3?'':'')));
+    const cc=cum;const hit=el('rect',{x:0,y:m.t+rh*i,width:W,height:rh,fill:'transparent'});svg.appendChild(hit);
+    hit.addEventListener('mousemove',e=>showTip(tip,c,e,`<b>${lab}</b><div class="row"><i style="--c:${col}">Fail calls</i><span>${fmtN(v)}</span></div><div class="row"><i style="--c:var(--line)">Share</i><span>${fmtP(v/tot,2)}</span></div><div class="row"><i style="--c:var(--line)">Cumulative</i><span>${fmtP(cc/tot,1)}</span></div>`));hit.addEventListener('mouseleave',()=>tip.style.display='none')});
+  const y2h=m.t+rh*3;svg.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:y2h,y2:y2h,stroke:'var(--ink)','stroke-dasharray':'5 4',opacity:.6,class:'fadein'}));svg.appendChild(el('text',{x:W-m.r,y:y2h-5,'text-anchor':'end','font-size':11.5,'font-weight':700,fill:'var(--ink)',class:'fadein'},'50.1% come back within 2 hours'));
+  const y1d=m.t+rh*5;svg.appendChild(el('line',{x1:m.l,x2:W-m.r,y1:y1d,y2:y1d,stroke:'var(--s3)','stroke-dasharray':'5 4',opacity:.8,class:'fadein'}));svg.appendChild(el('text',{x:W-m.r,y:y1d-5,'text-anchor':'end','font-size':11.5,'font-weight':700,fill:'var(--s3)',class:'fadein'},'75.9% within the 1-Day window'));
+  c.appendChild(svg);c.insertAdjacentHTML('afterend','<div class="legend" style="margin-top:8px"><span style="--c:var(--s1)">Within the 1-Day window</span><span style="--c:var(--s3)">Day 2 and later</span></div>');
+  const roll=[['Within 30 minutes',[0]],['Within 2 hours',[0,1,2]],['Within 24 hours (1-Day window)',[0,1,2,3,4]],['Day 2–7 (late repeats)',[5,6]],['Within 7 days (7-Day window)',[0,1,2,3,4,5,6]],['Beyond 7 days',[7]]];
+  g('t-cb').innerHTML='<table><thead><tr><th style="cursor:default">Window</th><th style="cursor:default">Fail calls</th><th style="cursor:default">% of total</th><th style="cursor:default;width:120px"></th></tr></thead><tbody>'+roll.map(([n,ix])=>{const v=ix.reduce((s,i)=>s+CB[i][1],0);return `<tr><td>${n}</td><td>${fmtN(v)}</td><td><b>${fmtP(v/tot,1)}</b></td><td><div class="meter" style="--c:${ix[0]>=5?'var(--s3)':'var(--s1)'}"><b data-w="${(v/tot*100).toFixed(1)}%"></b></div></td></tr>`}).join('')+`</tbody><tfoot><tr><td>All fail calls</td><td>${fmtN(tot)}</td><td>100%</td><td></td></tr></tfoot></table><p style="color:var(--muted);font-size:13px;margin:10px 0 0">Cross-check: the daily tables put the day 2–7 share of call repeats at ${fmtP((T.call7-T.call1)/T.call7,1)}; this export puts it at ${fmtP((CB[5][1]+CB[6][1])/tot,1)}. Consistent, allowing for the different cut.</p>`})();
+
+// ---- scorecard ----
+(function(){const ring=(v,col)=>{const r=20,C=2*Math.PI*r;return `<svg viewBox="0 0 50 50" style="width:48px;height:48px;position:absolute;right:12px;top:12px"><circle cx="25" cy="25" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="6"/><circle cx="25" cy="25" r="${r}" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C*v} ${C}" transform="rotate(-90 25 25)"/></svg>`};
+  g('score-grid').innerHTML=`
+  <div class="kpi" style="--c:var(--navy)"><div class="lab">AICR fail calls</div><div class="val" data-count="${SCORE.fail}" data-fmt="v=>Math.round(v).toLocaleString('en-US')">${fmtN(SCORE.fail)}</div><div class="sub">all callback timeframes, site total</div></div>
+  <div class="kpi" style="--c:var(--navy)"><div class="lab">AHT</div><div class="val" data-count="${SCORE.aht/60}" data-fmt="v=>v.toFixed(1)+' min'">${(SCORE.aht/60).toFixed(1)} min</div><div class="sub">${fmtN(SCORE.aht)} seconds average handle time</div></div>
+  <div class="kpi" style="--c:var(--s3)">${ring(SCORE.xfrp,'var(--s3)')}<div class="lab">Transfer rate (XFR)</div><div class="val" data-count="${SCORE.xfrp}" data-fmt="v=>(v*100).toFixed(2)+'%'">${fmtP(SCORE.xfrp)}</div><div class="sub">${fmtN(SCORE.xfr)} transferred · feeds 0–30 min callbacks</div></div>
+  <div class="kpi" style="--c:var(--teal)"><div class="lab">TNPS</div><div class="val" data-count="${SCORE.tnps}" data-fmt="v=>v.toFixed(2)">${SCORE.tnps.toFixed(2)}</div><div class="sub">transactional NPS as exported</div></div>
+  <div class="kpi" style="--c:var(--s3)">${ring(SCORE.cpr,'var(--s2)')}<div class="lab">CPR</div><div class="val" data-count="${SCORE.cpr}" data-fmt="v=>(v*100).toFixed(2)+'%'">${fmtP(SCORE.cpr)}</div><div class="sub">customers reporting their issue resolved</div></div>
+  <div class="kpi" style="--c:var(--good)"><div class="lab">Invalid releases</div><div class="val">${fmtP(SCORE.invp)}</div><div class="sub">${SCORE.inv} possible · ${SCORE.rel60} releases under 60 s · not a repeat driver</div></div>`})();
+
+// ---- insights ----
+(function(){const INS=[
+ [fmtP(T.lateShare,0),'Report the 7-Day number, coach on the 1-Day number',`7-Day AICR is ${fmtP(T.a7)} against ${fmtP(T.a1)} on 1-Day, an ${T.gap.toFixed(1)} pp gap that never narrows below 10 pp on any day. ${fmtP(T.lateShare,0)} of repeats are invisible on day 1. The two move together (correlation 0.82), so yesterday's 1-Day result is a reliable early warning for the 7-Day KPI.`,'<b>Action:</b> leaders read 1-Day AICR every morning for coaching; the supervisor reports 7-Day AICR weekly for the week that closed 7 days ago, so the number is mature.'],
+ ['50%','Attack the first two hours',`Half of all repeat calls (50.1%) come back within two hours, and 28.5% within 30 minutes. A callback that fast means the call ended without a confirmed fix, in a failed transfer, or in a disconnect. The 18.2% transfer rate is the most likely feeder.`,'<b>Action:</b> each leader pulls two 0–30 minute callbacks per agent per week and listens to the original call. Coach a mandatory close: restate the fix, test it with the customer, confirm nothing else is open, and avoid transfers that can be resolved in place.'],
+ ['−2.8 pp','Week 2 slipped: 1–2 Oct are the days to investigate',`Week 1 ran ${fmtP(WK[0].a1,1)} on 1-Day and Week 2 ${fmtP(WK[1].a1,1)} on identical volume. 1 Oct (${fmtP(worst1.a1,1)} 1-Day) and 2 Oct (${fmtP(worst7.a7,1)} 7-Day) are the worst days of the period. 6 Oct recovered to ${fmtP(ROWS.at(-1).a1,1)} but is still below Week 1.`,'<b>Action:</b> pull agent-level repeat counts for 1–2 Oct, check for a product, outage or process change on those days, and have each leader name which of their agents drove the increase.'],
+ ['r ≈ 0','Volume is not the excuse',`Correlation between contacts received and AICR is −0.08 (1-Day) and 0.01 (7-Day). Weekends at ~1,085 contacts a day score the same as weekdays at ~1,717. 5 Oct was the busiest day (2,057 contacts) and sat right at the average.`,'<b>Action:</b> keep the conversation on resolution quality per agent, not on staffing or queue pressure, when leaders review repeats.'],
+ ['46%','Chat needs a follow-through standard',`46% of chat repeats surface only on day 2–7, versus 27% of call repeats. Chat is a small share of repeats (${fmtP(T.chat7/T.rep7,1)}) but its late share is almost double, which usually means chats are closed before the fix is confirmed or the ticket is left open without an owner.`,'<b>Action:</b> QA samples chats with a day 2–7 repeat; add "fix confirmed / next step stated / ticket status" to the chat QA form.'],
+ ['23.6%','Day 2–7 repeats point at repair commitments',`23.6% of fail calls come back on day 2–7 (1,905 calls in the Distribution export; 2,384 late call repeats in the daily tables). In a repair line these are typically missed callbacks, dispatch or repair dates not met, or a fix that did not hold.`,'<b>Action:</b> track promised-callback and dispatch dates for the team; have leaders review every repeat where a commitment date passed before the customer called back, and escalate process gaps rather than coaching them as agent errors.'],
+ [fmtP(SCORE.cpr,1),'Resolution scores agree with the repeat picture',`CPR is ${fmtP(SCORE.cpr,1)} and TNPS ${SCORE.tnps.toFixed(2)}, with AHT at ${(SCORE.aht/60).toFixed(1)} minutes. Fewer than half of surveyed customers say their issue was resolved, consistent with a ${fmtP(T.a7,1)} 7-Day AICR. Invalid releases (0.10%) and sub-60-second releases (0) rule out call-avoidance as a cause.`,'<b>Action:</b> use CPR and 7-Day AICR together in the monthly review; a rise in 7-Day AICR without a rise in CPR means repeats moved outside the window rather than being solved.']];
+  g('insights').innerHTML=INS.map((x,i)=>`<div class="ins"><div class="n">${i+1}</div><div><h3><span class="num">${x[0]}</span>${x[1]}</h3><p>${x[2]}</p><p class="act">${x[3]}</p></div></div>`).join('')})();
+
+// ---- reveal, nav, progress ----
+document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
+document.querySelectorAll('.card,.kpi').forEach(s=>{if(!s.closest('.reveal'))io.observe(s)});
+const navLinks=[...document.querySelectorAll('#nav a')];const secs=navLinks.map(a=>document.querySelector(a.getAttribute('href')));
+function onScroll(){const h=document.documentElement;g('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';let cur=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<140)cur=i});navLinks.forEach((a,i)=>a.classList.toggle('active',i===cur))}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+</script>
