@@ -2735,6 +2735,10 @@ html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--text-3) 
 .spark__dot.is-bad { fill: var(--danger); }
 .trend__item--tnps .spark__line { stroke: var(--c-people); } .trend__item--tnps .spark__area { fill: color-mix(in srgb, var(--c-people) 14%, transparent); }
 .trend__item--itg .spark__line { stroke: var(--c-tech); } .trend__item--itg .spark__area { fill: color-mix(in srgb, var(--c-tech) 14%, transparent); }
+/* Home: the upload is the first action; data freshness under the hero buttons */
+.hero__data { display: flex; align-items: center; gap: 7px; margin: 14px 0 0; font-size: 12.5px; font-weight: 600; color: rgba(255, 255, 255, 0.78); }
+.hero__data .icon { width: 14px; height: 14px; color: #34c3b5; flex: none; }
+.score-card__btns { display: inline-flex; gap: 6px; margin-left: auto; }
 </style>
 </head>
 <body>
@@ -8828,10 +8832,12 @@ function renderHome(main) {
       h(
         'div',
         { class: 'hero__actions' },
-        h('a', { class: 'btn hero__cta', href: '#/call-review', 'data-fk': 'home-review' }, icon('checklist'), 'Start a call review'),
+        h('button', { type: 'button', class: 'btn hero__cta', 'data-fk': 'home-load', onclick: importSnapshotFromFile }, icon('upload'), "Load today's export"),
+        h('a', { class: 'btn hero__ghost', href: '#/call-review', 'data-fk': 'home-review' }, icon('checklist'), 'Start a call review'),
         h('a', { class: 'btn hero__ghost', href: '#/today', 'data-fk': 'home-today' }, icon('pulse'), todayOpenCount() ? `My Day (${todayOpenCount()} left)` : 'My Day'),
         h('a', { class: 'btn hero__ghost', href: '#/builder', 'data-fk': 'home-builder' }, icon('clipboard'), bc ? `Coaching Builder (${bc})` : 'Coaching Builder')
-      )
+      ),
+      h('p', { class: 'hero__data' }, icon(hasSnapshot() ? 'calendar' : 'alert', 'icon--sm'), hasSnapshot() ? `Numbers as of ${fmtDay(state.kpis.asOf, true)} · ${plural(state.kpis.agents.length, 'agent')} in the export · load the daily Excel report to move the date forward` : 'No numbers loaded yet. Load the daily Excel report from the LOB to see every agent against target.')
     )
   );
 
@@ -11499,7 +11505,7 @@ function teamScoreboard(opts = {}) {
       { class: 'card__head' },
       h('h2', { class: 'card__title', id: 'scoreTitle' }, icon('trend'), 'Team scoreboard'),
       h('span', { class: 'sec__sub' }, `${k.label || k.asOf}${k.team.rank.score ? ` · leader score #${k.team.rank.score} of ${k.team.of}` : ''}`),
-      opts.compact ? h('a', { class: 'btn btn--ghost btn--sm', href: '#/team', 'data-fk': 'score-team' }, 'Team Pulse', icon('arrow-right')) : h('button', { type: 'button', class: 'btn btn--ghost btn--sm', 'data-fk': 'score-load', onclick: importSnapshotFromFile }, icon('upload'), 'Load newer export')
+      h('span', { class: 'score-card__btns' }, h('button', { type: 'button', class: 'btn btn--ghost btn--sm', 'data-fk': 'score-load', onclick: importSnapshotFromFile }, icon('upload'), 'Load export'), opts.compact ? h('a', { class: 'btn btn--ghost btn--sm', href: '#/team', 'data-fk': 'score-team' }, 'Team Pulse', icon('arrow-right')) : null)
     ),
     h(
       'div',
