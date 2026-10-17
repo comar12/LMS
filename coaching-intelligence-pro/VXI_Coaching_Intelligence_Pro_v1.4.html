@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <title>Coaching Intelligence Pro — VXI</title>
 <meta name="description" content="Offline coaching reference library and coaching builder for contact center supervisors.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23121826'/%3E%3Cpath d='M9 9l14 14M23 9L9 23' fill='none' stroke='%23F26522' stroke-width='4.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23F26522'/%3E%3Cpath d='M10 10l12 12M22 10L10 22' fill='none' stroke='%23FFFFFF' stroke-width='4.4' stroke-linecap='round'/%3E%3C/svg%3E">
 <script>(function(){try{var p=JSON.parse(localStorage.getItem('cip.v1.prefs')||'{}');if(p&&(p.theme==='light'||p.theme==='dark')){document.documentElement.setAttribute('data-theme',p.theme);}var c=JSON.parse(localStorage.getItem('cip.v1.brandcss')||'""');if(typeof c==='string'&&c&&p&&p.brand){var st=document.createElement('style');st.id='brand-style';st.textContent=c;document.head.appendChild(st);}}catch(e){}})();</script>
 <style>
 /* ==========================================================================
@@ -17,8 +17,8 @@
    ========================================================================== */
 
 :root {
-  --font: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Inter", "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font: "Calibri", "Carlito", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Calibri", "Carlito", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
 
   --sidebar-w: 256px;
@@ -2830,7 +2830,7 @@ html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--text-3) 
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .workspace { background: radial-gradient(1100px 480px at 85% -180px, rgba(242, 101, 34, 0.16), transparent 66%), radial-gradient(820px 560px at -140px 108%, rgba(43, 86, 194, 0.16), transparent 66%), var(--bg); } }
 
 /* ---------- Logo: the orange X on charcoal ---------- */
-.brand__mark { background: #0b1220 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8.2 8.2l15.6 15.6M23.8 8.2L8.2 23.8' stroke='%23F26522' stroke-width='5.4' stroke-linecap='square'/%3E%3C/svg%3E") center / 100% 100% no-repeat; border-radius: 10px; box-shadow: 0 8px 22px -6px rgba(242, 101, 34, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(242, 101, 34, 0.25); }
+.brand__mark { background: #F26522 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23F26522'/%3E%3Cpath d='M10 10l12 12M22 10L10 22' fill='none' stroke='%23FFFFFF' stroke-width='4.4' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat; border-radius: 10px; box-shadow: 0 8px 22px -6px rgba(242, 101, 34, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(242, 101, 34, 0.25); }
 .brand__mark .logo-bg, .brand__mark .logo-fg, .brand__mark .logo-dot { display: none; }
 .brand:hover .brand__mark { box-shadow: 0 10px 28px -6px rgba(242, 101, 34, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(242, 101, 34, 0.4); }
 .brand__sub { color: #ffb089; }
@@ -3079,7 +3079,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.4.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -3190,19 +3190,19 @@ function setIcon(svg, name) {
 }
 
 function logoSvg() {
+  // The VXI mark: a rounded orange tile with a bold white X.
   const svg = document.createElementNS(SVGNS, 'svg');
   svg.setAttribute('viewBox', '0 0 32 32');
   svg.setAttribute('class', 'brand__mark');
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
   const rect = document.createElementNS(SVGNS, 'rect');
-  // The VXI mark: an orange geometric X on charcoal.
-  rect.setAttribute('width', '32'); rect.setAttribute('height', '32'); rect.setAttribute('rx', '9'); rect.setAttribute('fill', '#121826'); rect.setAttribute('class', 'logo-bg');
+  rect.setAttribute('width', '32'); rect.setAttribute('height', '32'); rect.setAttribute('rx', '9'); rect.setAttribute('fill', '#F26522'); rect.setAttribute('class', 'logo-bg');
   const path = document.createElementNS(SVGNS, 'path');
-  path.setAttribute('d', 'M9 9l14 14M23 9L9 23');
-  path.setAttribute('fill', 'none'); path.setAttribute('stroke', '#F26522'); path.setAttribute('stroke-width', '4.2'); path.setAttribute('stroke-linecap', 'round'); path.setAttribute('class', 'logo-fg');
+  path.setAttribute('d', 'M10 10l12 12M22 10L10 22');
+  path.setAttribute('fill', 'none'); path.setAttribute('stroke', '#FFFFFF'); path.setAttribute('stroke-width', '4.4'); path.setAttribute('stroke-linecap', 'round'); path.setAttribute('class', 'logo-fg');
   const dot = document.createElementNS(SVGNS, 'circle');
-  dot.setAttribute('cx', '16'); dot.setAttribute('cy', '16'); dot.setAttribute('r', '0'); dot.setAttribute('fill', '#F26522'); dot.setAttribute('class', 'logo-dot');
+  dot.setAttribute('cx', '16'); dot.setAttribute('cy', '16'); dot.setAttribute('r', '0'); dot.setAttribute('fill', '#FFFFFF'); dot.setAttribute('class', 'logo-dot');
   svg.append(rect, path, dot);
   return svg;
 }
