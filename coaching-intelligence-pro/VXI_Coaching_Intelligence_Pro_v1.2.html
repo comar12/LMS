@@ -2406,6 +2406,335 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { background-color: 
 .score-card .card__head .sec__sub { white-space: normal; flex: 1 1 100%; order: 3; }
 @media (min-width: 900px) { .score-card .card__head .sec__sub { flex: 1 1 auto; order: 0; } }
 
+/* ==========================================================================
+   Premium VXI layer: tokens, layered surfaces, glow, typography, motion.
+   Appended last so it refines everything above without renaming anything.
+   ========================================================================== */
+:root {
+  --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --vxi-teal: #34c3b5;
+  --vxi-navy: #0b1630;
+  --surface-hi: rgba(255, 255, 255, 0.85);
+  --glow-accent: 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent), 0 12px 32px -12px color-mix(in srgb, var(--accent) 55%, transparent);
+  --bg: #f1f4f9;
+  --surface-2: #f7f9fc;
+  --border: #e2e8f0;
+  --border-strong: #c9d3e0;
+  --shadow-xs: 0 1px 2px rgba(11, 22, 48, 0.05), 0 0 0 1px rgba(11, 22, 48, 0.015);
+  --shadow-sm: 0 2px 6px -1px rgba(11, 22, 48, 0.07), 0 1px 2px rgba(11, 22, 48, 0.04);
+  --shadow-md: 0 16px 34px -16px rgba(11, 22, 48, 0.24), 0 4px 12px -4px rgba(11, 22, 48, 0.08);
+  --shadow-lg: 0 36px 72px -28px rgba(11, 22, 48, 0.38), 0 12px 28px -14px rgba(11, 22, 48, 0.16);
+  --sidebar-bg: #0b1630;
+  --sidebar-bg-2: #0f1d3d;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+}
+:root[data-theme="dark"] {
+  --bg: #070d19;
+  --surface: #0e1627;
+  --surface-2: #111b2f;
+  --surface-3: #162238;
+  --hover: #172642;
+  --border: #1e2b45;
+  --border-strong: #2c3e60;
+  --surface-hi: rgba(255, 255, 255, 0.05);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.025);
+  --shadow-sm: 0 3px 10px -3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 18px 40px -18px rgba(0, 0, 0, 0.65), 0 6px 16px -8px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 44px 90px -30px rgba(0, 0, 0, 0.8), 0 14px 30px -14px rgba(0, 0, 0, 0.5);
+  --sidebar-bg: #050b18;
+  --sidebar-bg-2: #0a152c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #070d19;
+    --surface: #0e1627;
+    --surface-2: #111b2f;
+    --surface-3: #162238;
+    --hover: #172642;
+    --border: #1e2b45;
+    --border-strong: #2c3e60;
+    --surface-hi: rgba(255, 255, 255, 0.05);
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.025);
+    --shadow-sm: 0 3px 10px -3px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 18px 40px -18px rgba(0, 0, 0, 0.65), 0 6px 16px -8px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 44px 90px -30px rgba(0, 0, 0, 0.8), 0 14px 30px -14px rgba(0, 0, 0, 0.5);
+    --sidebar-bg: #050b18;
+    --sidebar-bg-2: #0a152c;
+  }
+}
+
+/* ---------- Type ---------- */
+body { font-feature-settings: "cv11" 1, "ss03" 1, "calt" 1; }
+.page-title { font-size: 28px; font-weight: 780; letter-spacing: -0.03em; line-height: 1.15; }
+.page-sub { font-size: 14px; max-width: 72ch; }
+.eyebrow { letter-spacing: 0.1em; }
+.card__title { font-size: 14.5px; letter-spacing: -0.012em; }
+.card__title .icon { color: var(--accent-text); }
+.home-sec__title { font-size: 17px; letter-spacing: -0.015em; }
+:is(.stat__num, .score-tile__num, .health__pct, .clock, .ring__value strong, .ls-stat strong, .present__clock, .sess-clock) { letter-spacing: -0.04em; font-feature-settings: "tnum" 1, "cv11" 1; }
+.hero__title { font-size: 36px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.08; }
+.hero__sub { font-size: 15.5px; }
+
+/* ---------- Canvas ---------- */
+html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--text-3) 45%, transparent) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--text-3) 38%, transparent); border: 3px solid transparent; border-radius: 10px; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--text-3) 60%, transparent); }
+::-webkit-scrollbar-track { background: transparent; }
+.workspace {
+  background:
+    radial-gradient(1000px 420px at 85% -160px, color-mix(in srgb, var(--accent) 12%, transparent), transparent 68%),
+    radial-gradient(760px 520px at -120px 105%, color-mix(in srgb, var(--indigo) 8%, transparent), transparent 66%),
+    var(--bg);
+}
+
+/* ---------- Sidebar: navy with a teal breath and a glowing rail ---------- */
+.sidebar {
+  background-image:
+    radial-gradient(460px 300px at -10% -8%, rgba(52, 195, 181, 0.2), transparent 66%),
+    radial-gradient(360px 320px at 110% 104%, rgba(76, 70, 214, 0.18), transparent 66%),
+    linear-gradient(180deg, var(--sidebar-bg) 0%, var(--sidebar-bg-2) 100%);
+  border-right-color: rgba(255, 255, 255, 0.055);
+}
+.brand { padding: 22px 20px 16px; }
+.brand__mark { box-shadow: 0 8px 22px -6px rgba(52, 195, 181, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08); transition: transform 0.4s var(--ease-spring), box-shadow var(--t) var(--ease); }
+.brand:hover .brand__mark { transform: rotate(-6deg) scale(1.06); box-shadow: 0 10px 26px -6px rgba(52, 195, 181, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12); }
+.brand__name { font-weight: 760; letter-spacing: -0.02em; }
+.brand__sub { color: color-mix(in srgb, var(--sidebar-accent) 70%, var(--sidebar-muted)); }
+.nav__section { color: color-mix(in srgb, var(--sidebar-muted) 80%, transparent); letter-spacing: 0.12em; font-size: 10.5px; }
+.nav__item { border-radius: 10px; transition: background var(--t) var(--ease), color var(--t) var(--ease), transform var(--t) var(--ease-out), box-shadow var(--t) var(--ease); }
+.nav__item:hover { transform: translateX(2px); }
+.nav__item[aria-current="page"] { background: linear-gradient(90deg, rgba(52, 195, 181, 0.2), rgba(52, 195, 181, 0.04)); box-shadow: inset 0 0 0 1px rgba(52, 195, 181, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.05); transform: none; }
+.nav__item[aria-current="page"]::before { width: 3px; box-shadow: 0 0 14px 2px rgba(52, 195, 181, 0.6); }
+.nav__item[aria-current="page"] .nav__label { color: #fff; font-weight: 650; }
+.nav__badge { box-shadow: 0 0 16px rgba(52, 195, 181, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.nav__badge--alert { box-shadow: 0 0 16px rgba(198, 40, 40, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+.sidebar__guide { background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.035)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+.sidebar__guide:hover { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(52, 195, 181, 0.35), 0 8px 20px -10px rgba(52, 195, 181, 0.6); }
+
+/* ---------- Topbar: glass ---------- */
+.topbar { background: color-mix(in srgb, var(--bg) 66%, transparent); -webkit-backdrop-filter: saturate(170%) blur(14px); backdrop-filter: saturate(170%) blur(14px); border-bottom-color: color-mix(in srgb, var(--border) 75%, transparent); box-shadow: 0 1px 0 var(--surface-hi); }
+.search__input { border-radius: 12px; box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs); }
+.search__input:focus { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent), 0 0 28px -8px color-mix(in srgb, var(--accent) 50%, transparent); }
+.btn--builder .pill.is-active { box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 55%, transparent); }
+
+/* ---------- Buttons: tactile, with a sheen on primary ---------- */
+.btn { border-radius: 11px; box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs); transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), box-shadow var(--t) var(--ease), transform 0.22s var(--ease-spring); }
+.btn:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-sm); }
+.btn:active { transform: translateY(0) scale(0.965); }
+.btn--sm { border-radius: 9px; }
+.btn--ghost { box-shadow: none; }
+.btn--ghost:hover { box-shadow: none; }
+.btn--primary, .btn--primary:hover {
+  background-color: var(--accent);
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--accent) 82%, #fff) 0%, var(--accent) 55%, color-mix(in srgb, var(--accent) 86%, #000) 100%);
+  border-color: color-mix(in srgb, var(--accent) 80%, #000);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 20px -10px color-mix(in srgb, var(--accent) 90%, transparent);
+  overflow: hidden;
+}
+.btn--primary:hover { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 12px 26px -10px color-mix(in srgb, var(--accent) 95%, transparent), 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); filter: brightness(1.04); }
+.btn--primary::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(108deg, transparent 38%, rgba(255, 255, 255, 0.34) 50%, transparent 62%); transform: translateX(-130%); transition: transform 0.7s var(--ease-expo); }
+.btn--primary:hover::after { transform: translateX(130%); }
+.btn--primary:disabled { filter: none; }
+.icon-btn { transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), transform 0.22s var(--ease-spring); }
+.icon-btn:active { transform: scale(0.9); }
+.segmented { padding: 3px; border-radius: 11px; background: color-mix(in srgb, var(--surface-3) 85%, var(--bg)); box-shadow: inset 0 1px 2px rgba(11, 22, 48, 0.06); }
+.segmented button { transition: background var(--t) var(--ease), color var(--t) var(--ease), box-shadow var(--t) var(--ease), transform 0.22s var(--ease-spring); }
+.segmented button:active { transform: scale(0.96); }
+.segmented button[aria-pressed="true"], .segmented button[aria-checked="true"] { background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface) 94%, var(--accent))); box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-sm), 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent); color: var(--accent-text); }
+.filter-chip { transition: background var(--t) var(--ease), color var(--t) var(--ease), border-color var(--t) var(--ease), transform 0.22s var(--ease-spring), box-shadow var(--t) var(--ease); }
+.filter-chip:hover { transform: translateY(-1px); box-shadow: var(--shadow-xs); }
+.filter-chip[aria-pressed="true"] { background: linear-gradient(180deg, var(--vxi-navy), #142448); border-color: var(--vxi-navy); color: #fff; box-shadow: 0 8px 18px -10px rgba(11, 22, 48, 0.8); }
+.input:focus, .select:focus, .textarea:focus { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent), 0 0 24px -8px color-mix(in srgb, var(--accent) 45%, transparent); }
+.rv-btn--met[aria-pressed="true"] { box-shadow: 0 0 14px -2px color-mix(in srgb, var(--success) 60%, transparent); }
+.rv-btn--gap[aria-pressed="true"] { box-shadow: 0 0 14px -2px color-mix(in srgb, var(--danger) 55%, transparent); }
+
+/* ---------- Surfaces: a soft inner highlight and a quieter edge ---------- */
+:is(.card, .opp-card, .stat, .home-tile, .cat-tile, .kpi-tile, .score-tile, .plan, .glance__card, .s-card, .tk-step, .tk-signal, .type-card, .pr-card, .ls-pad, .out-sec, .sec, .ref, .timeline__card, .hd-seg__card, .sess-card, .health__item, .pin-chip, .pulse, .modal, .scorecard, .ls-hero, .day-hero, .hd-hero, .pr-hero, .promo, .due-strip, .num-row, .kb, .saved-item, .sel-item, .parked__item, .focus-pick__row, .tpl-item, .lk-row, .mp__opt, .rt-row__icon, .eod-row) { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs); }
+.card { border-radius: 18px; }
+.card:hover { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-sm); }
+.opp-card { border-radius: 16px; }
+.opp-card:hover { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-md), 0 0 0 1px color-mix(in srgb, var(--cc) 28%, transparent); }
+:is(.stat, .home-tile, .cat-tile, .glance__card):hover { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-md), 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent); }
+.stat { border-radius: 18px; }
+.stat__icon { background: linear-gradient(145deg, var(--accent-soft), color-mix(in srgb, var(--accent) 24%, var(--accent-soft))); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 6px 14px -8px color-mix(in srgb, var(--accent) 60%, transparent); }
+.stat--alert .stat__icon { background: linear-gradient(145deg, var(--danger-soft), color-mix(in srgb, var(--danger) 22%, var(--danger-soft))); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 6px 14px -8px color-mix(in srgb, var(--danger) 55%, transparent); }
+.stat--good .stat__icon { background: linear-gradient(145deg, var(--success-soft), color-mix(in srgb, var(--success) 22%, var(--success-soft))); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 6px 14px -8px color-mix(in srgb, var(--success) 55%, transparent); }
+.home-tile__icon, .cat-tile__icon, .kpi-tile__icon, .type-card__icon, .ref__icon, .group__icon, .pr-card__icon, .due-strip__icon, .day-huddle__icon, .promo__icon { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4); }
+.plan__avatar, .mp__av { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 8px 18px -8px color-mix(in srgb, var(--accent) 80%, transparent); }
+.page-head .page-title::after, .day-hero .page-title::after { box-shadow: 0 0 14px -2px color-mix(in srgb, var(--accent) 60%, transparent); }
+.pill.is-active { box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 45%, transparent); }
+.kpi { border: 1px solid color-mix(in srgb, var(--indigo) 18%, transparent); }
+.kpi.is-focus { border-color: transparent; box-shadow: 0 0 10px -2px color-mix(in srgb, var(--accent) 60%, transparent); }
+
+/* ---------- Hero: a slow aurora behind the greeting ---------- */
+.hero { border-radius: 24px; padding: 38px 40px 36px; background-image: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--sidebar-bg-2) 100%); box-shadow: 0 30px 60px -30px rgba(8, 18, 40, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.07), inset 0 0 0 1px rgba(255, 255, 255, 0.04); }
+.hero::before {
+  content: ""; position: absolute; inset: -35% -25%; z-index: -2; pointer-events: none; opacity: 0.95;
+  background:
+    radial-gradient(36% 44% at 74% 28%, rgba(52, 195, 181, 0.45), transparent 70%),
+    radial-gradient(30% 40% at 22% 84%, rgba(76, 70, 214, 0.42), transparent 70%),
+    radial-gradient(26% 34% at 92% 88%, rgba(52, 195, 181, 0.26), transparent 70%),
+    radial-gradient(22% 30% at 40% 20%, rgba(141, 225, 215, 0.14), transparent 70%);
+  will-change: transform; animation: aurora 18s var(--ease) infinite alternate;
+}
+.hero::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, rgba(11, 22, 48, 0.55), rgba(11, 22, 48, 0.1) 60%, transparent); }
+@keyframes aurora {
+  0% { transform: translate3d(-3%, -2%, 0) rotate(-2deg) scale(1); }
+  50% { transform: translate3d(2.5%, 3%, 0) rotate(1.5deg) scale(1.07); }
+  100% { transform: translate3d(4%, -3%, 0) rotate(3deg) scale(1.02); }
+}
+.hero__art { z-index: 0; opacity: 0.95; }
+.hero__content { z-index: 1; }
+.hero__eyebrow { color: color-mix(in srgb, var(--sidebar-accent) 75%, var(--sidebar-muted)); }
+.hero__cta { background-image: linear-gradient(180deg, #5ad3c7, #34c3b5 55%, #27a89b); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 12px 28px -10px rgba(52, 195, 181, 0.9); overflow: hidden; }
+.hero__cta:hover { filter: none; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 16px 34px -10px rgba(52, 195, 181, 1), 0 0 0 1px rgba(52, 195, 181, 0.4); transform: translateY(-2px); }
+.hero__cta::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(108deg, transparent 38%, rgba(255, 255, 255, 0.4) 50%, transparent 62%); transform: translateX(-130%); transition: transform 0.7s var(--ease-expo); }
+.hero__cta:hover::after { transform: translateX(130%); }
+.hero__ghost { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+.hero__ghost:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 10px 24px -14px rgba(0, 0, 0, 0.8); }
+
+/* ---------- KPI tiles, score tiles, pills: gradient fills with light ---------- */
+.kpi-tile { border-radius: 18px; background-image: linear-gradient(170deg, color-mix(in srgb, var(--kc) 6%, var(--surface)), var(--surface) 55%); }
+.kpi-tile::before { height: 3px; background: linear-gradient(90deg, var(--kc), color-mix(in srgb, var(--kc) 12%, transparent)); box-shadow: 0 0 18px 1px color-mix(in srgb, var(--kc) 45%, transparent); }
+.kpi-tile:hover { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-md), 0 0 0 1px color-mix(in srgb, var(--kc) 30%, transparent); }
+.kpi-tile__icon { background: linear-gradient(145deg, var(--kc-bg), color-mix(in srgb, var(--kc) 24%, var(--kc-bg))); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 8px 16px -10px color-mix(in srgb, var(--kc) 70%, transparent); }
+.score-card { border-radius: 20px; }
+.score-tile { border-radius: 16px; background-image: linear-gradient(168deg, color-mix(in srgb, var(--kc) 8%, var(--surface)), var(--surface) 58%); }
+.score-tile::before { height: 3px; background: linear-gradient(90deg, var(--kc), color-mix(in srgb, var(--kc) 15%, transparent)); box-shadow: 0 0 16px 1px color-mix(in srgb, var(--kc) 40%, transparent); }
+.score-tile:hover { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-md), 0 0 0 1px color-mix(in srgb, var(--kc) 32%, transparent); }
+.score-tile__num { font-size: 28px; }
+.score-tile__bar { height: 7px; background: color-mix(in srgb, var(--surface-3) 80%, var(--kc)); box-shadow: inset 0 1px 2px rgba(11, 22, 48, 0.08); }
+.score-tile__fill { position: relative; overflow: hidden; box-shadow: 0 0 12px -1px color-mix(in srgb, var(--kc) 55%, transparent); }
+.score-tile__fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent); transform: translateX(-100%); }
+.anim-enter .score-tile__fill::after { animation: shimmer 2.4s var(--ease-expo) 1.1s 2; }
+@keyframes shimmer { to { transform: translateX(100%); } }
+.score-tile__rank { box-shadow: inset 0 1px 0 var(--surface-hi); }
+.score-tile__rank.is-top { box-shadow: 0 0 10px -2px color-mix(in srgb, var(--success) 55%, transparent); }
+.score-tile__rank.is-low { box-shadow: 0 0 10px -2px color-mix(in srgb, var(--danger) 50%, transparent); }
+.kpi-pill { border-radius: 9px; box-shadow: inset 0 1px 0 var(--surface-hi); }
+.kpi-pill:hover { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-sm), 0 0 12px -3px var(--kc); }
+.kpi-pill.is-weakest { box-shadow: inset 0 1px 0 var(--surface-hi), 0 0 0 2px color-mix(in srgb, var(--danger) 35%, transparent), 0 0 14px -2px color-mix(in srgb, var(--danger) 45%, transparent); }
+.focus-kpi { border-radius: 13px; box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs); }
+.focus-kpi:active { transform: scale(0.96); }
+.focus-kpi.is-on { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 60%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 10px 24px -10px color-mix(in srgb, var(--kc) 90%, transparent), 0 0 0 3px color-mix(in srgb, var(--kc) 16%, transparent); }
+.focus-kpi.is-on .focus-kpi__val { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15); }
+.focus-card { border-top: 0; background-image: linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, var(--surface)), var(--surface) 140px); }
+.focus-card::before { content: ""; position: absolute; left: 18px; right: 18px; top: -1px; height: 3px; border-radius: 0 0 3px 3px; background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 10%, transparent)); box-shadow: 0 0 16px 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+.focus-card { position: relative; }
+.chip--pick { border-radius: 999px; box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs); }
+.chip--pick:hover { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-sm), 0 0 0 1px color-mix(in srgb, var(--cc) 35%, transparent); }
+.focus-rule.is-full { box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 10%, transparent); }
+.pulse { border-radius: 20px; }
+.pulse.is-fav { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs), 0 0 0 1px rgba(224, 168, 0, 0.25), 0 10px 26px -16px rgba(224, 168, 0, 0.6); }
+.pulse:hover { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-md), 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent); }
+.health { border-radius: 20px; }
+.health__moon { filter: drop-shadow(0 0 6px var(--accent)); }
+.fa-row__avatar { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 8px 16px -8px color-mix(in srgb, var(--accent) 70%, transparent); }
+.glance__card { border-radius: 20px; }
+.due-strip { border-radius: 16px; }
+
+/* ---------- Overlays: glass ---------- */
+.modal-backdrop { -webkit-backdrop-filter: blur(6px) saturate(1.1); backdrop-filter: blur(6px) saturate(1.1); }
+.modal { border-radius: 20px; background: color-mix(in srgb, var(--surface) 94%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.3); backdrop-filter: blur(20px) saturate(1.3); border-color: color-mix(in srgb, var(--border) 80%, transparent); box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-lg); animation-timing-function: var(--ease-expo); animation-duration: 0.36s; }
+.menu, .combo__list { border-radius: 14px; background: color-mix(in srgb, var(--surface) 94%, transparent); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3); box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-lg); animation: pick-in 0.2s var(--ease-out); }
+.panel { box-shadow: var(--shadow-lg), inset 1px 0 0 var(--surface-hi); transition-timing-function: var(--ease-expo); transition-duration: 0.42s; }
+.app.panel-open .panel { transition: transform 0.42s var(--ease-expo), visibility 0s; }
+.toast { background: linear-gradient(180deg, #16284a, #0f1a2e); border: 1px solid rgba(52, 195, 181, 0.28); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), var(--shadow-lg), 0 0 30px -12px rgba(52, 195, 181, 0.55); border-radius: 14px; animation: toast-in 0.4s var(--ease-expo); }
+.selection-bar { background: linear-gradient(180deg, #16284a, #0f1a2e); border: 1px solid rgba(52, 195, 181, 0.22); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), var(--shadow-lg); border-radius: 16px; }
+.selection-bar .btn--primary { background-image: linear-gradient(180deg, #5ad3c7, #34c3b5 55%, #27a89b); }
+
+/* ---------- Motion: one choreography for every page ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes pop-in { from { opacity: 0; transform: translateY(10px) scale(0.975); } to { opacity: 1; transform: none; } }
+.anim-enter > * { animation-duration: 0.62s; animation-timing-function: var(--ease-expo); }
+.anim-enter :is(.grid, .rv-list, .kpi-tiles, .home-grid, .cat-tiles, .lk-list, .pk-grid, .timeline, .tk-steps, .type-picker, .stats, .tk-signals, .pin-row, .plans, .rt-list, .snap-grid, .pulse-grid, .score-tiles, .pr-grid) > * { animation-duration: 0.66s; animation-timing-function: var(--ease-expo); }
+.anim-panel { animation-duration: 0.45s; animation-timing-function: var(--ease-expo); }
+.anim-enter .hero { animation: hero-in 0.8s var(--ease-expo) both; }
+@keyframes hero-in { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: none; } }
+.anim-enter .hero__content > * { animation: rise 0.7s var(--ease-expo) both; }
+.anim-enter .hero__content > :nth-child(2) { animation-delay: 80ms; }
+.anim-enter .hero__content > :nth-child(3) { animation-delay: 160ms; }
+.anim-enter .hero__content > :nth-child(4) { animation-delay: 240ms; }
+.anim-enter .focus-kpi { animation: btn-pop 0.5s var(--ease-spring) both; animation-delay: calc(220ms + var(--i, 0) * 0ms); }
+.anim-enter .focus-kpi:nth-child(2) { animation-delay: 270ms; } .anim-enter .focus-kpi:nth-child(3) { animation-delay: 320ms; } .anim-enter .focus-kpi:nth-child(4) { animation-delay: 370ms; } .anim-enter .focus-kpi:nth-child(5) { animation-delay: 420ms; } .anim-enter .focus-kpi:nth-child(6) { animation-delay: 470ms; }
+.anim-enter .chip--pick { animation: rise 0.5s var(--ease-expo) both; animation-delay: 380ms; }
+.sidebar .nav__item { animation: none; }
+.stat__num, .score-tile__num { transition: color var(--t) var(--ease); }
+.tl__fill, .fb__fill, .kb__fill, .rt-bar > span, .type-card__bar > span { background-image: linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, #fff), var(--accent)); box-shadow: 0 0 12px -2px color-mix(in srgb, var(--accent) 60%, transparent); }
+.fb__fill.is-partial { background-image: linear-gradient(90deg, var(--warning), var(--success)); }
+.kb.is-met .kb__fill { background-image: linear-gradient(90deg, var(--success), var(--accent)); }
+.rt-row--done .rt-bar > span { background-image: linear-gradient(90deg, color-mix(in srgb, var(--success) 70%, #fff), var(--success)); }
+.type-card__bar > span { background-image: linear-gradient(90deg, color-mix(in srgb, var(--cc) 70%, #fff), var(--cc)); box-shadow: 0 0 12px -2px color-mix(in srgb, var(--cc) 60%, transparent); }
+.ring__bar { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 45%, transparent)); }
+
+/* ---------- Dark mode: luminous, not inverted ---------- */
+:root[data-theme="dark"] .workspace, :root[data-theme="dark"] .main { background-color: transparent; }
+:root[data-theme="dark"] .workspace { background: radial-gradient(1100px 480px at 85% -180px, rgba(52, 195, 181, 0.16), transparent 66%), radial-gradient(820px 560px at -140px 108%, rgba(76, 70, 214, 0.14), transparent 66%), var(--bg); }
+:root[data-theme="dark"] .hero { box-shadow: 0 30px 70px -28px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(52, 195, 181, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+:root[data-theme="dark"] .hero::before { opacity: 1; }
+:root[data-theme="dark"] :is(.kpi-tile, .score-tile) { background-image: linear-gradient(168deg, color-mix(in srgb, var(--kc) 12%, var(--surface)), var(--surface) 60%); }
+:root[data-theme="dark"] .focus-card { background-image: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, var(--surface)), var(--surface) 150px); }
+:root[data-theme="dark"] .stat__icon { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 18px -6px color-mix(in srgb, var(--accent) 70%, transparent); }
+:root[data-theme="dark"] .btn--primary, :root[data-theme="dark"] .btn--primary:hover { border-color: color-mix(in srgb, var(--accent) 70%, #000); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 10px 26px -10px color-mix(in srgb, var(--accent) 90%, transparent); }
+:root[data-theme="dark"] .filter-chip[aria-pressed="true"] { background: linear-gradient(180deg, #e7ecf5, #c9d3e6); color: #0b1630; border-color: transparent; box-shadow: 0 10px 22px -12px rgba(231, 236, 245, 0.6); }
+:root[data-theme="dark"] .topbar { background: color-mix(in srgb, var(--bg) 62%, transparent); }
+:root[data-theme="dark"] .page-head .page-title::after { box-shadow: 0 0 18px -2px color-mix(in srgb, var(--accent) 80%, transparent); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .workspace { background: radial-gradient(1100px 480px at 85% -180px, rgba(52, 195, 181, 0.16), transparent 66%), radial-gradient(820px 560px at -140px 108%, rgba(76, 70, 214, 0.14), transparent 66%), var(--bg); }
+  :root:not([data-theme="light"]) .hero { box-shadow: 0 30px 70px -28px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(52, 195, 181, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+  :root:not([data-theme="light"]) .hero::before { opacity: 1; }
+  :root:not([data-theme="light"]) :is(.kpi-tile, .score-tile) { background-image: linear-gradient(168deg, color-mix(in srgb, var(--kc) 12%, var(--surface)), var(--surface) 60%); }
+  :root:not([data-theme="light"]) .focus-card { background-image: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, var(--surface)), var(--surface) 150px); }
+  :root:not([data-theme="light"]) .stat__icon { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 18px -6px color-mix(in srgb, var(--accent) 70%, transparent); }
+  :root:not([data-theme="light"]) .btn--primary, :root:not([data-theme="light"]) .btn--primary:hover { border-color: color-mix(in srgb, var(--accent) 70%, #000); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 10px 26px -10px color-mix(in srgb, var(--accent) 90%, transparent); }
+  :root:not([data-theme="light"]) .filter-chip[aria-pressed="true"] { background: linear-gradient(180deg, #e7ecf5, #c9d3e6); color: #0b1630; border-color: transparent; box-shadow: 0 10px 22px -12px rgba(231, 236, 245, 0.6); }
+  :root:not([data-theme="light"]) .topbar { background: color-mix(in srgb, var(--bg) 62%, transparent); }
+  :root:not([data-theme="light"]) .page-head .page-title::after { box-shadow: 0 0 18px -2px color-mix(in srgb, var(--accent) 80%, transparent); }
+}
+
+/* ---------- Small screens keep the same finish, less lift ---------- */
+@media (max-width: 720px) {
+  .hero { padding: 26px 22px 24px; border-radius: 20px; }
+  .hero__title { font-size: 27px; }
+  .page-title { font-size: 24px; }
+  .score-tile__num { font-size: 25px; }
+  .btn:hover, .card:hover, .kpi-tile:hover, .score-tile:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero::before { animation: none; }
+  .btn--primary::after, .hero__cta::after, .score-tile__fill::after { display: none; }
+}
+
+/* ---------- Status edges carry a little light ---------- */
+.pulse--alert { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs), 0 -6px 18px -14px var(--danger); }
+.pulse--good { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs), 0 -6px 18px -14px var(--indigo); }
+.plan--overdue { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs), -6px 0 18px -14px var(--danger); }
+.plan--due, .plan--soon { box-shadow: inset 0 1px 0 var(--surface-hi), var(--shadow-xs), -6px 0 18px -14px var(--warning); }
+.due-chip, .rt-due, .hub-pill, .pr-card__badge, .badge { box-shadow: inset 0 1px 0 var(--surface-hi); }
+.card__head { padding: 15px 18px 12px; }
+.card__body { padding: 0 18px 18px; }
+.card__sep { margin-left: -18px; margin-right: -18px; }
+.notice { border-radius: 12px; box-shadow: inset 0 1px 0 var(--surface-hi); }
+.focus-why { border-radius: 12px; box-shadow: inset 0 1px 0 var(--surface-hi), 0 0 0 1px color-mix(in srgb, var(--accent) 14%, transparent); }
+
+/* Day-over-day trend sparklines on agent cards */
+.trend { display: grid; grid-template-columns: 1fr; gap: 3px; padding: 8px 10px 6px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.trend__item { display: grid; grid-template-columns: 38px 1fr 44px; align-items: center; gap: 8px; min-width: 0; }
+.trend__label { font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); }
+.trend__last { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-2); text-align: right; }
+.trend__cap { font-size: 9.5px; color: var(--text-3); font-weight: 600; text-align: right; margin-top: 2px; }
+.spark { width: 100%; height: 22px; overflow: visible; display: block; }
+.spark__line { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.anim-enter .spark__line { animation: draw 1.1s var(--ease-out) forwards; animation-delay: calc(350ms + var(--d, 0ms)); }
+.spark__line:not(.anim-enter *) { stroke-dashoffset: 0; }
+.spark__area { fill: color-mix(in srgb, var(--accent) 14%, transparent); }
+.spark__target { stroke: var(--text-3); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.7; }
+.spark__dot { fill: var(--accent); }
+.spark__dot.is-good { fill: var(--success); }
+.spark__dot.is-bad { fill: var(--danger); }
+.trend__item--tnps .spark__line { stroke: var(--c-people); } .trend__item--tnps .spark__area { fill: color-mix(in srgb, var(--c-people) 14%, transparent); }
+.trend__item--itg .spark__line { stroke: var(--c-tech); } .trend__item--itg .spark__area { fill: color-mix(in srgb, var(--c-tech) 14%, transparent); }
 </style>
 </head>
 <body>
@@ -2515,7 +2844,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -3319,7 +3648,13 @@ function sanitizeKpis(o) {
     const key = hrid || bpid;
     if (seen.has(key)) continue;
     seen.add(key);
-    agents.push({ hrid, bpid, name: str(a.name, 80).trim(), wave: str(a.wave, 30).trim(), calls: clampInt(a.calls, 0, 100000, 0), surveys: clampInt(a.surveys, 0, 100000, 0), tNPS: nn(a.tNPS), aiCR: nn(a.aiCR), XM: nn(a.XM), GSR: nn(a.GSR), score: nn(a.score), rank: clampInt(a.rank, 0, 100000, 0) || null });
+    const days = [];
+    for (const d of Array.isArray(a.days) ? a.days.slice(-62) : []) {
+      if (!d || typeof d !== 'object' || !isIsoDate(d.d)) continue;
+      days.push({ d: d.d, calls: clampInt(d.calls, 0, 100000, 0), surveys: clampInt(d.surveys, 0, 100000, 0), tNPS: nn(d.tNPS), aiCR: nn(d.aiCR), XM: nn(d.XM), GSR: nn(d.GSR), ITG: nn(d.ITG) });
+    }
+    days.sort((x, y) => (x.d < y.d ? -1 : 1));
+    agents.push({ hrid, bpid, name: str(a.name, 80).trim(), wave: str(a.wave, 30).trim(), calls: clampInt(a.calls, 0, 100000, 0), surveys: clampInt(a.surveys, 0, 100000, 0), tNPS: nn(a.tNPS), aiCR: nn(a.aiCR), XM: nn(a.XM), GSR: nn(a.GSR), ITG: nn(a.ITG), ITGsuite: nn(a.ITGsuite), ITGutil: nn(a.ITGutil), XFR: nn(a.XFR), AHT: nn(a.AHT), gsrApprox: a.gsrApprox === true, score: nn(a.score), rank: clampInt(a.rank, 0, 100000, 0) || null, days });
   }
   const leaders = [];
   for (const l of Array.isArray(src.leaders) ? src.leaders.slice(0, 60) : []) {
@@ -3329,6 +3664,7 @@ function sanitizeKpis(o) {
   const lob = src.lob && typeof src.lob === 'object' ? src.lob : {};
   return {
     source: str(src.source, 200).trim(),
+    kind: src.kind === 'daily' ? 'daily' : 'dashboard',
     asOf: isIsoDate(src.asOf) ? src.asOf : '',
     from: isIsoDate(src.from) ? src.from : '',
     to: isIsoDate(src.to) ? src.to : '',
@@ -8510,7 +8846,7 @@ function renderHome(main) {
     { class: 'stats' },
     stat(coachedWeek, state.team.members.length ? `of ${state.team.members.length} agents coached this week` : 'agents coached this week', 'clipboard'),
     stat(reviewsWeek, 'call reviews logged this week', 'checklist'),
-    h('div', { class: `stat${itg && itg.pct < 100 ? ' stat--alert' : itg ? ' stat--good' : ''}` }, h('span', { class: 'stat__icon', 'aria-hidden': 'true' }, icon('router')), h('span', { class: 'stat__num' }, itg ? h('span', null, h('span', { 'data-count': String(itg.pct) }, String(itg.pct)), '%') : '–'), h('span', { class: 'stat__label' }, itg ? `ITG compliance on ${itg.n} reviewed calls (target 100%)` : 'ITG compliance: log call reviews to measure')),
+    h('div', { class: `stat${itg && itg.pct < 100 ? ' stat--alert' : itg ? ' stat--good' : ''}` }, h('span', { class: 'stat__icon', 'aria-hidden': 'true' }, icon('router')), h('span', { class: 'stat__num' }, itg ? h('span', null, h('span', { 'data-count': String(Math.round(itg.pct)) }, String(Math.round(itg.pct))), '%') : '–'), h('span', { class: 'stat__label' }, itg ? (itg.source === 'export' ? `ITG compliance on ${itg.n} calls in the export (target 100%)` : `ITG compliance on ${itg.n} reviewed calls (target 100%)`) : 'ITG compliance: load the daily export or log call reviews')),
     stat(belowN, 'agents below target on a KPI', 'alert', belowN ? 'stat--alert' : '')
   );
 
@@ -10696,7 +11032,7 @@ function openAddMembers() {
     body: h(
       'div',
       { class: 'tr-form' },
-      h('p', { class: 'prose' }, 'Each agent gets a numbered code such as Agent 01. Add names, HRIDs, and BP-IDs afterwards with Paste roster or Edit details.'),
+      h('p', { class: 'prose' }, 'Each agent gets a numbered code such as Agent 01. Add names afterwards with Paste roster or Edit details; IDs are kept only to match the export and are never shown.'),
       h('div', { class: 'form-grid', style: 'margin-top:12px' }, h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'tm-count' }, 'How many'), count), h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'tm-prefix' }, 'Code prefix'), prefix)),
       warn
     ),
@@ -10751,8 +11087,8 @@ function editMember(id) {
       { class: 'tr-form' },
       field('tm-name', 'Name shown in the app', name),
       field('tm-code', 'Code', code, 'Connects this person to their follow-up plans.'),
-      h('div', { class: 'form-grid' }, field('tm-hrid', 'HRID', hrid), field('tm-bpid', 'BP-ID', bpid)),
-      h('p', { class: 'field__hint' }, icon('lock', 'icon--sm'), ' Names and IDs stay only in this browser. They are never copied into coaching text or a team pack.')
+      h('details', { class: 'tr-other' }, h('summary', null, 'Matching IDs (used only to match the export, never shown)'), h('div', { class: 'form-grid', style: 'margin-top:10px' }, field('tm-hrid', 'HRID', hrid), field('tm-bpid', 'BP-ID', bpid))),
+      h('p', { class: 'field__hint' }, icon('lock', 'icon--sm'), ' Names and IDs stay only in this browser. They are never shown on cards or copied into coaching text.')
     ),
     footer: [cancel, h('span', { class: 'spacer' }), save],
     initialFocus: name,
@@ -10874,8 +11210,8 @@ function openPasteRoster() {
         h(
           'table',
           { class: 'roster-tbl' },
-          h('thead', null, h('tr', null, h('th', { scope: 'col' }, 'Name'), h('th', { scope: 'col' }, 'HRID'), h('th', { scope: 'col' }, 'BP-ID'), h('th', { scope: 'col' }, 'Card'))),
-          h('tbody', null, matches.map(({ r, m }) => h('tr', null, h('td', null, r.name || '—'), h('td', null, r.hrid || '—'), h('td', null, r.bpid || '—'), h('td', { class: m ? '' : 'is-new' }, m ? m.code : `${codes[k++] || 'New'} (new)`))))
+          h('thead', null, h('tr', null, h('th', { scope: 'col' }, 'Name'), h('th', { scope: 'col' }, 'IDs'), h('th', { scope: 'col' }, 'Card'))),
+          h('tbody', null, matches.map(({ r, m }) => h('tr', null, h('td', null, r.name || '—'), h('td', null, r.hrid || r.bpid ? 'matched, hidden' : '—'), h('td', { class: m ? '' : 'is-new' }, m ? m.code : `${codes[k++] || 'New'} (new)`))))
         )
       )
     );
@@ -10951,7 +11287,7 @@ function coachMember(id, kpi) {
 /** One pill per KPI: the value against its target, colored by whether it meets the target. */
 function kpiStrip(m, opts = {}) {
   const mk = memberKpis(m);
-  if (!mk.row && !mk.items.some((x) => x.v !== null)) return opts.compact ? null : h('p', { class: 'kpi-strip kpi-strip--empty' }, icon('info', 'icon--sm'), hasSnapshot() ? 'Not in the dashboard export. Check the HRID in Edit details.' : 'Load the dashboard export in Settings & Data to see KPIs here.');
+  if (!mk.row && !mk.items.some((x) => x.v !== null)) return opts.compact ? null : h('p', { class: 'kpi-strip kpi-strip--empty' }, icon('info', 'icon--sm'), hasSnapshot() ? `Not in the latest export (${state.kpis.label || state.kpis.asOf}). Load a file that includes this agent.` : 'Load the daily export to see KPIs here.');
   return h(
     'div',
     { class: `kpi-strip${opts.compact ? ' kpi-strip--compact' : ''}`, role: 'list', 'aria-label': `KPIs for ${memberLabel(m)}` },
@@ -10972,6 +11308,67 @@ function kpiStrip(m, opts = {}) {
       )
     ),
     mk.row && mk.row.rank && !opts.compact ? h('span', { class: 'kpi-strip__rank', title: `Scorecard rank on the floor, ${state.kpis.label}` }, `#${mk.row.rank}`) : null
+  );
+}
+
+/** A small line chart of one KPI over the export's days, drawn as inline SVG. */
+function sparkline(points, { w = 120, h = 30, target = null, dir = 'up' } = {}) {
+  const vals = points.map((p) => p.v).filter((v) => v !== null && v !== undefined);
+  if (vals.length < 2) return null;
+  const ns = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs) => {
+    const el = document.createElementNS(ns, tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    return el;
+  };
+  let lo = Math.min(...vals, target === null ? Infinity : target);
+  let hi = Math.max(...vals, target === null ? -Infinity : target);
+  if (hi === lo) {
+    hi += 1;
+    lo -= 1;
+  }
+  const pad = 3;
+  const x = (i) => pad + (i / (points.length - 1)) * (w - pad * 2);
+  const y = (v) => h - pad - ((v - lo) / (hi - lo)) * (h - pad * 2);
+  const coords = points.map((p, i) => (p.v === null || p.v === undefined ? null : [x(i), y(p.v)])).filter(Boolean);
+  const svg = mk('svg', { viewBox: `0 0 ${w} ${h}`, class: 'spark', 'aria-hidden': 'true', preserveAspectRatio: 'none' });
+  if (target !== null) svg.appendChild(mk('line', { x1: pad, x2: w - pad, y1: y(target), y2: y(target), class: 'spark__target' }));
+  const d = coords.map(([px, py], i) => `${i ? 'L' : 'M'}${px.toFixed(1)} ${py.toFixed(1)}`).join(' ');
+  svg.appendChild(mk('path', { d: `${d} L${coords[coords.length - 1][0].toFixed(1)} ${h} L${coords[0][0].toFixed(1)} ${h} Z`, class: 'spark__area' }));
+  svg.appendChild(mk('path', { d, class: 'spark__line', 'stroke-dasharray': '400', 'stroke-dashoffset': '400' }));
+  const last = coords[coords.length - 1];
+  const lastV = vals[vals.length - 1];
+  const good = target === null ? null : dir === 'down' ? lastV <= target : lastV >= target;
+  svg.appendChild(mk('circle', { cx: last[0].toFixed(1), cy: last[1].toFixed(1), r: '2.6', class: `spark__dot${good === null ? '' : good ? ' is-good' : ' is-bad'}` }));
+  return svg;
+}
+/** Day-over-day trend for the agent's KPIs, from the daily export (only when it was loaded from the Excel report). */
+function trendStrip(m) {
+  const row = snapRow(m);
+  if (!row || !row.days || row.days.length < 2) return null;
+  const days = row.days.filter((d) => d.calls > 0).slice(-14);
+  if (days.length < 2) return null;
+  const items = [
+    { k: 'aiCR', label: 'aiCR', unit: '%' },
+    { k: 'ITG', label: 'ITG', unit: '%' },
+    { k: 'tNPS', label: 'tNPS', unit: 'count' },
+  ].filter((it) => days.filter((d) => d[it.k] !== null && d[it.k] !== undefined).length >= 2);
+  if (!items.length) return null;
+  return h(
+    'div',
+    { class: 'trend', role: 'group', 'aria-label': `Last ${days.length} working days` },
+    items.map((it) => {
+      const pts = days.map((d) => ({ v: d[it.k] }));
+      const last = [...pts].reverse().find((p) => p.v !== null && p.v !== undefined);
+      return h(
+        'div',
+        { class: `trend__item trend__item--${it.k.toLowerCase()}`, title: `${KPI_MEASURE[it.k].name}, last ${days.length} working days, dotted line is the target` },
+        h('span', { class: 'trend__label' }, it.label),
+        sparkline(pts, { target: snapTarget(it.k), dir: KPI_MEASURE[it.k].dir }),
+        h('span', { class: 'trend__last' }, last ? fmtNum(Math.round(last.v * 10) / 10, it.unit) : '')
+      );
+    }),
+    h('span', { class: 'trend__cap' }, `${days.length} days`)
   );
 }
 
@@ -11004,14 +11401,8 @@ function memberCard(m, idx = 0) {
         ],
       })
     ),
-    !state.prefs.hideIds && (m.hrid || m.bpid)
-      ? h(
-          'div',
-          { class: 'pulse__ids' },
-          [['HRID', m.hrid], ['BP-ID', m.bpid]].map(([k, v]) => (v ? h('button', { type: 'button', class: 'id-chip', 'aria-label': `Copy ${k} for ${memberLabel(m)}`, 'data-fk': `mem-${k}:${m.id}`, onclick: () => copyText(v, { label: k }) }, h('span', { class: 'id-chip__k' }, k), h('span', { class: 'id-chip__v' }, v), icon('copy', 'icon--sm')) : null))
-        )
-      : null,
     kpiStrip(m),
+    trendStrip(m),
     hubStrip(m),
     h(
       'dl',
@@ -11038,7 +11429,18 @@ function memberCard(m, idx = 0) {
 }
 
 /* ---------- Team scoreboard: the team against target and against the other team leaders ---------- */
+/** Team ITG compliance: from the daily export (required actions completed, weighted by calls) when loaded, else from logged call reviews. */
 function teamItg() {
+  let wn = 0;
+  let wd = 0;
+  state.team.members.forEach((m) => {
+    const row = snapRow(m);
+    if (row && row.ITG !== null && row.ITG !== undefined && row.calls) {
+      wn += row.ITG * row.calls;
+      wd += row.calls;
+    }
+  });
+  if (wd) return { ok: Math.round((wn / 100)), n: wd, pct: Math.round((wn / wd) * 10) / 10, source: 'export' };
   let ok = 0;
   let n = 0;
   state.team.members.forEach((m) => {
@@ -11048,7 +11450,7 @@ function teamItg() {
       n += x.n;
     }
   });
-  return n ? { ok, n, pct: Math.round((ok / n) * 100) } : null;
+  return n ? { ok, n, pct: Math.round((ok / n) * 100), source: 'logs' } : null;
 }
 function teamScoreboard(opts = {}) {
   const k = state.kpis;
@@ -11064,7 +11466,8 @@ function teamScoreboard(opts = {}) {
   const rows = members.map((m) => memberKpis(m));
   const below = (kk) => rows.filter((r) => r.items.some((x) => x.k === kk && x.meets === false)).length;
   const itg = teamItg();
-  const tile = ({ key, label, value, unit, target, rank, of, belowN, sub, lead }) => {
+  const tile = ({ key, label, value: raw, unit, target, rank, of, belowN, sub, lead }) => {
+    const value = raw === null || raw === undefined ? null : Math.round(raw * 10) / 10;
     const meets = value === null || value === undefined || target === null ? null : KPI_MEASURE[key] && KPI_MEASURE[key].dir === 'down' ? value <= target : value >= target;
     const pct = value === null || value === undefined || !target ? 0 : Math.max(0, Math.min(1, value / target));
     return h(
@@ -11085,7 +11488,7 @@ function teamScoreboard(opts = {}) {
     tile({ key: 'aiCR', label: 'aiCR', value: k.team.aiCR, unit: '%', target: 62, rank: k.team.rank.aiCR, of: k.team.of, belowN: below('aiCR') }),
     tile({ key: 'GSR', label: 'GSR 2026', value: k.team.GSR, unit: '%', target: 9, rank: k.team.rank.GSR, of: k.team.of, belowN: below('GSR') }),
     tile({ key: 'XM', label: 'XM · 3+ lines', value: hit3 !== null ? hit3 : k.team.hit3, unit: '%', target: 100, rank: k.team.rank.hit3, of: k.team.of, belowN: below('XM'), lead: 'agent target: 4 lines' }),
-    tile({ key: 'ITG', label: 'ITG compliance', value: itg ? itg.pct : null, unit: '%', target: 100, sub: itg ? `${itg.ok} of ${itg.n} reviewed calls` : 'from your logged call reviews' })
+    tile({ key: 'ITG', label: 'ITG compliance', value: itg ? itg.pct : null, unit: '%', target: 100, belowN: itg && itg.source === 'export' ? below('ITG') : undefined, sub: itg ? (itg.source === 'export' ? `${itg.n} calls in the export` : `${itg.ok} of ${itg.n} reviewed calls`) : 'load the daily export or log call reviews' })
   );
   const missing = snapshotMissingMembers();
   return h(
@@ -11214,7 +11617,7 @@ function renderTeam(main) {
     put(
       main,
       pageHead({ eyebrow: [h('span', { class: 'group__icon cat-people', style: 'width:22px;height:22px;border-radius:6px' }, icon('heart', 'icon--sm')), 'Team'], title: 'Team Pulse', sub: 'One card per agent: when they were last recognized, when you last talked one-on-one, and whether coaching and recognition are in balance. People stay with leaders who notice their good work, not only their gaps.' }),
-      emptyState({ iconName: 'users', title: 'Set up your team', text: 'Paste your roster (HRID, BP-ID, and name) to make one card per agent, or start with numbered codes such as Agent 01 to Agent 16.', action: h('div', { class: 'toolbar', style: 'margin:0;justify-content:center' }, h('button', { type: 'button', class: 'btn btn--primary btn--sm', 'data-fk': 'tm-paste0', onclick: openPasteRoster }, icon('clipboard'), 'Paste roster'), h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-setup', onclick: openAddMembers }, icon('plus'), 'Add team members')) })
+      emptyState({ iconName: 'users', title: 'Set up your team', text: 'Paste your roster (names, with IDs if you have them) to make one card per agent, or start with numbered codes such as Agent 01 to Agent 16. IDs are never shown.', action: h('div', { class: 'toolbar', style: 'margin:0;justify-content:center' }, h('button', { type: 'button', class: 'btn btn--primary btn--sm', 'data-fk': 'tm-paste0', onclick: openPasteRoster }, icon('clipboard'), 'Paste roster'), h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-setup', onclick: openAddMembers }, icon('plus'), 'Add team members')) })
     );
     return;
   }
@@ -11254,12 +11657,12 @@ function renderTeam(main) {
       title: 'Team Pulse',
       sub: 'One card per agent: when they were last recognized, when you last talked one-on-one, and whether coaching and recognition are in balance. People stay with leaders who notice their good work, not only their gaps.',
       actions: [
-        members.some((m) => m.hrid || m.bpid) ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-ids', onclick: toggleIds }, icon(state.prefs.hideIds ? 'eye' : 'eye-off'), state.prefs.hideIds ? 'Show IDs' : 'Hide IDs') : null,
+        h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'tm-load', onclick: importSnapshotFromFile }, icon('upload'), 'Load export'),
         h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-paste', onclick: openPasteRoster }, icon('clipboard'), 'Paste roster'),
         h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tm-add', onclick: openAddMembers }, icon('plus'), 'Add members'),
       ],
     }),
-    h('p', { class: 'notice notice--privacy', role: 'note', style: 'margin-bottom:16px' }, icon('lock'), h('span', { class: 'notice__body' }, 'Names, HRIDs, and BP-IDs stay only in this browser. They are never copied into coaching text or a team pack. Use Hide IDs before sharing your screen. Only dates are saved, never message text.')),
+    h('p', { class: 'notice notice--privacy', role: 'note', style: 'margin-bottom:16px' }, icon('lock'), h('span', { class: 'notice__body' }, 'Names stay only in this browser and are never copied into coaching text or a team pack. Agent IDs are never shown; they only match each agent to the export. Only dates are saved, never message text.')),
     teamScoreboard(),
     teamHealth(pulses),
     hub.sales || hub.aux ? hubTeamCard() : null,
@@ -12290,19 +12693,23 @@ function memberItg(m) {
   }));
   return n ? { ok, n, pct: Math.round((ok / n) * 100) } : null;
 }
-/** One agent's KPIs against target: snapshot numbers plus ITG compliance from logged reviews. */
+/** One agent's KPIs against target: snapshot numbers, with ITG compliance from the export when it has it, else from logged reviews. */
 function memberKpis(m) {
   const row = snapRow(m);
   const out = { row, items: [] };
-  const push = (k, v, extra) => out.items.push({ k, v, target: snapTarget(k), meets: kpiMeets(k, v), name: KPI_MEASURE[k].name, unit: KPI_MEASURE[k].unit, ...extra });
+  const push = (k, raw, extra) => {
+    const v = raw === null || raw === undefined ? null : Math.round(raw * 10) / 10;
+    out.items.push({ k, v, target: snapTarget(k), meets: kpiMeets(k, v), name: KPI_MEASURE[k].name, unit: KPI_MEASURE[k].unit, ...extra });
+  };
   if (row) {
     push('tNPS', row.tNPS, { sub: row.surveys ? `${plural(row.surveys, 'survey')}` : 'no surveys' });
     push('aiCR', row.aiCR, {});
     push('XM', row.XM, {});
-    push('GSR', row.GSR, {});
+    push('GSR', row.GSR, { sub: row.gsrApprox ? 'mean of daily values' : '' });
   }
   const itg = memberItg(m);
-  push('ITG', itg ? itg.pct : null, { sub: itg ? `${itg.ok} of ${itg.n} reviewed calls` : 'log call reviews to measure' });
+  if (row && row.ITG !== null && row.ITG !== undefined) push('ITG', row.ITG, { sub: `required actions completed, from the export${itg ? `; ${itg.ok} of ${itg.n} reviewed calls logged` : ''}` });
+  else push('ITG', itg ? itg.pct : null, { sub: itg ? `${itg.ok} of ${itg.n} reviewed calls` : 'log call reviews to measure' });
   out.below = out.items.filter((x) => x.meets === false);
   // The weakest KPI: furthest below target, as a share of the target (ITG counts only once reviews exist).
   const gap = (x) => (x.meets === false && x.target ? (KPI_MEASURE[x.k].dir === 'down' ? x.v - x.target : x.target - x.v) / Math.max(1, Math.abs(x.target)) : -1);
@@ -12394,15 +12801,338 @@ function parseTsxExport(text, tlName) {
   return { snapshot: sanitizeKpis(snap), tls };
 }
 
-/** Load a newer TSX Dashboard export: choose the file, then the team leader, then replace the snapshot. */
+/* ---------- Excel export (daily rows per agent), read in the browser with no library ---------- */
+/** Minimal .xlsx reader: the zip directory, deflate via DecompressionStream, and the sheet XML via DOMParser. */
+async function readXlsx(buffer) {
+  const bytes = new Uint8Array(buffer);
+  const dv = new DataView(buffer);
+  if (!window.DecompressionStream) throw new Error('This browser cannot unpack Excel files. Use Chrome or Edge, or save the sheet as CSV.');
+  // End of central directory record, searched from the end of the file.
+  let eocd = -1;
+  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 70000); i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) {
+      eocd = i;
+      break;
+    }
+  }
+  if (eocd < 0) throw new Error('This is not an Excel (.xlsx) file.');
+  const count = dv.getUint16(eocd + 10, true);
+  let p = dv.getUint32(eocd + 16, true);
+  const entries = {};
+  const td = new TextDecoder();
+  for (let i = 0; i < count; i++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const method = dv.getUint16(p + 10, true);
+    const csize = dv.getUint32(p + 20, true);
+    const nlen = dv.getUint16(p + 28, true);
+    const xlen = dv.getUint16(p + 30, true);
+    const clen = dv.getUint16(p + 32, true);
+    const off = dv.getUint32(p + 42, true);
+    const name = td.decode(bytes.subarray(p + 46, p + 46 + nlen));
+    entries[name] = { method, csize, off };
+    p += 46 + nlen + xlen + clen;
+  }
+  const read = async (name) => {
+    const e = entries[name];
+    if (!e) return null;
+    const ln = dv.getUint16(e.off + 26, true);
+    const lx = dv.getUint16(e.off + 28, true);
+    const start = e.off + 30 + ln + lx;
+    const slice = bytes.subarray(start, start + e.csize);
+    if (e.method === 0) return td.decode(slice);
+    const ds = new DecompressionStream('deflate-raw');
+    const out = await new Response(new Blob([slice]).stream().pipeThrough(ds)).arrayBuffer();
+    return td.decode(out);
+  };
+  const xml = (s) => new DOMParser().parseFromString(s, 'application/xml');
+  const shared = [];
+  const ssx = await read('xl/sharedStrings.xml');
+  if (ssx) xml(ssx).querySelectorAll('si').forEach((si) => shared.push(Array.from(si.querySelectorAll('t')).map((t) => t.textContent).join('')));
+  const wb = await read('xl/workbook.xml');
+  const firstSheet = wb ? xml(wb).querySelector('sheet') : null;
+  const sheetName = firstSheet ? firstSheet.getAttribute('name') : 'Sheet1';
+  // The first sheet, found through the workbook relationships when the file names its parts unusually.
+  let sheetPath = 'xl/worksheets/sheet1.xml';
+  const rels = await read('xl/_rels/workbook.xml.rels');
+  if (firstSheet && rels) {
+    const rid = firstSheet.getAttribute('r:id') || firstSheet.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+    const rel = Array.from(xml(rels).querySelectorAll('Relationship')).find((r) => r.getAttribute('Id') === rid);
+    if (rel) sheetPath = 'xl/' + rel.getAttribute('Target').replace(/^\/?xl\//, '').replace(/^\//, '');
+  }
+  const sx = await read(sheetPath);
+  if (!sx) throw new Error('The workbook has no readable sheet.');
+  const colIndex = (ref) => {
+    let n = 0;
+    for (const ch of ref.replace(/\d+/g, '')) n = n * 26 + (ch.charCodeAt(0) - 64);
+    return n - 1;
+  };
+  const rows = [];
+  xml(sx).querySelectorAll('sheetData > row').forEach((r) => {
+    const row = [];
+    r.querySelectorAll('c').forEach((c) => {
+      const ref = c.getAttribute('r') || '';
+      const t = c.getAttribute('t');
+      const v = c.querySelector('v');
+      let val = null;
+      if (t === 's') val = shared[Number(v ? v.textContent : -1)] ?? null;
+      else if (t === 'inlineStr') val = Array.from(c.querySelectorAll('t')).map((x) => x.textContent).join('');
+      else if (t === 'str' || t === 'b') val = v ? v.textContent : null;
+      else if (v) val = Number(v.textContent);
+      if (ref) row[colIndex(ref)] = val;
+      else row.push(val);
+    });
+    rows.push(row);
+  });
+  return { name: sheetName, rows };
+}
+/** CSV with quotes, for an export saved from Excel as CSV. */
+function readCsv(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"' && text[i + 1] === '"') {
+        cell += '"';
+        i++;
+      } else if (ch === '"') q = false;
+      else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ',') {
+      row.push(cell);
+      cell = '';
+    } else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i++;
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+    } else cell += ch;
+  }
+  if (cell || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+  return { name: 'CSV', rows: rows.map((r) => r.map((c) => (c === '' ? null : Number.isFinite(Number(c)) && c.trim() !== '' ? Number(c) : c))) };
+}
+/** Excel serial dates (1900 system) and date strings, to YYYY-MM-DD. */
+function cellDay(v) {
+  if (typeof v === 'number' && v > 20000 && v < 80000) {
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(v) * 86400000);
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+  }
+  if (typeof v === 'string') {
+    const m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+    const us = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (us) return `${us[3]}-${us[1].padStart(2, '0')}-${us[2].padStart(2, '0')}`;
+  }
+  return '';
+}
+/** The column each KPI lives in, found by header text, so a changed column order still imports. */
+const EXPORT_COLUMNS = {
+  agent: /^agent\b/i,
+  date: /interaction date|^date$/i,
+  calls: /interactions handled|calls handled|^calls$/i,
+  surveys: /survey count/i,
+  tNPS: /^t-?nps$/i,
+  aiCR: /^aicr$/i,
+  XM: /tm lines sold|xm lines|^lines sold/i,
+  GSR: /^gsr 2026/i,
+  ITG: /itg required actions/i,
+  ITGsuite: /itg suite utili[sz]ation/i,
+  ITGutil: /^itg utili[sz]ation/i,
+  XFR: /^xfr$|^transfer/i,
+  AHT: /^aht$/i,
+};
+/**
+ * Turn an export of daily rows (one row per agent per day, as the TSX report exports it) into a snapshot:
+ * month-to-date per agent, exactly as the dashboard aggregates where it can be reproduced (tNPS survey-weighted,
+ * aiCR and ITG weighted by calls, lines summed), scores and floor ranks on the dashboard's agent scorecard.
+ * A "Total" row per agent is used as is when the export carries one.
+ */
+function snapshotFromDaily(sheet, fileName) {
+  const rows = sheet.rows.filter((r) => r && r.some((c) => c !== null && c !== undefined && c !== ''));
+  if (!rows.length) return { error: 'The sheet is empty.' };
+  const headAt = rows.findIndex((r) => r.some((c) => typeof c === 'string' && EXPORT_COLUMNS.agent.test(c.trim())) && r.some((c) => typeof c === 'string' && EXPORT_COLUMNS.date.test(c.trim())));
+  if (headAt < 0) return { error: 'No header row with "Agent" and "Interaction Date" was found. Export the daily report with its column titles.' };
+  const head = rows[headAt].map((c) => (typeof c === 'string' ? c.trim() : ''));
+  const col = {};
+  Object.entries(EXPORT_COLUMNS).forEach(([k, re]) => {
+    const i = head.findIndex((hname) => hname && re.test(hname));
+    if (i >= 0) col[k] = i;
+  });
+  const missing = ['agent', 'date', 'calls'].filter((k) => col[k] === undefined);
+  if (missing.length) return { error: `Missing columns: ${missing.join(', ')}.` };
+  const numv = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : typeof v === 'string' && v.trim() !== '' && Number.isFinite(Number(v.replace('%', ''))) ? Number(v.replace('%', '')) : null);
+  const get = (r, k) => (col[k] === undefined ? null : numv(r[col[k]]));
+  // Rates exported as fractions (0.588) are turned into percentages; rates already in percent are kept.
+  const rateCols = ['aiCR', 'ITG', 'ITGsuite', 'ITGutil', 'XFR', 'GSR'];
+  const frac = {};
+  rateCols.forEach((k) => {
+    const vals = rows.slice(headAt + 1).map((r) => get(r, k)).filter((v) => v !== null);
+    frac[k] = vals.length ? Math.max(...vals.map(Math.abs)) <= 1.5 : false;
+  });
+  const rate = (r, k) => {
+    const v = get(r, k);
+    return v === null ? null : frac[k] ? v * 100 : v;
+  };
+  const byAgent = new Map();
+  let from = '';
+  let to = '';
+  rows.slice(headAt + 1).forEach((r) => {
+    const label = String(r[col.agent] ?? '').trim();
+    if (!label) return;
+    const parts = label.split('|').map((s) => s.trim());
+    const name = parts[0];
+    const bp = (parts.find((p) => /^bp-/i.test(p)) || '').toLowerCase();
+    const key = bp || normalizeText(name);
+    if (!byAgent.has(key)) byAgent.set(key, { name, bpid: bp, days: [], total: null });
+    const a = byAgent.get(key);
+    const dateCell = r[col.date];
+    const day = cellDay(dateCell);
+    if (!day) {
+      if (typeof dateCell === 'string' && /total/i.test(dateCell)) a.total = r;
+      return;
+    }
+    if (!from || day < from) from = day;
+    if (!to || day > to) to = day;
+    const calls = get(r, 'calls') || 0;
+    a.days.push({ d: day, calls, surveys: get(r, 'surveys') || 0, tNPS: get(r, 'tNPS'), aiCR: rate(r, 'aiCR'), XM: get(r, 'XM') || 0, GSR: rate(r, 'GSR'), ITG: rate(r, 'ITG'), ITGsuite: rate(r, 'ITGsuite'), ITGutil: rate(r, 'ITGutil'), XFR: rate(r, 'XFR'), AHT: get(r, 'AHT') });
+  });
+  if (!byAgent.size) return { error: 'No agent rows were found under the header.' };
+  const wmean = (days, k, w) => {
+    let n = 0;
+    let d = 0;
+    days.forEach((x) => {
+      const v = x[k];
+      const ww = x[w] || 0;
+      if (v !== null && v !== undefined && ww > 0) {
+        n += v * ww;
+        d += ww;
+      }
+    });
+    return d ? Math.round((n / d) * 100) / 100 : null;
+  };
+  const r1 = (v) => (v === null || v === undefined ? null : Math.round(v * 100) / 100);
+  const T = { tNPS: 33, aiCR: 62, XM: 4, GSR: 8 };
+  const W = { tNPS: 20, aiCR: 35, XM: 20, GSR: 25 };
+  const agents = [];
+  byAgent.forEach((a) => {
+    const days = a.days.sort((x, y) => (x.d < y.d ? -1 : 1));
+    const calls = days.reduce((n, x) => n + x.calls, 0);
+    const surveys = days.reduce((n, x) => n + x.surveys, 0);
+    let out = {
+      bpid: a.bpid,
+      hrid: '',
+      name: a.name,
+      calls,
+      surveys,
+      tNPS: wmean(days, 'tNPS', 'surveys'),
+      aiCR: wmean(days, 'aiCR', 'calls'),
+      XM: days.reduce((n, x) => n + x.XM, 0),
+      GSR: null,
+      ITG: wmean(days, 'ITG', 'calls'),
+      ITGsuite: wmean(days, 'ITGsuite', 'calls'),
+      ITGutil: wmean(days, 'ITGutil', 'calls'),
+      XFR: wmean(days, 'XFR', 'calls'),
+      AHT: wmean(days, 'AHT', 'calls'),
+      gsrApprox: false,
+      days: days.map((x) => ({ d: x.d, calls: x.calls, surveys: x.surveys, tNPS: x.tNPS, aiCR: r1(x.aiCR), XM: x.XM, GSR: r1(x.GSR), ITG: r1(x.ITG) })),
+    };
+    const gsrDays = days.filter((x) => x.GSR !== null && x.GSR !== undefined);
+    if (gsrDays.length) {
+      out.GSR = r1(gsrDays.reduce((n, x) => n + x.GSR, 0) / gsrDays.length);
+      out.gsrApprox = true;
+    }
+    // A Total row from the report wins over anything computed here.
+    if (a.total) {
+      const t = a.total;
+      const tv = (k) => get(t, k);
+      if (tv('calls') !== null) out.calls = tv('calls');
+      if (tv('surveys') !== null) out.surveys = tv('surveys');
+      if (tv('tNPS') !== null) out.tNPS = tv('tNPS');
+      if (rate(t, 'aiCR') !== null) out.aiCR = r1(rate(t, 'aiCR'));
+      if (tv('XM') !== null) out.XM = tv('XM');
+      if (rate(t, 'GSR') !== null) {
+        out.GSR = r1(rate(t, 'GSR'));
+        out.gsrApprox = false;
+      }
+      if (rate(t, 'ITG') !== null) out.ITG = r1(rate(t, 'ITG'));
+    }
+    if (!out.calls && !out.surveys) return;
+    let score = 0;
+    Object.keys(W).forEach((k) => {
+      const v = out[k];
+      if (v !== null && v !== undefined) score += W[k] * Math.max(0, Math.min(1, v / T[k]));
+    });
+    out.score = r1(score);
+    agents.push(out);
+  });
+  agents.sort((x, y) => y.score - x.score).forEach((a, i) => (a.rank = i + 1));
+  // The team is whoever on the roster matches an exported agent, by BP-ID first, then by name.
+  const mine = state.team.members;
+  const matchRow = (m) => {
+    const bp = String(m.bpid || '').toLowerCase();
+    let row = bp ? agents.find((a) => a.bpid === bp) : null;
+    if (!row && m.name) {
+      const toks = normalizeText(m.name).split(' ').filter(Boolean);
+      const hits = agents.filter((a) => toks.length >= 2 && toks.every((t) => normalizeText(a.name).split(' ').includes(t)));
+      if (hits.length === 1) row = hits[0];
+    }
+    return row;
+  };
+  const team = [];
+  const unmatched = [];
+  mine.forEach((m) => {
+    const row = matchRow(m);
+    if (row) {
+      row.hrid = m.hrid || '';
+      if (!team.includes(row)) team.push(row);
+    } else unmatched.push(m);
+  });
+  const withT = team.filter((a) => a.tNPS !== null && a.surveys > 0);
+  const sw = withT.reduce((n, a) => n + a.surveys, 0);
+  const mean = (list, k) => {
+    const v = list.map((a) => a[k]).filter((x) => x !== null && x !== undefined);
+    return v.length ? r1(v.reduce((n, x) => n + x, 0) / v.length) : null;
+  };
+  const allT = agents.filter((a) => a.tNPS !== null && a.surveys > 0);
+  const allSw = allT.reduce((n, a) => n + a.surveys, 0);
+  const snap = {
+    source: `Daily export${fileName ? ` (${fileName})` : ''}, aggregated here`,
+    kind: 'daily',
+    asOf: to,
+    from,
+    to,
+    label: `${fmtDay(to, true)} · daily export ${fmtDay(from)} to ${fmtDay(to)}`,
+    tl: state.kpis.tl || '',
+    ops: state.kpis.ops || '',
+    targets: state.kpis.targets && Object.keys(state.kpis.targets).length ? state.kpis.targets : { tNPS: 33, aiCR: 62, ITG: 100, XM: 4, GSR: 8 },
+    team: { surveys: sw, tNPS: sw ? r1(withT.reduce((n, a) => n + a.tNPS * a.surveys, 0) / sw) : null, aiCR: mean(team, 'aiCR'), GSR: mean(team, 'GSR'), hit3: team.length ? r1((team.filter((a) => a.XM >= 3).length / team.length) * 100) : null, score: mean(team, 'score'), rank: {}, of: 0 },
+    lob: { agents: agents.length, scored: agents.length, surveys: allSw, tNPS: allSw ? r1(allT.reduce((n, a) => n + a.tNPS * a.surveys, 0) / allSw) : null, aiCR: mean(agents, 'aiCR'), GSR: mean(agents, 'GSR') },
+    leaders: [],
+    agents: team,
+  };
+  return { snapshot: sanitizeKpis(snap), team, unmatched, floor: agents.length, gsrApprox: team.some((a) => a.gsrApprox) };
+}
+
+/** Load a newer export: the TSX Dashboard page, or the daily Excel/CSV report. */
 function importSnapshotFromFile() {
-  const input = h('input', { type: 'file', accept: '.html,.htm,.json,text/html,application/json', style: 'display:none' });
+  const input = h('input', { type: 'file', accept: '.html,.htm,.json,.xlsx,.csv,text/html,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv', style: 'display:none' });
   input.addEventListener('change', () => {
     const file = input.files && input.files[0];
     input.remove();
     if (!file) return;
-    if (file.size > 40 * 1024 * 1024) {
-      toast('That file is too large to be a dashboard export.', { type: 'error' });
+    if (file.size > 60 * 1024 * 1024) {
+      toast('That file is too large to be an export.', { type: 'error' });
+      return;
+    }
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (ext === 'xlsx' || ext === 'csv') {
+      importDailyFile(file, ext);
       return;
     }
     const reader = new FileReader();
@@ -12471,6 +13201,51 @@ function importSnapshotFromFile() {
   });
   document.body.appendChild(input);
   input.click();
+}
+
+/** Read the daily report, show what matched, and replace the snapshot. The file never leaves this browser. */
+async function importDailyFile(file, ext) {
+  let sheet;
+  try {
+    sheet = ext === 'csv' ? readCsv(await file.text()) : await readXlsx(await file.arrayBuffer());
+  } catch (e) {
+    toast(e && e.message ? e.message : 'The file could not be read.', { type: 'error', duration: 7000 });
+    return;
+  }
+  const r = snapshotFromDaily(sheet, file.name);
+  if (r.error) {
+    toast(r.error, { type: 'error', duration: 8000 });
+    return;
+  }
+  const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
+  const save = h('button', { type: 'button', class: 'btn btn--primary', disabled: !r.team.length }, icon('download'), 'Update the numbers');
+  const m = openModal({
+    title: 'Load the daily export',
+    size: 'md',
+    body: h(
+      'div',
+      { class: 'tr-form' },
+      h('p', { class: 'prose' }, `${r.snapshot.label}. ${plural(r.floor, 'agent')} in the file; ${plural(r.team.length, 'agent')} matched to your team.`),
+      r.unmatched.length ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `Not found in the file: ${joinList(r.unmatched.map(memberLabel))}. Their cards keep no numbers until a file includes them.`)) : null,
+      r.gsrApprox ? h('p', { class: 'field__hint' }, icon('info', 'icon--sm'), ' GSR 2026 is the mean of the daily values. For the report\'s own month-to-date GSR, include the Total row per agent in the export.') : null,
+      h('p', { class: 'field__hint' }, 'tNPS is survey-weighted, aiCR and ITG are weighted by calls handled, lines are summed. Ranks are the dashboard scorecard applied to every agent in the file. Nothing is estimated.'),
+      h('p', { class: 'field__hint' }, icon('lock', 'icon--sm'), ' The file is read here and never uploaded anywhere.')
+    ),
+    footer: [cancel, h('span', { class: 'spacer' }), save],
+    initialFocus: save,
+  });
+  cancel.addEventListener('click', () => m.close());
+  save.addEventListener('click', () => {
+    state.kpis = r.snapshot;
+    state.team.members.forEach((mem) => {
+      const row = snapRow(mem);
+      if (row && !mem.bpid && row.bpid) mem.bpid = row.bpid;
+    });
+    persist('kpis', 'team');
+    m.close();
+    refresh({ panel: false });
+    toast(`Numbers updated through ${fmtDay(r.snapshot.to, true)} for ${plural(r.team.length, 'agent')}`);
+  });
 }
 
 /** Numbers ready for the Builder and the tracker: the snapshot first, then the hub dashboards, as the dashboards show them. */
@@ -14922,12 +15697,12 @@ function renderSettings(main) {
           'div',
           { class: 'prose' },
           h('p', null, hasSnapshot() ? `Loaded: ${state.kpis.label || state.kpis.asOf} for ${state.kpis.tl || 'your team'}${state.kpis.ops ? ` (${state.kpis.ops})` : ''}: ${plural(state.kpis.agents.length, 'agent')}, ${state.kpis.leaders.length} team leaders ranked. Source: ${state.kpis.source || 'TSX Dashboard export'}.` : 'No dashboard numbers loaded yet.'),
-          h('p', null, 'To refresh after each export: open the TSX Dashboard, save the page (Ctrl+S, "Webpage, HTML only"), and load that file here. Every agent\'s tNPS, aiCR, XM lines, and GSR then update across Team Pulse, Home, and the Builder. Nothing is estimated: a number shows only when the export has it.')
+          h('p', null, 'Day over day: pull the daily report from the LOB as Excel (one row per agent per day, with the column titles) and load it here. Every agent\'s tNPS, aiCR, ITG compliance, XM lines, and GSR update across Team Pulse, Home, and the Builder, with a day-by-day trend on each card. The saved TSX Dashboard page works too. Nothing is estimated: a number shows only when the export has it, and the file never leaves this browser.')
         ),
         h(
           'div',
           { class: 'data-row' },
-          h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'ssnap', onclick: importSnapshotFromFile }, icon('upload'), 'Load dashboard export'),
+          h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'ssnap', onclick: importSnapshotFromFile }, icon('upload'), 'Load Excel or dashboard export'),
           hasSnapshot() && snapshotMissingMembers().length ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'ssnapadd', onclick: addSnapshotMembers }, icon('users'), `Add ${plural(snapshotMissingMembers().length, 'missing agent')} to the team`) : null
         ),
         h('p', { class: 'hint' }, icon('info'), `Targets used everywhere: tNPS ${fmtNum(snapTarget('tNPS'), 'count')} (leader 35), aiCR ${fmtNum(snapTarget('aiCR'), '%')}, ITG ${fmtNum(snapTarget('ITG'), '%')}, XM ${fmtNum(snapTarget('XM'), 'count')} lines, GSR ${fmtNum(snapTarget('GSR'), '%')} (leader 9%).`),
