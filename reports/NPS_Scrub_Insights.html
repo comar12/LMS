@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0}[hidden]{display:none!important}</style></head><body><title>TSX Calls Monitoring</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>TSX Calls Monitoring</title><style>body{margin:0}[hidden]{display:none!important}</style></head><body><title>TSX Calls Monitoring</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
@@ -270,6 +270,13 @@ tr.tot td{font-weight:700;background:var(--soft)} tr.tot:hover td{background:var
 .minis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 22px} .minis.m3{grid-template-columns:repeat(3,minmax(0,1fr))} @media (max-width:980px){.minis.m3{grid-template-columns:repeat(2,minmax(0,1fr))}} @media (max-width:640px){.minis,.minis.m3{grid-template-columns:1fr}}
 .emptyx{display:flex;gap:22px;align-items:center;padding:6px 0} .emptyx .big{font-size:56px;font-weight:800;letter-spacing:-2px;color:var(--faint);line-height:1} .emptyx p{max-width:80ch;margin-top:4px}
 .lnk{font-weight:700;color:var(--teal);font-size:inherit;padding:0} .lnk:hover{text-decoration:underline}
+/* survey IDs and customer verbatims in agent history */
+.idc{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:2px 8px;border-radius:7px;background:var(--soft);border:1px solid var(--line);color:var(--muted);transition:border-color .15s,color .15s}
+.idc:hover{border-color:var(--teal);color:var(--teal)} .idc b{font-family:var(--mono);font-weight:600;color:var(--text);font-size:11.5px} .idc span:empty{display:none}
+.idc.ok{border-color:var(--good);color:var(--good)}
+.metarow{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:6px 0 4px;font-size:12px;color:var(--muted)}
+.vox{margin-top:8px;padding:8px 12px;border-left:3px solid var(--c-cus);background:var(--soft);border-radius:0 10px 10px 0;font-size:12.5px;display:flex;flex-direction:column;gap:2px;max-width:90ch}
+.vox .who{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 /* sliding tab indicator */
 .tabs{position:relative} .tabs button{position:relative;z-index:1}
 .tabs .tthumb{position:absolute;top:3px;left:0;height:calc(100% - 6px);border-radius:9px;background:var(--card);box-shadow:0 1px 4px #0b203218,0 0 0 1px var(--line);z-index:0;pointer-events:none}
@@ -1964,6 +1971,13 @@ const avColor=k=>{let s=0;for(const ch of k)s=(s*31+ch.charCodeAt(0))>>>0;return
 const avatar=(name,color,lg)=>h("span",{class:"av"+(lg?" lg":""),style:"background:"+(color||avColor(name)),"aria-hidden":"true",text:initials(name)});
 const chg=(v,{d=0,unit="",bad="up"}={})=>v==null||isNaN(v)?h("span",{class:"flat",text:"—"}):h("span",{class:Math.abs(v)<1e-9||bad==="none"?"flat":(v>0)===(bad==="up")?"up":"down",text:(v>0?"▲ ":v<0?"▼ ":"")+sg(v,d)+unit});
 const tag=(t,k)=>h("span",{class:"tag "+k,text:t});
+/* click-to-copy identifier chip (survey ID, UCID) */
+function idChip(label,v){if(v==null||v==="")return null;const val=String(v);const el=h("button",{type:"button",class:"idc",title:"Click to copy"},h("span",{text:label}),h("b",{text:val}));
+  el.addEventListener("click",e=>{e.stopPropagation();const done=()=>{el.classList.add("ok");const s0=el.firstChild.textContent;el.firstChild.textContent="Copied";setTimeout(()=>{el.classList.remove("ok");el.firstChild.textContent=s0;},1200);};
+    try{navigator.clipboard.writeText(val).then(done,done);}catch(_){done();}});return el;}
+/* source exports sometimes carry literal \u2019-style escapes in free text */
+const unesc=t=>String(t==null?"":t).replace(/\\u([0-9a-fA-F]{4})/g,(_,x)=>String.fromCharCode(parseInt(x,16)));
+const normSid=v=>v==null||v===""?"":String(v).trim().replace(/\.0+$/,"");
 function strong(t){return String(t).split(/(\*\*[^*]+\*\*)/).filter(Boolean).map(p=>p.startsWith("**")?h("strong",{text:p.slice(2,-2)}):p);}
 function table(cols,rows,{onRow,rowClass}={}){const tb=h("tbody");let ri=0;for(const r of rows){const tr=h("tr",{class:[onRow?"click":"",rowClass?rowClass(r):""].join(" ").trim()||null,style:`--r:${ri++}`});if(onRow){tr.tabIndex=0;tr.addEventListener("click",()=>onRow(r));tr.addEventListener("keydown",e=>{if(e.key==="Enter")onRow(r);});}
   for(const c of cols){const v=c.f(r);const td=h("td",{class:(c.n?"n ":"")+(c.cls||"")});if(v!=null&&v.nodeType)td.append(v);else td.textContent=v==null?"":v;tr.append(td);}tb.append(tr);}
@@ -1992,7 +2006,7 @@ function buildRows(objs){
     const rr=String(o[km.rca]||"").trim();const ri=mapKw(rr,RCA_MAP);const rca=ri<0?(rr||"(blank)"):RCA_MAP[ri][1];
     const t2r=[km.t2a,km.t2cu,km.t2co,km.t2v].map(k=>k?String(o[k]==null?"":o[k]).trim():"").find(x=>x)||"";const ti=t2r?mapKw(t2r,T2_MAP):-1;const t2=t2r?(ti<0?t2r:T2_MAP[ti][1]):"";
     out.push({id:km.id?o[km.id]:"",scrub,lk:key,bpid:String(o[km.bpid]==null?"":o[km.bpid]).trim().toLowerCase(),survey:km.survey?String(o[km.survey]==null?"":o[km.survey]).trim():"",
-      sdate:km.sdate?toDay(o[km.sdate]):null,rca,t2,bucket:rca===AO?(BUCKET_OF[t2]||""):"",comment:km.comment?String(o[km.comment]==null?"":o[km.comment]).trim():"",agent:"",rtl:"",om:"",tenure:"",phase:"",wave:"",est,future:false});}
+      sdate:km.sdate?toDay(o[km.sdate]):null,rca,t2,bucket:rca===AO?(BUCKET_OF[t2]||""):"",comment:km.comment?unesc(o[km.comment]).trim():"",agent:"",rtl:"",om:"",tenure:"",phase:"",wave:"",est,future:false});}
   if(!out.length)throw new Error("No NPS detractor scrubs with a usable date were found.");
   for(const[,g]of groupBy(out.filter(r=>r.survey),r=>r.survey))if(g.length>1){const cf=new Set(g.map(r=>r.rca)).size>1;for(const r of g){r.dup=true;r.conflict=cf;}}
   for(const r of out){const i=[];if(r.dup)i.push("Duplicate survey");if(r.conflict)i.push("Conflicting RCA");if(!/^bp-[a-z0-9]+$/.test(r.bpid)||r.bpid.length<7)i.push("Invalid BPID");
@@ -2294,8 +2308,14 @@ function vAgentBody(c){const g=c.W.filter(r=>r.bpid===S.agent).sort((a,b)=>b.scr
   gr.append(card("c6","Weekly scrubs","Agent Opportunity vs other reasons · last 12 weeks",chart(b=>CH.stackedCols(b,{cats:wks.map(w=>fd(w,"dm")),stacks:[{name:"Agent Opportunity",color:"var(--c-ao)",values:wks.map(w=>count(g,r=>isAO(r)&&wk(r.scrub)===w))},{name:"Other",color:"var(--c-cus)",values:wks.map(w=>count(g,r=>!isAO(r)&&wk(r.scrub)===w))}],height:220}),220)));
   const drv=AGT.map(t=>({label:t,value:count(ao,r=>r.t2===t),color:BCOLOR[BUCKET_OF[t]]||"var(--s3)"})).filter(x=>x.value).sort((a,b)=>b.value-a.value);
   gr.append(card("c6","Behaviours to coach",`${nf(ao.length)} Agent Opportunities in the period · agent ${pct(ar)} vs team ${pct(tr)}`,drv.length?chart(b=>CH.hbars(b,{items:drv,fmt:nf,rowH:32}),20+32*drv.length):h("div",{class:"empty",text:"No Agent Opportunity in the period."})));
-  const tl=h("div",{class:"timeline"},inP.slice(0,60).map(r=>h("div",{class:"tl-item"},h("span",{class:"d",text:fd(r.scrub,"dm")}),h("span",{class:"dot",style:"background:"+(COLOR[r.rca]||"var(--faint)")}),h("div",{class:"body"},h("b",{text:(SHORT[r.rca]||r.rca)+(r.t2?" · "+r.t2:"")}),h("p",{text:r.comment||"(no comment)"}),r.issues.length?h("div",null,r.issues.map(i=>h("span",{class:"tagx",text:i}))):null))));
-  gr.append(card("c12","Scrub history","Newest first · the leader's comment is the evidence for the 1:1",inP.length?tl:h("div",{class:"empty",text:"No scrubs in the selected period. Choose All time for the full history."})));return[gr];}
+  const detBy=typeof DET!=="undefined"&&DET.length?new Map(DET.filter(d=>d.sid).map(d=>[d.sid,d])):new Map();
+  const tl=h("div",{class:"timeline"},inP.slice(0,60).map(r=>{const dv=detBy.get(normSid(r.survey));return h("div",{class:"tl-item"},h("span",{class:"d",text:fd(r.scrub,"dm")}),h("span",{class:"dot",style:"background:"+(COLOR[r.rca]||"var(--faint)")}),h("div",{class:"body"},
+    h("b",{text:(SHORT[r.rca]||r.rca)+(r.t2?" · "+r.t2:"")}),
+    h("div",{class:"metarow"},idChip("Survey ID",normSid(r.survey)),r.sdate!=null?h("span",{text:"Surveyed "+fd(r.sdate,"dm")}):null,h("span",{text:(r.est?"Scrub date not recorded":"Scrubbed "+fd(r.scrub,"dm"))}),h("span",{text:"By "+LN(r.lk)}),r.bucket?h("span",{class:"tagx",text:"KPI: "+r.bucket}):null),
+    h("p",{text:r.comment||"(no comment)"}),
+    dv?h("div",{class:"vox"},h("span",{class:"who",text:`Customer · score ${nf(dv.score)}${dv.ctype?" · "+dv.ctype:""}${dv.resolved?" · resolved: "+dv.resolved:""}`}),h("span",{text:dv.reason?`“${dv.reason}”`:"No verbatim left"})):null,
+    r.issues.length?h("div",null,r.issues.map(i=>h("span",{class:"tagx",text:i}))):null));}));
+  gr.append(card("c12","Scrub history","Newest first · survey ID (click to copy), root cause, the leader's evidence and the customer's own words · use it for the 1:1",inP.length?tl:h("div",{class:"empty",text:"No scrubs in the selected period. Choose All time for the full history."})));return[gr];}
 
 /* ===================== comment intelligence ===================== */
 const THEMES=[
@@ -2458,18 +2478,18 @@ function loadMonitoring(sh,file){
     const bp=low(t==="nps"?o.BPID:t==="aicr"?o.BPID2:t==="short"?o.BPID3:t==="out"?o.BPID4:o.BPID5);
     const sub=low(o.Email),a=ROSTER.get(bp);
     const r={t,d,bp,sub,tle:(a&&a.tle)||sub,onRoster:!!a,ucid:String(pick(o,"UCID","UCID2","UCID3","UCID4")||""),future:d!=null&&d>today,rca:"",t2:"",comment:"",f:{}};
-    if(t==="nps"){const rr=String(o["Survey RCA"]||"");const i=mapKw(rr,RCA_MAP);r.rca=i<0?rr:RCA_MAP[i][1];r.t2=canonT2(pick(o,"Survey RCA T2 (Agent)","Survey RCA T2 (Customer)","Survey RCA T2 (Comcast)","Survey RCA T2 (VXI)"));r.comment=String(o.Comment||"").trim();r.sid=sidOf(o);}
-    else if(t==="aicr"){const rr=String(o["Failure RCA"]||"");const i=mapKw(rr,RCA_MAP);r.rca=i<0?rr:RCA_MAP[i][1];r.t2=canonT2(pick(o,"Failure RCA T2 (Agent)","Failure RCA T2 (Customer)","Failure RCA T2 (Comcast)","Failure RCA T2 (VXI)"));r.comment=String(o.Comment2||"").trim();r.f.itg=yn(pref(o,"Was ITG Utilized"));}
-    else if(t==="short"){r.f={reason:String(o["Short Call Reason"]||"").trim(),valid:yn(pref(o,"Was the short call valid")),action:String(o["Action Required"]||"").trim(),dur:nnum(o["Call Duration (seconds)"])};r.comment=String(o.Comment3||"").trim();}
-    else if(t==="out"){r.f={reason:String(o["Outbound Reason"]||"").trim(),justified:yn(pref(o,"Was the outbound call justified")),documented:yn(pref(o,"Was the call documented")),action:String(o["Action Required2"]||"").trim()};r.comment=String(o.Comment4||"").trim();}
-    else{r.f={product:String(o["Product Sold"]||"").trim(),consent:yn(pref(o,"Was customer consent")),price:yn(pref(o,"Were price and terms")),result:String(o["Validation Result"]||"").trim(),action:String(o["Action Required3"]||"").trim()};r.comment=String(o.Comment5||"").trim();}
+    if(t==="nps"){const rr=String(o["Survey RCA"]||"");const i=mapKw(rr,RCA_MAP);r.rca=i<0?rr:RCA_MAP[i][1];r.t2=canonT2(pick(o,"Survey RCA T2 (Agent)","Survey RCA T2 (Customer)","Survey RCA T2 (Comcast)","Survey RCA T2 (VXI)"));r.comment=unesc(o.Comment||"").trim();r.sid=sidOf(o);}
+    else if(t==="aicr"){const rr=String(o["Failure RCA"]||"");const i=mapKw(rr,RCA_MAP);r.rca=i<0?rr:RCA_MAP[i][1];r.t2=canonT2(pick(o,"Failure RCA T2 (Agent)","Failure RCA T2 (Customer)","Failure RCA T2 (Comcast)","Failure RCA T2 (VXI)"));r.comment=unesc(o.Comment2||"").trim();r.f.itg=yn(pref(o,"Was ITG Utilized"));}
+    else if(t==="short"){r.f={reason:String(o["Short Call Reason"]||"").trim(),valid:yn(pref(o,"Was the short call valid")),action:String(o["Action Required"]||"").trim(),dur:nnum(o["Call Duration (seconds)"])};r.comment=unesc(o.Comment3||"").trim();}
+    else if(t==="out"){r.f={reason:String(o["Outbound Reason"]||"").trim(),justified:yn(pref(o,"Was the outbound call justified")),documented:yn(pref(o,"Was the call documented")),action:String(o["Action Required2"]||"").trim()};r.comment=unesc(o.Comment4||"").trim();}
+    else{r.f={product:String(o["Product Sold"]||"").trim(),consent:yn(pref(o,"Was customer consent")),price:yn(pref(o,"Were price and terms")),result:String(o["Validation Result"]||"").trim(),action:String(o["Action Required3"]||"").trim()};r.comment=unesc(o.Comment5||"").trim();}
     recs.push(r);}
   /* detractor population (NPS raw sheet) — our own roster lookup, not the sheet's helper columns */
   const reviewed=new Set(recs.filter(r=>r.t==="nps"&&r.sid).map(r=>r.sid));let hc=0,hm=0;const det=[];
   for(const o of sh.npsraw||[]){const bp=low(o["Employee NTID"]);if(!/^bp-/.test(bp))continue;const sc=nnum(pick(o,"SMS tNPS","tNPS"));if(sc==null||sc>6)continue;
     const a=ROSTER.get(bp),sid=sidOf({"Survey ID":pick(o,"Surveyid for internal use (e.g. RI link)")});
     if(a&&o["TL Email"]!=null){hc++;if(low(o["TL Email"])!==a.tle)hm++;}
-    det.push({d:toDay(o["Response Date"]),td:toDay(o["Transaction Date"]),bp,score:sc,reason:String(o["Reason for score"]||"").trim(),resolved:yn(o["Issue Resolved"]),ctype:String(o["Call Type Name"]||"").trim(),sid,tle:a?a.tle:"",onRoster:!!a,reviewed:!!(sid&&reviewed.has(sid))});}
+    det.push({d:toDay(o["Response Date"]),td:toDay(o["Transaction Date"]),bp,score:sc,reason:unesc(o["Reason for score"]||"").trim(),resolved:yn(o["Issue Resolved"]),ctype:String(o["Call Type Name"]||"").trim(),sid,tle:a?a.tle:"",onRoster:!!a,reviewed:!!(sid&&reviewed.has(sid))});}
   MONCFG={file,tgt,rpt:{from:rf,to:rt},wd,tls:[...tls.values()].sort((a,b)=>a.name.localeCompare(b.name)),helper:{checked:hc,mismatch:hm}};
   MREC=recs;DET=det;
   SRC.mon=(sh.raw||[]).filter(o=>MTYPE[norm(pick(o,"Monitoring Type"))]==="nps");
@@ -2523,7 +2543,7 @@ function dayList(W){const d=[];for(let x=W.from;x<=W.to;x++)d.push(x);return d;}
 function recMeta(r){const p=[];if(r.t==="nps"||r.t==="aicr"){p.push((SHORT[r.rca]||r.rca||"—")+(r.t2?" · "+r.t2:""));if(r.f.itg)p.push("ITG: "+r.f.itg);}
   else for(const[k,v]of Object.entries(r.f))if(v!=null&&v!==""&&k!=="dur")p.push(v);if(r.f.dur)p.push(nf(r.f.dur)+"s");return p.join(" · ");}
 function recItem(r,q){const txt=r.comment||"(no comment)";let body;if(q){const parts=txt.split(new RegExp("("+q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","i"));body=h("p",null,parts.map((p,i)=>i%2?h("mark",{text:p}):p));}else body=h("p",{text:txt});
-  return h("div",{class:"cmt"},h("span",{class:"dot",style:"background:"+(r.t==="nps"||r.t==="aicr"?(COLOR[r.rca]||MCOL[r.t]):MCOL[r.t])}),h("div",null,h("div",{class:"m"},h("span",{text:fd(r.d,"dm")}),h("span",{class:"tagx",text:MLABEL[r.t]}),h("b",{text:LN(r.tle)}),
+  return h("div",{class:"cmt"},h("span",{class:"dot",style:"background:"+(r.t==="nps"||r.t==="aicr"?(COLOR[r.rca]||MCOL[r.t]):MCOL[r.t])}),h("div",null,h("div",{class:"m"},h("span",{text:fd(r.d,"dm")}),h("span",{class:"tagx",text:MLABEL[r.t]}),r.t==="nps"?idChip("Survey ID",r.sid):idChip("UCID",r.ucid),h("b",{text:LN(r.tle)}),
     r.bp?h("button",{type:"button",class:"lnk",onclick:()=>drillAgent(r.bp),text:AN(r.bp)||r.bp}):null,h("span",{text:recMeta(r)})),body));}
 function recList(title,sub,recs){const R_=[...recs].sort((a,b)=>b.d-a.d);const inp=h("input",{type:"text",placeholder:"Search the comments…","aria-label":"Search comments"}),out=h("div",{style:"margin-top:12px"}),st=h("span",{class:"muted small"});
   const run=()=>{const q=inp.value.trim().toLowerCase();const m=q?R_.filter(r=>(r.comment||"").toLowerCase().includes(q)||(AN(r.bp)||r.bp).toLowerCase().includes(q)):R_;st.textContent=q?`${nf(m.length)} of ${nf(R_.length)} match`:`${nf(R_.length)} reviews · newest first`;
@@ -2558,7 +2578,7 @@ function backlogCard(c,M,cls){const B=M.dets.filter(r=>!r.reviewed),to=M.W.to;if
   const ages=[["0–2 days",0,2],["3–7 days",3,7],["8–14 days",8,14],["15+ days",15,1e9]].map(([l,a,b],i)=>({label:l,value:count(B,r=>r.d!=null&&to-r.d>=a&&to-r.d<=b),color:["var(--seq2)","var(--seq3)","var(--seq4)","var(--seq5)"][i]}));
   if(c.level==="tl"||c.level==="agent"){const L=[...B].sort((a,b)=>a.d-b.d).slice(0,40);
     return card("c12","Detractors still to review",`${nf(B.length)} of ${nf(M.dets.length)} detractor surveys for ${c.level==="agent"?"this agent":"this team"} have no NPS review yet · oldest first`,h("div",null,hb(ages,nf),
-      L.length?table([{t:"Survey",f:r=>fd(r.d,"dm")},{t:"Waiting",n:1,f:r=>nf(to-r.d)+" d"},{t:"Agent",f:r=>h("button",{type:"button",class:"lnk",onclick:()=>drillAgent(r.bp),text:AN(r.bp)||r.bp})},{t:"Score",n:1,f:r=>nf(r.score)},{t:"Call type",f:r=>r.ctype||"—"},{t:"Resolved",f:r=>r.resolved||"—"},{t:"Customer said",f:r=>h("span",{class:"small",text:r.reason?r.reason.slice(0,140):"—"})}],L):h("div",{class:"empty",text:"Nothing waiting — every detractor has been reviewed."})));}
+      L.length?table([{t:"Survey",f:r=>fd(r.d,"dm")},{t:"Survey ID",f:r=>idChip("",r.sid)||"—"},{t:"Waiting",n:1,f:r=>nf(to-r.d)+" d"},{t:"Agent",f:r=>h("button",{type:"button",class:"lnk",onclick:()=>drillAgent(r.bp),text:AN(r.bp)||r.bp})},{t:"Score",n:1,f:r=>nf(r.score)},{t:"Call type",f:r=>r.ctype||"—"},{t:"Resolved",f:r=>r.resolved||"—"},{t:"Customer said",f:r=>h("span",{class:"small",text:r.reason?r.reason.slice(0,140):"—"})}],L):h("div",{class:"empty",text:"Nothing waiting — every detractor has been reviewed."})));}
   const by=M.rows.filter(r=>r.dets).map(r=>({label:r.t.name,value:r.backlog,color:r.backlog/r.dets>.5?"var(--bad)":"var(--warn)",extra:[[null,"Detractors",nf(r.dets)],[null,"Reviewed",nf(r.dets-r.backlog)]]})).sort((a,b)=>b.value-a.value);
   return card(cls,"Detractor backlog",`${nf(B.length)} of ${nf(M.dets.length)} detractor surveys have no review yet (matched by survey ID)`,h("div",{style:"display:flex;flex-direction:column;gap:14px"},h("div",null,h("div",{class:"flab",text:"Waiting by team leader"}),hb(by,nf)),h("div",null,h("div",{class:"flab",text:"How long they have waited"}),hb(ages,nf))));}
 function agentCoverage(c,M){const W=M.W,TG=MONCFG.tgt,ag=[...ROSTER.values()].filter(a=>a.tle===S.tl);if(!ag.length)return null;
@@ -2571,7 +2591,7 @@ function agentCoverage(c,M){const W=M.W,TG=MONCFG.tgt,ag=[...ROSTER.values()].fi
       {t:"Open gaps",n:1,f:r=>r.gaps?tag(nf(r.gaps),r.gaps>=3?"bad":"warn"):tag("none","good")}],rows,{onRow:r=>drillAgent(r.a.bp)}));}
 function monitoringTab(c,M){const g=h("div",{class:"g12"});
   if(c.level==="agent"){const rs=[...M.recs].sort((a,b)=>b.d-a.d);g.append(backlogCard(c,M,"c12")||h("span"),card("c12","Every check on this agent",`${nf(rs.length)} reviews in the period · newest first`,rs.length?h("div",{class:"timeline"},rs.map(r=>h("div",{class:"tl-item"},h("span",{class:"d",text:fd(r.d,"dm")}),h("span",{class:"dot",style:"background:"+MCOL[r.t]}),
-    h("div",{class:"body"},h("b",{text:MLABEL[r.t]+" · "+recMeta(r)}),h("p",{text:(r.comment||"(no comment)")+" — "+LN(r.tle)}))))):h("div",{class:"empty",text:"No monitoring logged for this agent in the period."})));return[g];}
+    h("div",{class:"body"},h("b",{text:MLABEL[r.t]+" · "+recMeta(r)}),h("div",{class:"metarow"},r.t==="nps"?idChip("Survey ID",r.sid):idChip("UCID",r.ucid),h("span",{text:"Reviewed by "+(r.sub?nameFromEmail(r.sub):LN(r.tle))})),h("p",{text:r.comment||"(no comment)"}))))):h("div",{class:"empty",text:"No monitoring logged for this agent in the period."})));return[g];}
   g.append(scoreCard(c,M));const gp=gapCard(M,"c5");if(gp)g.append(gp);const pc=paceCard(M,gp?"c7":"c12");if(pc)g.append(pc);
   if(c.level==="tl"){const ac=agentCoverage(c,M);if(ac)g.append(ac);const bl=backlogCard(c,M,"c12");if(bl)g.append(bl);const dc=dailyCard(M,"c12");if(dc)g.append(dc);return[g];}
   const hm=attHeat(M,"c7");if(hm)g.append(hm);const bl=backlogCard(c,M,hm?"c5":"c6");if(bl)g.append(bl);const dc=dailyCard(M,"c12");if(dc)g.append(dc);return[g];}
