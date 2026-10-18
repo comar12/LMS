@@ -5934,7 +5934,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.3.1';
+const APP_VERSION = '2.3.2';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -8048,10 +8048,9 @@ function composeRecord(b, s) {
     // A tNPS far below target is not promised in one plan: the direction is, and the number target follows the behavior.
     if (k === 'tNPS' && v.cur !== null && v.target !== null && v.cur < v.target - 15) {
       const step = v.cur < 0 ? 0 : Math.round((v.cur + v.target) / 2);
-      out.push(line(`tNPS: ${fmtNum(v.cur, v.unit)} as of ${textDay(v.asOf)}. Direction by ${planEndDay(s)}: ${step === 0 ? 'no detractor on the reviewed behavior, and the score back above 0' : `${step} or higher`}. The ${fmtNum(v.target, v.unit)} target is set once the behavior holds and at least 10 new surveys are in`));
+      out.push(line(`tNPS: ${fmtNum(v.cur, v.unit)} as of ${textDay(v.asOf)}. Direction by ${planEndDay(s)}: ${step === 0 ? 'no detractor on the reviewed behavior, and the score back above 0' : `${step} or higher`}. Target ${fmtNum(v.target, v.unit)}`));
     } else out.push(line(kpiMeasureLine(k, v, s)));
   });
-  if (nums.includes('tNPS')) out.push(line('tNPS is read on a small number of surveys, so one survey moves it several points; we judge the behavior on reviewed calls first and the survey trend by the end of the plan'));
 
   head('Follow-up');
   if (mode === 'people') out.push(bullet(`By ${followDay(s)}: a short check-in on how the plan is going`));
@@ -20535,7 +20534,7 @@ const tpFloorSize = () => {
 const tpNameKey = (m) => normalizeText(`${memberLabel(m)} ${m.code}`);
 const TP_PHONE = '(max-width: 700px)';
 const tpPhone = () => !!(window.matchMedia && window.matchMedia(TP_PHONE).matches);
-const TP_LOW_SURVEYS = 5;
+const TP_LOW_SURVEYS = 0;
 const TP_TREND_SURVEYS = 10;
 
 /** One agent's KPIs with a status per item: met, near (within 5% of target), below, or none (no value or too few surveys). */
@@ -21687,7 +21686,7 @@ numbersCard = function () {
       h('div', { class: 'num-row__grid' }, field('cur', 'Current'), field('target', 'Target'), h('div', { class: 'field' }, h('label', { class: 'field__label', for: `num-${k}-unit` }, 'Unit'), unit)),
       err,
       negNote,
-      surveys ?h('p', { class: 'num-row__note' }, icon('info', 'icon--sm'), `Read on ${plural(surveys, 'survey')} as of ${fmtDay(hubValuesDate(agent), true)}, so one survey moves it several points.`) : null
+      surveys ?h('p', { class: 'num-row__note' }, icon('info', 'icon--sm'), `Read on ${plural(surveys, 'survey')} as of ${fmtDay(hubValuesDate(agent), true)}.`) : null
     );
   };
   const empty = !keys.length;
