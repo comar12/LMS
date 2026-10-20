@@ -90,6 +90,16 @@ Both are counted in the rail, the summary and the CSV (`next_steps` and
 `qa_check`: the ticked items, `none` when nothing was ticked, empty when the
 check did not apply). Calls logged before this change are not counted.
 
+### Article sent
+
+Every call asks "Article sent to the customer?" (Sent / Not sent), required
+like the other answers. It shows in the call list, the rail and the summary;
+a sent article goes into the account note; a repeat caller's note says
+whether an article went out last time (and suggests sending one if none did);
+the CSV adds `article_sent`; the board adds an "Article sent" column per agent
+and for the team, and the supervisor line gives the team's rate. Calls logged
+before the question existed are left out of the count ("Not asked").
+
 ### Overnight shifts
 
 Operating hours run overnight (14:00 to 07:00 Cairo time), so nothing in My
@@ -133,7 +143,7 @@ are missing.
 
 The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id`,
 `warmup`, `next_steps`, `qa_check`, `what_worked`, `holds`, `hold_secs`,
-`longest_hold_secs`, `long_holds`, `shift_day`, `checkin` and `checkin_why` columns, and the file is named
+`longest_hold_secs`, `long_holds`, `shift_day`, `checkin`, `checkin_why` and `article_sent` columns, and the file is named
 `my-shift-<name>-<hr id>-<date>.csv`.
 
 ### Warm-up, goals, "Customer said" and My week
