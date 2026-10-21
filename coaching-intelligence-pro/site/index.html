@@ -5825,6 +5825,69 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .kc-card > .sec__title svg, .ro-card > .sec__title svg { color: var(--accent-text); flex: none; }
 .kc-card > .sec__sub, .ro-card > .sec__sub { margin: 0 0 6px; font-size: 0.82rem; }
 .ro-card { margin-bottom: 18px; }
+/* ===== layer: layers/83-kpitable.css ===== */
+/* 83-kpitable: every agent's KPIs against target */
+.kt-card { padding: 20px 22px 18px; margin: 0 0 22px; }
+.kt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; margin-bottom: 14px; }
+.kt-title { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.15rem; }
+.kt-title svg { color: var(--accent-text, var(--accent)); }
+.kt-sub { margin: 4px 0 0; color: var(--text-2); font-size: 0.86rem; }
+.kt-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.kt-scroll { overflow-x: auto; margin: 0 -6px; padding: 0 6px; }
+.kt-table { width: 100%; min-width: 640px; border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; }
+.kt-table thead th { background: #121826; color: #fff; padding: 10px 8px; text-align: center; font-weight: 700; vertical-align: middle; }
+.kt-table thead th:first-child { border-radius: 10px 0 0 10px; text-align: left; padding-left: 14px; }
+.kt-table thead th:last-child { border-radius: 0 10px 10px 0; }
+.kt-th { display: block; font-size: 0.92rem; }
+.kt-target { display: block; margin-top: 2px; font-size: 0.72rem; font-weight: 500; color: #F6A57A; }
+.kt-table tbody th, .kt-table tbody td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.kt-table tbody tr:nth-child(even):not(.kt-tr--team) { background: color-mix(in srgb, var(--text) 2.5%, transparent); }
+.kt-name { text-align: left; font-weight: 600; white-space: nowrap; padding-left: 14px !important; }
+.kt-td { text-align: center; }
+.kt-val { display: inline-flex; align-items: center; justify-content: center; min-width: 84px; padding: 6px 10px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; }
+.kt-val--met { background: #E3F2EC; color: #1E7F5C; }
+.kt-val--close { background: #FFF1CC; color: #8A5A00; }
+.kt-val--below { background: #FDE4E1; color: #B42318; }
+.kt-val--none { background: color-mix(in srgb, var(--text) 5%, transparent); color: var(--text-2); }
+.kt-met { font-weight: 700; color: var(--text-2); white-space: nowrap; }
+.kt-met.is-all { color: #1E7F5C; }
+.kt-tr--team th, .kt-tr--team td { background: color-mix(in srgb, var(--accent) 7%, var(--surface)); border-bottom: 0; }
+.kt-tr--team th { font-weight: 800; border-radius: 10px 0 0 10px; }
+.kt-tr--team td:last-child { border-radius: 0 10px 10px 0; }
+.kt-tr--team th, .kt-tr--team td { border-top: 8px solid var(--surface); }
+
+.kt-legend { display: flex; align-items: center; gap: 8px 18px; flex-wrap: wrap; margin-top: 14px; font-size: 0.85rem; font-weight: 600; }
+.kt-key { display: inline-flex; align-items: center; gap: 8px; }
+.kt-dot { width: 18px; height: 18px; border-radius: 5px; display: inline-grid; place-items: center; }
+.kt-dot::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.kt-key--met .kt-dot { background: #E3F2EC; color: #1E7F5C; }
+.kt-key--close .kt-dot { background: #FFF1CC; color: #8A5A00; }
+.kt-key--below .kt-dot { background: #FDE4E1; color: #B42318; }
+.kt-note { margin-left: auto; font-weight: 400; color: var(--text-2); font-size: 0.78rem; }
+
+/* dark theme: deeper tints, readable text */
+:root[data-theme='dark'] .kt-val--met { background: rgba(30, 127, 92, 0.22); color: #7FD8B4; }
+:root[data-theme='dark'] .kt-val--close { background: rgba(214, 160, 30, 0.2); color: #F2CF6B; }
+:root[data-theme='dark'] .kt-val--below { background: rgba(180, 35, 24, 0.24); color: #FF9C91; }
+:root[data-theme='dark'] .kt-met.is-all { color: #7FD8B4; }
+:root[data-theme='dark'] .kt-table thead th { background: #0B0F18; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .kt-val--met { background: rgba(30, 127, 92, 0.22); color: #7FD8B4; }
+  :root:not([data-theme='light']) .kt-val--close { background: rgba(214, 160, 30, 0.2); color: #F2CF6B; }
+  :root:not([data-theme='light']) .kt-val--below { background: rgba(180, 35, 24, 0.24); color: #FF9C91; }
+  :root:not([data-theme='light']) .kt-met.is-all { color: #7FD8B4; }
+}
+
+.anim-enter .kt-card { animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.anim-enter .kt-tr { animation: fade-in 0.4s ease both; animation-delay: calc(120ms + var(--d, 0) * 30ms); }
+@media (max-width: 560px) {
+  .kt-card { padding: 16px 14px; }
+  .kt-note { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-enter .kt-card, .anim-enter .kt-tr { animation: none; }
+}
 </style>
 </head>
 <body>
@@ -5934,7 +5997,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.3.3';
+const APP_VERSION = '2.3.4';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -28712,6 +28775,300 @@ snapRow = function (m) {
   if (!/^bp-/.test(bp)) return null;
   const h = idHash(bp);
   return state.kpis.agents.find((a) => a.bpid === h) || null;
+};
+/* ===== layer: layers/83-kpitable.js ===== */
+/* ==========================================================================
+   83-kpitable: every agent's KPIs against target, on Home
+   - One row per agent, one column per KPI (ITG, tNPS, aiCR, XM lines, GSR), the target in the header.
+   - Green on target, yellow almost there, red below; a team row at the bottom.
+   - "Copy image" and "Save image" draw the same table as a clean picture for WhatsApp. Names only, never IDs.
+   ========================================================================== */
+
+const KT_KPIS = [
+  { k: 'ITG', label: 'ITG', close: 5 },
+  { k: 'tNPS', label: 'tNPS', close: 10 },
+  { k: 'aiCR', label: 'aiCR', close: 3 },
+  { k: 'XM', label: 'XM lines', close: 1 },
+  { k: 'GSR', label: 'GSR', close: 1 },
+];
+const KT_LOOK = {
+  met: { word: 'On target', bg: '#E3F2EC', fg: '#1E7F5C' },
+  close: { word: 'Almost there', bg: '#FFF1CC', fg: '#8A5A00' },
+  below: { word: 'Below target', bg: '#FDE4E1', fg: '#B42318' },
+  none: { word: 'No data', bg: '#F1F2F4', fg: '#8C96AC' },
+};
+
+/** met, close or below: "close" is within a few points of the target (ITG 5, tNPS 10, aiCR 3, XM 1 line, GSR 1). */
+function ktLevel(k, v) {
+  const t = snapTarget(k);
+  if (v === null || v === undefined || t === null) return 'none';
+  if (v >= t) return 'met';
+  const c = KT_KPIS.find((x) => x.k === k);
+  return c && v >= t - c.close ? 'close' : 'below';
+}
+const ktFmt = (k, v, team) => (v === null || v === undefined ? '–' : `${fmtNum(Math.round(v * 10) / 10, KPI_MEASURE[k].unit)}${team && k === 'XM' ? ' avg' : ''}`);
+const ktTargetText = (k) => {
+  const t = snapTarget(k);
+  return t === null ? '' : k === 'XM' ? `${t} lines` : fmtNum(t, KPI_MEASURE[k].unit);
+};
+
+/** The table's rows: agents by name, then the team. */
+function ktRows() {
+  const agents = state.team.members
+    .map((m) => {
+      const mk = memberKpis(m);
+      const vals = {};
+      KT_KPIS.forEach(({ k }) => {
+        const it = mk.items.find((x) => x.k === k);
+        vals[k] = it ? it.v : null;
+      });
+      return { name: m.name || m.code, vals, met: KT_KPIS.filter(({ k }) => ktLevel(k, vals[k]) === 'met').length, measured: KT_KPIS.filter(({ k }) => vals[k] !== null && vals[k] !== undefined).length };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const t = state.kpis.team || {};
+  const itg = teamItg();
+  const withXm = agents.filter((a) => a.vals.XM !== null && a.vals.XM !== undefined);
+  const team = {
+    name: 'Team',
+    team: true,
+    vals: {
+      ITG: itg ? itg.pct : null,
+      tNPS: typeof t.tNPS === 'number' ? t.tNPS : null,
+      aiCR: typeof t.aiCR === 'number' ? t.aiCR : null,
+      XM: withXm.length ? Math.round((withXm.reduce((n, a) => n + a.vals.XM, 0) / withXm.length) * 10) / 10 : null,
+      GSR: typeof t.GSR === 'number' ? t.GSR : null,
+    },
+  };
+  team.met = KT_KPIS.filter(({ k }) => ktLevel(k, team.vals[k]) === 'met').length;
+  team.measured = KT_KPIS.filter(({ k }) => team.vals[k] !== null).length;
+  return { agents, team };
+}
+
+const ktTitle = () => 'Team KPIs vs target';
+const ktSub = () => {
+  const k = state.kpis;
+  const lead = k.tl ? `${k.tl}'s team` : 'My team';
+  return `${lead} · ${k.label || (k.asOf ? `as of ${fmtDay(k.asOf, true)}` : '')}`;
+};
+
+/** Draw the table on a canvas, 2x for a sharp picture on phones. */
+function ktCanvas() {
+  const { agents, team } = ktRows();
+  const rows = [...agents, team];
+  const S = 2;
+  const pad = 36;
+  const nameW = 250;
+  const colW = 128;
+  const metW = 112;
+  const W = pad * 2 + nameW + colW * KT_KPIS.length + metW;
+  const headH = 112;
+  const thH = 62;
+  const rowH = 46;
+  const legendH = 64;
+  const H = headH + thH + rows.length * rowH + 10 + legendH;
+  const cv = document.createElement('canvas');
+  cv.width = W * S;
+  cv.height = H * S;
+  const g = cv.getContext('2d');
+  g.scale(S, S);
+  const font = (w, px) => `${w} ${px}px "Segoe UI", Calibri, system-ui, -apple-system, Roboto, Arial, sans-serif`;
+  const round = (x, y, w, hh, r) => {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + hh, r);
+    g.arcTo(x + w, y + hh, x, y + hh, r);
+    g.arcTo(x, y + hh, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  };
+  const fit = (text, w) => {
+    let s = text;
+    while (s.length > 3 && g.measureText(s).width > w) s = s.slice(0, -2);
+    return s === text ? s : `${s.trimEnd()}…`;
+  };
+  g.fillStyle = '#FFFFFF';
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = '#F26522';
+  g.fillRect(0, 0, W, 6);
+  g.textBaseline = 'middle';
+  g.fillStyle = '#121826';
+  g.font = font(700, 26);
+  g.fillText(ktTitle(), pad, 46);
+  g.fillStyle = '#6B7280';
+  g.font = font(400, 15);
+  g.fillText(fit(ktSub(), W - pad * 2), pad, 80);
+  // header
+  let y = headH;
+  g.fillStyle = '#121826';
+  round(pad - 8, y, W - pad * 2 + 16, thH, 10);
+  g.fill();
+  g.fillStyle = '#FFFFFF';
+  g.font = font(700, 15);
+  g.textAlign = 'left';
+  g.fillText('Agent', pad + 6, y + thH / 2);
+  g.textAlign = 'center';
+  KT_KPIS.forEach(({ k, label }, i) => {
+    const cx = pad + nameW + colW * i + colW / 2;
+    g.fillStyle = '#FFFFFF';
+    g.font = font(700, 15);
+    g.fillText(label, cx, y + 23);
+    g.fillStyle = '#F6A57A';
+    g.font = font(400, 12);
+    g.fillText(`Target ${ktTargetText(k)}`, cx, y + 43);
+  });
+  g.fillStyle = '#FFFFFF';
+  g.font = font(700, 15);
+  g.fillText('On target', pad + nameW + colW * KT_KPIS.length + metW / 2, y + thH / 2);
+  y += thH;
+  rows.forEach((r, ri) => {
+    if (r.team) {
+      y += 10;
+      g.fillStyle = '#F6F3EE';
+      round(pad - 8, y + 2, W - pad * 2 + 16, rowH - 4, 8);
+      g.fill();
+    } else if (ri % 2) {
+      g.fillStyle = '#FAFAFB';
+      g.fillRect(pad - 8, y, W - pad * 2 + 16, rowH);
+    }
+    g.textAlign = 'left';
+    g.fillStyle = '#121826';
+    g.font = font(r.team ? 700 : 600, 15);
+    g.fillText(fit(r.name, nameW - 16), pad + 6, y + rowH / 2);
+    g.textAlign = 'center';
+    KT_KPIS.forEach(({ k }, i) => {
+      const lv = KT_LOOK[ktLevel(k, r.vals[k])];
+      const cx = pad + nameW + colW * i + 8;
+      g.fillStyle = lv.bg;
+      round(cx, y + 7, colW - 16, rowH - 14, 8);
+      g.fill();
+      g.fillStyle = lv.fg;
+      g.font = font(700, 15);
+      g.fillText(ktFmt(k, r.vals[k], r.team), cx + (colW - 16) / 2, y + rowH / 2);
+    });
+    g.fillStyle = r.measured && r.met === r.measured ? '#1E7F5C' : '#3D4453';
+    g.font = font(700, 15);
+    g.fillText(r.measured ? `${r.met} of ${r.measured}` : '–', pad + nameW + colW * KT_KPIS.length + metW / 2, y + rowH / 2);
+    if (!r.team) {
+      g.fillStyle = '#ECEEF1';
+      g.fillRect(pad - 8, y + rowH - 1, W - pad * 2 + 16, 1);
+    }
+    y += rowH;
+  });
+  // legend
+  y += 22;
+  g.textAlign = 'left';
+  let x = pad;
+  ['met', 'close', 'below'].forEach((key) => {
+    const lv = KT_LOOK[key];
+    g.fillStyle = lv.bg;
+    round(x, y, 22, 22, 6);
+    g.fill();
+    g.fillStyle = lv.fg;
+    round(x + 7, y + 7, 8, 8, 4);
+    g.fill();
+    g.fillStyle = '#3D4453';
+    g.font = font(600, 14);
+    g.fillText(lv.word, x + 30, y + 11);
+    x += 30 + g.measureText(lv.word).width + 28;
+  });
+  g.fillStyle = '#8C96AC';
+  g.font = font(400, 12.5);
+  g.textAlign = 'right';
+  g.fillText('Almost there: within ITG 5 · tNPS 10 · aiCR 3 · XM 1 line · GSR 1', W - pad, y + 11);
+  return cv;
+}
+
+const ktFileName = () => `Team_KPIs_${state.kpis.asOf || todayDay()}.png`;
+function ktSave() {
+  ktCanvas().toBlob((blob) => {
+    if (!blob) return toast('The picture could not be made.', { type: 'error' });
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: ktFileName(), style: 'display:none' });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast('Picture saved. Send it on WhatsApp.');
+  }, 'image/png');
+}
+function ktCopy() {
+  if (!navigator.clipboard || typeof ClipboardItem === 'undefined') return ktSave();
+  ktCanvas().toBlob(async (blob) => {
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      toast('Picture copied. Paste it in WhatsApp.');
+    } catch (e) {
+      ktSave();
+    }
+  }, 'image/png');
+}
+
+function kpiTableCard() {
+  if (!hasSnapshot() || !state.team.members.length) return null;
+  const { agents, team } = ktRows();
+  const cell = (k, v, team) => {
+    const lv = ktLevel(k, v);
+    return h('td', { class: 'kt-td' }, h('span', { class: `kt-val kt-val--${lv}`, title: `${KPI_MEASURE[k].name}: ${ktFmt(k, v, team)} · ${KT_LOOK[lv].word}` }, ktFmt(k, v, team)));
+  };
+  const row = (r, i) =>
+    h(
+      'tr',
+      { class: `kt-tr${r.team ? ' kt-tr--team' : ''}`, style: `--d:${i}` },
+      h('th', { class: 'kt-name', scope: 'row' }, r.name),
+      KT_KPIS.map(({ k }) => cell(k, r.vals[k], r.team)),
+      h('td', { class: 'kt-td' }, h('span', { class: `kt-met${r.measured && r.met === r.measured ? ' is-all' : ''}` }, r.measured ? `${r.met} of ${r.measured}` : '–'))
+    );
+  return h(
+    'section',
+    { class: 'card kt-card', 'aria-labelledby': 'kt-title' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('h2', { class: 'kt-title', id: 'kt-title' }, icon('target'), ktTitle()), h('p', { class: 'kt-sub' }, ktSub())),
+      h(
+        'div',
+        { class: 'kt-actions' },
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'kt-copy', onclick: ktCopy, title: 'Copy the table as a picture, then paste it in WhatsApp' }, icon('copy'), 'Copy image'),
+        h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'kt-save', onclick: ktSave, title: 'Save the table as a picture' }, icon('download'), 'Save image')
+      )
+    ),
+    h(
+      'div',
+      { class: 'kt-scroll' },
+      h(
+        'table',
+        { class: 'kt-table' },
+        h(
+          'thead',
+          null,
+          h(
+            'tr',
+            null,
+            h('th', { class: 'kt-name', scope: 'col' }, 'Agent'),
+            KT_KPIS.map(({ k, label }) => h('th', { scope: 'col' }, h('span', { class: 'kt-th' }, label), h('span', { class: 'kt-target' }, `Target ${ktTargetText(k)}`))),
+            h('th', { scope: 'col' }, h('span', { class: 'kt-th' }, 'On target'))
+          )
+        ),
+        h('tbody', null, agents.map(row), row(team, agents.length))
+      )
+    ),
+    h(
+      'div',
+      { class: 'kt-legend' },
+      ['met', 'close', 'below'].map((key) => h('span', { class: `kt-key kt-key--${key}` }, h('span', { class: 'kt-dot', 'aria-hidden': 'true' }), KT_LOOK[key].word)),
+      h('span', { class: 'kt-note' }, 'Almost there: within ITG 5 · tNPS 10 · aiCR 3 · XM 1 line · GSR 1')
+    )
+  );
+}
+
+const _ktRenderHome = renderHome;
+renderHome = function (main) {
+  _ktRenderHome(main);
+  const card = kpiTableCard();
+  if (!card) return;
+  const hero = main.querySelector('.hero');
+  if (hero && hero.parentNode) hero.parentNode.insertBefore(card, hero.nextSibling);
+  else main.prepend(card);
 };
 /* ===== layer: layers/90-integration.js ===== */
 /* ==========================================================================
