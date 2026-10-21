@@ -39,6 +39,18 @@ def load(TRACKER, ROSTER):
     s["Tenure"] = s["hr"].map(rmap["Tenure Bucket"]).fillna("-")
     s["Type"] = s["Line or GSR"].str.strip()
     s["xm"] = np.where(s["Type"] == "XM Lines", s["No. of XM Lines"].fillna(1), 0).astype(int)
+    def _norm_types(v):  # the form now stores ["A","B"]; older entries are "A;B;"
+        if not isinstance(v, str): return v
+        t = v.strip()
+        if t.startswith("["):
+            try:
+                import json
+                arr = json.loads(t)
+                if isinstance(arr, list): return ";".join(str(x).strip() for x in arr if str(x).strip())
+            except ValueError:
+                pass
+        return v
+    s["Type of GSR"] = s["Type of GSR"].map(_norm_types)
     types = s["Type of GSR"].fillna("").str.strip().str.strip(";")
     ntypes = types.apply(lambda t: len([p for p in t.split(";") if p.strip()]))
     gcount = s["Count of GSR"]
