@@ -24,16 +24,16 @@ async function readXlsb(buf, want, cols){ const z=await unzipBin(buf); const wbB
 
 /* ---------------------------------------------------------------- TSX handover -> calls per agent per business day (same rules as calls_data.py) */
 const CALL_SHIFT=[14,15,16,17,18,19,20,21,22,23,0,1,2,3,4,5,6,7];
-function parseHandover(sh, name){ const pa=sh['Performance per Agent']; if(!pa) throw new Error(`${name}: no "Performance per Agent" sheet – is this the TSX handover?`);
-  const hi=pa.findIndex(r=>r&&r[0]==='HRID'); if(hi<0) throw new Error(`${name}: could not find the HRID header in Performance per Agent`); const ix={}; pa[hi].forEach((h,i)=>{ if(h!=null) ix[String(h).trim()]=i; });
-  for(const n of ['AVAYA ID','Handled Calls','Answered Calls','AHT','Transferred Calls']) if(ix[n]==null) throw new Error(`${name}: Performance per Agent is missing "${n}"`);
-  const num=v=>typeof v==='number'&&isFinite(v)?v:0; const agents={}, login2hr={};
-  for(const r of pa.slice(hi+1)){ if(!r||typeof r[0]!=='number') continue; const hr=String(Math.trunc(r[0])); if(typeof r[ix['AVAYA ID']]==='number') login2hr[Math.trunc(r[ix['AVAYA ID']])]=hr; const aht=r[ix['AHT']]; agents[hr]=[hr, Math.trunc(num(r[ix['Handled Calls']])), Math.trunc(num(r[ix['Answered Calls']])), typeof aht==='number'?Math.round(aht):0, Math.trunc(num(r[ix['Transferred Calls']]))]; }
-  let day=null; const seen=new Map(); const da=sh['D-Agent'];
-  if(da){ let started=false; for(const r of da){ if(!started){ started=!!r&&r[0]==='Date'&&(r[1]==null||r[1]==='')&&r.length>6; continue; } if(!r||typeof r[0]!=='number'||typeof r[3]!=='number') continue; if(!day) day=r[0]; seen.set(Math.trunc(r[3])+'|'+Math.round((r[1]||0)*48)+'|'+r[5], num(r[6])); } }
-  const hourly={}; for(const [k,calls] of seen){ if(!calls) continue; const [login,half]=k.split('|'); const hr=login2hr[+login]; if(!hr) continue; const cairo=(Math.floor(+half/2)+7)%24; const si=CALL_SHIFT.indexOf(cairo); if(si<0) continue; (hourly[hr] ||= new Array(CALL_SHIFT.length).fill(0))[si]+=calls; }
-  if(day==null){ const hf=sh['Hourly Figures']||[]; for(const r of hf){ if(r&&r[1]==='From'&&typeof r[2]==='number'){ day=r[2]; break; } } }
-  if(day==null) throw new Error(`${name}: could not find the handover date`);
+function parseHandover(sh, name, lob='EG TSX 4P'){ const da=sh['D-Agent']; if(!da||!da.length) throw new Error(`${name}: no "D-Agent" sheet – is this the TSX handover?`);
+  /* calls are summed from the D-Agent interval table exactly as the handover's "Performance per OM" sheet does:
+     Handled Calls, IN THT and TRANSFERRED per row, attributed by the table's HRID column; repeated-looking rows are separate calls */
+  const ix={}; (da[0]||[]).forEach((h,i)=>{ if(h!=null&&h!=='') ix[String(h).trim()]=i; });
+  const miss=['Date','Time','Handled Calls','IN THT','TRANSFERRED','HRID','LOB'].filter(n=>ix[n]==null); if(miss.length) throw new Error(`${name}: D-Agent is missing ${miss.join(', ')}`);
+  const num=v=>typeof v==='number'&&isFinite(v)?v:0; const acc={}; let day=null;
+  for(const r of da){ if(!r||typeof r[ix['Date']]!=='number') continue; if(lob&&String(r[ix['LOB']]??'').trim()!==lob) continue; const hv=r[ix['HRID']]; const hr=typeof hv==='number'?String(Math.trunc(hv)):String(hv??'').trim(); if(!hr||hr==='-'||hr==='0') continue;
+    if(day==null) day=r[ix['Date']]; const h=num(r[ix['Handled Calls']]); const o=acc[hr] ||= {h:0,tht:0,tr:0,hours:new Array(CALL_SHIFT.length).fill(0)}; o.h+=h; o.tht+=num(r[ix['IN THT']]); o.tr+=num(r[ix['TRANSFERRED']]);
+    if(h){ const cairo=(Math.floor(num(r[ix['Time']])*24+1e-6)+7)%24; const si=CALL_SHIFT.indexOf(cairo); if(si>=0) o.hours[si]+=h; } }
+  if(day==null) throw new Error(`${name}: no ${lob} rows with a date in D-Agent`);
   const iso=new Date(Date.UTC(1899,11,30)+Math.trunc(day)*86400000).toISOString().slice(0,10);
-  const a=[]; for(const [hr,v] of Object.entries(agents)){ const h=hourly[hr]||new Array(CALL_SHIFT.length).fill(0); if(v[1]||v[2]||h.some(x=>x)) a.push([...v,h]); }
+  const a=[]; for(const [hr,o] of Object.entries(acc)) if(o.h) a.push([hr, Math.trunc(o.h), Math.trunc(o.h), Math.floor(o.tht/o.h+0.5), Math.trunc(o.tr), o.hours]);
   return {date:iso, src:name, a}; }

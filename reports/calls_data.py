@@ -1,6 +1,6 @@
 """Read the daily TSX handover workbook (.xlsb) into compact per-agent call figures.
 
-One handover = one business day. Per agent we keep handled, answered, AHT (seconds),
+One handover = one business day. Per agent we keep handled calls, AHT (seconds),
 transferred calls and handled calls per hour of the shift (Cairo 14:00 -> 07:00).
 The interval sheet (D-Agent) is in US Eastern time; Cairo is 7 hours ahead all year
 for this shift, so EST hour h maps to Cairo hour (h + 7) % 24.
@@ -23,55 +23,46 @@ def _num(v):
     return float(v) if isinstance(v, (int, float)) else 0.0
 
 
-def read_handover(path):
+def read_handover(path, lob="EG TSX 4P"):
+    """Calls come from the D-Agent interval table, exactly as the handover's own
+    'Performance per OM' sheet sums them: Handled Calls, IN THT and TRANSFERRED per
+    row, attributed by the table's HRID column, for rows of the given LOB.
+    Rows that look repeated are separate calls (different talk times), so none are dropped."""
     with open_workbook(path) as wb:
-        names = wb.sheets
-        if "Performance per Agent" not in names:
-            raise ValueError(f"{path}: no 'Performance per Agent' sheet - is this the TSX handover?")
-        pa = list(_rows(wb, "Performance per Agent"))
-        hi = next(i for i, r in enumerate(pa) if r and r[0] == "HRID")
-        ix = {h: i for i, h in enumerate(pa[hi]) if h}
-        agents, login2hr = {}, {}
-        for r in pa[hi + 1:]:
-            if not r or not isinstance(r[0], (int, float)):
+        if "D-Agent" not in wb.sheets:
+            raise ValueError(f"{path}: no 'D-Agent' sheet - is this the TSX handover?")
+        it = _rows(wb, "D-Agent")
+        hdr = next(it)
+        ix = {str(h).strip(): i for i, h in enumerate(hdr) if h not in (None, "")}
+        need = ["Date", "Time", "Handled Calls", "IN THT", "TRANSFERRED", "HRID", "LOB"]
+        miss = [n for n in need if n not in ix]
+        if miss:
+            raise ValueError(f"{path}: D-Agent is missing {', '.join(miss)}")
+        day = None
+        acc = defaultdict(lambda: {"h": 0, "tht": 0.0, "tr": 0, "hours": [0] * len(SHIFT)})
+        for r in it:
+            if not r or len(r) <= max(ix.values()) or not isinstance(r[ix["Date"]], (int, float)):
                 continue
-            hr = str(int(r[0]))
-            if isinstance(r[ix["AVAYA ID"]], (int, float)):
-                login2hr[int(r[ix["AVAYA ID"]])] = hr
-            aht = r[ix["AHT"]]
-            agents[hr] = [hr, int(_num(r[ix["Handled Calls"]])), int(_num(r[ix["Answered Calls"]])),
-                          int(aht + 0.5) if isinstance(aht, (int, float)) else 0, int(_num(r[ix["Transferred Calls"]]))]
-        # interval calls (deduplicated: the export repeats rows)
-        day, seen, hourly = None, {}, defaultdict(lambda: [0] * len(SHIFT))
-        if "D-Agent" in names:
-            started = False
-            for r in _rows(wb, "D-Agent"):
-                if not started:
-                    started = bool(r) and r[0] == "Date" and r[1] in (None, "") and len(r) > 6
-                    continue
-                if not r or not isinstance(r[0], (int, float)) or not isinstance(r[3], (int, float)):
-                    continue
-                day = day or EPOCH + dt.timedelta(days=int(r[0]))
-                seen[(int(r[3]), round(float(r[1]) * 48), r[5])] = _num(r[6])
-            for (login, half, _skill), calls in seen.items():
-                hr = login2hr.get(login)
-                if not hr or not calls:
-                    continue
-                cairo = (half // 2 + 7) % 24
+            if lob and str(r[ix["LOB"]]).strip() != lob:
+                continue
+            hrv = r[ix["HRID"]]
+            hr = str(int(hrv)) if isinstance(hrv, (int, float)) else str(hrv or "").strip()
+            if not hr or hr in ("-", "0"):
+                continue
+            day = day or EPOCH + dt.timedelta(days=int(r[ix["Date"]]))
+            h = _num(r[ix["Handled Calls"]])
+            o = acc[hr]
+            o["h"] += h; o["tht"] += _num(r[ix["IN THT"]]); o["tr"] += _num(r[ix["TRANSFERRED"]])
+            if h:
+                cairo = (int(_num(r[ix["Time"]]) * 24 + 1e-6) + 7) % 24
                 if cairo in SHIFT:
-                    hourly[hr][SHIFT.index(cairo)] += int(calls)
-        if day is None and "Hourly Figures" in names:
-            for r in _rows(wb, "Hourly Figures"):
-                if len(r) > 2 and r[1] == "From" and isinstance(r[2], (int, float)):
-                    day = EPOCH + dt.timedelta(days=int(r[2]))
-                    break
+                    o["hours"][SHIFT.index(cairo)] += int(h)
     if day is None:
-        raise ValueError(f"{path}: could not find the handover date")
+        raise ValueError(f"{path}: no {lob} rows with a date in D-Agent")
     out = []
-    for hr, a in agents.items():
-        h = hourly.get(hr, [0] * len(SHIFT))
-        if a[1] or a[2] or any(h):
-            out.append(a + [h])
+    for hr, o in acc.items():
+        if o["h"]:
+            out.append([hr, int(o["h"]), int(o["h"]), int(o["tht"] / o["h"] + 0.5), int(o["tr"]), o["hours"]])
     return day.isoformat(), out
 
 
