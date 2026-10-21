@@ -28,14 +28,14 @@ wiring = rep(wiring, "function showTab(k){ state.tab=k; document.querySelectorAl
 wiring = rep(wiring, "document.getElementById('leaderSel').innerHTML=''; document.getElementById('agentList').innerHTML='';", "document.getElementById('agentList').innerHTML='';")
 wiring = rep(wiring, "document.getElementById('leaderSel').addEventListener('change',e=>{ state.leader=e.target.value; renderLeaderTrend(); }); document.getElementById('agentSel').addEventListener('change',e=>{ state.agent=e.target.value; renderAgentTrend(); });",
  "document.getElementById('agentSel').addEventListener('change',e=>{ state.agent=e.target.value; renderAgentTrend(); });")
-wiring = rep(wiring, "for(const [k,l] of [['overview','Overview'],['leaders','Leaders'],['agents','Agents'],['insights','Insights'],['data','Data & settings']])", "for(const [k,l] of [['exec','Executive'],['om','Ops managers'],['leader','Team leaders'],['agents','Agents'],['insights','Insights'],['data','Data & settings']])")
+wiring = rep(wiring, "for(const [k,l] of [['overview','Overview'],['leaders','Leaders'],['agents','Agents'],['insights','Insights'],['data','Data & settings']])", "for(const [k,l] of [['exec','Executive'],['om','Ops managers'],['leader','Team leaders'],['agents','Agents'],['calls','Calls & conversion'],['insights','Insights'],['data','Data & settings']])")
 wiring = rep(wiring, "document.querySelectorAll('button[data-tv]').forEach(b=>b.addEventListener('click',()=>{ const fig=document.getElementById(b.dataset.tv); if(fig._tv) fig._tv(); }));", "document.querySelectorAll('button[data-tv]').forEach(b=>b.addEventListener('click',()=>toggleTable(b.dataset.tv)));")
 wiring = rep(wiring, "document.getElementById('v-overview').classList.add('active');", "document.getElementById('v-exec').classList.add('active'); state.tab='exec';")
 # state default tab
 data = rep(data, "tab:'overview'", "tab:'exec'")
 charts = open(SP+'charts/charts.js').read()
 engine = open(SP+'engine.js').read()
-render = open(SP+'motion.js').read() + '\n' + open(SP+'hero.js').read() + '\n' + open(SP+'render_products.js').read() + '\n' + open(SP+'render_v3.js').read()
+render = open(SP+'motion.js').read() + '\n' + open(SP+'xlsb.js').read() + '\n' + open(SP+'calls.js').read() + '\n' + open(SP+'hero.js').read() + '\n' + open(SP+'render_products.js').read() + '\n' + open(SP+'render_v3.js').read()
 script = "<script>\n" + data + compute + helpers + "\n" + hist + "\n/* ---------------------------------------------------------------- chart library */\n" + charts + "\n" + engine + "\n" + render + "\n" + xlsx + upload + pickers + wiring + "init();\n</script>\n</body>\n</html>\n"
 out = head + body + script
 assert out.count('__DATA__')==1

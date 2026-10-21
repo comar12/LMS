@@ -1,14 +1,14 @@
 <header class="topbar"><div class="topbar-inner">
   <div class="brand"><span class="brand-mark">VXI | TSX</span><span>Sales performance</span><span class="snapshot" id="snapshotBadge">Snapshot</span><span class="status-pill" id="freshPill"><i></i><span id="freshText"></span></span></div>
-  <div class="top-actions"><label class="primary" style="cursor:pointer">⬆ Load tracker export<input type="file" id="fileTracker" accept=".xlsx" hidden></label><button class="secondary" id="toData">Data &amp; settings</button>
+  <div class="top-actions"><label class="primary" style="cursor:pointer">⬆ Load tracker export<input type="file" id="fileTracker" accept=".xlsx,.xlsb" hidden></label><button class="secondary" id="toData">Data &amp; settings</button>
     <div class="theme-switch" role="group" aria-label="Color theme"><button data-theme-choice="auto">Auto</button><button data-theme-choice="light">Light</button><button data-theme-choice="dark">Dark</button></div></div>
 </div></header>
 
 <main class="workspace">
   <section class="panel upload-panel" id="uploadPanel">
     <div class="upload-copy"><h2>Tracker &amp; roster files</h2><span id="fileLine"></span></div>
-    <div class="upload-actions"><label class="primary" style="cursor:pointer">⬆ Upload files<input type="file" id="fileAny" accept=".xlsx" multiple hidden></label><label class="secondary" style="cursor:pointer">👥 Roster<input type="file" id="fileRoster" accept=".xlsx" hidden></label><button class="secondary" id="resetData">Reset to built-in</button></div>
-    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
+    <div class="upload-actions"><label class="primary" style="cursor:pointer">⬆ Upload files<input type="file" id="fileAny" accept=".xlsx,.xlsb" multiple hidden></label><label class="secondary" style="cursor:pointer">👥 Roster<input type="file" id="fileRoster" accept=".xlsx,.xlsb" hidden></label><button class="secondary" id="resetData">Reset to built-in</button></div>
+    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx), the daily TSX handover with calls (.xlsb) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
   </section>
 
   <section class="hero" id="hero" aria-label="Sales performance summary">
@@ -114,6 +114,11 @@
   </section>
 
   <!-- ================= INSIGHTS -->
+  <section class="view" id="v-calls">
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Calls &amp; conversion</span><h2>How many calls turn into sales</h2><p id="callsSub"></p></div></div></div>
+    <div id="callsBody"></div>
+  </section>
+
   <section class="view" id="v-insights">
     <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Top 5 to present</span><h2>If you only show five things</h2><p>Ranked by business impact · follows the filters</p></div></div><div class="callouts" id="top5"></div></div>
     <div class="grid-two">
@@ -137,6 +142,7 @@
         <div><strong>XMC attach target</strong> <input type="number" id="xmcTarget" min="0" max="100" step="1" placeholder="none" style="width:90px;height:32px;margin-left:8px"> % of answered XM-line entries · leave empty for no XMC target.</div>
         <div class="panel-meta" id="targetNote"></div></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Uploaded sources</h2><p>What this page is showing</p></div></div><div class="source-numbers" id="sourceNumbers"></div><div class="method-list" id="sourceList"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Call data</h2><p>One TSX handover per business day · uploads are kept in this browser</p></div><button class="text-button" id="clearCalls">Clear uploaded calls</button></div><div class="method-list" id="callsSources"></div></div>
     </div>
     <div class="grid-two">
       <div class="panel"><div class="panel-head"><div><h2>HRIDs not on the roster</h2><p>Valid-looking 9-digit IDs are probably attrited or transferred agents – add them to a Leavers tab to attribute their sales</p></div></div><div class="table-wrap table-tall" id="unmapped"></div></div>

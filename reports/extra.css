@@ -233,3 +233,7 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
 /* XM · GSR numbers on dark heat cells: light tints on mid cells, dark ink on bright cells */
 [data-theme=dark] td[style*="background:var(--heat"] .xgc b{color:#b5f1f7}[data-theme=dark] td[style*="background:var(--heat"] .xgc i{color:#ffd2b0}
 [data-theme=dark] td[style*="color:#06202b"] .xgc b,[data-theme=dark] td[style*="color:#06202b"] .xgc i{color:#06202b}
+
+/* calls view */
+.kpis.calls-kpis{grid-template-columns:repeat(6,minmax(0,1fr))}@media(max-width:1150px){.kpis.calls-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.kpis.calls-kpis{grid-template-columns:1fr 1fr}}
+.calls-empty{padding:22px 24px;font-size:13.5px;color:var(--muted);line-height:1.6}.calls-empty b{color:var(--text)}

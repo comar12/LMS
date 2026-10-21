@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------- director-style hero: insight headline, attainment ring, glass KPI cards */
-const VIEWNAME={exec:'Executive view', om:'Ops manager view', leader:'Team leader view', agents:'Agent view', insights:'Insights', data:'Data & settings'};
+const VIEWNAME={exec:'Executive view', om:'Ops manager view', leader:'Team leader view', agents:'Agent view', calls:'Calls & conversion', insights:'Insights', data:'Data & settings'};
 let DVSEQ=0;
 function dvSetView(){ const el=document.getElementById('dvView'); if(el) el.textContent=VIEWNAME[state.tab]||VIEWNAME.exec; }
 function dvScope(){ const p=[]; if(state.tl&&state.tl!=='All') p.push(`${state.tl}'s team`); else if(state.om&&state.om!=='All') p.push(`${state.om}'s teams`); else p.push('Whole floor'); if(state.phase&&state.phase!=='All') p.push(`${state.phase} agents`); if(state.tenure&&state.tenure!=='All') p.push(`tenure ${state.tenure}`); return p; }
@@ -34,7 +34,7 @@ function renderHero(){ const {cur,prev,dy,i1,len,target}=C; const hero=document.
   document.getElementById('dvHead').innerHTML=`<span class="ln"><em class="x"><b id="dvHX"></b> XM line${cur.xm===1?'':'s'}</em> and <em class="g"><b id="dvHG"></b> GSR</em></span><span class="ln">sold ${when}</span>`;
   morphNum(document.getElementById('dvHX'), cur.xm, n0, 1100); morphNum(document.getElementById('dvHG'), cur.gsr, n0, 1100);
   const types=[['XM Lines',PT.xmG],['Speed Upgrade',PT.speed],['X-PRO',PT.xpro],['Adding LOB',PT.lob],['Mobile Plus',PT.mplus],['XMC',PT.xmcG]].sort((a,b)=>b[1]-a[1]); const top=types[0]; const es=cur.xm?PT.esimL/cur.xm:null;
-  const bits=[]; if(pt) bits.push(`<b>${pct0(ratio)}</b> of the ${n0(pt)} target`); if(cur.gsr&&top[1]) bits.push(`top GSR type <b>${esc(top[0])}</b> (${pct0(top[1]/cur.gsr)} of GSR)`); if(es!=null) bits.push(`e‑SIM on ${pct0(es)} of XM lines`); bits.push(`${n0(cur.active)} of ${n0(C.hcScope)} agents sold`);
+  const bits=[]; if(pt) bits.push(`<b>${pct0(ratio)}</b> of the ${n0(pt)} target`); if(cur.gsr&&top[1]) bits.push(`top GSR type <b>${esc(top[0])}</b> (${pct0(top[1]/cur.gsr)} of GSR)`); if(es!=null) bits.push(`e‑SIM on ${pct0(es)} of XM lines`); const cb=callsHeroBit(); if(cb) bits.push(cb); bits.push(`${n0(cur.active)} of ${n0(C.hcScope)} agents sold`);
   document.getElementById('dvSub').innerHTML=bits.join(' · ');
   // change vs the prior period
   const de=document.getElementById('dvDelta'); const vs=len===1?'the day before':`the prior ${len} days`;

@@ -335,20 +335,24 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
 /* XM · GSR numbers on dark heat cells: light tints on mid cells, dark ink on bright cells */
 [data-theme=dark] td[style*="background:var(--heat"] .xgc b{color:#b5f1f7}[data-theme=dark] td[style*="background:var(--heat"] .xgc i{color:#ffd2b0}
 [data-theme=dark] td[style*="color:#06202b"] .xgc b,[data-theme=dark] td[style*="color:#06202b"] .xgc i{color:#06202b}
+
+/* calls view */
+.kpis.calls-kpis{grid-template-columns:repeat(6,minmax(0,1fr))}@media(max-width:1150px){.kpis.calls-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.kpis.calls-kpis{grid-template-columns:1fr 1fr}}
+.calls-empty{padding:22px 24px;font-size:13.5px;color:var(--muted);line-height:1.6}.calls-empty b{color:var(--text)}
 </style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner">
   <div class="brand"><span class="brand-mark">VXI | TSX</span><span>Sales performance</span><span class="snapshot" id="snapshotBadge">Snapshot</span><span class="status-pill" id="freshPill"><i></i><span id="freshText"></span></span></div>
-  <div class="top-actions"><label class="primary" style="cursor:pointer">⬆ Load tracker export<input type="file" id="fileTracker" accept=".xlsx" hidden></label><button class="secondary" id="toData">Data &amp; settings</button>
+  <div class="top-actions"><label class="primary" style="cursor:pointer">⬆ Load tracker export<input type="file" id="fileTracker" accept=".xlsx,.xlsb" hidden></label><button class="secondary" id="toData">Data &amp; settings</button>
     <div class="theme-switch" role="group" aria-label="Color theme"><button data-theme-choice="auto">Auto</button><button data-theme-choice="light">Light</button><button data-theme-choice="dark">Dark</button></div></div>
 </div></header>
 
 <main class="workspace">
   <section class="panel upload-panel" id="uploadPanel">
     <div class="upload-copy"><h2>Tracker &amp; roster files</h2><span id="fileLine"></span></div>
-    <div class="upload-actions"><label class="primary" style="cursor:pointer">⬆ Upload files<input type="file" id="fileAny" accept=".xlsx" multiple hidden></label><label class="secondary" style="cursor:pointer">👥 Roster<input type="file" id="fileRoster" accept=".xlsx" hidden></label><button class="secondary" id="resetData">Reset to built-in</button></div>
-    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
+    <div class="upload-actions"><label class="primary" style="cursor:pointer">⬆ Upload files<input type="file" id="fileAny" accept=".xlsx,.xlsb" multiple hidden></label><label class="secondary" style="cursor:pointer">👥 Roster<input type="file" id="fileRoster" accept=".xlsx,.xlsb" hidden></label><button class="secondary" id="resetData">Reset to built-in</button></div>
+    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx), the daily TSX handover with calls (.xlsb) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
   </section>
 
   <section class="hero" id="hero" aria-label="Sales performance summary">
@@ -454,6 +458,11 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
   </section>
 
   <!-- ================= INSIGHTS -->
+  <section class="view" id="v-calls">
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Calls &amp; conversion</span><h2>How many calls turn into sales</h2><p id="callsSub"></p></div></div></div>
+    <div id="callsBody"></div>
+  </section>
+
   <section class="view" id="v-insights">
     <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Top 5 to present</span><h2>If you only show five things</h2><p>Ranked by business impact · follows the filters</p></div></div><div class="callouts" id="top5"></div></div>
     <div class="grid-two">
@@ -477,6 +486,7 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
         <div><strong>XMC attach target</strong> <input type="number" id="xmcTarget" min="0" max="100" step="1" placeholder="none" style="width:90px;height:32px;margin-left:8px"> % of answered XM-line entries · leave empty for no XMC target.</div>
         <div class="panel-meta" id="targetNote"></div></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Uploaded sources</h2><p>What this page is showing</p></div></div><div class="source-numbers" id="sourceNumbers"></div><div class="method-list" id="sourceList"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Call data</h2><p>One TSX handover per business day · uploads are kept in this browser</p></div><button class="text-button" id="clearCalls">Clear uploaded calls</button></div><div class="method-list" id="callsSources"></div></div>
     </div>
     <div class="grid-two">
       <div class="panel"><div class="panel-head"><div><h2>HRIDs not on the roster</h2><p>Valid-looking 9-digit IDs are probably attrited or transferred agents – add them to a Leavers tab to attribute their sales</p></div></div><div class="table-wrap table-tall" id="unmapped"></div></div>
@@ -515,6 +525,7 @@ function applyData(D){
   DATES = []; { let d = new Date(META.minDate+'T00:00:00Z'); const e = new Date(META.maxDate+'T00:00:00Z'); while (d <= e) { DATES.push(d.toISOString().slice(0,10)); d.setUTCDate(d.getUTCDate()+1); } }
   DI = Object.fromEntries(DATES.map((d,i)=>[d,i]));
   HIST = computeHist();
+  callsInit();
 }
 const state = { from:null, to:null, om:'All', tl:'All', phase:'All', tenure:'All', exdup:true, tab:'exec', leader:null, agent:null, preset:'7', perAgent:2, xmcTarget:null, targetProd:false };
 
@@ -1501,8 +1512,115 @@ function renderShift(figId, footId, rs){ const s=shiftHours(rs); const cats=SHIF
   let b3=0, b3s=0; for(let k=0;k+2<SHIFT_HOURS.length;k++){ const v=xm[k]+gs[k]+xm[k+1]+gs[k+1]+xm[k+2]+gs[k+2]; if(v>b3){ b3=v; b3s=k; } }
   foot.innerHTML=`<span>Peak hour <b>${peak[0]}</b> (${n0(peak[1])} · ${pct0(peak[1]/tot)}) · busiest 3-hour window <b>${cats[b3s]}–${String((SHIFT_HOURS[b3s+2]+1)%24).padStart(2,'0')}:00</b> with ${pct0(b3/tot)} of sales · <b>${pct0(am/tot)}</b> logged after midnight · ${pct0(ev/tot)} in the first four hours (14:00–18:00)${s.ox+s.og?` · ${n0(s.ox+s.og)} outside shift hours`:''}</span>`; }
 
+/* ---------------------------------------------------------------- in-browser .xlsb reader (zip + BIFF12 records, no libraries) */
+async function unzipBin(buf){ const dv=new DataView(buf), u8=new Uint8Array(buf); let e=-1; for (let i=u8.length-22; i>=Math.max(0,u8.length-70000); i--){ if (dv.getUint32(i,true)===0x06054b50){ e=i; break; } } if (e<0) throw new Error('Not an Excel file (zip directory not found)');
+  const count=dv.getUint16(e+10,true); let p=dv.getUint32(e+16,true); const files={}; for (let k=0;k<count;k++){ if (dv.getUint32(p,true)!==0x02014b50) break; const method=dv.getUint16(p+10,true), csize=dv.getUint32(p+20,true), nlen=dv.getUint16(p+28,true), elen=dv.getUint16(p+30,true), clen=dv.getUint16(p+32,true), loff=dv.getUint32(p+42,true); const name=new TextDecoder().decode(u8.subarray(p+46,p+46+nlen)); files[name]={method,csize,loff}; p+=46+nlen+elen+clen; }
+  const bytes=async name=>{ const f=files[name]; if(!f) return null; const q=f.loff; const nlen=dv.getUint16(q+26,true), elen=dv.getUint16(q+28,true); const data=u8.subarray(q+30+nlen+elen, q+30+nlen+elen+f.csize); if (f.method===0) return data.slice(); const ds=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return new Uint8Array(await new Response(ds).arrayBuffer()); };
+  const text=async name=>{ const b=await bytes(name); return b? new TextDecoder().decode(b) : null; };
+  return {names:Object.keys(files), bytes, text}; }
+/* walk BIFF12 records: cb(type, offset, size) */
+function biffWalk(u8, cb){ let p=0; const n=u8.length; while(p<n){ let t=u8[p++]; if(t&0x80){ t=(t&0x7f)|((u8[p++]&0x7f)<<7); } let sz=0, sh=0; for(let k=0;k<4;k++){ const b=u8[p++]; sz|=(b&0x7f)<<sh; sh+=7; if(!(b&0x80)) break; } if(cb(t,p,sz)===false) return; p+=sz; } }
+function biffWide(dv, u8, o){ const cch=dv.getUint32(o,true); if(cch===0xFFFFFFFF) return [null,o+4]; let s=''; const end=o+4+cch*2; for(let q=o+4;q<end;q+=2) s+=String.fromCharCode(u8[q]|(u8[q+1]<<8)); return [s,end]; }
+const _rkBuf=new DataView(new ArrayBuffer(8));
+function biffRk(v){ let x; if(v&2){ x=v>>2; } else { _rkBuf.setUint32(0,0,true); _rkBuf.setUint32(4,v&0xFFFFFFFC,true); x=_rkBuf.getFloat64(0,true); } return (v&1)? x/100 : x; }
+/* read named sheets as arrays of rows; cols (optional) limits which columns are kept per sheet */
+async function readXlsb(buf, want, cols){ const z=await unzipBin(buf); const wbB=await z.bytes('xl/workbook.bin'); if(!wbB) throw new Error('Not an .xlsb workbook');
+  const relsTxt=await z.text('xl/_rels/workbook.bin.rels'); const rel={}; for(const m of relsTxt.matchAll(/<Relationship\b[^>]*>/g)){ const id=/Id="([^"]+)"/.exec(m[0]), tg=/Target="([^"]+)"/.exec(m[0]); if(id&&tg) rel[id[1]]=tg[1]; }
+  const dvW=new DataView(wbB.buffer,wbB.byteOffset,wbB.byteLength); const sheetsMeta=[]; biffWalk(wbB,(t,o)=>{ if(t===156){ const [rid,o2]=biffWide(dvW,wbB,o+8); const [name]=biffWide(dvW,wbB,o2); sheetsMeta.push({name,target:rel[rid]}); } });
+  const sst=[]; const ssB=await z.bytes('xl/sharedStrings.bin'); if(ssB){ const dv=new DataView(ssB.buffer,ssB.byteOffset,ssB.byteLength); biffWalk(ssB,(t,o)=>{ if(t===19){ sst.push(biffWide(dv,ssB,o+1)[0]); } }); }
+  const out={names:sheetsMeta.map(s=>s.name)};
+  for(const sm of sheetsMeta){ if(want && !want.includes(sm.name)) continue; let tg=(sm.target||'').replace(/^\//,''); if(!tg.startsWith('xl/')) tg='xl/'+tg; const b=await z.bytes(tg); if(!b) continue; const dv=new DataView(b.buffer,b.byteOffset,b.byteLength); const keep=cols&&cols[sm.name]; const kset=keep?new Set(keep):null; const rowsArr=[]; let cur=null;
+    biffWalk(b,(t,o,sz)=>{ if(t===0){ cur=[]; rowsArr[dv.getUint32(o,true)]=cur; return; } if(t<1||t>11||!cur) return; const c=dv.getUint32(o,true); if(kset&&!kset.has(c)) return; const v=o+8; let val=null;
+      switch(t){ case 2: val=biffRk(dv.getUint32(v,true)); break; case 3: case 11: val=null; break; case 4: case 10: val=!!b[v]; break; case 5: case 9: val=dv.getFloat64(v,true); break; case 6: case 8: val=biffWide(dv,b,v)[0]; break; case 7: val=sst[dv.getUint32(v,true)]??null; break; default: val=null; }
+      cur[c]=val; });
+    out[sm.name]=Array.from(rowsArr,r=>r||[]); }
+  return out; }
+
+/* ---------------------------------------------------------------- TSX handover -> calls per agent per business day (same rules as calls_data.py) */
+const CALL_SHIFT=[14,15,16,17,18,19,20,21,22,23,0,1,2,3,4,5,6,7];
+function parseHandover(sh, name){ const pa=sh['Performance per Agent']; if(!pa) throw new Error(`${name}: no "Performance per Agent" sheet – is this the TSX handover?`);
+  const hi=pa.findIndex(r=>r&&r[0]==='HRID'); if(hi<0) throw new Error(`${name}: could not find the HRID header in Performance per Agent`); const ix={}; pa[hi].forEach((h,i)=>{ if(h!=null) ix[String(h).trim()]=i; });
+  for(const n of ['AVAYA ID','Handled Calls','Answered Calls','AHT','Transferred Calls']) if(ix[n]==null) throw new Error(`${name}: Performance per Agent is missing "${n}"`);
+  const num=v=>typeof v==='number'&&isFinite(v)?v:0; const agents={}, login2hr={};
+  for(const r of pa.slice(hi+1)){ if(!r||typeof r[0]!=='number') continue; const hr=String(Math.trunc(r[0])); if(typeof r[ix['AVAYA ID']]==='number') login2hr[Math.trunc(r[ix['AVAYA ID']])]=hr; const aht=r[ix['AHT']]; agents[hr]=[hr, Math.trunc(num(r[ix['Handled Calls']])), Math.trunc(num(r[ix['Answered Calls']])), typeof aht==='number'?Math.round(aht):0, Math.trunc(num(r[ix['Transferred Calls']]))]; }
+  let day=null; const seen=new Map(); const da=sh['D-Agent'];
+  if(da){ let started=false; for(const r of da){ if(!started){ started=!!r&&r[0]==='Date'&&(r[1]==null||r[1]==='')&&r.length>6; continue; } if(!r||typeof r[0]!=='number'||typeof r[3]!=='number') continue; if(!day) day=r[0]; seen.set(Math.trunc(r[3])+'|'+Math.round((r[1]||0)*48)+'|'+r[5], num(r[6])); } }
+  const hourly={}; for(const [k,calls] of seen){ if(!calls) continue; const [login,half]=k.split('|'); const hr=login2hr[+login]; if(!hr) continue; const cairo=(Math.floor(+half/2)+7)%24; const si=CALL_SHIFT.indexOf(cairo); if(si<0) continue; (hourly[hr] ||= new Array(CALL_SHIFT.length).fill(0))[si]+=calls; }
+  if(day==null){ const hf=sh['Hourly Figures']||[]; for(const r of hf){ if(r&&r[1]==='From'&&typeof r[2]==='number'){ day=r[2]; break; } } }
+  if(day==null) throw new Error(`${name}: could not find the handover date`);
+  const iso=new Date(Date.UTC(1899,11,30)+Math.trunc(day)*86400000).toISOString().slice(0,10);
+  const a=[]; for(const [hr,v] of Object.entries(agents)){ const h=hourly[hr]||new Array(CALL_SHIFT.length).fill(0); if(v[1]||v[2]||h.some(x=>x)) a.push([...v,h]); }
+  return {date:iso, src:name, a}; }
+
+/* ---------------------------------------------------------------- calls & conversion: handover call data joined to sales by HRID and business day */
+let CALLS={days:{}}; const CALLS_KEY='tsxCalls';
+function callsInit(){ const days={}; const emb=(typeof EMBEDDED!=='undefined'&&EMBEDDED.calls&&EMBEDDED.calls.days)||{}; for(const [d,v] of Object.entries(emb)) days[d]=v; try{ const s=JSON.parse(localStorage.getItem(CALLS_KEY)||'null'); if(s&&s.days) for(const [d,v] of Object.entries(s.days)) if(!days[d]||v.added) days[d]=v; }catch(e){} CALLS={days}; }
+function callsPersist(){ try{ const up={}; for(const [d,v] of Object.entries(CALLS.days)) if(v.added) up[d]=v; localStorage.setItem(CALLS_KEY, JSON.stringify({days:up})); }catch(e){ toast('Call data could not be saved in this browser (storage full) – it stays loaded until you close the page', true); } }
+function callsAdd(h){ CALLS.days[h.date]={src:h.src, a:h.a, added:Date.now()}; callsPersist(); }
+function callsClear(){ try{ localStorage.removeItem(CALLS_KEY); }catch(e){} callsInit(); }
+const callsTot = a => a.reduce((s,x)=>s+x[1],0);
+
+function callsCompute(){ const {base,i0,i1,p0,p1}=C; const inRange=(d,a,b)=>{ const i=DI[d]; return i!=null&&i>=a&&i<=b; };
+  const allDays=Object.keys(CALLS.days).sort(); const days=allDays.filter(d=>inRange(d,i0,i1)), pdays=allDays.filter(d=>p0>=0&&inRange(d,p0,p1));
+  const noFilter=state.om==='All'&&state.tl==='All'&&state.phase==='All'&&state.tenure==='All';
+  const mk=()=>({h:0,ans:0,tr:0,ahtW:0,xm:0,gsr:0,gsr0:0,hours:new Array(CALL_SHIFT.length).fill(0),shour:new Array(CALL_SHIFT.length).fill(0),agents:new Set(),sellers:new Set()});
+  const scopeOf=dset=>{ const T=mk(), byTl={}, byAg={}, byDay={};
+    for(const d of dset){ const D=byDay[d]=mk(); for(const a of CALLS.days[d].a){ const ag=rosterBy[a[0]]; if(ag? !agentIn(ag) : !noFilter) continue; const tl=ag?ag.tl:'Not in roster'; const tgt=[T,D,(byTl[tl] ||= mk()),(byAg[a[0]] ||= Object.assign(mk(),{hr:a[0],name:ag?ag.name:'HRID '+a[0],tl,phase:ag?ag.phase:'-',days:new Set()}))];
+        for(const o of tgt){ o.h+=a[1]; o.ans+=a[2]; o.tr+=a[4]; o.ahtW+=a[3]*a[1]; if(a[1]) o.agents.add(a[0]); a[5].forEach((v,k)=>o.hours[k]+=v); } if(a[1]) byAg[a[0]].days.add(d); } }
+    const dset2=new Set(dset); for(const r of base){ if(!dset2.has(r.d)||!rowIn(r)) continue; const tl=r.inr?r.tl:'Not in roster'; const tgt=[T,byDay[r.d],(byTl[tl] ||= mk())]; if(byAg[r.hr]) tgt.push(byAg[r.hr]); else if(rosterBy[r.hr]&&agentIn(rosterBy[r.hr])){ const ag=rosterBy[r.hr]; tgt.push(byAg[r.hr]=Object.assign(mk(),{hr:r.hr,name:ag.name,tl:ag.tl,phase:ag.phase,days:new Set()})); }
+      const si=CALL_SHIFT.indexOf(r.h); for(const o of tgt){ o.xm+=r.xm; o.gsr+=r.gsr; o.gsr0+=r.gsr0; if(si>=0) o.shour[si]+=r.gsr; if(r.u) o.sellers.add(r.hr); } }
+    return {T,byTl,byAg,byDay}; };
+  const cur=scopeOf(days), pri=scopeOf(pdays); return {days, pdays, allDays, cur, pri}; }
+const rate=(n,h)=>h?n/h:null; const pctc=v=>v==null?'—':(v*100).toFixed(1)+'%'; const ahtMin=o=>o.h?(o.ahtW/o.h/60):null;
+
+function callsHeroBit(){ if(!C||!CALLS) return ''; const K=callsCompute(); if(!K.days.length||!K.cur.T.h) return ''; return `GSR per call <b>${pctc(rate(K.cur.T.gsr,K.cur.T.h))}</b> (${K.days.length} day${K.days.length>1?'s':''} with call data)`; }
+
+function renderCalls(){ const host=document.getElementById('callsBody'); if(!host) return; const K=callsCompute(); const T=K.cur.T, P=K.pri.T;
+  const avail=K.allDays.length?`Call data loaded for ${K.allDays.length} day${K.allDays.length>1?'s':''}: ${K.allDays.map(fds).join(', ')}`:'No call data loaded yet';
+  document.getElementById('callsSub').textContent=`${avail} · conversion compares sales and handled calls on the same business days, same filters`;
+  if(!K.days.length||!T.h){ host.innerHTML=`<div class="panel"><div class="panel-body calls-empty"><b>No call data for ${fdl(state.from)} – ${fdl(state.to)} in this scope.</b><p>Drop the daily TSX handover file (.xlsb) anywhere on this page, or use Upload files. Each handover adds its day; the numbers below fill in automatically.</p>${K.allDays.length?`<p>Days with call data: ${K.allDays.map(d=>`<button class="text-button" data-day="${d}">${fd(d)}</button>`).join(' · ')}</p>`:''}</div></div>`; host.querySelectorAll('[data-day]').forEach(b=>b.addEventListener('click',()=>{ state.from=b.dataset.day; state.to=b.dataset.day; state.preset='custom'; syncInputs(); renderAll(); })); return; }
+  const gr=rate(T.gsr,T.h), xr=rate(T.xm,T.h), pg=rate(P.gsr,P.h), px=rate(P.xm,P.h); const aht=ahtMin(T), trr=rate(T.tr,T.h); const cpa=T.agents.size?T.h/T.agents.size/K.days.length:0;
+  const dd=(c,p)=>p==null||c==null?'':` · ${sgn((c-p)*100,v=>v.toFixed(1)+' pts')} vs prior`;
+  const kp=[{l:'Handled calls',v:T.h,f:n0,d:`${n0(T.agents.size)} agents took calls · ${K.days.length} day${K.days.length>1?'s':''}`},{l:'GSR per call',v:gr,f:pctc,d:`${n0(T.gsr)} GSR ÷ ${n0(T.h)} calls${dd(gr,pg)}`,c:'s2'},{l:'XM lines per call',v:xr,f:pctc,d:`${n0(T.xm)} XM ÷ ${n0(T.h)} calls${dd(xr,px)}`,c:'s1'},{l:'Calls per agent per day',v:cpa,f:n1,d:'agents who took at least one call'},{l:'Average handle time',v:aht,f:v=>v==null?'—':v.toFixed(1)+' min',d:'weighted by handled calls'},{l:'Transfer rate',v:trr,f:pctc,d:`${n0(T.tr)} transferred calls`}];
+  const tls=Object.entries(K.cur.byTl).map(([tl,o])=>({tl,h:o.h,gsr:o.gsr,xm:o.xm,gr:rate(o.gsr,o.h),xr:rate(o.xm,o.h),aht:ahtMin(o),tr:rate(o.tr,o.h),ag:o.agents.size,pg:K.pri.byTl[tl]?rate(K.pri.byTl[tl].gsr,K.pri.byTl[tl].h):null})).filter(x=>x.h>0&&x.tl!=='Not in roster').sort((a,b)=>(b.gr??-1)-(a.gr??-1)); const nrT=K.cur.byTl['Not in roster'];
+  const MIN=Math.max(5,3*K.days.length); const ags=Object.values(K.cur.byAg).map(o=>({hr:o.hr,name:o.name,tl:o.tl,phase:o.phase,h:o.h,gsr:o.gsr,xm:o.xm,gr:rate(o.gsr,o.h),xr:rate(o.xm,o.h),aht:ahtMin(o),tr:rate(o.tr,o.h),days:o.days.size})).filter(a=>a.h>0);
+  host.innerHTML=`<div class="kpis calls-kpis" id="callKpis">${kp.map((k,i)=>`<div class="kpi" style="--i:${i};${k.c?`border-top:3px solid ${cvar(k.c)}`:''}"><div class="l">${k.l}</div><div class="v" id="ck${i}">${k.f(k.v)}</div><div class="d">${k.d}</div></div>`).join('')}</div>
+    <div class="grid-two"><div class="panel"><div class="panel-head"><div><h2>Handled calls per day</h2><p>From the daily handover · same filters as sales</p></div><button class="text-button" data-tv="cc1">Table view</button></div><div class="panel-body"><figure id="cc1"></figure></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Conversion per day</h2><p>GSR and XM lines sold per handled call, same business day</p></div><button class="text-button" data-tv="cc2">Table view</button></div><div class="panel-body"><figure id="cc2"></figure><div class="legend"><span><i class="k" style="border-color:var(--s2)"></i>GSR per call</span><span><i class="k" style="border-color:var(--s1)"></i>XM lines per call</span></div></div></div></div>
+    <div class="grid-two"><div class="panel"><div class="panel-head"><div><span class="eyebrow">Shift timing</span><h2>Calls by hour of the shift</h2><p>Handled calls per hour, Cairo time, 14:00 → 07:00 · interval data</p></div><button class="text-button" data-tv="cc3">Table view</button></div><div class="panel-body"><figure id="cc3"></figure></div></div>
+      <div class="panel"><div class="panel-head"><div><span class="eyebrow">Shift timing</span><h2>GSR per call by hour</h2><p>GSR logged in the hour ÷ calls handled in the hour · logging can lag the call, so read the shape, not single hours</p></div><button class="text-button" data-tv="cc4">Table view</button></div><div class="panel-body"><figure id="cc4"></figure><div class="chart-foot" id="cc4Foot"></div></div></div></div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Team leaders</span><h2>GSR per call by team</h2><p>Bar = team conversion · tick = account conversion ${pctc(gr)} · green at or above it</p></div><button class="text-button" data-tv="cc5">Table view</button></div><div class="panel-body"><figure id="cc5"></figure></div><div class="table-wrap" id="callsTl"></div></div>
+    <div class="grid-two"><div class="panel"><div class="panel-head"><div><span class="eyebrow">Agents</span><h2>Calls vs conversion</h2><p>Each dot is an agent with ${MIN}+ calls · lines = account medians · bottom-right = many calls, few GSR</p></div><button class="text-button" data-tv="cc6">Table view</button></div><div class="panel-body"><figure id="cc6"></figure></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>What the calls say</h2><p>Rules on conversion, volume and handle time</p></div></div><div class="callouts" id="callsIns"></div></div></div>
+    <div class="panel" style="margin-bottom:20px"><div class="panel-head"><div><span class="eyebrow">Agents</span><h2>Agent conversion</h2><p>Every agent with handled calls in the period · sort any column</p></div><span class="panel-meta" id="callsAgN"></span></div><div class="table-wrap table-tall" id="callsAg"></div></div>`;
+  kp.forEach((k,i)=>{ if(typeof k.v==='number'&&isFinite(k.v)) countTo(document.getElementById('ck'+i),k.v,k.f); });
+  const labs=K.days; chart('cc1','columns',{cats:labs.map(fds), series:[{name:'Handled calls',values:labs.map(d=>K.cur.byDay[d].h),color:'s1'}], valueLabels:labs.length<=14?'all':'max', yFormat:n0, height:240});
+  chart('cc2','line',{labels:labs, series:[{name:'GSR per call',values:labs.map(d=>{ const o=K.cur.byDay[d]; return o.h?100*o.gsr/o.h:null; }),color:'s2',markers:true},{name:'XM lines per call',values:labs.map(d=>{ const o=K.cur.byDay[d]; return o.h?100*o.xm/o.h:null; }),color:'s1',markers:true}], yFormat:v=>v.toFixed(0)+'%', pctAxis:true, height:240});
+  const hl=CALL_SHIFT.map(h=>String(h).padStart(2,'0')+':00'); chart('cc3','columns',{cats:hl, series:[{name:'Handled calls',values:T.hours,color:'s1'}], valueLabels:'max', yFormat:n0, height:240});
+  const hr=T.hours.map((c,k)=>c>=10?100*T.shour[k]/c:null); chart('cc4','columns',{cats:hl, series:[{name:'GSR per call',values:hr.map(v=>v??0),color:'s2'}], valueLabels:'max', yFormat:v=>v.toFixed(0)+'%', height:240});
+  const best=hr.map((v,k)=>[v,k]).filter(x=>x[0]!=null).sort((a,b)=>b[0]-a[0]); document.getElementById('cc4Foot').innerHTML=best.length?`<span>Best hour <b>${hl[best[0][1]]}</b> at ${best[0][0].toFixed(1)}% · weakest <b>${hl[best[best.length-1][1]]}</b> at ${best[best.length-1][0].toFixed(1)}% · hours with fewer than 10 calls are left out</span>`:'';
+  chart('cc5','bullet',{rows:tls.map(t=>({label:t.tl, value:100*(t.gr||0), target:100*(gr||0), max:Math.max(100*(gr||0)*1.4,...tls.map(x=>100*(x.gr||0))), sub:`${n0(t.h)} calls · ${n0(t.gsr)} GSR · ${t.ag} agents`})), format:v=>v.toFixed(1)+'%', rowHeight:38, height:38*Math.max(1,tls.length)+30});
+  if(nrT&&(nrT.h||nrT.gsr)){ const el=document.getElementById('callsTl'); setTimeout(()=>{ const f=document.createElement('div'); f.className='chart-foot'; f.style.padding='10px 24px 16px'; f.innerHTML=`<span>Not matched to a roster team (counted in the account totals only): ${n0(nrT.h)} calls and ${n0(nrT.gsr)} GSR.</span>`; el.after(f); },0); } makeTable(document.getElementById('callsTl'),[{k:'tl',label:'Team leader',asc:true,html:r=>`<span class="row-name">${esc(r.tl)}</span><span class="row-sub">${r.ag} agents took calls</span>`},{k:'h',label:'Handled calls',fmt:n0},{k:'gsr',label:'GSR',fmt:n0},{k:'gr',label:'GSR per call',html:r=>`<b style="color:${r.gr>=gr?'var(--good)':'var(--bad)'}">${pctc(r.gr)}</b>${r.pg!=null?`<span class="stack-sub">${sgn(((r.gr||0)-r.pg)*100,v=>v.toFixed(1)+' pts')} vs prior</span>`:''}`},{k:'xm',label:'XM lines',fmt:n0},{k:'xr',label:'XM per call',fmt:pctc},{k:'aht',label:'AHT',html:r=>r.aht==null?'—':r.aht.toFixed(1)+' min'},{k:'tr',label:'Transfer rate',fmt:pctc}],tls,{sortK:'gr'});
+  const sc=ags.filter(a=>a.h>=MIN); const med=a=>{ const s=[...a].sort((x,y)=>x-y); return s.length?s[Math.floor(s.length/2)]:0; };
+  chart('cc6','scatter',{points:sc.map(a=>({label:a.name.split(' ').slice(0,2).join(' '), x:a.h, y:100*(a.gr||0), group:0, labelled:false})), xLabel:'Handled calls', yLabel:'GSR per call (%)', xRef:med(sc.map(a=>a.h)), yRef:med(sc.map(a=>100*(a.gr||0))), quadrantLabels:['Few calls, high conversion','Many calls, high conversion','Few calls, low conversion','Many calls, low conversion'], xFormat:n0, yFormat:v=>v.toFixed(0)+'%', height:300});
+  document.getElementById('callsAgN').textContent=`${ags.length} agents`;
+  makeTable(document.getElementById('callsAg'),[{k:'name',label:'Agent',asc:true,html:r=>`<span class="row-name">${esc(r.name)}</span><span class="row-sub">${esc(r.tl)} · ${esc(r.phase)}</span>`},{k:'h',label:'Handled calls',fmt:n0},{k:'gsr',label:'GSR',fmt:n0},{k:'gr',label:'GSR per call',html:r=>`<b style="color:${r.h<MIN?'var(--muted)':r.gr>=gr?'var(--good)':'var(--bad)'}">${pctc(r.gr)}</b>${r.h<MIN?'<span class="stack-sub">few calls</span>':''}`},{k:'xm',label:'XM lines',fmt:n0},{k:'xr',label:'XM per call',fmt:pctc},{k:'aht',label:'AHT',html:r=>r.aht==null?'—':r.aht.toFixed(1)+' min'},{k:'tr',label:'Transfer rate',fmt:pctc},{k:'days',label:'Days with calls',fmt:n0}],ags,{sortK:'h'});
+  // insights
+  const out=[]; const big=tls.filter(t=>t.h>=Math.max(30,10*K.days.length)); const silent=big.filter(t=>t.gsr===0); const sell=big.filter(t=>t.gsr>0);
+  for(const t of silent) out.push(callout('bad','!',`<b>${esc(t.tl)}</b>'s team logged <b>no sales</b> on ${K.days.length>1?'these days':fd(K.days[0])} while handling ${n0(t.h)} calls.`,'Check first whether sales were made but not logged in the tracker; if they were not, this team needs a pitch reset today.','Risk'));
+  if(sell.length>=2){ const b=sell[0], w=sell[sell.length-1]; out.push(callout('good','↑',`<b>${esc(b.tl)}</b> converts best — ${pctc(b.gr)} GSR per call on ${n0(b.h)} calls, vs ${pctc(gr)} for the scope.`,`Ask ${esc(b.tl)} what the team says after the fix that the others don't; share it in the next huddle.`,'Strength'));
+    out.push(callout('bad','!',`<b>${esc(w.tl)}</b> converts least — ${pctc(w.gr)} on ${n0(w.h)} calls. Matching the scope rate would add about ${n0(Math.max(0,(gr-w.gr)*w.h))} GSR.`,'Side-by-side listening on two calls per agent this shift; check the offer is made on every resolved call.','Risk')); }
+  const zero=ags.filter(a=>a.h>=Math.max(15,5*K.days.length)&&a.gsr===0).sort((a,b)=>b.h-a.h); if(zero.length) out.push(callout('warn','△',`<b>${zero.length} agent${zero.length>1?'s':''}</b> took ${Math.max(15,5*K.days.length)}+ calls without a single GSR: ${zero.slice(0,4).map(a=>`${esc(a.name.split(' ').slice(0,2).join(' '))} (${a.h})`).join(', ')}${zero.length>4?'…':''}.`,'These are the fastest wins: coach the pitch, not the volume.','Watch'));
+  const vol=big.slice().sort((a,b)=>b.h-a.h)[0]; if(vol&&vol.gr<gr) out.push(callout('warn','△',`<b>${esc(vol.tl)}</b> takes the most calls (${n0(vol.h)}) but converts below the scope (${pctc(vol.gr)} vs ${pctc(gr)}).`,'High volume with low conversion usually means the offer is skipped on busy hours; check the late-shift calls.','Watch'));
+  if(aht!=null){ const slow=ags.filter(a=>a.h>=MIN&&a.aht!=null).sort((a,b)=>b.aht-a.aht)[0]; if(slow&&slow.aht>aht*1.4) out.push(callout('','•',`Longest handle time: <b>${esc(slow.name.split(' ').slice(0,2).join(' '))}</b> at ${slow.aht.toFixed(1)} min vs ${aht.toFixed(1)} min for the scope, converting ${pctc(slow.gr)}.`,'Long calls with low conversion are troubleshooting time; long calls with high conversion are selling time.','Insight')); }
+  if(!out.length) out.push(callout('','•','Not enough calls in this scope for team comparisons yet.','Load more handover days or widen the filters.','Insight'));
+  document.getElementById('callsIns').innerHTML=out.join('');
+  document.querySelectorAll('#callsBody button[data-tv]').forEach(b=>b.addEventListener('click',()=>toggleTable(b.dataset.tv)));
+  armReveals(); }
+function renderCallsSources(){ const el=document.getElementById('callsSources'); if(!el) return; const ds=Object.keys(CALLS.days).sort(); el.innerHTML=ds.length? ds.map(d=>{ const v=CALLS.days[d]; return `<div><strong>${fd(d)}</strong> · ${n0(callsTot(v.a))} handled calls · ${v.a.length} agents · ${esc(v.src||'')}${v.added?' · uploaded here':' · built in'}</div>`; }).join('') : '<div>No call data yet. Drop the daily TSX handover (.xlsb) on the page.</div>'; }
+
 /* ---------------------------------------------------------------- director-style hero: insight headline, attainment ring, glass KPI cards */
-const VIEWNAME={exec:'Executive view', om:'Ops manager view', leader:'Team leader view', agents:'Agent view', insights:'Insights', data:'Data & settings'};
+const VIEWNAME={exec:'Executive view', om:'Ops manager view', leader:'Team leader view', agents:'Agent view', calls:'Calls & conversion', insights:'Insights', data:'Data & settings'};
 let DVSEQ=0;
 function dvSetView(){ const el=document.getElementById('dvView'); if(el) el.textContent=VIEWNAME[state.tab]||VIEWNAME.exec; }
 function dvScope(){ const p=[]; if(state.tl&&state.tl!=='All') p.push(`${state.tl}'s team`); else if(state.om&&state.om!=='All') p.push(`${state.om}'s teams`); else p.push('Whole floor'); if(state.phase&&state.phase!=='All') p.push(`${state.phase} agents`); if(state.tenure&&state.tenure!=='All') p.push(`tenure ${state.tenure}`); return p; }
@@ -1537,7 +1655,7 @@ function renderHero(){ const {cur,prev,dy,i1,len,target}=C; const hero=document.
   document.getElementById('dvHead').innerHTML=`<span class="ln"><em class="x"><b id="dvHX"></b> XM line${cur.xm===1?'':'s'}</em> and <em class="g"><b id="dvHG"></b> GSR</em></span><span class="ln">sold ${when}</span>`;
   morphNum(document.getElementById('dvHX'), cur.xm, n0, 1100); morphNum(document.getElementById('dvHG'), cur.gsr, n0, 1100);
   const types=[['XM Lines',PT.xmG],['Speed Upgrade',PT.speed],['X-PRO',PT.xpro],['Adding LOB',PT.lob],['Mobile Plus',PT.mplus],['XMC',PT.xmcG]].sort((a,b)=>b[1]-a[1]); const top=types[0]; const es=cur.xm?PT.esimL/cur.xm:null;
-  const bits=[]; if(pt) bits.push(`<b>${pct0(ratio)}</b> of the ${n0(pt)} target`); if(cur.gsr&&top[1]) bits.push(`top GSR type <b>${esc(top[0])}</b> (${pct0(top[1]/cur.gsr)} of GSR)`); if(es!=null) bits.push(`e‑SIM on ${pct0(es)} of XM lines`); bits.push(`${n0(cur.active)} of ${n0(C.hcScope)} agents sold`);
+  const bits=[]; if(pt) bits.push(`<b>${pct0(ratio)}</b> of the ${n0(pt)} target`); if(cur.gsr&&top[1]) bits.push(`top GSR type <b>${esc(top[0])}</b> (${pct0(top[1]/cur.gsr)} of GSR)`); if(es!=null) bits.push(`e‑SIM on ${pct0(es)} of XM lines`); const cb=callsHeroBit(); if(cb) bits.push(cb); bits.push(`${n0(cur.active)} of ${n0(C.hcScope)} agents sold`);
   document.getElementById('dvSub').innerHTML=bits.join(' · ');
   // change vs the prior period
   const de=document.getElementById('dvDelta'); const vs=len===1?'the day before':`the prior ${len} days`;
@@ -1604,7 +1722,7 @@ function fig(id){ return document.getElementById(id); }
 function chart(id, fn, opts){ if(CH[id]&&CH[id].destroy) try{ CH[id].destroy(); }catch(e){} const el=fig(id); if(!el) return null; const o={height:240, tip:tipFn, hideTip, ...opts}; try{ CH[id]=Charts[fn](el,o); deferAnims(el); }catch(e){ console.error('chart',id,e); el.innerHTML=`<div class="panel-meta">Chart unavailable: ${esc(e.message)}</div>`; CH[id]=null; } return CH[id]; }
 function toggleTable(id){ const el=fig(id); if(!el) return; let w=el.parentElement.querySelector('.tvwrap[data-for="'+id+'"]'); if(w){ w.remove(); return; } const ch=CH[id]; if(!ch||!ch.tableView) return; const rows=ch.tableView(); const t=document.createElement('table'); t.className='data-table'; rows.forEach((r,i)=>{ const tr=document.createElement('tr'); for(const v of r){ const c=document.createElement(i?'td':'th'); if(!i) c.className='nosort'; c.textContent=v; tr.appendChild(c);} t.appendChild(tr); }); w=document.createElement('div'); w.className='table-wrap tvwrap'; w.dataset.for=id; w.style.maxHeight='260px'; w.style.marginTop='10px'; w.appendChild(t); el.insertAdjacentElement('afterend', w); }
 function countTo(el, v, f){ if(!el) return; if(typeof v==='number'&&isFinite(v)) morphNum(el, v, f, 700); else el.textContent=f(v); }
-const VIEWS={exec:renderExec, om:renderOM, leader:renderLeader, agents:renderAgents, insights:renderInsights, data:renderQuality};
+const VIEWS={exec:renderExec, om:renderOM, leader:renderLeader, agents:renderAgents, calls:renderCalls, insights:renderInsights, data:renderQuality};
 function renderAll(){ document.body.classList.add('refreshing'); C=extendCompute(compute()); INS=insightsFor(C);
   const sc=[state.om==='All'?'all managers':state.om, state.tl==='All'?'all teams':state.tl, state.phase==='All'?'all phases':state.phase, state.tenure==='All'?'all tenure buckets':'tenure '+state.tenure].join(' · ');
   document.getElementById('scopeText').textContent=`${sc} · ${n0(C.hcScope)} agents`; document.getElementById('periodLabel').textContent=`${fdl(state.from)} – ${fdl(state.to)}`;
@@ -1735,7 +1853,7 @@ function renderInsights(){ const top5=[...INS].sort((a,b)=>b.impact-a.impact).sl
   document.getElementById('recs').innerHTML=[['☀','<b>Daily (10 minutes)</b>: open the Team leader view for your team, read the day strip and the last-day tile; message every agent with 0 sales by mid-shift and recognise the top mover publicly.'],['📅','<b>Weekly</b>: set the period to the week; review participation, sales per agent per day against the target, the coaching priorities and the slope chart; pair each coaching case with a top-10 agent for a side-by-side.'],['🎯','<b>Pitch focus</b>: XMC attach is weakest on Free Line for 1 Year sales – build a one-line XMC offer into every Free Line close; chase every unactivated e-SIM the same shift.'],['✎','<b>Hygiene</b>: every agent submits the form before closing the interaction, HRID copied from the roster, order number from the system – one wrong HRID removes the sale from your scorecard.']].map(([i,t])=>callout('',i,t)).join(''); }
 
 /* ---- data & settings view */
-function renderQuality(){ const all=rows; const unm=all.filter(r=>!r.inr); const dups=all.filter(r=>r.dup).length; const junk=all.filter(r=>!r.ov).length;
+function renderQuality(){ renderCallsSources(); const all=rows; const unm=all.filter(r=>!r.inr); const dups=all.filter(r=>r.dup).length; const junk=all.filter(r=>!r.ov).length;
   document.getElementById('qTiles').innerHTML=[['Entries not matching the roster',`${n0(unm.length)}`,`${pct0(unm.length/all.length)} of entries · ${ns(unm.reduce((s,r)=>s+r.u,0))} unattributed`,unm.length/all.length>0.1?'danger':'warning'],['Exact duplicate entries',n0(dups),state.exdup?'excluded by the toggle above':'currently INCLUDED in all figures',state.exdup?'':'danger'],['Unusable order numbers',n0(junk),"e.g. '1', '0', '.', 'N/A', pasted work-order text · duplicates cannot be detected there",'warning']].map(([a,b,c,k])=>`<div class="summary-card"><span>${a}</span><strong class="${k}">${b}</strong><p>${c}</p></div>`).join('');
   const by={}; for(const r of unm){ const k=r.hr.replace(/^UNMAPPED:/,''); const o=(by[k] ||= {hr:k,n:0,u:0,first:r.d,last:r.d,valid:/^1000\d{5}$/.test(k)}); o.n++; o.u+=r.u; if(r.d<o.first)o.first=r.d; if(r.d>o.last)o.last=r.d; }
   makeTable(document.getElementById('unmapped'),[{k:'hr',label:'HRID as typed'},{k:'valid',label:'Looks valid',html:r=>r.valid?'<span class="alert-chip ok">9-digit</span>':'<span class="alert-chip overdue">no</span>'},{k:'n',label:'Entries',fmt:n0},{k:'u',label:'Sales',fmt:n0},{k:'first',label:'First entry',fmt:fds},{k:'last',label:'Last entry',fmt:fds}],Object.values(by),{sortK:'u'});
@@ -1786,13 +1904,13 @@ function buildData(trackerRows, rosterList, name){ if(!trackerRows.length) throw
 let pendingRoster=null, pendingRosterName=null;
 function toast(msg, err){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast'+(err?' error':''); t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>{t.style.display='none';},err?7000:4000); }
 function persist(){ try{ localStorage.setItem('tsxDashData', JSON.stringify({meta:{...META, rowsRaw:undefined}, rows:rows.map(r=>[r.d,r.hr,r.tl,r.om,r.xm,r.gsr0,r.xmc,r.esim,r.dev,r.promo,r.dup,r.inr,r.ov,r.ty,r.id,r.h,r.sim]), roster:roster.map(a=>[a.hr,a.name,a.tl,a.om,a.phase,a.tenure,a.wave]), tls:TLS, oms:OMS})); }catch(e){ console.warn('Could not save to this browser',e); } }
-async function handleFiles(fileList){ const msg=document.getElementById('uploadMsg'); for (const f of fileList){ try{ msg.textContent=`Reading ${f.name}…`; const sheets=await readXlsx(await f.arrayBuffer()); const names=Object.keys(sheets); const isRoster=n=>{ const h=(sheets[n][0]||[]).map(v=>String(v??'').trim()); return h.includes('Agent Name')&&(h.includes('Ops Manager')||h.includes('Team Leader'))&&!h.includes('Completion time')&&!h.includes('Line or GSR'); };
+async function handleFiles(fileList){ const msg=document.getElementById('uploadMsg'); for (const f of fileList){ try{ if(/\.xlsb$/i.test(f.name)){ msg.textContent=`Reading calls from ${f.name}… large file, a few seconds`; const sh=await readXlsb(await f.arrayBuffer(),['Performance per Agent','D-Agent','Hourly Figures'],{'D-Agent':[0,1,3,5,6]}); const h=parseHandover(sh,f.name); callsAdd(h); renderAll(); msg.textContent=`Loaded calls for ${fd(h.date)} from ${f.name}: ${n0(callsTot(h.a))} handled calls across ${h.a.length} agents.`; toast(`Calls added for ${fd(h.date)} · see Calls & conversion`); continue; } msg.textContent=`Reading ${f.name}…`; const sheets=await readXlsx(await f.arrayBuffer()); const names=Object.keys(sheets); const isRoster=n=>{ const h=(sheets[n][0]||[]).map(v=>String(v??'').trim()); return h.includes('Agent Name')&&(h.includes('Ops Manager')||h.includes('Team Leader'))&&!h.includes('Completion time')&&!h.includes('Line or GSR'); };
       if (sheets['Roster']||names.some(isRoster)){ const sh=sheets['Roster']||sheets[names.find(isRoster)]; pendingRoster=cleanRoster(sh); pendingRosterName=f.name; const tr=META.rowsRaw; if(tr){ const data=buildData(cleanTracker(tr,pendingRoster),pendingRoster,META.uploaded?META.uploaded.name:'tracker'); data.meta.rowsRaw=tr; data.meta.rosterName=f.name; applyData(data); } else { msg.textContent=`Roster loaded (${pendingRoster.length} agents). Now load the tracker export to apply it.`; toast(`Roster loaded: ${pendingRoster.length} agents. Load the tracker export next.`); continue; } }
       else { const sh=sheets[names[0]]; const rl=pendingRoster||EMBEDDED.roster; const data=buildData(cleanTracker(sh,rl),rl,f.name); data.meta.rowsRaw=sh; data.meta.rosterName=pendingRosterName||null; applyData(data); }
       persist(); rebuildForData(); msg.textContent=`Loaded ${f.name}: ${n0(rows.length)} entries, ${fds(META.minDate)} – ${fdl(META.maxDate)}.`; toast(`Loaded ${f.name} · ${n0(rows.length)} entries through ${fdl(META.maxDate)}`);
     } catch(e){ console.error(e); msg.textContent=`Could not read ${f.name}: ${e.message}`; toast(`Could not read ${f.name}: ${e.message}`, true); } } }
 function wireUpload(){ for (const id of ['fileTracker','fileAny','fileRoster']) document.getElementById(id).addEventListener('change',e=>{ handleFiles(e.target.files); e.target.value=''; });
-  document.getElementById('resetData').addEventListener('click',()=>{ try{ localStorage.removeItem('tsxDashData'); }catch(e){} pendingRoster=null; pendingRosterName=null; applyData(EMBEDDED); rebuildForData(); document.getElementById('uploadMsg').textContent='Back to the data built into this file.'; toast('Back to the built-in data'); });
+  document.getElementById('clearCalls').addEventListener('click',()=>{ callsClear(); renderAll(); toast('Uploaded call data cleared'); }); document.getElementById('resetData').addEventListener('click',()=>{ try{ localStorage.removeItem('tsxDashData'); }catch(e){} pendingRoster=null; pendingRosterName=null; applyData(EMBEDDED); rebuildForData(); document.getElementById('uploadMsg').textContent='Back to the data built into this file.'; toast('Back to the built-in data'); });
   let dc=0; document.addEventListener('dragenter',e=>{ e.preventDefault(); dc++; document.body.classList.add('drag'); }); document.addEventListener('dragover',e=>e.preventDefault()); document.addEventListener('dragleave',()=>{ if(--dc<=0){dc=0; document.body.classList.remove('drag');} }); document.addEventListener('drop',e=>{ e.preventDefault(); dc=0; document.body.classList.remove('drag'); if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); }); }
 
 
@@ -1833,7 +1951,7 @@ function init(){ const pr=document.getElementById('presets'); for(const [p,l] of
     document.getElementById('resetFilters').addEventListener('click',()=>{ Object.assign(state,{om:'All',tl:'All',phase:'All',tenure:'All',exdup:true}); for(const id of ['pk-om','pk-tl','pk-phase','pk-tenure']) PICKERS[id]&&PICKERS[id].setValue('All'); document.getElementById('exdup').checked=true; setPreset('7'); });
   document.getElementById('agentSel').addEventListener('change',e=>{ state.agent=e.target.value; renderAgentTrend(); });
   document.getElementById('agentSearchTop').addEventListener('change',e=>{ const q=e.target.value.trim(); if(!q) return; const a=roster.find(x=>x.hr===q)||roster.find(x=>x.name.toLowerCase().includes(q.toLowerCase())); if(a){ state.agent=`${a.name} (${a.hr})`; document.getElementById('agentSel').value=state.agent; showTab('agents'); document.getElementById('agentSearch').value=q; document.getElementById('agentSearch').dispatchEvent(new Event('input')); } else toast('No agent matches '+q,true); });
-  const tb=document.getElementById('tabs'); for(const [k,l] of [['exec','Executive'],['om','Ops managers'],['leader','Team leaders'],['agents','Agents'],['insights','Insights'],['data','Data & settings']]){ const b=document.createElement('button'); b.dataset.t=k; b.textContent=l; b.addEventListener('click',()=>showTab(k)); tb.appendChild(b); }
+  const tb=document.getElementById('tabs'); for(const [k,l] of [['exec','Executive'],['om','Ops managers'],['leader','Team leaders'],['agents','Agents'],['calls','Calls & conversion'],['insights','Insights'],['data','Data & settings']]){ const b=document.createElement('button'); b.dataset.t=k; b.textContent=l; b.addEventListener('click',()=>showTab(k)); tb.appendChild(b); }
   document.getElementById('toData').addEventListener('click',()=>showTab('data')); document.addEventListener('click',e=>{ const g=e.target.closest('[data-go]'); if(g) showTab(g.dataset.go); });
   document.querySelectorAll('button[data-tv]').forEach(b=>b.addEventListener('click',()=>toggleTable(b.dataset.tv)));
   const applyTheme=c=>{ const r=document.documentElement; if(c==='auto'){ r.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; } else r.dataset.theme=c; document.querySelectorAll('[data-theme-choice]').forEach(b=>b.classList.toggle('active',b.dataset.themeChoice===c)); try{ localStorage.setItem('tsxTheme2',c); }catch(e){} if(typeof C!=='undefined'&&C) renderAll(); }; document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>applyTheme(b.dataset.themeChoice))); let th='dark'; try{ th=localStorage.getItem('tsxTheme2')||'dark'; }catch(e){} applyTheme(th);
