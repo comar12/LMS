@@ -59,8 +59,18 @@ def parse_rosters(ROSTER):
         epochs.append({"from": frm, "name": os.path.basename(path), "r": r}); prev = r
     return epochs
 
+def read_tracker(path):
+    """Sales Tracker submissions: the form export itself, or the "P Sales" tab of the sales tool workbook (any tab with the form's columns)."""
+    xl = pd.ExcelFile(path)
+    names = sorted(xl.sheet_names, key=lambda n: n != "P Sales")
+    for n in names:
+        cols = {str(c).strip() for c in pd.read_excel(xl, sheet_name=n, nrows=0).columns}
+        if {"Completion time", "Line or GSR"} <= cols:
+            return pd.read_excel(xl, sheet_name=n)
+    return pd.read_excel(xl, sheet_name=0)
+
 def load(TRACKER, ROSTER):
-    s = pd.read_excel(TRACKER)
+    s = read_tracker(TRACKER)
     epochs = parse_rosters(ROSTER)
     r = epochs[-1]["r"]
     roster = set().union(*[set(e["r"]["HRID"]) for e in epochs])
