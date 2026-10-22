@@ -2,8 +2,8 @@
 const SYNC={on:false, tried:false, err:'', days:[], trackerTo:null}; const SYNC_API='api/store';
 const syncable=()=>/^https?:$/.test(location.protocol);
 async function syncFetch(opt){ const r=await fetch(SYNC_API,{cache:'no-store',credentials:'same-origin',headers:{'content-type':'application/json'},...opt}); const j=await r.json().catch(()=>null); if(!r.ok||!j||!j.ok) throw new Error((j&&j.error)||('website storage answered '+r.status)); return j; }
-function syncSnapshot(){ return {meta:{...META, rowsRaw:undefined}, rows:rows.map(r=>[r.d,r.hr,r.tl,r.om,r.xm,r.gsr0,r.xmc,r.esim,r.dev,r.promo,r.dup,r.inr,r.ov,r.ty,r.id,r.h,r.sim]), roster:roster.map(a=>[a.hr,a.name,a.tl,a.om,a.phase,a.tenure,a.wave]), tls:TLS, oms:OMS}; }
-const syncNewer=(a,b)=>{ const am=String(a.meta.maxDate), bm=String(b.meta.maxDate); return am>bm||(am===bm&&a.rows.length>b.rows.length); };
+function syncSnapshot(){ return {meta:{...META, rowsRaw:undefined}, rows:rows.map(r=>[r.d,r.hr,r.tl,r.om,r.xm,r.gsr0,r.xmc,r.esim,r.dev,r.promo,r.dup,r.inr,r.ov,r.ty,r.id,r.h,r.sim]), roster:roster.map(a=>[a.hr,a.name,a.tl,a.om,a.phase,a.tenure,a.wave]), rosters:EPOCHS.slice(0,-1).map(e=>({from:e.from,name:e.name,roster:e.list})), tls:TLS, oms:OMS}; }
+const syncNewer=(a,b)=>{ const am=String(a.meta.maxDate), bm=String(b.meta.maxDate); return am>bm||(am===bm&&(a.rows.length>b.rows.length||(a.rows.length===b.rows.length&&(a.meta.rosterAt||0)>(b.meta.rosterAt||0)))); };
 async function syncPull(){ if(!syncable()) { renderSyncStatus(); return; } SYNC.tried=true;
   try{ const j=await syncFetch({method:'GET'}); SYNC.on=true; SYNC.err=''; let changed=false;
     const sd=(j.calls&&j.calls.days)||{}; CALLS_SERVER=sd; for(const [d,v] of Object.entries(sd)){ const l=CALLS.days[d]; if(!l||(v.added||0)>=(l.added||0)){ if(!l||l.added!==v.added||l.src!==v.src) changed=true; CALLS.days[d]=v; } }

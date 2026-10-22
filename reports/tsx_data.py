@@ -1,22 +1,73 @@
 """Shared cleaning for the TSX sales tracker + roster. Used by the Excel and HTML builders."""
-import re, datetime as dt
+import os, re, datetime as dt
 import pandas as pd, numpy as np
+
+# Same leader spelled differently across roster files -> one name, so their trend stays continuous
+TL_ALIAS = {"Mohamed Kelany": "Mohamed EL-Kelany", "Eslam Farouk": "Islam Farouk"}
+
+def tenure_bucket(days):
+    if pd.isna(days): return "-"
+    return "0-30" if days < 30 else "30-60" if days < 60 else "60-120" if days < 120 else "120+"
+
+def read_roster(path, as_of=None, prev=None):
+    """Roster as one row per agent: HRID, Agent Name, Team Leader, Ops Manager, Phase, Tenure Bucket, Wave, LOB Start Date, Tenure Days.
+    Reads the original "Roster" sheet or the monthly HC layout (New TL / New Ops Manager, e.g. TSX November roster)."""
+    xl = pd.ExcelFile(path)
+    if "Roster" in xl.sheet_names:
+        r = pd.read_excel(xl, sheet_name="Roster")
+        r.columns = [str(c).strip() for c in r.columns]
+        r = r[r["LOB"].notna()].copy()
+        r["Tenure Days"] = pd.to_numeric(r["Tenurity"], errors="coerce")
+        r["LOB Start Date"] = pd.to_datetime(r["LOB Start Date"], errors="coerce")
+    else:
+        sheet = next(n for n in xl.sheet_names if {"Agent Name", "New TL"} <= {str(c).strip() for c in pd.read_excel(xl, sheet_name=n, nrows=0).columns})
+        r = pd.read_excel(xl, sheet_name=sheet)
+        r.columns = [str(c).strip() for c in r.columns]
+        r = r[r["HRID"].notna() & r["Agent Name"].notna()].copy()
+        if "Status" in r: r = r[r["Status"].astype(str).str.strip().str.lower().isin(["active", "nan"])]
+        if "Role" in r: r = r[r["Role"].astype(str).str.strip().str.lower().isin(["agent", "nan"])]
+        tl = r["New TL"].where(r["New TL"].notna(), np.where(r["Phase"].astype(str).str.strip() == "Training", "Training", r.get("TEAM-2")))
+        r["Team Leader"] = tl
+        r["Ops Manager"] = r["New Ops Manager"]
+        r["LOB Start Date"] = pd.to_datetime(r.get("Hiring Date"), errors="coerce").fillna(pd.to_datetime(r.get("PST Date"), errors="coerce"))
+        ref = pd.Timestamp(as_of or dt.date.today())
+        r["Tenure Days"] = (ref - r["LOB Start Date"]).dt.days
+        r["Tenure Bucket"] = r["Tenure Days"].apply(tenure_bucket)
+    r["HRID"] = r["HRID"].astype(str).str.extract(r"(\d+)")[0]
+    r = r[r["HRID"].notna()].drop_duplicates("HRID")
+    r["Agent Name"] = r["Agent Name"].astype(str).str.strip().str.title()
+    r["Team Leader"] = r["Team Leader"].astype(str).str.strip().replace(TL_ALIAS)
+    r["Ops Manager"] = r["Ops Manager"].astype(str).str.strip()
+    r["Phase"] = r["Phase"].astype(str).str.strip()
+    r["Wave"] = r["Wave"].astype(str).str.strip().str.replace(r"^Wav\s", "Wave ", regex=True)
+    if prev is not None:  # no start date in this file -> keep the bucket the agent had on the previous roster
+        pb = prev.set_index("HRID")["Tenure Bucket"]
+        miss = r["Tenure Bucket"].isin(["-", "nan"]) | r["Tenure Bucket"].isna()
+        r.loc[miss, "Tenure Bucket"] = r.loc[miss, "HRID"].map(pb).fillna("-")
+    r = r.sort_values(["Team Leader", "Agent Name"]).reset_index(drop=True)
+    r["Label"] = r["Agent Name"] + " (" + r["HRID"] + ")"
+    return r
+
+def parse_rosters(ROSTER):
+    """ROSTER: a path, or a list of "path" / "path@YYYY-MM-DD" (the date the roster takes effect; the first one covers all earlier dates)."""
+    items = [ROSTER] if isinstance(ROSTER, str) else list(ROSTER)
+    epochs, prev = [], None
+    for i, it in enumerate(items):
+        path, _, frm = it.partition("@")
+        frm = "" if i == 0 else frm
+        r = read_roster(path, as_of=frm or None, prev=prev)
+        epochs.append({"from": frm, "name": os.path.basename(path), "r": r}); prev = r
+    return epochs
 
 def load(TRACKER, ROSTER):
     s = pd.read_excel(TRACKER)
-    r = pd.read_excel(ROSTER, sheet_name="Roster")
-    r.columns = [str(c).strip() for c in r.columns]
-    r = r[r["LOB"].notna()].copy()
-    r["HRID"] = r["HRID"].astype(str).str.extract(r"(\d+)")[0]
-    r["Agent Name"] = r["Agent Name"].astype(str).str.strip().str.title()
-    r["Team Leader"] = r["Team Leader"].astype(str).str.strip()
-    r["Ops Manager"] = r["Ops Manager"].astype(str).str.strip()
-    r["Tenure Days"] = pd.to_numeric(r["Tenurity"], errors="coerce")
-    r["LOB Start Date"] = pd.to_datetime(r["LOB Start Date"], errors="coerce")
-    r = r.sort_values(["Team Leader", "Agent Name"]).reset_index(drop=True)
-    r["Label"] = r["Agent Name"] + " (" + r["HRID"] + ")"
-    roster = set(r["HRID"])
+    epochs = parse_rosters(ROSTER)
+    r = epochs[-1]["r"]
+    roster = set().union(*[set(e["r"]["HRID"]) for e in epochs])
     rmap = r.set_index("HRID")
+    emaps = [e["r"].set_index("HRID") for e in epochs]
+    anymap = pd.concat(emaps[::-1])  # newest first: name/phase/tenure from the latest roster the agent is on
+    anymap = anymap[~anymap.index.duplicated(keep="first")]
 
     def map_hrid(x):
         x = re.sub(r"\D", "", str(x).strip())
@@ -32,11 +83,18 @@ def load(TRACKER, ROSTER):
     s["hr"] = s["hr_raw"].apply(map_hrid)
     s["in_roster"] = s["hr"].notna().astype(int)
     s["hr_key"] = s["hr"].fillna("UNMAPPED:" + s["hr_raw"].str.replace(r"\s+", " ", regex=True))
-    s["Agent"] = s["hr"].map(rmap["Agent Name"]).fillna("Not in Roster")
-    s["TL"] = s["hr"].map(rmap["Team Leader"]).fillna("Not in Roster")
-    s["OM"] = s["hr"].map(rmap["Ops Manager"]).fillna("Not in Roster")
-    s["Phase"] = s["hr"].map(rmap["Phase"]).fillna("-")
-    s["Tenure"] = s["hr"].map(rmap["Tenure Bucket"]).fillna("-")
+    s["Agent"] = s["hr"].map(anymap["Agent Name"]).fillna("Not in Roster")
+    # team and manager come from the roster in force on the business day; an agent missing from it keeps their latest known team
+    ep = np.zeros(len(s), dtype=int); ds = s["Date"].dt.strftime("%Y-%m-%d")
+    for i, e in enumerate(epochs):
+        if e["from"]: ep[(ds >= e["from"]).values] = i
+    s["TL"] = s["hr"].map(anymap["Team Leader"]); s["OM"] = s["hr"].map(anymap["Ops Manager"])
+    for i, m in enumerate(emaps):
+        sel = (ep == i) & s["hr"].isin(m.index).values
+        s.loc[sel, "TL"] = s.loc[sel, "hr"].map(m["Team Leader"]); s.loc[sel, "OM"] = s.loc[sel, "hr"].map(m["Ops Manager"])
+    s["TL"] = s["TL"].fillna("Not in Roster"); s["OM"] = s["OM"].fillna("Not in Roster")
+    s["Phase"] = s["hr"].map(anymap["Phase"]).fillna("-")
+    s["Tenure"] = s["hr"].map(anymap["Tenure Bucket"]).fillna("-")
     s["Type"] = s["Line or GSR"].str.strip()
     s["xm"] = np.where(s["Type"] == "XM Lines", s["No. of XM Lines"].fillna(1), 0).astype(int)
     def _norm_types(v):  # the form now stores ["A","B"]; older entries are "A;B;"
@@ -100,8 +158,8 @@ def load(TRACKER, ROSTER):
 
     NS = len(s); LAST = NS + 1
     dates = sorted(s["Date"].dt.date.unique()); ND = len(dates)
-    tls = sorted(r["Team Leader"].unique()); oms = sorted(r["Ops Manager"].unique())
+    tls = sorted(set().union(*[set(e["r"]["Team Leader"]) for e in epochs])); oms = sorted(set().union(*[set(e["r"]["Ops Manager"]) for e in epochs]))
     MAXD = max(dates); DEF_TO = MAXD; DEF_FROM = MAXD - dt.timedelta(days=6)
     print("rows", NS, "dates", ND, "tls", len(tls), "unmatched", (s.in_roster == 0).sum(), "dups", s.dup.sum())
 
-    return dict(s=s, r=r, rmap=rmap, roster=roster, NS=NS, LAST=LAST, dates=dates, ND=ND, tls=tls, oms=oms, MAXD=MAXD, DEF_TO=DEF_TO, DEF_FROM=DEF_FROM)
+    return dict(s=s, r=r, rmap=rmap, roster=roster, epochs=epochs, NS=NS, LAST=LAST, dates=dates, ND=ND, tls=tls, oms=oms, MAXD=MAXD, DEF_TO=DEF_TO, DEF_FROM=DEF_FROM)
