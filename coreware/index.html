@@ -2160,46 +2160,54 @@ function garment(type,color,variant=0,bg="#F3F0EA"){
   /* ---------------- JEANS / SHORTS ---------------- */
   case "jeans": case "shorts":{
     const S=type==="shorts", den=_GM.blue(c)||dark, th=den?gold:stitch;
-    const d=S?`M66 54Q130 48 194 54L204 92C208 110 212 130 214 150L214 192Q214 196 210 196L148 196Q144 196 143 192L136 142Q132 126 130 122Q128 126 124 142L117 192Q116 196 112 196L50 196Q46 196 46 192L46 150C48 130 52 110 56 92Z`
-      :`M70 40Q130 34 190 40L198 74C202 96 206 122 208 150L210 236Q210 240 206 240L150 240Q146 240 145 236L136 150Q132 132 130 128Q128 132 124 150L115 236Q114 240 110 240L54 240Q50 240 50 236L52 150C54 122 58 96 62 74Z`;
-    sil=[d];
-    const wy=S?54:40, wb=16, cy=S?122:128, hem=S?196:240;
+    // P: waist y, band h, crotch y, hem y, hem x-ranges, pocket-scoop end x, pocket y-range
+    const P=S?{d:`M66 54Q130 48 194 54L206 92C212 120 218 160 218 192Q218 196 214 196L142 196Q138 196 137 192L136 150Q132 130 130 124Q128 130 124 150L123 192Q122 196 118 196L46 196Q42 196 42 192C42 160 48 120 54 92Z`,
+        wy:54,wb:16,cy:124,hem:196,hl:[44,118],hr:[142,216],px:[62,198],wl:[66,194],knee:146,kr:[24,36]}
+      :{d:`M80 22Q130 17 180 22L188 70C194 110 206 180 206 243Q206 247 202 247L152 247Q148 247 148 243L136 140Q132 124 130 118Q128 124 124 140L112 243Q112 247 108 247L58 247Q54 247 54 243C54 180 66 110 72 70Z`,
+        wy:22,wb:14,cy:118,hem:247,hl:[56,110],hr:[150,204],px:[70,190],wl:[80,180],knee:160,kr:[20,56]};
+    const {wy,wb,cy,hem,hl,hr,px,wl,knee,kr}=P;
+    sil=[P.d];
     washO=light?.2:(dark?.08:(lum>150?.18:.15));
-    const kneeY=S?140:170;
-    folds=wash(88,kneeY,24,S?36:56)+wash(172,kneeY,24,S?36:56)+(v?"":wash(130,wy+36,56,16))
-      +fold(`M${S?70:72} ${wy+40}q22 8 30 2`,2)+fold(`M${S?190:188} ${wy+40}q-22 8 -30 2`,2)+fold(`M${S?76:78} ${wy+52}q18 8 26 0`,1.6)+fold(`M${S?184:182} ${wy+52}q-18 8 -26 0`,1.6);
-    over=`<path d="M${S?66:70} ${wy}Q130 ${wy-6} ${S?194:190} ${wy}L${S?196:192} ${wy+wb}Q130 ${wy+wb-6} ${S?64:68} ${wy+wb}Z" fill="${shade}" opacity="${dark?.25:.08}"/>`
-      +st(`M${S?67:71} ${wy+2.5}Q130 ${wy-3.5} ${S?193:189} ${wy+2.5}`,1,"3 2.6",th)+st(`M${S?65:69} ${wy+wb-2.5}Q130 ${wy+wb-8.5} ${S?195:191} ${wy+wb-2.5}`,1,"3 2.6",th);
-    const loops=v?[76,104,130,156,184]:[84,108,152,176];
+    const lx=(hl[0]+hl[1])/2, rx=(hr[0]+hr[1])/2;
+    folds=wash(lx+2,knee,kr[0],kr[1])+wash(rx-2,knee,kr[0],kr[1])+(v?"":wash(130,wy+wb+22,52,14))
+      +fold(`M${wl[0]+4} ${wy+wb+26}q22 8 30 2`,2)+fold(`M${wl[1]-4} ${wy+wb+26}q-22 8 -30 2`,2)+fold(`M${wl[0]+10} ${wy+wb+38}q18 8 26 0`,1.6)+fold(`M${wl[1]-10} ${wy+wb+38}q-18 8 -26 0`,1.6)
+      +(S?"":fold(`M${lx-16} ${knee+40}q14 6 28 0`,1.6)+fold(`M${rx+16} ${knee+40}q-14 6 -28 0`,1.6));
+    over=`<path d="M${wl[0]} ${wy}Q130 ${wy-6} ${wl[1]} ${wy}L${wl[1]+2} ${wy+wb}Q130 ${wy+wb-6} ${wl[0]-2} ${wy+wb}Z" fill="${shade}" opacity="${dark?.25:.08}"/>`
+      +st(`M${wl[0]+1} ${wy+2.5}Q130 ${wy-3.5} ${wl[1]-1} ${wy+2.5}`,1,"3 2.6",th)+st(`M${wl[0]-1} ${wy+wb-2.5}Q130 ${wy+wb-8.5} ${wl[1]+1} ${wy+wb-2.5}`,1,"3 2.6",th);
+    const loops=v?[wl[0]+6,wl[0]+32,130,wl[1]-32,wl[1]-6]:[wl[0]+12,wl[0]+34,wl[1]-34,wl[1]-12];
     loops.forEach(x=>{const y=wy-3+(Math.abs(x-130)/60)*2;over+=`<rect x="${x-3}" y="${y}" width="6" height="${wb+5}" rx="1.2" fill="${c}" stroke="${outline}" stroke-opacity="${outO}" stroke-width=".8"/>`+st(`M${x} ${y+2}V${y+wb+3}`,.8,"2 2",th,.8)});
-    over+=seam(`M130 ${cy}L124 ${cy+22}L${S?117:115} ${hem-2}`,1.4)+seam(`M130 ${cy}L136 ${cy+22}L${S?143:145} ${hem-2}`,1.4)+st(`M127 ${cy+8}L121 ${cy+26}`,.9,"3 2.6",th)
-      +st(`M${S?48:52} ${hem-8}L${S?114:112} ${hem-8}`,1,"3 2.6",th)+st(`M${S?146:148} ${hem-8}L${S?212:208} ${hem-8}`,1,"3 2.6",th)+seam(`M${S?47:51} ${hem-4}L${S?115:113} ${hem-4}`,.8)+seam(`M${S?145:147} ${hem-4}L${S?213:209} ${hem-4}`,.8);
+    over+=seam(`M130 ${cy}L124 ${cy+22}L${hl[1]+2} ${hem-2}M130 ${cy}L136 ${cy+22}L${hr[0]-2} ${hem-2}`,1.4)+st(`M127 ${cy+8}L121 ${cy+26}`,.9,"3 2.6",th)
+      +st(`M${hl[0]} ${hem-8}L${hl[1]} ${hem-8}M${hr[0]} ${hem-8}L${hr[1]} ${hem-8}`,1,"3 2.6",th)+seam(`M${hl[0]-1} ${hem-4}L${hl[1]+1} ${hem-4}M${hr[0]-1} ${hem-4}L${hr[1]+1} ${hem-4}`,.8);
     if(!v){
-      over+=seam(`M130 ${wy+wb}V${cy-8}`,1.2)+st2(`M138 ${wy+wb}V${cy-30}Q138 ${cy-14} 128 ${cy-8}`,3,0,th)
+      const py=wy+wb, pe=py+44;
+      over+=seam(`M130 ${py}V${cy-8}`,1.2)+st2(`M138 ${py}V${cy-30}Q138 ${cy-14} 128 ${cy-8}`,3,0,th)
         +`<circle cx="130" cy="${wy+wb/2}" r="4.2" fill="${copper}"/><circle cx="130" cy="${wy+wb/2}" r="2.4" fill="none" stroke="#F0D7B0" stroke-width=".8" opacity=".7"/>`
-        +st2(`M96 ${wy+wb}Q96 ${wy+wb+26} ${S?62:66} ${wy+wb+46}`,-2.5,-1.5,th)+st2(`M164 ${wy+wb}Q164 ${wy+wb+26} ${S?198:194} ${wy+wb+46}`,2.5,-1.5,th)
-        +seam(`M96 ${wy+wb}Q96 ${wy+wb+26} ${S?62:66} ${wy+wb+46}M164 ${wy+wb}Q164 ${wy+wb+26} ${S?198:194} ${wy+wb+46}`,1.3)
-        +st(`M152 ${wy+wb+2}L170 ${wy+wb+2}L169 ${wy+wb+16}L153 ${wy+wb+16}Z`,.9,"2.5 2",th)
-        +rivet(96,wy+wb+1)+rivet(S?63:67,wy+wb+45)+rivet(164,wy+wb+1)+rivet(S?197:193,wy+wb+45)+rivet(152,wy+wb+2,2)+rivet(170,wy+wb+2,2);
+        +st2(`M96 ${py}Q96 ${py+26} ${px[0]} ${pe}`,-2.5,-1.5,th)+st2(`M164 ${py}Q164 ${py+26} ${px[1]} ${pe}`,2.5,-1.5,th)
+        +seam(`M96 ${py}Q96 ${py+26} ${px[0]} ${pe}M164 ${py}Q164 ${py+26} ${px[1]} ${pe}`,1.3)
+        +st(`M152 ${py+2}L170 ${py+2}L169 ${py+16}L153 ${py+16}Z`,.9,"2.5 2",th)
+        +rivet(96,py+1)+rivet(px[0]+1,pe-1)+rivet(164,py+1)+rivet(px[1]-1,pe-1)+rivet(152,py+2,2)+rivet(170,py+2,2);
     } else {
-      over+=st2(`M${S?60:64} ${wy+wb+18}L130 ${wy+wb+32}L${S?200:196} ${wy+wb+18}`,0,3,th)+seam(`M130 ${wy+wb+32}V${cy}`,1.2)+st(`M133 ${wy+wb+34}V${cy-4}`,.9,"3 2.6",th);
-      const pk=(x,s)=>{const d2=`M${x} ${wy+wb+40}L${x+s*34} ${wy+wb+40}L${x+s*34} ${wy+wb+78}L${x+s*17} ${wy+wb+88}L${x} ${wy+wb+78}Z`;return `<path d="${d2}" fill="${shade}" opacity="${dark?.14:.05}"/>`+st2(d2,0,2.5,th)+st(`M${x+s*5} ${wy+wb+50}Q${x+s*17} ${wy+wb+64} ${x+s*29} ${wy+wb+50}`,.9,"2.5 2",th)+rivet(x+s*2,wy+wb+41,1.8)+rivet(x+s*32,wy+wb+41,1.8)};
-      over+=pk(S?70:74,1)+pk(S?190:186,-1)
+      const yy=wy+wb;
+      over+=st2(`M${wl[0]-8} ${yy+16}L130 ${yy+30}L${wl[1]+8} ${yy+16}`,0,3,th)+seam(`M130 ${yy+30}V${cy}`,1.2)+st(`M133 ${yy+32}V${cy-4}`,.9,"3 2.6",th);
+      const pk=(x,s)=>{const d2=`M${x} ${yy+38}L${x+s*34} ${yy+38}L${x+s*34} ${yy+76}L${x+s*17} ${yy+86}L${x} ${yy+76}Z`;return `<path d="${d2}" fill="${shade}" opacity="${dark?.14:.05}"/>`+st2(d2,0,2.5,th)+st(`M${x+s*5} ${yy+48}Q${x+s*17} ${yy+62} ${x+s*29} ${yy+48}`,.9,"2.5 2",th)+rivet(x+s*2,yy+39,1.8)+rivet(x+s*32,yy+39,1.8)};
+      over+=pk(S?70:76,1)+pk(S?190:184,-1)
         +`<rect x="150" y="${wy-1}" width="28" height="${wb+2}" rx="1.5" fill="#B48B5D"/><rect x="152" y="${wy+1}" width="24" height="${wb-2}" fill="none" stroke="#7A5634" stroke-width=".8" stroke-dasharray="2 1.5"/><path d="M156 ${wy+wb/2}h16" stroke="#5A3C22" stroke-width="2" opacity=".6"/>`;
     }
+    if(!S)shadowT="translate(3,5)";
     break;}
   /* ---------------- SWEATPANTS ---------------- */
   case "sweat":{
-    const d=`M72 46Q130 40 188 46L194 80C198 104 202 130 204 156L200 226Q198 234 190 234L150 234Q144 234 142 226L136 162Q132 142 130 138Q128 142 124 162L118 226Q116 234 110 234L70 234Q62 234 60 226L56 156C58 130 62 104 66 80Z`;
+    const d=`M80 24Q130 18 180 24L186 72C192 110 200 180 198 238Q197 248 188 248L150 248Q144 248 142 238L136 142Q132 126 130 122Q128 126 124 142L118 238Q116 248 110 248L72 248Q63 248 62 238C60 180 68 110 74 72Z`;
     sil=[d];
-    folds=fold("M72 120Q86 128 84 150",2.5)+fold("M188 120Q174 128 176 150",2.5)+fold("M80 190Q96 198 94 214",2)+fold("M180 190Q164 198 166 214",2)+hi("M88 92Q84 140 82 190",9,hiO*.35)+hi("M172 92Q176 140 178 190",9,hiO*.35);
-    over=rib("M72 54Q130 48 188 54",16)+seam("M130 140L124 164L118 226M130 140L136 164L142 226",1.3)
-      +rib("M62 227L116 227",13)+rib("M144 227L198 227",13)+st("M64 219L116 219",.9,"2 2")+st("M144 219L196 219",.9,"2 2");
-    if(v){ over+=seam("M130 62V140",1.2)+st("M133 66V136",.9,"2.5 2")+`<path d="M150 96L184 98L182 136L150 136Z" fill="${shade}" opacity="${dark?.14:.05}"/>`+st("M150 96L184 98L182 136L150 136Z")+label(124,54,12,6); }
+    folds=fold("M78 110Q92 118 90 140",2.5)+fold("M182 110Q168 118 170 140",2.5)+fold("M80 176Q96 184 94 200",2)+fold("M180 176Q164 184 166 200",2)+fold("M82 214Q94 220 90 232",1.6)+fold("M178 214Q166 220 170 232",1.6)+hi("M92 80Q86 140 84 200",9,hiO*.35)+hi("M168 80Q174 140 176 200",9,hiO*.35);
+    over=rib("M80 32Q130 26 180 32",16)+seam("M130 124L124 148L118 236M130 124L136 148L142 236",1.3)
+      +rib("M64 241L116 241",13)+rib("M144 241L196 241",13)+st("M66 233L116 233M144 233L194 233",.9,"2 2");
+    if(v){ over+=seam("M130 40V124",1.2)+st("M133 44V120",.9,"2.5 2")+`<path d="M150 80L184 82L182 120L150 120Z" fill="${shade}" opacity="${dark?.14:.05}"/>`+st("M150 80L184 82L182 120L150 120Z")+label(124,31,12,6); }
     else {
-      over+=line("M122 60C120 80 118 100 116 118M138 60C140 80 142 100 144 118",dark?lt(.42):dk(.3),2.2)+aglet(116,118)+aglet(144,118)
-        +seam("M68 74Q82 92 92 122M192 74Q178 92 168 122",1.4)+st("M71 74Q85 92 95 122M189 74Q175 92 165 122",.9)+mark(84,160,.8);
+      over+=line("M122 38C120 58 118 78 116 96M138 38C140 58 142 78 144 96",dark?lt(.42):dk(.3),2.2)+aglet(116,96)+aglet(144,96)
+        +seam("M74 56Q88 74 96 106M186 56Q172 74 164 106",1.4)+st("M77 56Q91 74 99 106M183 56Q169 74 161 106",.9)+mark(86,150,.8);
     }
+    shadowT="translate(3,5)";
     break;}
   /* ---------------- SHIRT ---------------- */
   case "shirt":{
@@ -2387,7 +2395,6 @@ function garment(type,color,variant=0,bg="#F3F0EA"){
 function garmentArt(type,color,variant=0){
   return garment(type,color,variant,"transparent").replace(/^<svg[^>]*>|<\/svg>$/g,"");
 }
-
 
 
 
