@@ -1447,6 +1447,150 @@ html[dir="rtl"] .bars i b{transform-origin:right center}
   .mo-progress{transition:none}
 }
 
+
+/* ===== REVIEW FIXES ===== */
+/* ==========================================================================
+   COREWARE — QA fixes (review agent)
+   Append as the LAST layer inside the page's style element, after the MOTION
+   block (i.e. immediately before the closing style tag). NOTE: never put a
+   literal closing style tag or raw markup in these comments: it would end the
+   style element early. Every selector matches the existing
+   markup; each block quotes the rule it overrides. Numbers match review.md.
+   ========================================================================== */
+
+/* ---------- P1-1  Page gutter lost on every non-home page -------------------
+   `.wrap{...padding-inline:var(--gutter)}` (base, l.39) is cancelled by the
+   later same-specificity `.section{padding:64px 0}` / `.section.tight{padding:44px 0}`
+   (theme l.487) because every page root is `div.wrap.section.tight`.
+   Result: content flush to the viewport edge at 390px, and at x=60 instead of
+   76 on 1440. Restore the inline padding with a compound selector.          */
+.wrap.section,.wrap.section.tight{padding-inline:var(--gutter)}
+
+/* ---------- P1-2  Header badges show "0" while `hidden` --------------------
+   `.badge-count{...display:flex}` (base l.56) beats the UA `[hidden]{display:none}`. */
+.badge-count[hidden]{display:none!important}
+
+/* ---------- P1-3  #/drops hero has no theme ---------------------------------
+   PAGES.drops renders `section.hero` but no `.hero{}` rule survives
+   in the merged file: volt eyebrow + `#CFCBC3` subtitle sit on paper.          */
+.hero{position:relative;isolation:isolate;overflow:hidden;background:var(--ink);color:var(--chalk)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.035;pointer-events:none;background:var(--grain) repeat;background-size:220px 220px}
+.hero::after{content:"";position:absolute;z-index:-1;top:-55%;inset-inline-end:-18%;width:70vmax;aspect-ratio:1;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(216,255,61,.11),rgba(216,255,61,0) 70%)}
+main .hero>.wrap[style]{padding-block:clamp(56px,8vw,104px)!important}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:12px;color:var(--volt)!important;font-family:var(--font-display);font-weight:700;font-size:12px!important;letter-spacing:.2em!important;line-height:1}
+.hero .eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--volt);flex:none}
+html[dir=rtl] .hero .eyebrow{letter-spacing:0!important;text-transform:none!important;font-size:14px!important}
+main .hero h1[style]{color:var(--chalk);font-size:clamp(40px,7.2vw,112px)!important;margin:18px 0 16px!important;max-width:16ch}
+.hero p{color:var(--on-dark)!important;font-size:17px;margin:0}
+.hero+.wrap.section.tight{padding-top:48px}
+@media(min-width:980px){.hero+.wrap.section.tight{padding-top:64px}}
+
+/* ---------- P1-4  About banner heading: RTL bidi garble + contrast ---------
+   `h3[style="font-size:24px"]` ("240 gsm · 14 oz · 420 gsm") renders as
+   "gsm · 14 240 oz · 420 gsm" under html[dir=rtl]; on 390px it also sits on
+   the hoodie art. Existing: `.banner.dark::after{background:linear-gradient(
+   180deg,rgba(10,10,10,0) 30%,rgba(10,10,10,.8) 100%)}`                      */
+.banner.dark .t h3{direction:ltr;unicode-bidi:isolate}
+html[dir=rtl] .banner.dark .t h3{text-align:right}
+.banner.dark::after{background:linear-gradient(180deg,rgba(10,10,10,0) 12%,rgba(10,10,10,.55) 55%,rgba(10,10,10,.9) 100%)}
+.banner.dark .t{text-shadow:0 2px 24px rgba(10,10,10,.6)}
+
+/* ---------- P1-5  Checkout step clipped at the edge ("ONTACT") -------------
+   motion: `.steps span.on{transform:scale(1.04)}` + `.steps{overflow:auto}`
+   pushes the active step 2px out of the scroll box. The scale adds nothing. */
+.steps span.on{transform:none}
+.steps{overflow:visible}
+@media(max-width:600px){.steps span{font-size:10px}}
+
+/* ---------- P1-6  Page titles too wide at 390 / inside narrow wraps --------
+   theme: `main h1[style]{font-size:clamp(38px,5.4vw,64px)!important}`.
+   "CHECKOUT" in Syne 800 at 38px = ~370px; "ACCOUNT" at 64px = 547px inside
+   the 480px login wrap (overflow audit: H1 textclip 67px).                   */
+@media(max-width:480px){main h1[style]{font-size:clamp(30px,8.6vw,38px)!important}}
+main>.wrap[style*="max-width:480px"]>h1[style],main>.wrap[style*="max-width:640px"]>h1[style]{font-size:clamp(34px,4.6vw,50px)!important}
+/* title → subtitle rhythm: several titles carry no margin-bottom inline
+   (track, size-guide, stores:6px, admin:6px) so the mute p is jammed under
+   a .92 line-height display face.                                           */
+main>.wrap>h1[style]{margin-bottom:18px!important}
+main>.wrap>h1[style]+p{margin-top:0}
+
+/* ---------- P2-7  Native blue "×" in the search field ----------------------- */
+.search-row input::-webkit-search-cancel-button,.search-row input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
+
+/* ---------- P2-8  "Added to cart" toast covers the drawer TOTAL on 390 -------
+   The drawer is already the confirmation; hide the toast while any drawer is
+   open. Existing: `.toast.show{opacity:1;...}`                               */
+html:has(.drawer.open) .toast.show{opacity:0;visibility:hidden}
+
+/* ---------- P2-9  Footer is a 1,250px single column at 390 ------------------
+   theme: `.fgrid{grid-template-columns:minmax(0,1fr)}` below 600px.          */
+@media(max-width:599px){
+  footer{padding-top:56px}
+  .fgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 20px}
+  .fgrid>div:first-child,.fgrid>div:last-child{grid-column:1/-1}
+  .fgrid>div:last-child a{display:inline-block;padding:4px 0;margin-inline-end:18px}
+  .fgrid>div:last-child h4[style]{margin-top:22px!important}
+  .fgrid>div:last-child .news{max-width:420px}
+  .fbottom{margin-top:36px}
+}
+
+/* ---------- P2-10 Sale price wraps mid-number on 2-up cards ---------------
+   `.price{...display:flex;gap:10px}` — at 171px the text node "EGP 1,250"
+   breaks into two lines next to the compare price and the −17% tag.          */
+.price{white-space:nowrap;flex-wrap:wrap;row-gap:4px}
+
+/* ---------- P2-11 Size-guide modal clips the SLEEVE column at 390 ----------
+   theme: `.modal .box{padding:32px 28px}` + `.modal{padding:16px}`.          */
+@media(max-width:480px){
+  .modal{padding:10px}
+  .modal .box{padding:26px 18px 24px}
+  .modal .box h3{font-size:22px}
+  .modal .table th,.modal .table td{padding:9px 6px}
+  .modal .table th{font-size:10px;letter-spacing:.04em}
+}
+
+/* ---------- P2-12 Policies tabs overflow at 390 ("PRIVA…") -----------------
+   base: `.tabs{display:flex;gap:6px;...overflow:auto}`                       */
+@media(max-width:600px){
+  .tabs{flex-wrap:wrap;overflow:visible;row-gap:0}
+  .tabs button{padding:12px 12px}
+}
+
+/* ---------- P2-13 Off-palette WhatsApp green on /contact --------------------
+   `a.btn.block[style="background:#25D366;border-color:#25D366"]`    */
+.summary .btn[style*="25D366"]{background:var(--ink)!important;border-color:var(--ink)!important;color:var(--chalk)}
+.summary .btn[style*="25D366"]:hover{background:var(--volt)!important;border-color:var(--volt)!important;color:var(--volt-ink)}
+
+/* ---------- P2-14 404 looks like a dashed-box template ----------------------
+   theme: `.empty{padding:72px 24px;border:1px solid var(--line);background:var(--chalk)}`
+   PAGES.notfound is the only `.wrap.section` (non-tight) that wraps `.empty`. */
+main>.wrap.section:not(.tight)>.empty{border:0;background:transparent;padding:clamp(24px,8vh,96px) 0}
+main>.wrap.section:not(.tight)>.empty h2{font-size:clamp(96px,22vw,220px);letter-spacing:-.05em}
+main>.wrap.section:not(.tight)>.empty p{font-size:17px;margin-bottom:22px}
+
+/* ---------- P2-15 Size grid orphans "2XL" on its own row at 390 ------------
+   theme: `.sizes-grid{grid-template-columns:repeat(auto-fill,minmax(60px,1fr))}` */
+@media(max-width:480px){.sizes-grid{grid-template-columns:repeat(auto-fill,minmax(52px,1fr))}}
+
+/* ---------- P2-16 Wide admin/account tables on phones ----------------------- */
+@media(max-width:700px){.table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}}
+
+/* ---------- P3-17 Ghost button hover is a muddy grey ------------------------
+   motion: `.btn::before{background:currentColor;opacity:.12;transform:scaleX(0)}`
+   + theme `.btn.ghost:hover{background:var(--ink);color:var(--chalk)}` →
+   chalk@12% on top of ink. Make the ::before the actual ink wipe instead.   */
+.btn.ghost::before{background:var(--ink);opacity:1}
+.btn.ghost:hover,.btn.ghost:focus-visible{background:transparent;color:var(--chalk)}
+.hero .btn.ghost::before,.banner.dark .btn.ghost::before{background:var(--chalk)}
+.hero .btn.ghost:hover,.banner.dark .btn.ghost:hover{color:var(--ink)}
+.btn.signal::before{opacity:.06}
+
+/* ---------- P3-18 Mobile trust strip: hint that it scrolls ------------------ */
+@media(max-width:979px){
+  .hm-trust ul{-webkit-mask-image:linear-gradient(90deg,#000 86%,transparent);mask-image:linear-gradient(90deg,#000 86%,transparent)}
+  html[dir=rtl] .hm-trust ul{-webkit-mask-image:linear-gradient(270deg,#000 86%,transparent);mask-image:linear-gradient(270deg,#000 86%,transparent)}
+}
+
 </style>
 </head>
 <body>
@@ -1882,7 +2026,7 @@ en:{
   rights:"© 2026 Coreware. Made in Egypt.", paymentsLbl:"We accept",
   home:"Home", shop:"Shop", search:"Search", searchHint:"Try “baggy”, “hoodie”, “black” or a size like “32”.", searchNone:"No matches. Try another word.",
   dropTitle:"Drop 01 · No noise", dropSub:"Limited run. When a size sells out it stays out until the next drop.",
-  adminTitle:"Store admin (demo)", kpiOrders:"Orders today", kpiRevenue:"Revenue (EGP)", kpiLow:"Low-stock variants", kpiNotify:"Back-in-stock requests",
+  adminTitle:"Store admin (demo)", adminOrders:"All orders", colProduct:"Product", colQty:"Qty", colRequests:"Requests", colStatus:"Status", newsletter:"Newsletter", subscribers:"subscribers", kpiOrders:"Orders today", kpiRevenue:"Revenue (EGP)", kpiLow:"Low-stock variants", kpiNotify:"Back-in-stock requests",
   breadcrumbHome:"Home", all:"All", sale:"Sale", new:"New", clearAll:"Clear all", of:"of", page:"Page"
 },
 ar:{
@@ -1934,7 +2078,7 @@ ar:{
   rights:"© 2026 كورويير. صناعة مصرية.", paymentsLbl:"نقبل",
   home:"الرئيسية", shop:"المتجر", search:"بحث", searchHint:"جرّب «واسع»، «هودي»، «أسود» أو مقاس مثل «32».", searchNone:"لا نتائج. جرّب كلمة أخرى.",
   dropTitle:"الإصدار 01 · بدون ضجيج", dropSub:"كمية محدودة. عندما ينفد المقاس يبقى نافداً حتى الإصدار التالي.",
-  adminTitle:"لوحة الإدارة (تجريبي)", kpiOrders:"طلبات اليوم", kpiRevenue:"الإيرادات (جنيه)", kpiLow:"مقاسات قاربت على النفاد", kpiNotify:"طلبات التنبيه بالتوفر",
+  adminTitle:"لوحة الإدارة (تجريبي)", adminOrders:"كل الطلبات", colProduct:"المنتج", colQty:"الكمية", colRequests:"طلبات التنبيه", colStatus:"الحالة", newsletter:"النشرة البريدية", subscribers:"مشترك", kpiOrders:"طلبات اليوم", kpiRevenue:"الإيرادات (جنيه)", kpiLow:"مقاسات قاربت على النفاد", kpiNotify:"طلبات التنبيه بالتوفر",
   breadcrumbHome:"الرئيسية", all:"الكل", sale:"تخفيضات", new:"جديد", clearAll:"مسح الكل", of:"من", page:"صفحة"
 }};
 
@@ -3059,18 +3203,18 @@ PAGES.policies = (params)=>{const tab=params.tab||"shipping";const texts={
 
 PAGES.wishlist = ()=>{const list=S.wish.map(id=>PRODUCTS.find(p=>p.id===id)).filter(Boolean);return `<div class="wrap section tight"><h1 style="font-size:36px;margin-bottom:18px">${t("wishlist")}</h1>${list.length?grid(list):`<div class="empty">${t("wishEmpty")}</div>`}</div>`};
 
-PAGES.drops = ()=>{const list=PRODUCTS.filter(p=>p.tags.includes("new"));return `<section class="hero" style="min-height:0"><div class="wrap" style="padding:56px var(--gutter)"><span class="eyebrow" style="color:var(--signal);font-weight:600;letter-spacing:.14em;font-size:12px;text-transform:uppercase">Drop 01</span><h1 style="margin:8px 0">${t("dropTitle")}</h1><p style="color:#CFCBC3;max-width:50ch">${t("dropSub")}</p></div></section><div class="wrap section tight">${grid(list)}</div>`};
+PAGES.drops = ()=>{const list=PRODUCTS.filter(p=>p.tags.includes("new"));return `<section class="hero" style="min-height:0"><div class="wrap" style="padding:56px var(--gutter)"><span class="eyebrow" style="color:var(--signal);font-weight:600;letter-spacing:.14em;font-size:12px;text-transform:uppercase">${t("heroEyebrow")}</span><h1 style="margin:8px 0">${t("dropTitle")}</h1><p style="color:#CFCBC3;max-width:50ch">${t("dropSub")}</p></div></section><div class="wrap section tight">${grid(list)}</div>`};
 
 PAGES.account = ()=>{if(!S.user)return `<div class="wrap section" style="max-width:480px"><h1 style="font-size:36px">${t("account")}</h1><p style="color:var(--mute)">${t("loginHint")}</p><form data-form="login" novalidate><div class="field"><label>${t("fName")}</label><input name="name" required><span class="err">${t("required")}</span></div><div class="field"><label>${t("fPhone")}</label><input name="phone" required inputmode="tel" pattern="^01[0-9]{9}$"><span class="err">${t("phoneErr")}</span></div><button class="btn block">${t("login")} / ${t("register")}</button></form></div>`;
   const mine=S.orders.filter(o=>o.phone===S.user.phone);
-  return `<div class="wrap section tight" style="max-width:800px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h1 style="font-size:36px">${fmt(t("welcome"),{n:esc(S.user.name.split(" ")[0])})}</h1><button class="btn ghost sm" data-action="logout">${t("logout")}</button></div><h3 style="margin:24px 0 10px">${t("orders")}</h3>${mine.length?`<table class="table"><tr><th>#</th><th>${t("total")}</th><th>${t("payWith")}</th><th>Status</th><th></th></tr>${mine.map(o=>`<tr><td>${o.no}</td><td>${money(o.total)}</td><td>${t("payOpts."+o.pay)}</td><td>${t("statuses")[o.stage]}</td><td><a href="#/track?no=${o.no}&phone=${o.phone}" style="text-decoration:underline">${t("track")}</a></td></tr>`).join("")}</table>`:`<div class="empty">${t("noOrders")}</div>`}<h3 style="margin:24px 0 10px">${t("wishlist")}</h3>${S.wish.length?grid(S.wish.map(id=>PRODUCTS.find(p=>p.id===id)).filter(Boolean).slice(0,4)):`<p style="color:var(--mute)">${t("wishEmpty")}</p>`}</div>`};
+  return `<div class="wrap section tight" style="max-width:800px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h1 style="font-size:36px">${fmt(t("welcome"),{n:esc(S.user.name.split(" ")[0])})}</h1><button class="btn ghost sm" data-action="logout">${t("logout")}</button></div><h3 style="margin:24px 0 10px">${t("orders")}</h3>${mine.length?`<table class="table"><tr><th>#</th><th>${t("total")}</th><th>${t("payWith")}</th><th>${t("colStatus")}</th><th></th></tr>${mine.map(o=>`<tr><td>${o.no}</td><td>${money(o.total)}</td><td>${t("payOpts."+o.pay)}</td><td>${t("statuses")[o.stage]}</td><td><a href="#/track?no=${o.no}&phone=${o.phone}" style="text-decoration:underline">${t("track")}</a></td></tr>`).join("")}</table>`:`<div class="empty">${t("noOrders")}</div>`}<h3 style="margin:24px 0 10px">${t("wishlist")}</h3>${S.wish.length?grid(S.wish.map(id=>PRODUCTS.find(p=>p.id===id)).filter(Boolean).slice(0,4)):`<p style="color:var(--mute)">${t("wishEmpty")}</p>`}</div>`};
 
 PAGES.admin = ()=>{const low=[];PRODUCTS.forEach(p=>p.colors.forEach(c=>p.sizes.forEach(s=>{const n=stockOf(p,c,s);if(n<=3)low.push([p,c,s,n])})));const today=S.orders.filter(o=>Date.now()-o.at<864e5);const rev=today.reduce((a,o)=>a+o.total,0);
   return `<div class="wrap section tight"><h1 style="font-size:36px;margin-bottom:6px">${t("adminTitle")}</h1><p style="color:var(--mute);margin-bottom:18px">${S.lang==="ar"?"بيانات هذا المتصفح فقط (نموذج تجريبي).":"Data from this browser only (prototype)."}</p>
   <div class="kpis"><div class="kpi"><b>${today.length}</b><span>${t("kpiOrders")}</span></div><div class="kpi"><b>${rev.toLocaleString()}</b><span>${t("kpiRevenue")}</span></div><div class="kpi"><b>${low.length}</b><span>${t("kpiLow")}</span></div><div class="kpi"><b>${S.notify.length}</b><span>${t("kpiNotify")}</span></div></div>
-  <h3 style="margin:28px 0 10px">${t("orders")}</h3>${S.orders.length?`<table class="table"><tr><th>#</th><th>${t("fName")}</th><th>${t("fGov")}</th><th>${t("total")}</th><th>${t("payWith")}</th><th>Status</th><th></th></tr>${S.orders.slice().reverse().map(o=>`<tr><td>${o.no}</td><td>${esc(o.name)}<br><small style="color:var(--mute)">${o.phone}</small></td><td>${S.lang==="ar"?o.govAr:o.gov}</td><td>${money(o.total)}</td><td>${t("payOpts."+o.pay)}</td><td>${t("statuses")[o.stage]}</td><td>${o.stage<4?`<button class="btn ghost sm" data-action="advance" data-no="${o.no}">→</button>`:"✓"}</td></tr>`).join("")}</table>`:`<div class="empty">${t("noOrders")}</div>`}
-  <h3 style="margin:28px 0 10px">${t("kpiLow")}</h3><table class="table"><tr><th>Product</th><th>${t("color")}</th><th>${t("size")}</th><th>Qty</th><th>Requests</th></tr>${low.slice(0,40).map(([p,c,s,n])=>`<tr><td><a href="#/product/${p.id}">${pname(p)}</a></td><td>${cname(c)}</td><td>${s}</td><td style="color:${n?"var(--warn)":"var(--bad)"};font-weight:600">${n}</td><td>${S.notify.filter(x=>x.id===p.id&&x.size===s).length||""}</td></tr>`).join("")}</table>
-  <h3 style="margin:28px 0 10px">Newsletter</h3><p>${S.news.length} ${S.lang==="ar"?"مشترك":"subscribers"}: ${S.news.map(esc).join(", ")||"—"}</p></div>`};
+  <h3 style="margin:28px 0 10px">${t("adminOrders")}</h3>${S.orders.length?`<table class="table"><tr><th>#</th><th>${t("fName")}</th><th>${t("fGov")}</th><th>${t("total")}</th><th>${t("payWith")}</th><th>${t("colStatus")}</th><th></th></tr>${S.orders.slice().reverse().map(o=>`<tr><td>${o.no}</td><td>${esc(o.name)}<br><small style="color:var(--mute)">${o.phone}</small></td><td>${S.lang==="ar"?o.govAr:o.gov}</td><td>${money(o.total)}</td><td>${t("payOpts."+o.pay)}</td><td>${t("statuses")[o.stage]}</td><td>${o.stage<4?`<button class="btn ghost sm" data-action="advance" data-no="${o.no}">→</button>`:"✓"}</td></tr>`).join("")}</table>`:`<div class="empty">${t("noOrders")}</div>`}
+  <h3 style="margin:28px 0 10px">${t("kpiLow")}</h3><table class="table"><tr><th>${t("colProduct")}</th><th>${t("color")}</th><th>${t("size")}</th><th>${t("colQty")}</th><th>${t("colRequests")}</th></tr>${low.slice(0,40).map(([p,c,s,n])=>`<tr><td><a href="#/product/${p.id}">${pname(p)}</a></td><td>${cname(c)}</td><td>${s}</td><td style="color:${n?"var(--warn)":"var(--bad)"};font-weight:600">${n}</td><td>${S.notify.filter(x=>x.id===p.id&&x.size===s).length||""}</td></tr>`).join("")}</table>
+  <h3 style="margin:28px 0 10px">${t("newsletter")}</h3><p>${S.news.length} ${t("subscribers")}: ${S.news.map(esc).join(", ")||"—"}</p></div>`};
 
 PAGES.notfound = ()=>`<div class="wrap section"><div class="empty"><h2>404</h2><p>${S.lang==="ar"?"الصفحة غير موجودة.":"That page does not exist."}</p><a class="btn" href="#/">${t("home")}</a></div></div>`;
 
