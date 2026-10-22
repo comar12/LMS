@@ -339,6 +339,10 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
 /* calls view */
 .kpis.calls-kpis{grid-template-columns:repeat(6,minmax(0,1fr))}@media(max-width:1150px){.kpis.calls-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.kpis.calls-kpis{grid-template-columns:1fr 1fr}}
 .calls-empty{padding:22px 24px;font-size:13.5px;color:var(--muted);line-height:1.6}.calls-empty b{color:var(--text)}
+.sync-status{margin:0 24px;padding:10px 14px;border-radius:10px;font-size:12.5px;line-height:1.5;color:var(--muted);background:color-mix(in srgb,var(--muted) 8%,transparent)}
+.sync-status.ok{color:var(--text);background:color-mix(in srgb,var(--good) 12%,transparent);border-left:3px solid var(--good)}
+.sync-status.warn{color:var(--text);background:color-mix(in srgb,var(--warn,#c98500) 14%,transparent);border-left:3px solid var(--warn,#c98500)}
+.sync-status:empty{display:none}
 </style>
 </head>
 <body>
@@ -352,7 +356,7 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
   <section class="panel upload-panel" id="uploadPanel">
     <div class="upload-copy"><h2>Tracker &amp; roster files</h2><span id="fileLine"></span></div>
     <div class="upload-actions"><label class="primary" style="cursor:pointer">⬆ Upload files<input type="file" id="fileAny" accept=".xlsx,.xlsb" multiple hidden></label><label class="secondary" style="cursor:pointer">👥 Roster<input type="file" id="fileRoster" accept=".xlsx,.xlsb" hidden></label><button class="secondary" id="resetData">Reset to built-in</button></div>
-    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx), the daily TSX handover with calls (.xlsb) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
+    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx), the daily TSX handover with calls (.xlsb) or the roster workbook anywhere on this page · processed in this browser.</span><span id="naLine"></span></div>
   </section>
 
   <section class="hero" id="hero" aria-label="Sales performance summary">
@@ -486,7 +490,7 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
         <div><strong>XMC attach target</strong> <input type="number" id="xmcTarget" min="0" max="100" step="1" placeholder="none" style="width:90px;height:32px;margin-left:8px"> % of answered XM-line entries · leave empty for no XMC target.</div>
         <div class="panel-meta" id="targetNote"></div></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Uploaded sources</h2><p>What this page is showing</p></div></div><div class="source-numbers" id="sourceNumbers"></div><div class="method-list" id="sourceList"></div></div>
-      <div class="panel"><div class="panel-head"><div><h2>Call data</h2><p>One TSX handover per business day · uploads are kept in this browser</p></div><button class="text-button" id="clearCalls">Clear uploaded calls</button></div><div class="method-list" id="callsSources"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Call data</h2><p>One TSX handover per business day · each upload adds its day to the saved history</p></div><button class="text-button" id="clearCalls">Clear uploaded calls</button></div><div class="sync-status" id="syncStatus"></div><div class="method-list" id="callsSources"></div></div>
     </div>
     <div class="grid-two">
       <div class="panel"><div class="panel-head"><div><h2>HRIDs not on the roster</h2><p>Valid-looking 9-digit IDs are probably attrited or transferred agents – add them to a Leavers tab to attribute their sales</p></div></div><div class="table-wrap table-tall" id="unmapped"></div></div>
@@ -1553,9 +1557,9 @@ function parseHandover(sh, name, lob='EG TSX 4P'){ const da=sh['D-Agent']; if(!d
   return {date:iso, src:name, a}; }
 
 /* ---------------------------------------------------------------- calls & conversion: handover call data joined to sales by HRID and business day */
-let CALLS={days:{}}; const CALLS_KEY='tsxCalls';
-function callsInit(){ const days={}; const emb=(typeof EMBEDDED!=='undefined'&&EMBEDDED.calls&&EMBEDDED.calls.days)||{}; for(const [d,v] of Object.entries(emb)) days[d]=v; try{ const s=JSON.parse(localStorage.getItem(CALLS_KEY)||'null'); if(s&&s.days) for(const [d,v] of Object.entries(s.days)) if(!days[d]||v.added) days[d]=v; }catch(e){} CALLS={days}; }
-function callsPersist(){ try{ const up={}; for(const [d,v] of Object.entries(CALLS.days)) if(v.added) up[d]=v; localStorage.setItem(CALLS_KEY, JSON.stringify({days:up})); }catch(e){ toast('Call data could not be saved in this browser (storage full) – it stays loaded until you close the page', true); } }
+let CALLS={days:{}}, CALLS_SERVER={}; const CALLS_KEY='tsxCalls';
+function callsInit(){ const days={}; const emb=(typeof EMBEDDED!=='undefined'&&EMBEDDED.calls&&EMBEDDED.calls.days)||{}; for(const [d,v] of Object.entries(emb)) days[d]=v; try{ const s=JSON.parse(localStorage.getItem(CALLS_KEY)||'null'); if(s&&s.days) for(const [d,v] of Object.entries(s.days)) if(!days[d]||v.added) days[d]=v; }catch(e){} for(const [d,v] of Object.entries(CALLS_SERVER)) if(!days[d]||(v.added||0)>=(days[d].added||0)) days[d]=v; CALLS={days}; }
+function callsPersist(){ try{ const up={}; for(const [d,v] of Object.entries(CALLS.days)) if(v.added) up[d]=v; localStorage.setItem(CALLS_KEY, JSON.stringify({days:up})); }catch(e){ if(!(typeof SYNC!=='undefined'&&SYNC.on)) toast('Call data could not be saved in this browser (storage full) – it stays loaded until you close the page', true); } }
 function callsAdd(h){ CALLS.days[h.date]={src:h.src, a:h.a, added:Date.now()}; callsPersist(); }
 function callsClear(){ try{ localStorage.removeItem(CALLS_KEY); }catch(e){} callsInit(); }
 const callsTot = a => a.reduce((s,x)=>s+x[1],0);
@@ -1617,7 +1621,43 @@ function renderCalls(){ const host=document.getElementById('callsBody'); if(!hos
   document.getElementById('callsIns').innerHTML=out.join('');
   document.querySelectorAll('#callsBody button[data-tv]').forEach(b=>b.addEventListener('click',()=>toggleTable(b.dataset.tv)));
   armReveals(); }
-function renderCallsSources(){ const el=document.getElementById('callsSources'); if(!el) return; const ds=Object.keys(CALLS.days).sort(); el.innerHTML=ds.length? ds.map(d=>{ const v=CALLS.days[d]; return `<div><strong>${fd(d)}</strong> · ${n0(callsTot(v.a))} handled calls · ${v.a.length} agents · ${esc(v.src||'')}${v.added?' · uploaded here':' · built in'}</div>`; }).join('') : '<div>No call data yet. Drop the daily TSX handover (.xlsb) on the page.</div>'; }
+function renderCallsSources(){ const el=document.getElementById('callsSources'); if(!el) return; const ds=Object.keys(CALLS.days).sort(); const onWeb=d=>typeof SYNC!=='undefined'&&SYNC.on&&CALLS_SERVER[d];
+  el.innerHTML=ds.length? ds.map(d=>{ const v=CALLS.days[d]; return `<div><strong>${fd(d)}</strong> · ${n0(callsTot(v.a))} handled calls · ${v.a.length} agents · ${esc(v.src||'')} · ${onWeb(d)?'<span style="color:var(--good)">saved on the website</span>':v.added?'this browser only':'built in'}${onWeb(d)?` <button class="text-button" data-rmday="${d}">Remove</button>`:''}</div>`; }).join('') : '<div>No call data yet. Drop the daily TSX handover (.xlsb) on the page.</div>';
+  el.querySelectorAll('[data-rmday]').forEach(b=>b.addEventListener('click',async()=>{ const d=b.dataset.rmday; if(!confirm(`Remove the calls for ${fd(d)} from the website for everyone? Upload that day's handover again to bring it back.`)) return; if(await syncDeleteDay(d)){ const emb=(EMBEDDED.calls&&EMBEDDED.calls.days)||{}; if(emb[d]) CALLS.days[d]=emb[d]; else delete CALLS.days[d]; callsPersist(); renderAll(); renderSyncStatus(); toast(`Calls for ${fd(d)} removed`); } })); }
+
+/* ---------------------------------------------------------------- website storage: every upload is saved on the site (/api/store), so each browser and device sees the same history */
+const SYNC={on:false, tried:false, err:'', days:[], trackerTo:null}; const SYNC_API='api/store';
+const syncable=()=>/^https?:$/.test(location.protocol);
+async function syncFetch(opt){ const r=await fetch(SYNC_API,{cache:'no-store',credentials:'same-origin',headers:{'content-type':'application/json'},...opt}); const j=await r.json().catch(()=>null); if(!r.ok||!j||!j.ok) throw new Error((j&&j.error)||('website storage answered '+r.status)); return j; }
+function syncSnapshot(){ return {meta:{...META, rowsRaw:undefined}, rows:rows.map(r=>[r.d,r.hr,r.tl,r.om,r.xm,r.gsr0,r.xmc,r.esim,r.dev,r.promo,r.dup,r.inr,r.ov,r.ty,r.id,r.h,r.sim]), roster:roster.map(a=>[a.hr,a.name,a.tl,a.om,a.phase,a.tenure,a.wave]), tls:TLS, oms:OMS}; }
+const syncNewer=(a,b)=>{ const am=String(a.meta.maxDate), bm=String(b.meta.maxDate); return am>bm||(am===bm&&a.rows.length>b.rows.length); };
+async function syncPull(){ if(!syncable()) { renderSyncStatus(); return; } SYNC.tried=true;
+  try{ const j=await syncFetch({method:'GET'}); SYNC.on=true; SYNC.err=''; let changed=false;
+    const sd=(j.calls&&j.calls.days)||{}; CALLS_SERVER=sd; for(const [d,v] of Object.entries(sd)){ const l=CALLS.days[d]; if(!l||(v.added||0)>=(l.added||0)){ if(!l||l.added!==v.added||l.src!==v.src) changed=true; CALLS.days[d]=v; } }
+    const missing=Object.keys(CALLS.days).filter(d=>!sd[d]); SYNC.days=Object.keys(sd).sort(); callsPersist();
+    const t=j.tracker; if(t&&t.rows&&t.rows.length&&syncNewer(t,{meta:META,rows})){ applyData(t); persist(); rebuildForData(); changed=false; }
+    SYNC.trackerTo=t?t.meta.maxDate:null;
+    if(changed) renderAll(); renderSyncStatus();
+    // anything this browser has that the website does not (built-in days, an upload made offline) is saved up now
+    for(const d of missing) await syncPushCalls(d,true);
+    if(!t||syncNewer({meta:META,rows},t)) await syncPushTracker(true);
+  }catch(e){ SYNC.on=false; SYNC.err=e.message; renderSyncStatus(); } }
+async function syncPushCalls(date,quiet){ if(!syncable()) return false; const v=CALLS.days[date]; if(!v) return false;
+  try{ const j=await syncFetch({method:'POST',body:JSON.stringify({kind:'calls',day:{date,src:v.src,a:v.a,added:v.added||0}})}); SYNC.on=true; SYNC.err=''; SYNC.days=j.days; CALLS_SERVER[date]=v; renderSyncStatus(); return true; }
+  catch(e){ SYNC.err=e.message; renderSyncStatus(); if(!quiet) toast('Calls kept in this browser only – the website could not save them ('+e.message+')',true); return false; } }
+async function syncPushTracker(quiet){ if(!syncable()) return false;
+  try{ const j=await syncFetch({method:'POST',body:JSON.stringify({kind:'tracker',data:syncSnapshot()})}); SYNC.on=true; SYNC.err=''; const t=j.tracker; SYNC.trackerTo=t.meta.maxDate;
+    if(t.rows.length!==rows.length||t.meta.minDate!==META.minDate||t.meta.maxDate!==META.maxDate){ applyData(t); persist(); rebuildForData(); }
+    renderSyncStatus(); return t; }
+  catch(e){ SYNC.err=e.message; renderSyncStatus(); if(!quiet) toast('Sales data kept in this browser only – the website could not save it ('+e.message+')',true); return false; } }
+async function syncDeleteDay(date){ try{ const r=await fetch(SYNC_API+'?day='+encodeURIComponent(date),{method:'DELETE',credentials:'same-origin'}); const j=await r.json().catch(()=>null); if(!r.ok||!j||!j.ok) throw new Error((j&&j.error)||('website storage answered '+r.status)); delete CALLS_SERVER[date]; SYNC.days=SYNC.days.filter(d=>d!==date); return true; }catch(e){ toast('Could not remove '+fd(date)+' from the website ('+e.message+')',true); return false; } }
+function renderSyncStatus(){ const on=SYNC.on, el=document.getElementById('syncStatus');
+  const txt=!syncable()? 'Opened as a file: uploads are kept in this browser only. Open the website link to save them for everyone.'
+    : on? `Saved on the website: ${SYNC.days.length} day${SYNC.days.length===1?'':'s'} of calls${SYNC.trackerTo?` · sales through ${fdl(SYNC.trackerTo)}`:''}. Every upload is added to this history and shows on every device.`
+    : SYNC.tried? `Website storage not reachable${SYNC.err?` (${SYNC.err})`:''}: uploads are kept in this browser for now and are saved to the website on the next visit.` : 'Connecting to website storage…';
+  if(el){ el.textContent=txt; el.className='sync-status '+(on?'ok':syncable()&&SYNC.tried?'warn':''); }
+  const um=document.getElementById('uploadMsg'); if(um&&um.dataset.idle!=='0') um.textContent=`Drop the Sales Tracker export (.xlsx), the daily TSX handover with calls (.xlsb) or the roster workbook anywhere on this page · ${on?'each upload is saved on the website and adds to the history':'processed in this browser'}.`;
+  const cc=document.getElementById('clearCalls'); if(cc) cc.hidden=on; renderCallsSources(); }
 
 /* ---------------------------------------------------------------- director-style hero: insight headline, attainment ring, glass KPI cards */
 const VIEWNAME={exec:'Executive view', om:'Ops manager view', leader:'Team leader view', agents:'Agent view', calls:'Calls & conversion', insights:'Insights', data:'Data & settings'};
@@ -1903,11 +1943,11 @@ function buildData(trackerRows, rosterList, name){ if(!trackerRows.length) throw
   return {meta:{minDate:minD, maxDate:maxD, defFrom:addDays(maxD,-6), built:EMBEDDED.meta.built, source:'uploaded Sales Tracker export', uploaded:{name, when:new Date().toLocaleString()}}, rows:trackerRows, roster:rosterList, tls, oms}; }
 let pendingRoster=null, pendingRosterName=null;
 function toast(msg, err){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast'+(err?' error':''); t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>{t.style.display='none';},err?7000:4000); }
-function persist(){ try{ localStorage.setItem('tsxDashData', JSON.stringify({meta:{...META, rowsRaw:undefined}, rows:rows.map(r=>[r.d,r.hr,r.tl,r.om,r.xm,r.gsr0,r.xmc,r.esim,r.dev,r.promo,r.dup,r.inr,r.ov,r.ty,r.id,r.h,r.sim]), roster:roster.map(a=>[a.hr,a.name,a.tl,a.om,a.phase,a.tenure,a.wave]), tls:TLS, oms:OMS})); }catch(e){ console.warn('Could not save to this browser',e); } }
-async function handleFiles(fileList){ const msg=document.getElementById('uploadMsg'); for (const f of fileList){ try{ if(/\.xlsb$/i.test(f.name)){ msg.textContent=`Reading calls from ${f.name}… large file, a few seconds`; const sh=await readXlsb(await f.arrayBuffer(),['D-Agent']); const h=parseHandover(sh,f.name); callsAdd(h); renderAll(); msg.textContent=`Loaded calls for ${fd(h.date)} from ${f.name}: ${n0(callsTot(h.a))} handled calls across ${h.a.length} agents.`; toast(`Calls added for ${fd(h.date)} · see Calls & conversion`); continue; } msg.textContent=`Reading ${f.name}…`; const sheets=await readXlsx(await f.arrayBuffer()); const names=Object.keys(sheets); const isRoster=n=>{ const h=(sheets[n][0]||[]).map(v=>String(v??'').trim()); return h.includes('Agent Name')&&(h.includes('Ops Manager')||h.includes('Team Leader'))&&!h.includes('Completion time')&&!h.includes('Line or GSR'); };
+function persist(){ try{ localStorage.setItem('tsxDashData', JSON.stringify(syncSnapshot())); }catch(e){ console.warn('Could not save to this browser',e); } }
+async function handleFiles(fileList){ const msg=document.getElementById('uploadMsg'); msg.dataset.idle='0'; for (const f of fileList){ try{ if(/\.xlsb$/i.test(f.name)){ msg.textContent=`Reading calls from ${f.name}… large file, a few seconds`; const sh=await readXlsb(await f.arrayBuffer(),['D-Agent']); const h=parseHandover(sh,f.name); callsAdd(h); renderAll(); const line=`Loaded calls for ${fd(h.date)} from ${f.name}: ${n0(callsTot(h.a))} handled calls across ${h.a.length} agents`; msg.textContent=line+(syncable()?' · saving to the website…':'.'); const ok=await syncPushCalls(h.date); msg.textContent=line+(ok?` · saved on the website (${SYNC.days.length} day${SYNC.days.length===1?'':'s'} of calls stored).`:syncable()?' · kept in this browser only, the website could not save it.':'.'); toast(`Calls added for ${fd(h.date)}${ok?' and saved on the website':''} · see Calls & conversion`); continue; } msg.textContent=`Reading ${f.name}…`; const sheets=await readXlsx(await f.arrayBuffer()); const names=Object.keys(sheets); const isRoster=n=>{ const h=(sheets[n][0]||[]).map(v=>String(v??'').trim()); return h.includes('Agent Name')&&(h.includes('Ops Manager')||h.includes('Team Leader'))&&!h.includes('Completion time')&&!h.includes('Line or GSR'); };
       if (sheets['Roster']||names.some(isRoster)){ const sh=sheets['Roster']||sheets[names.find(isRoster)]; pendingRoster=cleanRoster(sh); pendingRosterName=f.name; const tr=META.rowsRaw; if(tr){ const data=buildData(cleanTracker(tr,pendingRoster),pendingRoster,META.uploaded?META.uploaded.name:'tracker'); data.meta.rowsRaw=tr; data.meta.rosterName=f.name; applyData(data); } else { msg.textContent=`Roster loaded (${pendingRoster.length} agents). Now load the tracker export to apply it.`; toast(`Roster loaded: ${pendingRoster.length} agents. Load the tracker export next.`); continue; } }
       else { const sh=sheets[names[0]]; const rl=pendingRoster||EMBEDDED.roster; const data=buildData(cleanTracker(sh,rl),rl,f.name); data.meta.rowsRaw=sh; data.meta.rosterName=pendingRosterName||null; applyData(data); }
-      persist(); rebuildForData(); msg.textContent=`Loaded ${f.name}: ${n0(rows.length)} entries, ${fds(META.minDate)} – ${fdl(META.maxDate)}.`; toast(`Loaded ${f.name} · ${n0(rows.length)} entries through ${fdl(META.maxDate)}`);
+      persist(); rebuildForData(); const line=`Loaded ${f.name}: ${n0(rows.length)} entries, ${fds(META.minDate)} – ${fdl(META.maxDate)}`; msg.textContent=line+(syncable()?' · saving to the website…':'.'); const saved=await syncPushTracker(); msg.textContent=saved?`Loaded ${f.name} and saved on the website: ${n0(rows.length)} entries, ${fds(META.minDate)} – ${fdl(META.maxDate)}${saved.meta.keptRows?` (${n0(saved.meta.keptRows)} earlier entries kept from previous uploads)`:''}.`:line+(syncable()?' · kept in this browser only, the website could not save it.':'.'); toast(`Loaded ${f.name} · ${n0(rows.length)} entries through ${fdl(META.maxDate)}${saved?' · saved on the website':''}`);
     } catch(e){ console.error(e); msg.textContent=`Could not read ${f.name}: ${e.message}`; toast(`Could not read ${f.name}: ${e.message}`, true); } } }
 function wireUpload(){ for (const id of ['fileTracker','fileAny','fileRoster']) document.getElementById(id).addEventListener('change',e=>{ handleFiles(e.target.files); e.target.value=''; });
   document.getElementById('clearCalls').addEventListener('click',()=>{ callsClear(); renderAll(); toast('Uploaded call data cleared'); }); document.getElementById('resetData').addEventListener('click',()=>{ try{ localStorage.removeItem('tsxDashData'); }catch(e){} pendingRoster=null; pendingRosterName=null; applyData(EMBEDDED); rebuildForData(); document.getElementById('uploadMsg').textContent='Back to the data built into this file.'; toast('Back to the built-in data'); });
@@ -1958,7 +1998,7 @@ function init(){ const pr=document.getElementById('presets'); for(const [p,l] of
   document.getElementById('targetInput').addEventListener('change',e=>{ const v=+e.target.value; if(v>0){ state.perAgent=v; try{ localStorage.setItem('tsxTargets',JSON.stringify({perAgent:v,xmc:state.xmcTarget,prod:state.targetProd})); }catch(e){} renderAll(); } }); document.getElementById('targetProd').addEventListener('change',e=>{ state.targetProd=e.target.checked; try{ localStorage.setItem('tsxTargets',JSON.stringify({perAgent:state.perAgent,xmc:state.xmcTarget,prod:state.targetProd})); }catch(e){} renderAll(); }); document.getElementById('xmcTarget').addEventListener('change',e=>{ const s=e.target.value.trim(); const v=s===''?null:+s; if(v==null||v>=0){ state.xmcTarget=v; try{ localStorage.setItem('tsxTargets',JSON.stringify({perAgent:state.perAgent,xmc:v,prod:state.targetProd})); }catch(e){} renderAll(); } });
   let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(renderAll,150); }); wireUpload();
   let D=EMBEDDED; try{ const saved=JSON.parse(localStorage.getItem('tsxDashData')||'null'); if(saved&&saved.meta&&saved.roster&&saved.rows&&saved.rows.length&&saved.rows[0]&&saved.rows[0].length>=15){ const sm=String(saved.meta.maxDate||''), em=String(EMBEDDED.meta.maxDate||''); if(sm>em||(sm===em&&saved.rows.length>=EMBEDDED.rows.length)) D=saved; } }catch(e){}
-  applyData(D); document.querySelector('#tabs button').classList.add('active'); document.getElementById('v-exec').classList.add('active'); state.tab='exec'; rebuildForData(); document.getElementById('footerMid').textContent=`Built ${META.built} · uploads processed on this computer`; }
+  applyData(D); document.querySelector('#tabs button').classList.add('active'); document.getElementById('v-exec').classList.add('active'); state.tab='exec'; rebuildForData(); document.getElementById('footerMid').textContent=`Built ${META.built} · ${syncable()?'uploads saved on the website':'uploads processed on this computer'}`; renderSyncStatus(); syncPull(); }
 init();
 </script>
 </body>

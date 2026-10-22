@@ -8,7 +8,7 @@
   <section class="panel upload-panel" id="uploadPanel">
     <div class="upload-copy"><h2>Tracker &amp; roster files</h2><span id="fileLine"></span></div>
     <div class="upload-actions"><label class="primary" style="cursor:pointer">⬆ Upload files<input type="file" id="fileAny" accept=".xlsx,.xlsb" multiple hidden></label><label class="secondary" style="cursor:pointer">👥 Roster<input type="file" id="fileRoster" accept=".xlsx,.xlsb" hidden></label><button class="secondary" id="resetData">Reset to built-in</button></div>
-    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx), the daily TSX handover with calls (.xlsb) or the roster workbook anywhere on this page · processed in this browser, nothing is sent anywhere.</span><span id="naLine"></span></div>
+    <div class="upload-bottom"><span id="uploadMsg">Drop the Sales Tracker export (.xlsx), the daily TSX handover with calls (.xlsb) or the roster workbook anywhere on this page · processed in this browser.</span><span id="naLine"></span></div>
   </section>
 
   <section class="hero" id="hero" aria-label="Sales performance summary">
@@ -142,7 +142,7 @@
         <div><strong>XMC attach target</strong> <input type="number" id="xmcTarget" min="0" max="100" step="1" placeholder="none" style="width:90px;height:32px;margin-left:8px"> % of answered XM-line entries · leave empty for no XMC target.</div>
         <div class="panel-meta" id="targetNote"></div></div></div>
       <div class="panel"><div class="panel-head"><div><h2>Uploaded sources</h2><p>What this page is showing</p></div></div><div class="source-numbers" id="sourceNumbers"></div><div class="method-list" id="sourceList"></div></div>
-      <div class="panel"><div class="panel-head"><div><h2>Call data</h2><p>One TSX handover per business day · uploads are kept in this browser</p></div><button class="text-button" id="clearCalls">Clear uploaded calls</button></div><div class="method-list" id="callsSources"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Call data</h2><p>One TSX handover per business day · each upload adds its day to the saved history</p></div><button class="text-button" id="clearCalls">Clear uploaded calls</button></div><div class="sync-status" id="syncStatus"></div><div class="method-list" id="callsSources"></div></div>
     </div>
     <div class="grid-two">
       <div class="panel"><div class="panel-head"><div><h2>HRIDs not on the roster</h2><p>Valid-looking 9-digit IDs are probably attrited or transferred agents – add them to a Leavers tab to attribute their sales</p></div></div><div class="table-wrap table-tall" id="unmapped"></div></div>

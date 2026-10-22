@@ -237,3 +237,7 @@ td[style*="color:#fff"] .xgc b,td[style*="color:#fff"] .xgc i{color:#fff}td[styl
 /* calls view */
 .kpis.calls-kpis{grid-template-columns:repeat(6,minmax(0,1fr))}@media(max-width:1150px){.kpis.calls-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.kpis.calls-kpis{grid-template-columns:1fr 1fr}}
 .calls-empty{padding:22px 24px;font-size:13.5px;color:var(--muted);line-height:1.6}.calls-empty b{color:var(--text)}
+.sync-status{margin:0 24px;padding:10px 14px;border-radius:10px;font-size:12.5px;line-height:1.5;color:var(--muted);background:color-mix(in srgb,var(--muted) 8%,transparent)}
+.sync-status.ok{color:var(--text);background:color-mix(in srgb,var(--good) 12%,transparent);border-left:3px solid var(--good)}
+.sync-status.warn{color:var(--text);background:color-mix(in srgb,var(--warn,#c98500) 14%,transparent);border-left:3px solid var(--warn,#c98500)}
+.sync-status:empty{display:none}
