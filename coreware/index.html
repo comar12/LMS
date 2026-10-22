@@ -1593,6 +1593,7 @@ main>.wrap.section:not(.tight)>.empty p{font-size:17px;margin-bottom:22px}
 
 .pdp{grid-template-columns:minmax(0,1fr)} .pdp>*{min-width:0} @media(min-width:980px){.pdp{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}}
 .buy h1{overflow-wrap:anywhere} .acc .c{overflow-x:auto} @media(max-width:600px){.buy h1{font-size:clamp(22px,7vw,30px)!important}}
+@media(hover:none){body::after{animation:none!important}.hx-grain{animation:none!important}}
 </style>
 </head>
 <body>
@@ -2227,6 +2228,8 @@ const _GM={
   blue(h){const [r,g,b]=_GM.hx(h);return b>r+18&&b>=g}
 };
 
+/* phones: skip per-garment feTurbulence grain (expensive in mobile Safari); the CSS grain overlay covers the texture */
+const GARMENT_LITE=(typeof matchMedia!=="undefined")&&matchMedia("(pointer:coarse)").matches;
 function garment(type,color,variant=0,bg="#F3F0EA"){
   const c=COLORS[color]?.[0]||(/^#[0-9a-f]{6}$/i.test(color)?color:"#333333");
   const dark=isDark(c), v=variant?1:0;
@@ -2271,7 +2274,7 @@ function garment(type,color,variant=0,bg="#F3F0EA"){
   if(type==="wallet"||type==="bag"||type==="shoe")tex="none";
   if(type==="socks"||type==="cap")tex="knit";
 
-  let sil=[],base="",under="",over="",folds="",grain=true,sheen=true,shadowT="translate(3,8)",washO=0;
+  let sil=[],base="",under="",over="",folds="",grain=!GARMENT_LITE,sheen=true,shadowT="translate(3,8)",washO=0;
   const gradTop=lt(dark?.16:.12), gradMid=c, gradBot=dark?c:dk(.16);
 
   switch(type){
