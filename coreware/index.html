@@ -2296,6 +2296,143 @@ main .hx-hero[dir="rtl"] .hx-title[style]{font-size:min(14vw,8.4svh)!important}
 }
 
 .mb-bar{bottom:calc(var(--dock-h) + env(safe-area-inset-bottom))}
+
+/* ===== MOBILE MOTION (agent) ===== */
+/* ============================================================
+   COREWARE — mobile motion layer (mobile-motion.css)   prefix: mb-
+   Phones only: every rule is inside @media (max-width:979px),(hover:none)
+   AND gated on html.mb-js.mb-touch (both set by MBMotion.init() when the
+   same queries match), so desktop is untouched and nothing is hidden
+   when JS is missing. Only transform / opacity / scale are animated.
+   Append AFTER the MOTION block (just before the style end).
+   ============================================================ */
+:root{
+  --mb-ease:cubic-bezier(.22,1,.36,1);          /* out-expo (DIRECTION.md) */
+  --mb-spring:cubic-bezier(.34,1.56,.64,1);     /* press release */
+  --mb-volt:var(--volt,#D8FF3D);
+  --mb-x:24px;                                   /* inline travel: headlines + routes */
+  --mb-dock:var(--dock-h,64px);
+}
+
+@media (max-width:979px),(hover:none){
+
+/* ---------- 1. section headlines: slide from inline-start + volt underline ---------- */
+html.mb-js.mb-touch .mb-h{position:relative;transition:opacity .6s var(--mb-ease),transform .7s var(--mb-ease)}
+html.mb-js.mb-touch .mb-h:not(.mb-in){opacity:0;transform:translate3d(calc(-1 * var(--mb-x)),0,0)}
+html[dir=rtl].mb-js.mb-touch .mb-h:not(.mb-in){transform:translate3d(var(--mb-x),0,0)}
+html.mb-js.mb-touch .mb-h.mb-now{transition:none}                 /* already in the first viewport: visible from frame 1 */
+html.mb-js.mb-touch .mb-h::after{content:"";position:absolute;inset-inline-start:0;bottom:-10px;width:56px;height:3px;background:var(--mb-volt);
+  transform:scaleX(0);transform-origin:0 50%;transition:transform .7s var(--mb-ease) .2s;pointer-events:none}
+html[dir=rtl].mb-js.mb-touch .mb-h::after{transform-origin:100% 50%}
+html.mb-js.mb-touch .mb-h.mb-in::after{transform:scaleX(1)}
+html.mb-js.mb-touch .sec-head .mb-h::after{bottom:-6px;height:2px;width:40px}   /* sits in the 6px gap above .sec-head p */
+html.mb-js.mb-touch .hm-dark .mb-h::after{background:var(--mb-volt)}
+
+/* ---------- 1b. parallax inners (transform is set inline by JS) ---------- */
+html.mb-js.mb-touch .mb-px{transition:opacity .35s var(--mb-ease)!important}
+html.mb-js.mb-touch .mb-px.mb-on{will-change:transform}                  /* promoted only while on screen (IO) */
+
+/* ---------- 1c. dark bands: slow glow drift (injected <i class="mb-glow"><i></i></i>) ---------- */
+html.mb-js.mb-touch .mb-glow{position:absolute!important;inset:0;overflow:hidden;contain:strict;pointer-events:none;z-index:0;display:block}
+html.mb-js.mb-touch .mb-glow>i{position:absolute;top:-10%;inset-inline:-6%;height:min(120%,520px);display:block;   /* kept small: it is rastered when the band enters */
+  background:radial-gradient(55% 45% at 72% 28%,rgba(216,255,61,.11),transparent 70%),
+             radial-gradient(45% 40% at 18% 78%,rgba(243,240,234,.07),transparent 70%)}
+html.mb-js.mb-touch .mb-glow>i.mb-on{will-change:transform}
+
+/* ---------- 2. touch press feedback ---------- */
+/* `.mb-press` is shared with the commerce layer (same meaning, same .97). Its own controls (.mb-plus, .mb-alt,
+   .mb-pill, .mb-swatch) keep their own press styling; everything else gets the 120ms press + 160ms spring. */
+html.mb-js.mb-touch .mb-press:not(.mb-plus):not(.mb-alt):not(.mb-pill):not(.mb-swatch){transform:scale(var(--mb-press-s,.97))!important;transition:transform 120ms var(--mb-ease)!important}
+html.mb-js.mb-touch .mb-release{transition:transform 160ms var(--mb-spring)!important}
+html.mb-js.mb-touch .dock a,html.mb-js.mb-touch .dock button{--mb-press-s:.94}   /* the commerce layer also scales the icon inside (.88) */
+html.mb-js.mb-touch .colors button{--mb-press-s:.88}
+html.mb-js.mb-touch .mo-press{animation:none!important}                    /* desktop press keyframe would fight the hold state */
+html.mb-js.mb-touch .btn:active,html.mb-js.mb-touch .hm-btn:active,html.mb-js.mb-touch .hm-add:active{transform:none}
+
+/* ---------- 3. route transitions (wraps Motion.transition's mo-out / mo-pre / mo-fade states) ---------- */
+/* #app keeps Motion's opacity fade; the horizontal slide is on its direct children and #app clips it,
+   so the 24px travel never widens the page (an overflow on body would propagate to the viewport and
+   let the phone zoom out for a frame). overflow:clip is not a scroll container: sticky stays sticky. */
+html.mb-js.mb-touch #app.mo-out,html.mb-js.mb-touch #app.mo-pre,html.mb-js.mb-touch #app.mo-fade{transform:none}
+html.mb-js.mb-touch.mb-nav-fwd #app,html.mb-js.mb-touch.mb-nav-back #app{overflow-x:clip}
+html.mb-js.mb-touch #app.mo-out{transition:opacity 120ms var(--mo-ease-io,ease)}
+html.mb-js.mb-touch #app.mo-fade{transition:opacity 220ms var(--mb-ease)}
+html.mb-js.mb-touch #app.mo-out>*{transition:transform 120ms var(--mo-ease-io,ease)}
+html.mb-js.mb-touch #app.mo-pre>*{transition:none}
+html.mb-js.mb-touch #app.mo-fade>*{transition:transform 220ms var(--mb-ease)}
+html.mb-js.mb-touch.mb-nav-fwd #app.mo-out>*{transform:translate3d(-10px,0,0)}
+html.mb-js.mb-touch.mb-nav-fwd #app.mo-pre>*{transform:translate3d(var(--mb-x),0,0)}
+html.mb-js.mb-touch.mb-nav-back #app.mo-out>*{transform:translate3d(10px,0,0)}
+html.mb-js.mb-touch.mb-nav-back #app.mo-pre>*{transform:translate3d(calc(-1 * var(--mb-x)),0,0)}
+html[dir=rtl].mb-js.mb-touch.mb-nav-fwd #app.mo-out>*{transform:translate3d(10px,0,0)}
+html[dir=rtl].mb-js.mb-touch.mb-nav-fwd #app.mo-pre>*{transform:translate3d(calc(-1 * var(--mb-x)),0,0)}
+html[dir=rtl].mb-js.mb-touch.mb-nav-back #app.mo-out>*{transform:translate3d(-10px,0,0)}
+html[dir=rtl].mb-js.mb-touch.mb-nav-back #app.mo-pre>*{transform:translate3d(var(--mb-x),0,0)}
+
+/* ---------- 4. snap strips: active slide 1, others .96 (inline transform by JS) ---------- */
+html.mb-js.mb-touch .mb-snap-item{transition:transform .32s var(--mb-ease)}
+html.mb-js.mb-touch [data-mb-progress]{display:block;height:2px;position:relative;overflow:hidden;background:rgba(127,127,127,.28)}
+html.mb-js.mb-touch [data-mb-progress]::before{content:"";position:absolute;inset:0;background:var(--mb-volt);
+  transform:scaleX(var(--mb-p,0));transform-origin:0 50%;transition:transform .3s var(--mb-ease)}
+html[dir=rtl].mb-js.mb-touch [data-mb-progress]::before{transform-origin:100% 50%}
+
+/* ---------- 5. count-up, badge pop, toast ---------- */
+html.mb-js.mb-touch .mb-counting{font-variant-numeric:tabular-nums}
+html.mb-js.mb-touch .mb-pop{animation:mb-pop .5s var(--mb-spring)}
+@keyframes mb-pop{0%{scale:1}35%{scale:1.55}70%{scale:.92}100%{scale:1}}     /* `scale` property: never fights a translate */
+html.mb-js.mb-touch .toast{z-index:54;transform:translate(-50%,calc(100% + var(--mb-dock) + 24px));
+  transition:transform .5s var(--mb-ease),opacity .25s var(--mb-ease)}
+html[dir=rtl].mb-js.mb-touch .toast{transform:translate(50%,calc(100% + var(--mb-dock) + 24px))}
+/* commerce layer: sticky buy bar above the dock → start below both; toast parked at the top while a sheet is open → drop in */
+html.mb-bar-on.mb-js.mb-touch .toast{transform:translate(-50%,calc(100% + var(--mb-dock) + var(--mb-bar-h,64px) + 24px))}
+html[dir=rtl].mb-bar-on.mb-js.mb-touch .toast{transform:translate(50%,calc(100% + var(--mb-dock) + var(--mb-bar-h,64px) + 24px))}
+html.mb-sheet-open.mb-js.mb-touch .toast,html.mb-zoom-open.mb-js.mb-touch .toast{transform:translate(-50%,-24px)}
+html[dir=rtl].mb-sheet-open.mb-js.mb-touch .toast,html[dir=rtl].mb-zoom-open.mb-js.mb-touch .toast{transform:translate(50%,-24px)}
+html.mb-js.mb-touch .toast.show{transform:translate(-50%,0)}
+html[dir=rtl].mb-js.mb-touch .toast.show{transform:translate(50%,0)}
+html.mb-js.mb-touch .toast.mo-bump{animation:mb-bump .4s var(--mb-ease)}
+@keyframes mb-bump{0%{scale:1}40%{scale:1.05}100%{scale:1}}
+
+/* ---------- 6. pull / scroll cue (injected, fixed above the dock on the home page) ---------- */
+html.mb-js.mb-touch .mb-cue{position:fixed;bottom:calc(var(--mb-dock) + env(safe-area-inset-bottom,0px) + 12px);inset-inline-end:12px;
+  z-index:54;display:inline-flex;align-items:center;gap:8px;padding:8px 10px 8px 12px;
+  background:var(--ink,#0A0A0A);color:var(--mb-volt);box-shadow:0 0 0 1px rgba(216,255,61,.45),0 12px 28px rgba(10,10,10,.35);
+  font-family:"Syne",system-ui,sans-serif;font-weight:700;font-size:9px;letter-spacing:.22em;text-transform:uppercase;line-height:1;
+  pointer-events:none;opacity:0;transform:translate3d(0,8px,0);transition:opacity .5s var(--mb-ease),transform .6s var(--mb-ease)}
+html[dir=rtl].mb-js.mb-touch .mb-cue{font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;font-size:11px;letter-spacing:0;text-transform:none;padding:7px 12px 7px 10px}
+html.mb-js.mb-touch .mb-cue.mb-show{opacity:1;transform:none}
+html.mb-js.mb-touch .mb-cue.mb-hide{opacity:0;transform:translate3d(0,14px,0);transition-duration:.35s}
+html.mb-js.mb-touch .mb-cue svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;animation:mb-bob 1.5s var(--mb-ease) infinite}
+@keyframes mb-bob{0%,100%{transform:translate3d(0,-2px,0)}50%{transform:translate3d(0,3px,0)}}
+
+/* ---------- 7. lite mode (slow device): fades only ---------- */
+html.mb-lite.mb-js.mb-touch .mb-h,html.mb-lite.mb-js.mb-touch .mb-h:not(.mb-in){transform:none!important;transition:opacity .4s linear}
+html.mb-lite.mb-js.mb-touch .mb-h::after{transition:transform .5s var(--mb-ease)}
+html.mb-lite.mb-js.mb-touch .mb-glow{display:none}
+html.mb-lite.mb-js.mb-touch .mb-px{will-change:auto;transform:none!important}
+html.mb-lite.mb-js.mb-touch .mb-snap-item{transition:none;transform:none!important}
+html.mb-lite.mb-js.mb-touch .mb-cue svg{animation:none}
+
+/* ---------- reduced motion: no transforms, opacity fades <= 200ms ---------- */
+@media (prefers-reduced-motion:reduce){
+  html.mb-js.mb-touch .mb-h,html.mb-js.mb-touch .mb-h:not(.mb-in){transform:none!important;transition:opacity 200ms linear!important}
+  html.mb-js.mb-touch .mb-h::after{transition:none!important;transform:scaleX(1)!important}
+  html.mb-js.mb-touch .mb-press:not(.mb-plus):not(.mb-alt):not(.mb-pill):not(.mb-swatch),html.mb-js.mb-touch .dock .mb-press,html.mb-js.mb-touch .colors button.mb-press{transform:none!important;opacity:.6;transition:opacity 120ms linear!important}
+  html.mb-js.mb-touch .mb-release{transition:opacity 160ms linear!important}
+  html.mb-js.mb-touch #app.mo-out,html.mb-js.mb-touch #app.mo-pre,html.mb-js.mb-touch #app.mo-fade{transform:none!important;transition:opacity 150ms linear!important}
+  html.mb-js.mb-touch #app.mo-out>*,html.mb-js.mb-touch #app.mo-pre>*,html.mb-js.mb-touch #app.mo-fade>*{transform:none!important;transition:none!important}
+  html.mb-js.mb-touch .mb-snap-item{transition:none!important;transform:none!important}
+  html.mb-js.mb-touch .mb-px{transform:none!important;will-change:auto}
+  html.mb-js.mb-touch .mb-glow{display:none}
+  html.mb-js.mb-touch .mb-pop,html.mb-js.mb-touch .toast.mo-bump,html.mb-js.mb-touch .mb-cue svg{animation:none!important}
+  html.mb-js.mb-touch .toast,html[dir=rtl].mb-js.mb-touch .toast{transform:translate(-50%,0);transition:opacity 200ms linear!important}
+  html[dir=rtl].mb-js.mb-touch .toast{transform:translate(50%,0)}
+  html.mb-js.mb-touch .mb-cue,html.mb-js.mb-touch .mb-cue.mb-show,html.mb-js.mb-touch .mb-cue.mb-hide{transform:none;transition:opacity 200ms linear!important}
+  html.mb-js.mb-touch [data-mb-progress]::before{transition:none}
+}
+
+} /* end phone media */
+
 </style>
 </head>
 <body>
@@ -2676,6 +2813,585 @@ main .hx-hero[dir="rtl"] .hx-title[style]{font-size:min(14vw,8.4svh)!important}
   global.Motion = Motion;
 })(window);
 
+</script>
+<script>
+/* ===== MOBILE MOTION (agent) ===== */
+/* ============================================================
+   COREWARE — mobile motion layer (mobile-motion.js)   prefix: mb-
+   window.MBMotion = { init(), pageEnter(root, page) }  (+ helpers)
+   Phones only (<=979px or hover:none). Vanilla, no deps, idempotent,
+   everything feature-detected. Transform/opacity only; one rAF loop.
+     MBMotion.init()               once, right after Motion.init(), before render()
+     MBMotion.pageEnter(root,page) after Motion.pageEnter(app) in render()
+     MBMotion.setLite(bool)        force / clear html.mb-lite (perf guard)
+     MBMotion.state()              counts for tests
+   ============================================================ */
+(function (global) {
+  "use strict";
+  if (global.MBMotion) return;
+
+  var doc = document, de = doc.documentElement;
+  var mm = function (q) { return global.matchMedia ? global.matchMedia(q) : { matches: false, addEventListener: null, addListener: null }; };
+  var rmq = mm("(prefers-reduced-motion: reduce)");
+  var phoneq = mm("(max-width: 979px)");
+  var touchq = mm("(hover: none) and (pointer: coarse)");
+  var hasIO = "IntersectionObserver" in global;
+  var hasMO = "MutationObserver" in global;
+  var raf = global.requestAnimationFrame ? function (f) { return global.requestAnimationFrame(f); } : function (f) { return setTimeout(f, 16); };
+  var caf = global.cancelAnimationFrame ? function (i) { global.cancelAnimationFrame(i); } : clearTimeout;
+  var onMQ = function (q, fn) { if (!q) return; if (q.addEventListener) q.addEventListener("change", fn); else if (q.addListener) q.addListener(fn); };
+
+  var HEAD_SEL = ".hm-head > h2, .hm-drop-copy > h2, .sec-head h2, #app .wrap > h1, #app .section > h1, .hm-news .note h3";
+  var HEAD_SKIP = ".hx-hero, .hero, .buy";                          /* hero has its own reveal; .buy h1 belongs to the commerce agent */
+  /* [container, inner finder]. The inners are the transparent garment SVGs (or their wrapper), so a
+     12px shift inside the clipped tile needs no overscan scale (a scale would raster every layer bigger). */
+  var PX = [
+    [".card .media", function (m) { return [m.querySelector("svg")]; }, function (m) { return m.querySelector(".alt"); }],  /* .alt (2nd view) only moves while the card is flipped (.is-alt) */
+    [".gallery .shot", function (s) { return [s.querySelector("svg")]; }],
+    [".hm-tile", function (t) { return [t.querySelector(":scope > svg")]; }],
+    [".hm-drop-card", function (c) { return [c.querySelector(".hm-art")]; }],
+    [".hm-piece-art", function (a) { return [a.querySelector("svg")]; }]
+  ];
+  var PX_AMP = 12, GLOW_AMP = 60;
+  var DARK_SEL = ".hm-dark, .banner.dark";
+  var STRIP_SEL = "[data-mb-snap], .hm-fits, .hm-track, .hm-stores, ul, ol, [class*=track], [class*=strip], [class*=carousel], [class*=snap], [class*=gallery]";
+  var PRESS_SEL = ".btn, .card, .chip, .sizes-grid button, .colors button, .dock a, .dock button, .hm-fit-card, .hm-slide, .store, .hm-store, " +
+    ".hm-tile, .hm-drop-card, .hm-add, .hm-btn, .hm-link, .hm-arrow, .hx-btn, .icon-btn, .tabs button, .qty button, .quick .sizes button, " +
+    ".menu-list a, .hm-store-link, .hm-piece-art, .hm-feat-thumb, .line .thumb, .wish, .lang";
+  var COUNT_SEL = ".hm-count, .hm-big, .rating-sum .big, .kpi b, [data-mb-count]";
+
+  var MB = { version: "1.0", no: {} };
+  var inited = false, routing = false, firstRun = true, lastKey = null;
+  var headIO = null, pxIO = null, glowIO = null, countIO = null;
+  var pxVisible = [], glowVisible = [], strips = [], counters = [], timers = [];
+  var cue = null, cueDone = false, cueShown = false;
+  var scrollRaf = 0, vh = global.innerHeight || 800;
+
+  var phone = function () { return !!(phoneq.matches || touchq.matches); };
+  var reduced = function () { return !!rmq.matches; };
+  var lite = function () { return de.classList.contains("mb-lite"); };
+  var pageOf = function (p) {
+    if (p) return p;
+    var h = (global.location.hash || "#/").slice(1).split("?")[0].split("/").filter(Boolean);
+    return h[0] || "home";
+  };
+  var later = function (fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; };
+
+  Object.defineProperty(MB, "phone", { get: phone });
+  Object.defineProperty(MB, "reduced", { get: reduced });
+  Object.defineProperty(MB, "lite", { get: lite });
+
+  /* ================= init ================= */
+  MB.init = function (opts) {
+    if (inited) return MB;
+    inited = true; opts = opts || {};
+    de.classList.add("mb-js");
+    var sync = function () { de.classList.toggle("mb-touch", phone()); };
+    sync(); onMQ(phoneq, sync); onMQ(touchq, sync);
+    try {                                                   /* debug switches: ?mb=off | lite | full */
+      var q = global.location.search || "";
+      if (/[?&]mb=off\b/.test(q)) { MB.off = true; de.classList.remove("mb-js", "mb-touch"); MB.pageEnter = function () { return 0; }; return MB; }
+      if (/[?&]mb=lite\b/.test(q)) de.classList.add("mb-lite");
+      if (/[?&]mb=full\b/.test(q)) MB._noGuard = true;
+      var no = /[?&]mbno=([\w,]+)/.exec(q);                 /* ?mbno=glow,px,strips,count — per-feature kill switches for profiling */
+      if (no) no[1].split(",").forEach(function (k) { MB.no[k] = true; });
+    } catch (e) {}
+    if (opts.guard !== false && !MB._noGuard) setupGuard();
+    setupPress();
+    setupTransition();
+    setupBadges();
+    global.addEventListener("scroll", onScroll, { passive: true });
+    global.addEventListener("resize", onResize, { passive: true });
+    return MB;
+  };
+
+  /* ================= pageEnter ================= */
+  MB.pageEnter = function (root, page) {
+    root = root || doc.getElementById("app");
+    if (!root) return 0;
+    page = pageOf(page);
+    var key = global.location.hash || "#/";
+    var mode = (firstRun || routing || key !== lastKey) ? "reveal" : "instant";
+    firstRun = false; lastKey = key;
+    teardownPage();
+    vh = global.innerHeight || vh;
+    if (!phone()) { hideCue(true); return 0; }
+
+    var n = 0;
+    n += bindHeadlines(root, mode);
+    if (!reduced() && !lite()) { if (!MB.no.px) n += bindParallax(root); if (!MB.no.glow) n += bindGlow(root); }
+    if (!MB.no.strips) n += bindStrips(root);
+    if (!MB.no.count) n += bindCounters(root, mode);
+    if (page === "home" && mode === "reveal") showCue(); else hideCue(page !== "home");
+    later(onScroll, 0);
+    return n;
+  };
+
+  function teardownPage() {
+    if (headIO) { headIO.disconnect(); headIO = null; }
+    if (pxIO) { pxIO.disconnect(); pxIO = null; }
+    if (glowIO) { glowIO.disconnect(); glowIO = null; }
+    if (countIO) { countIO.disconnect(); countIO = null; }
+    if (stripIO) { stripIO.disconnect(); stripIO = null; }
+    pxVisible = []; glowVisible = [];
+    strips.forEach(function (s) { s.off(); }); strips = [];
+    counters.forEach(function (c) { if (c.raf) caf(c.raf); }); counters = [];
+    timers.forEach(clearTimeout); timers = [];
+  }
+
+  /* ================= 1. headlines ================= */
+  function bindHeadlines(root, mode) {
+    var els = [];
+    root.querySelectorAll(HEAD_SEL).forEach(function (el) {
+      if (el.closest(HEAD_SKIP)) return;
+      els.push(el);
+    });
+    if (!els.length) return 0;
+    if (mode === "instant" || !hasIO) {                 /* in-page re-render: nothing moves */
+      els.forEach(function (el) { el.classList.add("mb-h", "mb-in", "mb-now"); });
+      return els.length;
+    }
+    var first = true;
+    headIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var el = en.target;
+        if (first) {                                    /* first callback = the first viewport: never hidden */
+          if (en.isIntersecting) { el.classList.add("mb-h", "mb-in", "mb-now"); headIO && headIO.unobserve(el); }
+          else el.classList.add("mb-h");                /* below the fold: hide now (frame already painted) */
+          return;
+        }
+        if (en.isIntersecting) { el.classList.add("mb-in"); headIO && headIO.unobserve(el); }
+      });
+      first = false;
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0 });
+    els.forEach(function (el) { headIO.observe(el); });
+    return els.length;
+  }
+
+  /* ================= 1b. parallax ================= */
+  function bindParallax(root) {
+    if (!hasIO) return 0;
+    var items = [];
+    PX.forEach(function (spec) {
+      root.querySelectorAll(spec[0]).forEach(function (box) {
+        if (box.__mb) return;
+        var inners = spec[1](box).filter(Boolean);
+        if (!inners.length) return;
+        inners.forEach(function (i) { i.classList.add("mb-px"); });
+        var alt = spec[2] ? spec[2](box) : null;
+        if (alt) alt.classList.add("mb-px");
+        box.__mb = { inners: inners, alt: alt, card: alt ? box.closest(".card") : null, last: null, altLast: null };
+        items.push(box);
+      });
+    });
+    if (!items.length) return 0;
+    pxIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var b = en.target, i = pxVisible.indexOf(b);
+        if (en.isIntersecting) { if (i < 0) { pxVisible.push(b); b.__mb.on = false; } }   /* promoted later, one per frame (see tick) */
+        else if (i >= 0) {
+          pxVisible.splice(i, 1);
+          b.__mb.inners.forEach(function (x) { x.classList.remove("mb-on"); x.style.transform = ""; });
+          if (b.__mb.alt) { b.__mb.alt.classList.remove("mb-on"); b.__mb.alt.style.transform = ""; b.__mb.altLast = null; }
+          b.__mb.last = null; b.__mb.on = false;
+        }
+      });
+      kick();
+    }, { rootMargin: "160px 0px 160px 0px", threshold: 0 });   /* 160px of lead: a tile is promoted (rastered) before it is visible */
+    items.forEach(function (b) { pxIO.observe(b); });
+    if (!bindParallax._alt) {                                 /* a "view 2" flip (commerce layer's .mb-alt) re-syncs the alt on the next frame */
+      bindParallax._alt = true;
+      doc.addEventListener("click", function (e) { if (e.target && e.target.closest && e.target.closest(".mb-alt, [data-mb='alt']")) later(kick, 0); }, true);
+    }
+    return items.length;
+  }
+
+  /* ================= 1c. dark bands ================= */
+  function bindGlow(root) {
+    if (!hasIO) return 0;
+    var bands = [];
+    root.querySelectorAll(DARK_SEL).forEach(function (sec) {
+      var g = sec.querySelector(":scope > .mb-glow");
+      if (!g) {
+        g = doc.createElement("i"); g.className = "mb-glow"; g.setAttribute("aria-hidden", "true");
+        g.appendChild(doc.createElement("i"));
+        sec.insertBefore(g, sec.firstChild);
+      }
+      sec.__mbGlow = g.firstElementChild;
+      bands.push(sec);
+    });
+    if (!bands.length) return 0;
+    glowIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var i = glowVisible.indexOf(en.target), g = en.target.__mbGlow;
+        if (en.isIntersecting) { if (i < 0) glowVisible.push(en.target); g.classList.add("mb-on"); }
+        else if (i >= 0) { glowVisible.splice(i, 1); g.classList.remove("mb-on"); g.style.transform = ""; en.target.__mbLast = null; }
+      });
+      kick();
+    }, { threshold: 0 });
+    bands.forEach(function (b) { glowIO.observe(b); });
+    return bands.length;
+  }
+
+  /* ================= scroll loop (one rAF for everything) ================= */
+  function onScroll() { if (!scrollRaf) scrollRaf = raf(tick); }
+  function kick() { onScroll(); }
+  function onResize() { vh = global.innerHeight || vh; strips.forEach(function (s) { s.update(); }); onScroll(); }
+  function tick() {
+    scrollRaf = 0;
+    var y = global.scrollY || de.scrollTop || 0;
+    if (cueShown && !cueDone && y > 28) hideCue(true);
+    if (reduced() || lite()) return;
+    var half = vh / 2, reads = [], k, promoted = false;
+    /* read phase */
+    for (k = 0; k < pxVisible.length; k++) reads.push(pxVisible[k].getBoundingClientRect());
+    var greads = [];
+    for (k = 0; k < glowVisible.length; k++) greads.push(glowVisible[k].getBoundingClientRect());
+    /* write phase */
+    for (k = 0; k < pxVisible.length; k++) {
+      var b = pxVisible[k], r = reads[k], d = b.__mb;
+      if (!d.on) {                                        /* layer promotion = a paint: at most one tile per frame */
+        if (promoted) { scrollRaf = raf(tick); continue; }
+        promoted = true; d.on = true;
+        for (var q = 0; q < d.inners.length; q++) d.inners[q].classList.add("mb-on");
+      }
+      var p = (r.top + r.height / 2 - half) / (half + r.height / 2);        /* -1 (below) .. 1 (above) */
+      p = p < -1 ? -1 : p > 1 ? 1 : p;
+      var ty = Math.round(-p * PX_AMP * 2) / 2;                               /* 0.5px steps: fewer commits */
+      var tr = "translate3d(0," + ty + "px,0)";
+      if (d.alt) {                                                            /* flipped card: keep view 2 in step; unflipped: never touch it (it is opacity 0) */
+        var on = d.card && d.card.classList.contains("is-alt");
+        if (on && d.altLast !== ty) { d.alt.style.transform = tr; d.altLast = ty; d.alt.classList.add("mb-on"); }
+        else if (!on && d.altLast !== null) { d.alt.style.transform = ""; d.altLast = null; d.alt.classList.remove("mb-on"); }
+      }
+      if (d.last === ty) continue;
+      d.last = ty;
+      for (var j = 0; j < d.inners.length; j++) d.inners[j].style.transform = tr;
+    }
+    for (k = 0; k < glowVisible.length; k++) {
+      var s = glowVisible[k], gr = greads[k];
+      var gp = (gr.top + gr.height / 2 - half) / (half + gr.height / 2);
+      gp = gp < -1 ? -1 : gp > 1 ? 1 : gp;
+      var gy = Math.round(gp * GLOW_AMP / 2) * 2;
+      if (s.__mbLast === gy) continue;
+      s.__mbLast = gy;
+      s.__mbGlow.style.transform = "translate3d(0," + gy + "px,0)";
+    }
+    /* snap strips: once Motion has stripped its reveal classes, give the slides their scale (no-op after that) */
+    for (k = 0; k < strips.length; k++) if (strips[k].visible && strips[k].pending()) strips[k].update();
+  }
+
+  /* ================= 2. press feedback ================= */
+  function setupPress() {
+    var cur = null, sx = 0, sy = 0, relT = 0;
+    var clear = function (el) { if (!el) return; el.classList.remove("mb-press"); };
+    var release = function (spring) {
+      var el = cur; cur = null; if (!el) return;
+      el.classList.remove("mb-press");
+      if (spring) {
+        el.classList.add("mb-release");
+        clearTimeout(relT); relT = setTimeout(function () { el.classList.remove("mb-release"); }, 220);
+      }
+    };
+    doc.addEventListener("pointerdown", function (e) {
+      if (e.pointerType !== "touch" || !phone()) return;
+      var el = e.target && e.target.closest ? e.target.closest(PRESS_SEL) : null;
+      if (!el || el.disabled || el.getAttribute("aria-disabled") === "true") return;
+      if (cur) clear(cur);
+      cur = el; sx = e.clientX; sy = e.clientY;
+      el.classList.remove("mb-release");
+      el.classList.add("mb-press");
+    }, { passive: true });
+    doc.addEventListener("pointermove", function (e) {
+      if (!cur || e.pointerType !== "touch") return;
+      if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) release(false);   /* it's a scroll, not a tap */
+    }, { passive: true });
+    doc.addEventListener("pointerup", function (e) { if (e.pointerType === "touch") release(true); }, { passive: true });
+    doc.addEventListener("pointercancel", function () { release(false); }, { passive: true });
+    global.addEventListener("scroll", function () { if (cur) release(false); }, { passive: true });
+    global.addEventListener("blur", function () { release(false); });
+  }
+
+  /* ================= 3. route transitions ================= */
+  var stack = [];
+  function setupTransition() {
+    var M = global.Motion;
+    stack = [global.location.hash || "#/"];
+    if (!M || typeof M.transition !== "function" || M.transition.__mb) return;
+    var orig = M.transition;
+    var wrapped = function (fn) {
+      var dir = "same";
+      if (phone()) {
+        var key = global.location.hash || "#/", top = stack[stack.length - 1];
+        if (key !== top) {
+          var i = stack.lastIndexOf(key);
+          if (i >= 0) { stack.length = i + 1; dir = "back"; }            /* going to a hash we came from = back */
+          else { stack.push(key); if (stack.length > 80) stack.shift(); dir = "fwd"; }
+        }
+      }
+      de.classList.remove("mb-nav-fwd", "mb-nav-back");
+      if (dir !== "same") de.classList.add(dir === "fwd" ? "mb-nav-fwd" : "mb-nav-back");
+      var run = function () { routing = true; try { fn(); } finally { routing = false; } };
+      var done = function () { de.classList.remove("mb-nav-fwd", "mb-nav-back"); };
+      var p = orig.call(M, run);
+      if (p && typeof p.then === "function") p.then(done, done); else setTimeout(done, 400);
+      return p;
+    };
+    wrapped.__mb = true;
+    M.transition = wrapped;
+    MB.direction = function () { return de.classList.contains("mb-nav-back") ? "back" : de.classList.contains("mb-nav-fwd") ? "fwd" : "same"; };
+    MB.stack = function () { return stack.slice(); };
+  }
+
+  /* ================= 4. snap strips ================= */
+  function bindStrips(root) {
+    var seen = [], list = [];
+    root.querySelectorAll(STRIP_SEL).forEach(function (el) {
+      if (seen.indexOf(el) >= 0 || !el.children.length) return;
+      seen.push(el);
+      var cs = getComputedStyle(el);
+      var ox = cs.overflowX;
+      if ((ox !== "auto" && ox !== "scroll") || (cs.scrollSnapType || "none") === "none") return;
+      if (el.scrollWidth <= el.clientWidth + 4) return;
+      list.push(el);
+    });
+    list.forEach(function (strip) {
+      var items = Array.prototype.filter.call(strip.children, function (c) { return c.nodeType === 1 && !c.classList.contains("mb-glow"); });
+      if (items.length < 2) return;
+      var targets = items.map(function (it) { return it.children.length === 1 ? it.firstElementChild : it; });
+      targets.forEach(function (t) { t.classList.add("mb-snap-item"); });
+      var bar = strip.getAttribute("data-mb-progress-for") ? doc.getElementById(strip.getAttribute("data-mb-progress-for")) : null;
+      if (!bar) bar = strip.parentElement && strip.parentElement.querySelector("[data-mb-progress]");
+      if (!bar && strip.nextElementSibling && strip.nextElementSibling.hasAttribute("data-mb-progress")) bar = strip.nextElementSibling;
+      var r = 0, last = -1, lastP = -1, settle = 0;
+      var pending = function () {                      /* any slide still waiting for its scale? (no layout read) */
+        for (var k = 0; k < targets.length; k++) if (!targets[k].style.transform) return true;
+        return false;
+      };
+      var update = function () {
+        r = 0;
+        if (reduced() || lite()) return;
+        var sr = strip.getBoundingClientRect(), cx = sr.left + sr.width / 2, best = 0, bd = 1e9, k, skipped = 0;
+        var rects = [];
+        for (k = 0; k < items.length; k++) rects.push(items[k].getBoundingClientRect());
+        for (k = 0; k < rects.length; k++) { var d = Math.abs(rects[k].left + rects[k].width / 2 - cx); if (d < bd) { bd = d; best = k; } }
+        var changed = best !== last; last = best;
+        for (k = 0; k < targets.length; k++) {
+          if (!changed && targets[k].style.transform) continue;                       /* already right */
+          if (items[k].classList.contains("mo-reveal") || targets[k].classList.contains("mo-reveal")) { skipped++; continue; } /* Motion still revealing it: an inline transform would break its reveal */
+          targets[k].style.transform = k === best ? "scale(1)" : "scale(.96)";
+        }
+        if (skipped) { clearTimeout(settle); settle = setTimeout(update, 450); }    /* come back once Motion has stripped its classes */
+        strip.__mbActive = best;
+        if (bar) {
+          var max = strip.scrollWidth - strip.clientWidth;
+          var p = max > 0 ? Math.min(1, Math.abs(strip.scrollLeft) / max) : 0;
+          p = Math.round(p * 1000) / 1000;
+          if (p !== lastP) { lastP = p; bar.style.setProperty("--mb-p", String(p)); }
+        }
+      };
+      var onS = function () {
+        if (!r) r = raf(update);
+        clearTimeout(settle); settle = setTimeout(update, 950);   /* slides that scrolled into view are revealed by Motion ~800ms later */
+      };
+      strip.addEventListener("scroll", onS, { passive: true });
+      var rec = { el: strip, visible: false, pending: pending, update: update, off: function () { strip.removeEventListener("scroll", onS); if (r) caf(r); clearTimeout(settle); } };
+      strips.push(rec);
+      if (!stripIO) stripIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { var s = stripOf(en.target); if (s) { s.visible = en.isIntersecting; if (s.visible) kick(); } });
+      }, { rootMargin: "120px 0px", threshold: 0 });
+      stripIO.observe(strip);
+    });
+    return list.length;
+  }
+  var stripIO = null;
+  function stripOf(el) { for (var k = 0; k < strips.length; k++) if (strips[k].el === el) return strips[k]; return null; }
+
+  /* ================= 5a. count-up ================= */
+  function parseNum(text) {
+    var m = String(text).trim().match(/^([^\d]*)([\d,]+)(?:\.(\d+))?([^\d]*)$/);
+    if (!m) return null;
+    var dec = m[3] ? m[3].length : 0;
+    var v = parseFloat(m[2].replace(/,/g, "") + (m[3] ? "." + m[3] : ""));
+    if (isNaN(v)) return null;
+    return { v: v, dec: dec, comma: m[2].indexOf(",") >= 0, pre: m[1], post: m[4], pad: /^0\d/.test(m[2]) ? m[2].length : 0 };
+  }
+  function fmt(v, f) {
+    var s = v.toFixed(f.dec);
+    if (f.comma) { var parts = s.split("."); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ","); s = parts.join("."); }
+    if (f.pad) s = s.padStart(f.pad, "0");
+    return f.pre + s + f.post;
+  }
+  function textNodes(el) {
+    var out = [], w = doc.createTreeWalker(el, 4 /* TEXT */, null), n;
+    while ((n = w.nextNode())) if (n.nodeValue.trim()) out.push(n);
+    return out;
+  }
+  /* A "spec" is one number to animate. Two shapes:
+       cell  – an element whose textContent is the number (.hm-count <b>, re-written by the site's 1s interval,
+               which replaces the text node, so we go through the element and re-read it each frame)
+       nodes – the number's digits spread over several text nodes, e.g. .hm-big = "4" <span>.</span> "8";
+               the first digit node gets the integer part, the last one the decimals, others are left alone. */
+  function readSpec(sp) { return sp.el ? sp.el.textContent : sp.digits.map(function (n) { return n.nodeValue; }).join(sp.sep ? "." : ""); }
+  function writeSpec(sp, v) {
+    var s = fmt(v, sp.f);
+    if (sp.el) { sp.el.textContent = s; sp.wrote = s; return; }
+    if (sp.digits.length === 1) { sp.digits[0].nodeValue = s; sp.wrote = s; return; }
+    var i = s.indexOf(".");
+    sp.digits[0].nodeValue = i >= 0 ? s.slice(0, i) : s;
+    sp.digits[sp.digits.length - 1].nodeValue = i >= 0 ? s.slice(i + 1) : "";
+    sp.wrote = readSpec(sp);
+  }
+  function countUp(el) {
+    if (el.__mbCounted) return; el.__mbCounted = true;
+    var specs = [];
+    if (el.matches(".hm-count")) {
+      Array.prototype.forEach.call(el.querySelectorAll("b"), function (b) { var f = parseNum(b.textContent); if (f) specs.push({ el: b, f: f, goal: f.v, wrote: null }); });
+    } else {
+      var nodes = textNodes(el);
+      var digits = nodes.filter(function (n) { return /\d/.test(n.nodeValue); });
+      var sep = nodes.some(function (n) { return n.nodeValue.trim() === "."; });
+      var f = parseNum(nodes.map(function (n) { return n.nodeValue; }).join(""));
+      if (f && f.v > 0 && digits.length) specs.push({ digits: digits, sep: sep, f: f, goal: f.v, wrote: null });
+    }
+    if (!specs.length || reduced() || lite()) return;
+    el.classList.add("mb-counting");
+    var D = 900, t0 = 0, c = { raf: 0 };
+    counters.push(c);
+    var ease = function (t) { return 1 - Math.pow(1 - t, 4); };
+    var step = function (t) {
+      if (!t0) t0 = t;
+      var k = Math.min(1, (t - t0) / D), e = ease(k);
+      specs.forEach(function (sp) {
+        var cur = readSpec(sp);                                   /* the site may have re-written it: adopt the new goal */
+        if (sp.wrote !== null && cur !== sp.wrote) { var nf = parseNum(cur); if (nf) sp.goal = nf.v; }
+        writeSpec(sp, k >= 1 ? sp.goal : sp.goal * e);
+      });
+      if (k < 1) c.raf = raf(step); else { c.raf = 0; el.classList.remove("mb-counting"); }
+    };
+    c.raf = raf(step);
+  }
+  function bindCounters(root, mode) {
+    var els = Array.prototype.slice.call(root.querySelectorAll(COUNT_SEL)).filter(function (el) { return !el.closest(".hm-count") || el.matches(".hm-count"); });
+    if (!els.length) return 0;
+    if (mode === "instant" || !hasIO || reduced() || lite()) { els.forEach(function (el) { el.__mbCounted = true; }); return els.length; }
+    countIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { countUp(en.target); countIO && countIO.unobserve(en.target); } });
+    }, { threshold: 0.4 });
+    els.forEach(function (el) { countIO.observe(el); });
+    return els.length;
+  }
+  MB.countUp = countUp;
+
+  /* ================= 5b. badge pop ================= */
+  function pop(el) {
+    if (!el || reduced()) return;
+    el.classList.remove("mb-pop"); void el.offsetWidth; el.classList.add("mb-pop");
+    var off = function () { el.classList.remove("mb-pop"); };
+    el.addEventListener("animationend", off, { once: true }); setTimeout(off, 600);
+  }
+  MB.pop = pop;
+  function setupBadges() {
+    if (!hasMO) return;
+    var head = doc.getElementById("cartCount");
+    var lastHead = head ? (head.hidden ? "" : head.textContent) : "";
+    if (head) new MutationObserver(function () {
+      var now = head.hidden ? "" : head.textContent;
+      if (now && now !== lastHead && phone()) pop(head);
+      lastHead = now;
+    }).observe(head, { attributes: true, attributeFilter: ["hidden"], childList: true, characterData: true, subtree: true });
+    var dock = doc.getElementById("dock");
+    if (dock) {
+      var lastDock = (dock.querySelector(".badge-count") || {}).textContent || "";
+      new MutationObserver(function () {
+        var b = dock.querySelector(".badge-count"), now = b ? b.textContent : "";
+        if (b && now && now !== lastDock && phone()) pop(b);
+        lastDock = now;
+      }).observe(dock, { childList: true, subtree: true, characterData: true });
+    }
+  }
+
+  /* ================= 6. scroll cue ================= */
+  function cueLabel() {
+    try { if (typeof global.t === "function") { var s = global.t("heroScroll"); if (s && typeof s === "string" && s.indexOf("heroScroll") < 0) return s; } } catch (e) {}
+    return (de.dir === "rtl" || de.lang === "ar") ? "مرّر" : "Scroll";
+  }
+  function showCue() {
+    if (cueDone || reduced()) return;
+    try { if (global.sessionStorage && sessionStorage.getItem("mb:cue")) { cueDone = true; return; } } catch (e) {}
+    if ((global.scrollY || 0) > 28) return;
+    if (!cue) {
+      cue = doc.createElement("div"); cue.className = "mb-cue"; cue.setAttribute("aria-hidden", "true");
+      doc.body.appendChild(cue);
+    }
+    cue.innerHTML = "<span></span><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 5v14M6 13l6 6 6-6\"/></svg>";
+    cue.classList.remove("mb-hide");
+    later(function () {
+      if (!cue) return;
+      cue.firstChild.textContent = cueLabel();              /* late: renderChrome() has set dir/lang by now */
+      cue.classList.add("mb-show"); cueShown = true;
+    }, 900);
+  }
+  function hideCue(forever) {
+    if (!cue) return;
+    cue.classList.remove("mb-show"); cue.classList.add("mb-hide");
+    cueShown = false;
+    if (forever) { cueDone = true; try { sessionStorage.setItem("mb:cue", "1"); } catch (e) {} }
+  }
+  MB.showCue = showCue; MB.hideCue = hideCue;
+
+  /* ================= 7. performance guard ================= */
+  var guard = { tasks: 0, ms: 0, done: false, lite: false };
+  function setupGuard() {
+    if (lite()) { guard.done = true; guard.lite = true; return; }
+    try { if (global.navigator && navigator.connection && navigator.connection.saveData) { MB.setLite(true, "saveData"); return; } } catch (e) {}
+    if (!("PerformanceObserver" in global)) return;
+    var ok = false;
+    try { ok = (PerformanceObserver.supportedEntryTypes || []).indexOf("longtask") >= 0; } catch (e) {}
+    if (!ok) return;
+    var po;
+    try {
+      po = new PerformanceObserver(function (list) {
+        list.getEntries().forEach(function (en) { guard.tasks++; guard.ms += en.duration; });
+      });
+      po.observe({ type: "longtask", buffered: false });
+    } catch (e) { return; }
+    setTimeout(function () {
+      try { po.disconnect(); } catch (e) {}
+      guard.done = true;
+      if (guard.tasks > 3) MB.setLite(true, "longtasks:" + guard.tasks);
+    }, 2000);
+  }
+  MB.setLite = function (on, why) {
+    de.classList.toggle("mb-lite", !!on);
+    guard.lite = !!on; guard.why = why || (on ? "manual" : "");
+    if (on) {                                            /* drop live transforms */
+      pxVisible.forEach(function (b) { b.__mb.inners.forEach(function (x) { x.style.transform = ""; x.classList.remove("mb-on"); }); b.__mb.last = null; });
+      glowVisible.forEach(function (s) { if (s.__mbGlow) s.__mbGlow.style.transform = ""; s.__mbLast = null; });
+      strips.forEach(function (s) { s.el.querySelectorAll(".mb-snap-item").forEach(function (t) { t.style.transform = ""; }); });
+    } else { onScroll(); strips.forEach(function (s) { s.update(); }); }
+    return MB;
+  };
+  MB.guard = guard;
+
+  MB.state = function () {
+    return { phone: phone(), reduced: reduced(), lite: lite(), off: !!MB.off, touch: de.classList.contains("mb-touch"), px: pxVisible.length, glow: glowVisible.length,
+      strips: strips.length, cue: !!(cue && cue.classList.contains("mb-show")), guard: guard, stack: stack.slice(), dir: MB.direction ? MB.direction() : "n/a" };
+  };
+
+  global.MBMotion = MB;
+})(window);
+
+</script>
+<script>
+/* ===== REVEAL SAFETY NET (Safari): anything in view that is still hidden gets revealed ===== */
+(function(){
+  function sweep(){var h=innerHeight,w=innerWidth,els=document.querySelectorAll(".mo-reveal:not(.mo-in)");for(var i=0;i<els.length;i++){var el=els[i],r=el.getBoundingClientRect();if(r.width>0&&r.height>0&&r.bottom>-80&&r.top<h+80&&r.right>0&&r.left<w){el.classList.add("mo-in");(function(el){setTimeout(function(){el.classList.remove("mo-reveal","mo-in","mo-up","mo-scale","mo-clip","mo-fade");el.style.transitionDelay="";},950);})(el);}}}
+  var t=0;function sched(){if(t)return;t=setTimeout(function(){t=0;sweep();},160);}
+  addEventListener("scroll",sched,{capture:true,passive:true});addEventListener("resize",sched);addEventListener("orientationchange",sched);
+  addEventListener("hashchange",function(){setTimeout(sweep,600);setTimeout(sweep,1400);});
+  setTimeout(sweep,1200);setTimeout(sweep,2600);setInterval(sweep,1500);
+})();
 </script>
 <script>
 /* ===== MOBILE COMMERCE (agent) ===== */
@@ -4696,6 +5412,7 @@ function render(){
   const app=document.getElementById("app");
   app.innerHTML=fn(params,id);
   Motion.pageEnter(app);
+  if(window.MBMotion)MBMotion.pageEnter(app,page);
   if(window.MBCommerce)MBCommerce.pageEnter(app,page);
   if(page==="home")initHero(app);
   if(page==="home"&&window.MBHero)MBHero.init(app);
@@ -5111,6 +5828,7 @@ window.addEventListener("hashchange",()=>{closeAll()});
 
 /* boot */
 Motion.init();
+if(window.MBMotion)MBMotion.init();
 if(window.MBChrome)MBChrome.init();
 if(window.MBCommerce)MBCommerce.init();
 render();
