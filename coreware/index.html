@@ -1594,6 +1594,253 @@ main>.wrap.section:not(.tight)>.empty p{font-size:17px;margin-bottom:22px}
 .pdp{grid-template-columns:minmax(0,1fr)} .pdp>*{min-width:0} @media(min-width:980px){.pdp{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}}
 .buy h1{overflow-wrap:anywhere} .acc .c{overflow-x:auto} @media(max-width:600px){.buy h1{font-size:clamp(22px,7vw,30px)!important}}
 @media(hover:none){body::after{animation:none!important}.hx-grain{animation:none!important}}
+
+/* ===== MOBILE COMMERCE (agent) ===== */
+/* ==========================================================================
+   COREWARE — mobile commerce layer  (mobile-commerce.css, prefix mb-)
+   Append as the LAST layer inside the page's style element.
+   Scope: every rule lives under (max-width:979px) for layout or (hover:none)
+   for touch behaviour; desktop is untouched. Only transform/opacity animate.
+   NOTE: no "less-than" characters anywhere in this file (it is inlined).
+   ========================================================================== */
+
+/* new elements are hidden on desktop no matter what */
+.mb-bar,.mb-sheet,.mb-backdrop,.mb-zoom,.mb-plus,.mb-alt,.mb-dots,.mb-handle{display:none}
+
+/* ==========================================================================
+   A. LAYOUT (phones + small tablets)
+   ========================================================================== */
+@media (max-width:979px){
+  :root{--mb-bar-h:64px;--mb-r:20px;--mb-ease:cubic-bezier(.22,1,.36,1)}
+
+  /* ---- 1. PDP gallery: horizontal snap swiper, full-bleed with a 16px peek ---- */
+  .pdp .gallery{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter);scroll-padding-inline:var(--gutter);-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain}
+  .pdp .gallery::-webkit-scrollbar{display:none}
+  .pdp .gallery .shot{flex:0 0 calc(100% - 8px);scroll-snap-align:start;aspect-ratio:4/5;grid-column:auto;cursor:zoom-in;-webkit-tap-highlight-color:transparent}
+  .pdp .gallery .shot:hover svg{transform:none}
+  /* dots: a sibling row right under the swiper (never re-parent the observed shots) */
+  .mb-dots{display:flex;justify-content:center;margin:-10px 0 -8px;pointer-events:none}
+  .mb-dots-in{display:inline-flex;align-items:center;gap:6px;height:20px}
+  .mb-dots i{width:6px;height:6px;border-radius:50%;background:rgba(10,10,10,.22);transition:transform .35s var(--mb-ease),background .35s var(--mb-ease)}
+  .mb-dots i.on{background:var(--ink);transform:scale(1.35)}
+  .mb-gal-hint{position:absolute;top:12px;inset-inline-end:12px;z-index:2;height:28px;padding:0 10px;display:inline-flex;align-items:center;gap:6px;background:rgba(250,248,244,.9);backdrop-filter:blur(4px);font-family:var(--font-display);font-weight:700;font-size:10px;color:var(--ink);pointer-events:none;letter-spacing:0}
+  html[dir=ltr] .mb-gal-hint{text-transform:uppercase;letter-spacing:.08em}
+  .pdp .gallery .shot .mb-gal-hint svg{position:static;inset:auto;width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:none}
+
+  /* ---- 2. PDP info block: compact, no sticky column ---- */
+  .pdp{gap:22px}
+  .pdp .buy{position:static;gap:18px}
+  .pdp .buy h1{font-size:26px!important;margin:6px 0 8px;line-height:.98}
+  html[dir=rtl] .pdp .buy h1{line-height:1.2}
+  .pdp .buy .top .cat{font-size:11px}
+  .pdp .buy .price{font-size:20px}
+  .pdp .buy .top>div:last-child{margin-top:8px!important}
+  /* the inline add button is replaced by the sticky bar (notify stays inline) */
+  .pdp .buy>.btn[data-action="add"]{display:none}
+  /* size pills: one horizontal strip */
+  .pdp .sizes-grid{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * var(--gutter));padding-inline:var(--gutter);padding-bottom:2px;scroll-snap-type:x proximity;scroll-padding-inline:var(--gutter)}
+  .pdp .sizes-grid::-webkit-scrollbar{display:none}
+  .pdp .sizes-grid button{flex:0 0 auto;min-width:60px;height:48px;padding:0 16px;scroll-snap-align:start;-webkit-tap-highlight-color:transparent}
+  .pdp .colors button{width:36px;height:36px}
+  /* delivery: one condensed row */
+  .pdp .deliver{display:flex;align-items:center;gap:12px;padding:10px 12px}
+  .pdp .deliver .row{flex:1 1 150px;min-width:0;gap:8px}
+  .pdp .deliver .row>span{display:none}
+  .pdp .deliver select{height:40px;width:100%;font-size:13px;padding-inline-start:10px}
+  .pdp .deliver .eta{margin-top:0;flex:0 1 auto;min-width:0;font-size:12px;line-height:1.25;gap:2px}
+  .pdp .deliver .eta span:first-child{white-space:nowrap;font-weight:600}
+  .pdp .deliver .eta span:last-child{display:none}
+  .pdp .pay-row{gap:5px}
+  .pdp .pay{font-size:9px;padding:4px 6px}
+  /* room for the sticky bar above the dock */
+  html.mb-bar-on main{padding-bottom:var(--mb-bar-h)}
+
+  /* ---- 3. Sticky commerce bar (above the dock) ---- */
+  .mb-bar{display:flex;position:fixed;inset-inline:0;bottom:var(--dock-h);height:var(--mb-bar-h);z-index:54;background:var(--chalk);border-top:1px solid var(--line);align-items:center;gap:12px;padding:0 var(--gutter);transform:translate3d(0,calc(100% + var(--dock-h) + 4px),0);transition:transform .55s var(--mb-ease);will-change:transform}
+  html.mb-bar-on .mb-bar{transform:none}
+  .mb-bar-info{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+  .mb-bar-name{font-size:11px;font-weight:600;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0}
+  html[dir=ltr] .mb-bar-name{text-transform:uppercase;letter-spacing:.08em;font-size:10px}
+  .mb-bar-price{display:flex;align-items:baseline;gap:8px;font-family:var(--font-display);font-weight:800;font-size:19px;line-height:1;letter-spacing:-.01em;white-space:nowrap}
+  .mb-bar-price s{font-family:var(--font-body);font-weight:400;font-size:12px;color:var(--mute)}
+  .mb-bar .btn{flex:0 0 auto;min-height:46px;padding:0 20px;max-width:58%;font-size:12px}
+  .mb-bar .btn.ghost{background:transparent}
+  .mb-bar .btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  /* ---- 4. Cart drawer: bottom sheet ---- */
+  html[dir] #cartDrawer.drawer{top:auto;bottom:0;inset-inline:0;width:100%;max-height:88vh;max-height:88dvh;border-radius:var(--mb-r) var(--mb-r) 0 0;transform:translate3d(0,100%,0);box-shadow:0 -24px 60px rgba(10,10,10,.18);overflow:hidden}
+  html[dir] #cartDrawer.drawer.open.is-dragging{transform:translate3d(0,var(--mb-drag,0px),0)!important;transition:none!important}
+  #cartDrawer .head{padding:22px var(--gutter) 12px;position:relative}
+  #cartDrawer .head .mb-handle{display:grid;position:absolute;top:0;inset-inline:0;padding:10px 0 6px}
+  #cartDrawer .head h3{font-size:17px}
+  #cartDrawer .body{padding:4px var(--gutter) 8px;overscroll-behavior:contain}
+  #cartDrawer .line{grid-template-columns:72px 1fr auto;gap:12px;padding:14px 0;align-items:start}
+  #cartDrawer .line .thumb{width:72px}
+  #cartDrawer .line>div:nth-child(2)>a{font-size:14px;display:block;line-height:1.3}
+  #cartDrawer .qty{margin-top:10px}
+  #cartDrawer .qty button{width:40px;height:40px;font-size:18px}
+  #cartDrawer .qty span{min-width:36px;font-size:14px}
+  #cartDrawer .line>div:last-child button{min-height:40px;display:inline-flex;align-items:center;margin-top:4px!important}
+  #cartDrawer .foot{padding:10px var(--gutter) calc(12px + env(safe-area-inset-bottom));box-shadow:0 -12px 30px rgba(10,10,10,.06)}
+  #cartDrawer .foot .tot{padding:5px 0;font-size:13px}
+  #cartDrawer .foot .tot.big{font-size:19px;margin-top:4px;padding-top:10px}
+  #cartDrawer .foot .news{margin:8px 0!important}
+  #cartDrawer .foot .news input{height:42px}
+  #cartDrawer .foot .progress{margin:6px 0 4px}
+  #cartDrawer .foot .btn.block{min-height:54px;margin-top:10px!important;width:100%}
+  #cartDrawer .empty{border:0;background:transparent;padding:40px 16px 24px;font-size:16px;color:var(--ink)}
+  #cartDrawer .empty::before{content:"";display:block;width:56px;height:56px;margin:0 auto 14px;border:1.5px solid var(--stone);border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230A0A0A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 7h12l1 13H5z'/%3E%3Cpath d='M9 7a3 3 0 0 1 6 0'/%3E%3C/svg%3E") center/24px no-repeat}
+
+  /* ---- 5. Modal (size guide, notify): bottom sheet ---- */
+  .modal{align-items:flex-end;padding:0}
+  .modal .box{width:100%;max-width:none;max-height:88vh;max-height:88dvh;border-radius:var(--mb-r) var(--mb-r) 0 0;padding:0 var(--gutter) calc(22px + env(safe-area-inset-bottom));transform:translate3d(0,100%,0);transition:transform .55s var(--mb-ease);box-shadow:0 -24px 60px rgba(10,10,10,.18)}
+  .modal.open .box{transform:none}
+  .modal.open .box.is-dragging{transform:translate3d(0,var(--mb-drag,0px),0);transition:none}
+  .modal .box h3{font-size:22px;padding-inline-end:44px}
+  .modal .x{top:10px}
+  .modal .box .mb-handle{display:grid}
+
+  /* ---- 6. Toast: above the bar / dock, away from a sheet's primary button ---- */
+  .toast{bottom:calc(var(--dock-h) + 14px);max-width:calc(100vw - 32px);white-space:normal;text-align:center;line-height:1.35}
+  html.mb-bar-on .toast{bottom:calc(var(--dock-h) + var(--mb-bar-h) + 14px)}
+  html.mb-sheet-open .toast,html.mb-zoom-open .toast{bottom:auto;top:calc(var(--header-h) + 12px)}
+}
+
+/* ==========================================================================
+   B. TOUCH BEHAVIOUR (no hover available)
+   ========================================================================== */
+@media (hover:none){
+  /* sticky :hover on tap must not swap the image or scale it */
+  .card:hover .media .alt,.card:focus-within .media .alt{opacity:0}
+  .card.is-alt .media .alt,.card.is-alt:hover .media .alt,.card.is-alt:focus-within .media .alt{opacity:1}
+  .card .media .alt{transition:opacity .4s var(--mb-ease,cubic-bezier(.22,1,.36,1))}
+  .card:hover .media svg{transform:none}
+  .card{transition:transform .12s var(--mb-ease,cubic-bezier(.22,1,.36,1))}
+  .card.mb-press{transform:scale(.97)}
+  .card .media{-webkit-tap-highlight-color:transparent}
+  .wish{width:36px;height:36px;top:8px;inset-inline-end:8px}
+  .wish svg{width:17px;height:17px}
+  .quick{display:none!important}
+  /* "view 2" chip, bottom-start of the media */
+  .mb-alt{display:inline-flex;position:absolute;bottom:8px;inset-inline-start:8px;z-index:3;height:28px;padding:0 10px 0 8px;align-items:center;gap:5px;border-radius:14px;background:rgba(250,248,244,.92);backdrop-filter:blur(4px);color:var(--ink);font-family:var(--font-display);font-weight:700;font-size:10px;letter-spacing:0;transition:transform .12s var(--mb-ease,cubic-bezier(.22,1,.36,1)),background .2s}
+  html[dir=ltr] .mb-alt{text-transform:uppercase;letter-spacing:.08em}
+  .mb-alt::before{content:"";position:absolute;inset:-8px}
+  /* the site's `.card .media svg{position:absolute;inset:0;width:100%}` must not catch our icons */
+  .card .media .mb-alt svg{position:static;inset:auto;width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s var(--mb-ease,cubic-bezier(.22,1,.36,1))}
+  .card .media .mb-plus svg{position:static;inset:auto;width:18px;height:18px}
+  .card.is-alt .mb-alt{background:var(--ink);color:var(--chalk)}
+  .card.is-alt .media .mb-alt svg{transform:rotate(180deg)}
+  .card:hover .media .mb-alt svg,.card:hover .media .mb-plus svg{transform:none}
+  .card.is-alt:hover .media .mb-alt svg{transform:rotate(180deg)}
+  .mb-alt.mb-press{transform:scale(.94)}
+  /* "+" quick add, bottom-end of the media */
+  .mb-plus{display:grid;position:absolute;bottom:8px;inset-inline-end:8px;z-index:3;width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--chalk);place-items:center;box-shadow:0 8px 18px rgba(10,10,10,.22);transition:transform .12s var(--mb-ease,cubic-bezier(.22,1,.36,1)),background .2s}
+  .mb-plus svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+  .mb-plus.mb-press{transform:scale(.9);background:var(--volt);color:var(--volt-ink)}
+  /* generic press feedback */
+  .btn.mb-press,.chip.mb-press,.mb-pill.mb-press,.mb-swatch.mb-press,.qty button.mb-press,.sizes-grid button.mb-press,.colors button.mb-press{transform:scale(.96)}
+  .btn,.chip{transition:transform .12s var(--mb-ease,cubic-bezier(.22,1,.36,1)),background .2s,color .2s,border-color .2s}
+  .btn.mb-press::before{display:none}
+  .dock a.mb-press svg,.dock button.mb-press svg,.icon-btn.mb-press,.wish.mb-press{transform:scale(.88)}
+  .dock svg,.icon-btn,.wish{transition:transform .12s var(--mb-ease,cubic-bezier(.22,1,.36,1))}
+}
+
+/* ==========================================================================
+   C. SHEETS + ZOOM (used by both phones and touch tablets)
+   ========================================================================== */
+@media (max-width:979px),(hover:none){
+  .mb-handle{display:grid;flex:none;width:100%;padding:10px 0 6px;place-items:center;touch-action:none;cursor:grab;-webkit-tap-highlight-color:transparent}
+  /* drawer/modal handles belong to the phone layout only (block A turns them on) */
+  #cartDrawer .mb-handle,.modal .mb-handle{display:none}
+  .mb-handle::before{content:"";width:40px;height:4px;border-radius:2px;background:var(--stone,#D9D4CA)}
+  .mb-backdrop{display:block;position:fixed;inset:0;z-index:63;background:rgba(10,10,10,.55);backdrop-filter:blur(2px);opacity:0;visibility:hidden;transition:opacity .35s var(--mb-ease,cubic-bezier(.22,1,.36,1)),visibility 0s linear .35s;touch-action:none}
+  .mb-backdrop.is-open{opacity:1;visibility:visible;transition:opacity .35s var(--mb-ease,cubic-bezier(.22,1,.36,1)),visibility 0s}
+  .mb-sheet{display:flex;flex-direction:column;position:fixed;inset-inline:0;bottom:0;z-index:64;background:var(--paper,#FAF8F4);color:var(--ink,#0A0A0A);border-radius:var(--mb-r,20px) var(--mb-r,20px) 0 0;max-height:88vh;max-height:88dvh;transform:translate3d(0,100%,0);visibility:hidden;transition:transform .5s var(--mb-ease,cubic-bezier(.22,1,.36,1)),visibility 0s linear .5s;box-shadow:0 -24px 60px rgba(10,10,10,.18);padding-bottom:env(safe-area-inset-bottom);will-change:transform;contain:layout paint}
+  .mb-sheet.is-open{transform:none;visibility:visible;transition:transform .5s var(--mb-ease,cubic-bezier(.22,1,.36,1)),visibility 0s}
+  .mb-sheet.is-dragging{transition:none;transform:translate3d(0,var(--mb-drag,0px),0)}
+  .mb-sheet-head{display:flex;gap:14px;align-items:center;padding:4px var(--gutter,16px) 14px;border-bottom:1px solid var(--line,#E6E2DA)}
+  .mb-thumb{width:56px;height:70px;flex:none;border-radius:8px;overflow:hidden;position:relative;background:radial-gradient(120% 90% at 50% 30%,#FBFAF7,var(--chalk,#F3F0EA))}
+  .mb-thumb svg{position:absolute;inset:0;width:100%;height:100%}
+  .mb-thumb svg>rect{display:none}
+  .mb-sheet-title{flex:1;min-width:0}
+  .mb-sheet-cat{font-size:10px;font-weight:600;color:var(--mute,#6F6C66)}
+  html[dir=ltr] .mb-sheet-cat{text-transform:uppercase;letter-spacing:.1em}
+  .mb-sheet-name{font-family:var(--font-display);font-weight:800;font-size:17px;line-height:1.05;margin:3px 0 5px;overflow-wrap:anywhere}
+  html[dir=ltr] .mb-sheet-name{text-transform:uppercase;letter-spacing:-.02em}
+  html[dir=rtl] .mb-sheet-name{font-weight:700;line-height:1.25}
+  .mb-sheet-price{font-family:var(--font-display);font-weight:700;font-size:15px;display:flex;gap:8px;align-items:baseline}
+  .mb-sheet-price s{font-family:var(--font-body);font-weight:400;font-size:12px;color:var(--mute)}
+  .mb-sheet-x{position:absolute;top:8px;inset-inline-end:8px;width:44px;height:44px;display:grid;place-items:center;border-radius:50%}
+  .mb-sheet-body{flex:1 1 auto;overflow-y:auto;padding:14px var(--gutter,16px) 6px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .mb-sheet-foot{flex:none;padding:12px var(--gutter,16px) 12px;border-top:1px solid var(--line,#E6E2DA);background:var(--paper,#FAF8F4)}
+  .mb-sheet-foot .btn{width:100%;min-height:54px;font-size:13px;justify-content:space-between}
+  .mb-sheet-foot .btn[disabled]{opacity:.4}
+  .mb-sheet-foot .btn b{font-family:var(--font-display);font-weight:800;font-size:15px;letter-spacing:0}
+  .mb-label{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;margin:0 0 10px;letter-spacing:0}
+  html[dir=ltr] .mb-label{text-transform:uppercase;letter-spacing:.08em}
+  .mb-label .mb-stock{font-family:var(--font-body);font-weight:600;font-size:11px;text-transform:none;letter-spacing:0}
+  .mb-stock.low{color:var(--warn,#8F6410)} .mb-stock.out{color:var(--bad,#B3261E)} .mb-stock.ok{color:var(--ok,#1F7A48)}
+  .mb-swatches{display:flex;gap:10px;margin-bottom:18px}
+  .mb-swatch{width:36px;height:36px;border-radius:50%;border:2px solid var(--paper,#FAF8F4);box-shadow:0 0 0 1px var(--stone,#D9D4CA);transition:box-shadow .2s,transform .12s var(--mb-ease,cubic-bezier(.22,1,.36,1));position:relative;-webkit-tap-highlight-color:transparent}
+  .mb-swatch::before{content:"";position:absolute;inset:-6px}
+  .mb-swatch.on{box-shadow:0 0 0 2px var(--ink,#0A0A0A)}
+  .mb-swatch.out::after{content:"";position:absolute;left:50%;top:50%;width:140%;height:1.5px;background:var(--mute,#6F6C66);transform:translate(-50%,-50%) rotate(-45deg)}
+  .mb-pills{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+  .mb-pill{position:relative;height:54px;border:1px solid var(--stone,#D9D4CA);background:var(--paper,#FAF8F4);color:var(--ink,#0A0A0A);font-family:var(--font-display);font-weight:700;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:background .15s,color .15s,border-color .15s,transform .12s var(--mb-ease,cubic-bezier(.22,1,.36,1));-webkit-tap-highlight-color:transparent}
+  .mb-pill.on{background:var(--ink,#0A0A0A);color:var(--chalk,#F3F0EA);border-color:var(--ink,#0A0A0A)}
+  .mb-pill.out{color:var(--mute,#6F6C66);border-color:var(--line,#E6E2DA);background:repeating-linear-gradient(135deg,var(--paper,#FAF8F4) 0 5px,var(--stone,#D9D4CA) 5px 6px)}
+  .mb-pill.out span{text-decoration:line-through;text-decoration-thickness:1.5px}
+  .mb-pill.on.out{background:var(--ink,#0A0A0A);color:var(--chalk,#F3F0EA);border-color:var(--ink,#0A0A0A)}
+  .mb-pill small{font-family:var(--font-body);font-size:9px;font-weight:600;color:var(--warn,#8F6410);line-height:1}
+  .mb-pill.on small{color:var(--volt,#D8FF3D)}
+  .mb-model{font-size:12px;color:var(--mute,#6F6C66);margin:14px 0 4px}
+  .mb-sheet .mb-pill:focus-visible,.mb-sheet .mb-swatch:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+  /* ---- zoom overlay: snap across shots, tap to 2.2x, native pan/pinch ---- */
+  .mb-zoom{display:flex;flex-direction:column;position:fixed;inset:0;z-index:66;background:var(--paper,#FAF8F4);opacity:0;visibility:hidden;transition:opacity .3s var(--mb-ease,cubic-bezier(.22,1,.36,1)),visibility 0s linear .3s}
+  .mb-zoom.is-open{opacity:1;visibility:visible;transition:opacity .3s var(--mb-ease,cubic-bezier(.22,1,.36,1)),visibility 0s}
+  .mb-zoom-track{flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior:contain}
+  .mb-zoom-track::-webkit-scrollbar{display:none}
+  .mb-zoom.is-locked .mb-zoom-track{overflow-x:hidden;scroll-snap-type:none}
+  .mb-zoom-slide{flex:0 0 100%;width:100%;scroll-snap-align:start;overflow:auto;display:flex;flex-direction:column;touch-action:pan-x pan-y pinch-zoom;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .mb-zoom-slide::-webkit-scrollbar{display:none}
+  .mb-zoom-img{flex:none;width:100%;aspect-ratio:4/5;margin:auto;position:relative;cursor:zoom-in;-webkit-tap-highlight-color:transparent}
+  .mb-zoom-slide.is-zoomed .mb-zoom-img{width:220%;cursor:zoom-out}
+  .mb-zoom-img svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .mb-zoom-img svg>rect{display:none}
+  .mb-zoom-top{position:absolute;top:0;inset-inline:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 10px 10px 16px;pointer-events:none}
+  .mb-zoom-top>*{pointer-events:auto}
+  .mb-zoom-count{font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:.08em;color:var(--ink);background:rgba(250,248,244,.9);padding:6px 10px}
+  .mb-zoom-x{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--ink,#0A0A0A);color:var(--chalk,#F3F0EA);box-shadow:0 8px 18px rgba(10,10,10,.22)}
+  .mb-zoom-x svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+  .mb-zoom-hint{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));inset-inline:0;z-index:2;display:flex;justify-content:center;gap:6px;pointer-events:none;font-size:11px;font-weight:600;color:var(--mute);letter-spacing:0;transition:opacity .3s}
+  html[dir=ltr] .mb-zoom-hint{text-transform:uppercase;letter-spacing:.1em;font-size:10px}
+  .mb-zoom.is-locked .mb-zoom-hint{opacity:0}
+  .mb-zoom-dots{position:absolute;bottom:calc(40px + env(safe-area-inset-bottom));inset-inline:0;z-index:2;display:flex;justify-content:center;gap:6px;pointer-events:none}
+  .mb-zoom-dots i{width:6px;height:6px;border-radius:50%;background:rgba(10,10,10,.22);transition:transform .35s,background .35s}
+  .mb-zoom-dots i.on{background:var(--ink);transform:scale(1.35)}
+
+  /* body lock helper while a sheet is open (site already locks for drawers) */
+  html.mb-sheet-open body,html.mb-zoom-open body{overflow:hidden}
+}
+
+/* ==========================================================================
+   D. REDUCED MOTION: transforms off, opacity fades of at most 200ms
+   ========================================================================== */
+@media (prefers-reduced-motion:reduce){
+  .mb-bar{transition:opacity 200ms linear!important;transform:none!important;opacity:0}
+  html.mb-bar-on .mb-bar{opacity:1}
+  .mb-sheet,.mb-sheet.is-open{transform:none!important;transition:opacity 200ms linear,visibility 0s linear 200ms!important;opacity:0}
+  .mb-sheet.is-open{opacity:1;transition:opacity 200ms linear,visibility 0s!important}
+  .mb-sheet.is-dragging{transform:none!important}
+  .mb-backdrop,.mb-zoom{transition-duration:200ms!important}
+  .mb-dots i,.mb-zoom-dots i,.mb-alt svg,.mb-pill,.mb-swatch,.mb-plus,.mb-alt,.card,.btn,.chip,.icon-btn,.wish,.dock svg{transition-duration:0s!important;transform:none!important}
+  .card.mb-press,.btn.mb-press,.mb-pill.mb-press,.mb-plus.mb-press{transform:none!important}
+  html[dir] #cartDrawer.drawer,html[dir] #cartDrawer.drawer.open.is-dragging{transform:none!important}
+  .modal .box,.modal.open .box.is-dragging{transform:none!important;transition:opacity 200ms linear!important}
+  .mb-fly{display:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -1972,6 +2219,496 @@ main>.wrap.section:not(.tight)>.empty p{font-size:17px;margin-bottom:22px}
   }
 
   global.Motion = Motion;
+})(window);
+
+</script>
+<script>
+/* ===== MOBILE COMMERCE (agent) ===== */
+/* ============================================================
+   COREWARE — mobile commerce layer (mobile-commerce.js)
+   window.MBCommerce = { init(), pageEnter(root, page) }   (both idempotent)
+
+   - PDP: gallery swiper + dots + zoom overlay, sticky commerce bar, size sheet
+   - Cards: "view 2" chip, "+" quick-add (opens the same sheet), press feedback
+   - Cart drawer / modal: drag handle + swipe-down to close (CSS makes them sheets)
+   - Fly-to-cart retargeted to the dock cart icon on phones
+   - navigator.vibrate(10) on add-to-cart (Android; no-op elsewhere)
+   Everything is scoped at call time: (max-width:979px) for layout,
+   (hover:none) for touch. Desktop paths are untouched.
+   Site globals used lazily (S, PRODUCTS, COLORS, t, fmt, money, pname, cname,
+   stockOf, colorStock, anyStock, garment, fitArt, render, persist, addToCart,
+   closeAll, Motion). Must be placed BEFORE the main app script or loaded
+   after it; init() is only called once those exist.
+   ============================================================ */
+(function (global) {
+  "use strict";
+  if (global.MBCommerce) return;
+
+  const doc = document;
+  const mm = q => (global.matchMedia ? matchMedia(q) : { matches: false, addEventListener() {} });
+  const mqLayout = mm("(max-width:979px)");
+  const mqTouch = mm("(hover:none)");
+  const rmq = mm("(prefers-reduced-motion: reduce)");
+  const isPhone = () => mqLayout.matches;
+  const isTouch = () => mqTouch.matches;
+  const anyMobile = () => mqLayout.matches || mqTouch.matches;
+  const hasWAAPI = typeof Element !== "undefined" && !!Element.prototype.animate;
+
+  /* strings that the site's I18N does not have */
+  const L = {
+    en: { view2: "View 2", view1: "View 1", quickAdd: "Quick add", chooseSize: "Choose your size", zoom: "Tap to zoom", close: "Close", oneSize: "One size", swipe: "Swipe", pinch: "Tap to zoom · pinch to enlarge", colorLbl: "Color", sizeLbl: "Size" },
+    ar: { view2: "صورة 2", view1: "صورة 1", quickAdd: "إضافة سريعة", chooseSize: "اختر مقاسك", zoom: "اضغط للتكبير", close: "إغلاق", oneSize: "مقاس واحد", swipe: "اسحب", pinch: "اضغط للتكبير · قرّب بإصبعين", colorLbl: "اللون", sizeLbl: "المقاس" }
+  };
+  const lang = () => (typeof S !== "undefined" && S.lang === "ar") ? "ar" : "en";
+  const ml = k => (L[lang()] || L.en)[k] || L.en[k] || k;
+  const ts = k => { try { return t(k); } catch (e) { return k; } };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  const ICON_PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  const ICON_SWAP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg>';
+  const ICON_X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  const ICON_ZOOM = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M11 8v6M8 11h6"/></svg>';
+  const ICON_BAG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l1 13H5z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>';
+
+  const MB = { version: "1.0" };
+  let inited = false;
+  let els = {};
+  let sheet = null;          // { id, color, size, src, opener }
+  let zoomShots = [];
+  let barProduct = null;
+
+  const vibrate = () => { try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {} };
+  const product = id => (typeof PRODUCTS !== "undefined" ? PRODUCTS.find(p => p.id === id) : null);
+  const modelSize = p => p.sizeKey === "tops" ? "L" : p.sizeKey === "denim" ? "32" : p.sizeKey === "shoes" ? "43" : "ONE";
+  const parseHash = () => { const h = (location.hash || "#/").slice(1).split("?")[0].split("/").filter(Boolean); return { page: h[0] || "home", id: h[1] }; };
+
+  /* ================= init ================= */
+  MB.init = function () {
+    if (inited) return MB;
+    if (typeof S === "undefined" || typeof PRODUCTS === "undefined") return MB; // site not booted yet
+    inited = true;
+    doc.documentElement.classList.add("mb-js");
+    buildChrome();
+    setupClicks();
+    setupPress();
+    setupDrag();
+    setupFly();
+    setupMisc();
+    MB.pageEnter(doc.getElementById("app"));
+    return MB;
+  };
+
+  /* ================= pageEnter ================= */
+  MB.pageEnter = function (root, page) {
+    if (!inited) return MB;
+    root = root || doc.getElementById("app");
+    if (!root) return MB;
+    page = page || parseHash().page;
+    if (isTouch()) enhanceCards(root);
+    if (page === "product" && isPhone()) {
+      enhanceGallery(root);
+      syncBar();
+    } else {
+      doc.documentElement.classList.remove("mb-bar-on");
+      barProduct = null;
+    }
+    return MB;
+  };
+
+  /* ================= chrome: sheet, backdrop, zoom, bar ================= */
+  function buildChrome() {
+    const mk = (cls, html, attrs) => { const d = doc.createElement("div"); d.className = cls; d.innerHTML = html || ""; Object.entries(attrs || {}).forEach(([k, v]) => d.setAttribute(k, v)); doc.body.appendChild(d); return d; };
+    els.backdrop = mk("mb-backdrop", "", { "data-mb": "sheet-close", "aria-hidden": "true" });
+    els.sheet = mk("mb-sheet", "", { role: "dialog", "aria-modal": "true" });
+    els.zoom = mk("mb-zoom", `<div class="mb-zoom-top"><span class="mb-zoom-count"></span><button type="button" class="mb-zoom-x" data-mb="zoom-close">${ICON_X}</button></div><div class="mb-zoom-track"></div><div class="mb-zoom-dots"></div><div class="mb-zoom-hint"></div>`, { role: "dialog", "aria-modal": "true" });
+    els.bar = mk("mb-bar", "", { "aria-label": "Buy" });
+    // the dock (nav) is rendered later by renderChrome(); the bar must stay below it in z-order: handled by CSS z-index
+  }
+
+  /* ================= sticky bar ================= */
+  function syncBar() {
+    const { page, id } = parseHash();
+    const p = page === "product" ? product(id) : null;
+    if (!p) { doc.documentElement.classList.remove("mb-bar-on"); barProduct = null; return; }
+    barProduct = p;
+    const c = (S.pdp && S.pdp.color && p.colors.includes(S.pdp.color)) ? S.pdp.color : (p.colors.find(x => colorStock(p, x)) || p.colors[0]);
+    const one = p.sizeKey === "one";
+    const s = one ? "ONE" : (S.pdp && S.pdp.size);
+    const st = s ? stockOf(p, c, s) : null;
+    const notify = one ? !colorStock(p, c) : (s && st === 0);
+    const off = p.compare ? `<s>${money(p.compare)}</s>` : "";
+    let btn;
+    if (notify) btn = `<button type="button" class="btn ghost" data-action="notify" data-id="${p.id}" data-color="${c}" data-size="${s || "ONE"}">${ts("notify")}</button>`;
+    else if (!s) btn = `<button type="button" class="btn signal" data-mb="bar-add">${ts("selectSize")}</button>`;
+    else btn = `<button type="button" class="btn signal" data-mb="bar-add">${ICON_BAG}${ts("addToCart")}${!one ? ` · ${s}` : ""}</button>`;
+    els.bar.innerHTML = `<div class="mb-bar-info"><span class="mb-bar-name">${esc(pname(p))}</span><span class="mb-bar-price">${money(p.price)}${off}</span></div>${btn}`;
+    doc.documentElement.classList.add("mb-bar-on");
+  }
+
+  /* ================= gallery swiper ================= */
+  function enhanceGallery(root) {
+    const g = root.querySelector(".pdp .gallery");
+    if (!g || g.dataset.mb) return;
+    g.dataset.mb = "1";
+    const shots = Array.from(g.querySelectorAll(".shot"));
+    if (!shots.length) return;
+    // NOTE: never detach/re-attach the shots: the site's Motion layer observes them with an
+    // IntersectionObserver and a DOM move makes it hide them for good in "instant" mode.
+    shots.forEach((s, i) => { s.setAttribute("data-mb", "shot"); s.dataset.i = i; s.setAttribute("role", "button"); s.tabIndex = 0; s.setAttribute("aria-label", `${ml("zoom")} ${i + 1}/${shots.length}`); });
+    const dots = doc.createElement("div"); dots.className = "mb-dots"; dots.setAttribute("aria-hidden", "true");
+    dots.innerHTML = `<span class="mb-dots-in">${shots.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</span>`;
+    g.insertAdjacentElement("afterend", dots);
+    const hint = doc.createElement("span"); hint.className = "mb-gal-hint"; hint.innerHTML = `${ICON_ZOOM}<span>${ml("zoom")}</span>`; hint.setAttribute("aria-hidden", "true");
+    shots[0].appendChild(hint);
+    let raf = 0, last = 0;
+    const update = () => {
+      raf = 0;
+      const i = galleryIndex(g, shots);
+      if (i === last) return;
+      last = i;
+      Array.from(dots.querySelectorAll("i")).forEach((d, k) => d.classList.toggle("on", k === i));
+    };
+    g.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+  }
+  function galleryIndex(g, shots) {
+    if (shots.length < 2) return 0;
+    const step = Math.abs(shots[1].offsetLeft - shots[0].offsetLeft) || (shots[0].offsetWidth + 8);
+    return Math.max(0, Math.min(shots.length - 1, Math.round(Math.abs(g.scrollLeft) / step)));
+  }
+  function currentShotSvg() {
+    const g = doc.querySelector(".pdp .gallery"); if (!g) return null;
+    const shots = Array.from(g.querySelectorAll(".shot"));
+    const s = shots[galleryIndex(g, shots)] || shots[0];
+    return s ? s.querySelector("svg") : null;
+  }
+
+  /* ================= zoom overlay ================= */
+  function openZoom(i) {
+    const g = doc.querySelector(".pdp .gallery"); if (!g) return;
+    zoomShots = Array.from(g.querySelectorAll(".shot"));
+    const track = els.zoom.querySelector(".mb-zoom-track");
+    track.innerHTML = zoomShots.map(s => `<div class="mb-zoom-slide"><div class="mb-zoom-img" data-mb="zoom-toggle">${s.innerHTML}</div></div>`).join("");
+    els.zoom.querySelector(".mb-zoom-dots").innerHTML = zoomShots.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("");
+    els.zoom.querySelector(".mb-zoom-hint").textContent = ml("pinch");
+    els.zoom.classList.remove("is-locked");
+    els.zoom.setAttribute("aria-label", ml("zoom"));
+    setZoomCount(i);
+    els.zoom.classList.add("is-open");
+    doc.documentElement.classList.add("mb-zoom-open");
+    track.scrollTo({ left: i * track.clientWidth * (lang() === "ar" ? -1 : 1), top: 0, behavior: "auto" });
+    if (!track._mb) {
+      track._mb = 1;
+      let raf = 0;
+      track.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; const w = track.clientWidth || 1; setZoomCount(Math.round(Math.abs(track.scrollLeft) / w)); }); }, { passive: true });
+    }
+    setTimeout(() => { const x = els.zoom.querySelector(".mb-zoom-x"); x && x.focus({ preventScroll: true }); }, 50);
+  }
+  function setZoomCount(i) {
+    i = Math.max(0, Math.min(zoomShots.length - 1, i));
+    els.zoom.querySelector(".mb-zoom-count").textContent = `${i + 1} / ${zoomShots.length}`;
+    Array.from(els.zoom.querySelectorAll(".mb-zoom-dots i")).forEach((d, k) => d.classList.toggle("on", k === i));
+  }
+  function toggleZoom(img) {
+    const slide = img.closest(".mb-zoom-slide");
+    const on = !slide.classList.contains("is-zoomed");
+    slide.classList.toggle("is-zoomed", on);
+    els.zoom.classList.toggle("is-locked", on);
+    if (on) { slide.scrollTo({ left: (slide.scrollWidth - slide.clientWidth) / 2 * (lang() === "ar" ? -1 : 1), top: (slide.scrollHeight - slide.clientHeight) / 2, behavior: "auto" }); }
+    else slide.scrollTo({ left: 0, top: 0, behavior: "auto" });
+  }
+  function closeZoom() {
+    if (!els.zoom.classList.contains("is-open")) return;
+    els.zoom.classList.remove("is-open", "is-locked");
+    doc.documentElement.classList.remove("mb-zoom-open");
+    els.zoom.querySelectorAll(".mb-zoom-slide.is-zoomed").forEach(s => s.classList.remove("is-zoomed"));
+  }
+
+  /* ================= size sheet ================= */
+  function openSheet(o) {
+    const p = product(o.id); if (!p) return;
+    const color = (o.color && p.colors.includes(o.color)) ? o.color : (p.colors.find(c => colorStock(p, c)) || p.colors[0]);
+    sheet = { id: p.id, color, size: p.sizeKey === "one" ? "ONE" : (o.size || null), src: o.src || "card", opener: o.opener || null };
+    renderSheet();
+    els.sheet.setAttribute("aria-label", `${ml("chooseSize")} — ${pname(p)}`);
+    els.backdrop.classList.add("is-open");
+    els.sheet.classList.add("is-open");
+    doc.documentElement.classList.add("mb-sheet-open");
+    setTimeout(() => { if (!sheet) return; const f = els.sheet.querySelector(".mb-pill.on") || els.sheet.querySelector(".mb-pill:not(.out)") || els.sheet.querySelector(".mb-sheet-foot .btn"); f && f.focus({ preventScroll: true }); }, 60);
+  }
+  function renderSheet() {
+    if (!sheet) return;
+    const p = product(sheet.id); const c = sheet.color; const s = sheet.size; const one = p.sizeKey === "one";
+    const st = s ? stockOf(p, c, s) : null;
+    const off = p.compare ? `<s>${money(p.compare)}</s>` : "";
+    const stockLine = s === null ? "" : st > 0 ? `<span class="mb-stock ${st <= 3 ? "low" : "ok"}">${st <= 3 ? fmt(ts("onlyLeft"), { n: st }) : ts("inStock")}</span>` : `<span class="mb-stock out">${ts("soldOut")}</span>`;
+    const swatches = p.colors.map(x => `<button type="button" class="mb-swatch ${x === c ? "on" : ""} ${colorStock(p, x) ? "" : "out"}" data-mb="sheet-color" data-value="${x}" style="background:${COLORS[x][0]}" aria-label="${esc(cname(x))}${colorStock(p, x) ? "" : " · " + ts("soldOut")}" aria-pressed="${x === c}"></button>`).join("");
+    const pills = one ? "" : p.sizes.map(x => { const n = stockOf(p, c, x); return `<button type="button" class="mb-pill ${x === s ? "on" : ""} ${n ? "" : "out"}" data-mb="sheet-size" data-value="${x}" role="radio" aria-checked="${x === s}" ${n ? "" : 'aria-disabled="true"'}><span>${x}</span>${n && n <= 3 ? `<small>${fmt(ts("onlyLeft"), { n })}</small>` : ""}</button>`; }).join("");
+    let cta;
+    if (one ? !colorStock(p, c) : (s && st === 0)) cta = `<button type="button" class="btn ghost" data-action="notify" data-id="${p.id}" data-color="${c}" data-size="${s || "ONE"}"><span>${ts("notify")}</span>${ICON_BAG}</button>`;
+    else if (!s) cta = `<button type="button" class="btn signal" disabled><span>${ts("selectSize")}</span><b>${money(p.price)}</b></button>`;
+    else cta = `<button type="button" class="btn signal" data-mb="sheet-confirm"><span>${ts("addToCart")}${!one ? ` · ${s}` : ""}</span><b>${money(p.price)}</b></button>`;
+    els.sheet.innerHTML = `
+      <div class="mb-handle" data-mb="handle" aria-hidden="true"></div>
+      <div class="mb-sheet-head">
+        <div class="mb-thumb" aria-hidden="true">${fitArt(garment(p.garment, c, 0))}</div>
+        <div class="mb-sheet-title"><div class="mb-sheet-cat">${ts("cats." + p.cat)} · ${ts("fits." + p.fit)}</div><div class="mb-sheet-name">${esc(pname(p))}</div><div class="mb-sheet-price">${money(p.price)}${off}</div></div>
+        <button type="button" class="mb-sheet-x icon-btn" data-mb="sheet-close" aria-label="${ml("close")}">${ICON_X}</button>
+      </div>
+      <div class="mb-sheet-body">
+        <div class="mb-label"><span>${ts("color")}: ${esc(cname(c))}</span>${one ? stockLine : ""}</div>
+        <div class="mb-swatches">${swatches}</div>
+        ${one ? `<div class="mb-label"><span>${ts("size")}: ${ml("oneSize")}</span></div>` : `<div class="mb-label"><span>${ts("size")}${s ? ": " + s : ""}</span>${stockLine}</div><div class="mb-pills" role="radiogroup" aria-label="${ts("size")}">${pills}</div><p class="mb-model">${fmt(ts("model"), { s: modelSize(p) })}</p>`}
+      </div>
+      <div class="mb-sheet-foot">${cta}</div>`;
+  }
+  function closeSheet(restoreFocus) {
+    if (!sheet) return;
+    const opener = sheet.opener;
+    sheet = null;
+    els.sheet.classList.remove("is-open", "is-dragging");
+    els.sheet.style.removeProperty("--mb-drag");
+    els.backdrop.classList.remove("is-open");
+    doc.documentElement.classList.remove("mb-sheet-open");
+    if (restoreFocus && opener && opener.isConnected) { try { opener.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  function confirmSheet(btn) {
+    if (!sheet) return;
+    const { id, color, size, src } = sheet;
+    const p = product(id);
+    if (!p || !size || !stockOf(p, color, size)) return;
+    vibrate();
+    // fly source = the sheet thumbnail (rect read synchronously inside addToCart → flyToCart)
+    addToCart(id, color, size, 1, btn);
+    closeSheet(false);
+    if (src === "pdp" && S.pdp) { S.pdp.color = color; S.pdp.size = size; rerenderKeepScroll(); }
+  }
+
+  /* keep the user's place on in-page PDP re-renders (the site scrolls to top on every render) */
+  function rerenderKeepScroll() {
+    const y = global.scrollY || doc.documentElement.scrollTop || 0;
+    render();
+    global.scrollTo({ top: y, behavior: "instant" });
+  }
+
+  /* ================= cards ================= */
+  function enhanceCards(root) {
+    const cards = root.querySelectorAll(".card:not([data-mb])");
+    for (const card of cards) {
+      card.dataset.mb = "1";
+      const media = card.querySelector(".media"); if (!media) continue;
+      const p = product(card.dataset.id); if (!p) continue;
+      if (media.querySelector(".alt")) media.insertAdjacentHTML("beforeend", `<button type="button" class="mb-alt" data-mb="alt" aria-pressed="false" aria-label="${ml("view2")}">${ICON_SWAP}<span>${ml("view2")}</span></button>`);
+      if (anyStock(p)) media.insertAdjacentHTML("beforeend", `<button type="button" class="mb-plus" data-mb="quick" data-id="${p.id}" aria-label="${ml("quickAdd")} — ${esc(pname(p))}">${ICON_PLUS}</button>`);
+    }
+  }
+
+  /* ================= clicks (capture: runs before the site dispatcher) ================= */
+  function setupClicks() {
+    doc.addEventListener("click", e => {
+      const el = e.target.closest ? e.target.closest("[data-mb],[data-action]") : null;
+      if (!el) return;
+      const mb = el.getAttribute("data-mb");
+      if (mb) {
+        if (mb === "handle") return;
+        if (mb === "shot") { if (!isPhone()) return; e.preventDefault(); e.stopPropagation(); openZoom(+el.dataset.i || 0); return; }
+        e.preventDefault(); e.stopPropagation();
+        switch (mb) {
+          case "quick": { const p = product(el.dataset.id); if (!p) return; openSheet({ id: p.id, src: "card", opener: el }); break; }
+          case "alt": { const card = el.closest(".card"); const on = !card.classList.contains("is-alt"); card.classList.toggle("is-alt", on); el.setAttribute("aria-pressed", on); el.querySelector("span").textContent = ml(on ? "view1" : "view2"); break; }
+          case "bar-add": {
+            const p = barProduct || product(parseHash().id); if (!p) return;
+            const one = p.sizeKey === "one";
+            const c = (S.pdp && S.pdp.color) || p.colors[0];
+            const s = one ? "ONE" : (S.pdp && S.pdp.size);
+            if (s && stockOf(p, c, s)) { vibrate(); addToCart(p.id, c, s, 1, el); }
+            else openSheet({ id: p.id, color: c, size: null, src: "pdp", opener: el });
+            break;
+          }
+          case "sheet-close": closeSheet(true); break;
+          case "sheet-size": { if (!sheet) return; sheet.size = el.dataset.value; renderSheet(); const n = els.sheet.querySelector(".mb-pill.on"); n && n.focus({ preventScroll: true }); break; }
+          case "sheet-color": { if (!sheet) return; const p = product(sheet.id); sheet.color = el.dataset.value; if (sheet.size && sheet.size !== "ONE" && !stockOf(p, sheet.color, sheet.size)) { /* keep selection: shows notify state */ } renderSheet(); break; }
+          case "sheet-confirm": confirmSheet(el); break;
+          case "zoom-close": closeZoom(); break;
+          case "zoom-toggle": toggleZoom(el); break;
+        }
+        return;
+      }
+      // site actions we wrap on phones
+      const act = el.getAttribute("data-action");
+      if (act === "notify" && sheet && els.sheet.contains(el)) { closeSheet(false); return; } // let the site open its modal
+      if (!isPhone()) {
+        if (isTouch() && (act === "quick-add" || act === "add-outfit" || (act === "add" && el.dataset.size))) vibrate();
+        return;
+      }
+      if (act === "pdp-size" || act === "pdp-color") {
+        e.preventDefault(); e.stopPropagation();
+        if (act === "pdp-color") { S.pdp.color = el.dataset.value; S.pdp.size = null; }
+        else S.pdp.size = el.dataset.value;
+        rerenderKeepScroll();
+        return;
+      }
+      if (act === "quick-add" || act === "add-outfit" || (act === "add" && el.dataset.size)) vibrate();
+    }, true);
+
+    // keyboard: Enter/Space on a gallery shot opens zoom; Escape closes our layers
+    doc.addEventListener("keydown", e => {
+      if (e.key === "Escape") { if (els.zoom.classList.contains("is-open")) { e.stopPropagation(); closeZoom(); } else if (sheet) { e.stopPropagation(); closeSheet(true); } return; }
+      if ((e.key === "Enter" || e.key === " ") && e.target.closest && e.target.closest('.shot[data-mb="shot"]') && isPhone()) { e.preventDefault(); openZoom(+e.target.closest(".shot").dataset.i || 0); }
+    }, true);
+
+    // governorate change on the PDP re-renders: keep the scroll position
+    doc.addEventListener("change", e => {
+      const el = e.target;
+      if (!isPhone() || !el || el.dataset.action !== "gov" || parseHash().page !== "product") return;
+      e.stopPropagation();
+      S.gov = el.value; persist(); rerenderKeepScroll();
+    }, true);
+  }
+
+  /* ================= press feedback (touch) ================= */
+  const PRESS_SEL = ".card,.btn,.mb-pill,.mb-plus,.mb-alt,.mb-swatch,.chip,.dock a,.dock button,.sizes-grid button,.colors button,.wish,.icon-btn,.qty button";
+  function setupPress() {
+    let el = null, timer = 0, x0 = 0, y0 = 0;
+    const clear = () => { clearTimeout(timer); timer = 0; if (el) { const e = el; el = null; setTimeout(() => e.classList.remove("mb-press"), 120); } };
+    doc.addEventListener("touchstart", e => {
+      if (!isTouch()) return;
+      const t = e.target.closest ? e.target.closest(PRESS_SEL) : null;
+      if (!t || t.disabled) return;
+      clear();
+      const p = e.touches[0]; x0 = p.clientX; y0 = p.clientY; el = t;
+      timer = setTimeout(() => { if (el === t) t.classList.add("mb-press"); }, 40);
+    }, { passive: true });
+    doc.addEventListener("touchmove", e => {
+      if (!el) return;
+      const p = e.touches[0];
+      if (Math.abs(p.clientX - x0) > 8 || Math.abs(p.clientY - y0) > 8) { clearTimeout(timer); el.classList.remove("mb-press"); el = null; }
+    }, { passive: true });
+    doc.addEventListener("touchend", clear, { passive: true });
+    doc.addEventListener("touchcancel", clear, { passive: true });
+  }
+
+  /* ================= drag-to-close (sheet, cart drawer, modal box) ================= */
+  function dragToClose(panel, o) {
+    let y0 = 0, t0 = 0, dy = 0, armed = false, dragging = false, sc = null;
+    panel.addEventListener("touchstart", e => {
+      if (!o.isOpen() || !anyMobile()) { armed = false; return; }
+      const p = e.touches[0]; y0 = p.clientY; t0 = performance.now(); dy = 0; dragging = false;
+      sc = o.scrollerEl ? o.scrollerEl() : (o.scroller ? panel.querySelector(o.scroller) : null);
+      const onHandle = !!(e.target.closest && e.target.closest(o.handle));
+      armed = onHandle || !sc || !sc.contains(e.target) || sc.scrollTop <= 0;
+    }, { passive: true });
+    panel.addEventListener("touchmove", e => {
+      if (!armed) return;
+      dy = e.touches[0].clientY - y0;
+      if (!dragging) {
+        if (dy < 10) { if (dy < -6) armed = false; return; }   // scrolling up/inside: give up
+        if (sc && sc.contains(e.target) && sc.scrollTop > 0) { armed = false; return; }
+        dragging = true; panel.classList.add("is-dragging");
+      }
+      panel.style.setProperty("--mb-drag", Math.max(0, dy) + "px");
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+    const end = () => {
+      if (!dragging) { armed = false; return; }
+      dragging = false; armed = false;
+      const v = dy / Math.max(1, performance.now() - t0);
+      panel.classList.remove("is-dragging");
+      panel.style.removeProperty("--mb-drag");
+      if (dy > 90 || v > 0.55) o.close();
+    };
+    panel.addEventListener("touchend", end, { passive: true });
+    panel.addEventListener("touchcancel", end, { passive: true });
+  }
+  function setupDrag() {
+    dragToClose(els.sheet, { handle: ".mb-handle,.mb-sheet-head", scroller: ".mb-sheet-body", isOpen: () => !!sheet, close: () => closeSheet(true) });
+    const drawer = doc.getElementById("cartDrawer");
+    if (drawer) {
+      const head = drawer.querySelector(".head");
+      if (head && !head.querySelector(".mb-handle")) head.insertAdjacentHTML("afterbegin", '<div class="mb-handle" aria-hidden="true"></div>');
+      dragToClose(drawer, { handle: ".mb-handle,.head", scroller: ".body", isOpen: () => drawer.classList.contains("open"), close: () => closeAll() });
+    }
+    const modal = doc.getElementById("modal");
+    const box = modal && modal.querySelector(".box");
+    if (box) {
+      if (!box.querySelector(".mb-handle")) box.insertAdjacentHTML("afterbegin", '<div class="mb-handle" aria-hidden="true"></div>');
+      // the .box itself is the scroll container
+      dragToClose(box, { handle: ".mb-handle,h3", scrollerEl: () => box, isOpen: () => modal.classList.contains("open"), close: () => closeAll() });
+    }
+  }
+
+  /* ================= fly to the dock cart ================= */
+  function dockCart() { const d = doc.querySelector(".dock [data-action='open-cart']"); return d && d.offsetWidth ? d : null; }
+  function flyToDock(fromEl) {
+    const target = dockCart() || doc.querySelector(".header [data-action='open-cart']");
+    const src = fromEl && (
+      (fromEl.closest(".mb-sheet") && els.sheet.querySelector(".mb-thumb svg")) ||
+      (fromEl.closest(".card") && fromEl.closest(".card").querySelector(".media svg")) ||
+      (fromEl.closest(".mb-bar") && currentShotSvg()) ||
+      (fromEl.closest(".pdp") && currentShotSvg()) ||
+      (fromEl.closest(".line") && fromEl.closest(".line").querySelector(".thumb svg")) ||
+      (fromEl.closest(".hm-feat") && fromEl.closest(".hm-feat").querySelector("svg"))
+    ) || currentShotSvg() || null;
+    // re-query at the end: renderChrome() may have rebuilt the dock meanwhile
+    const pulse = () => { const tg = dockCart() || doc.querySelector(".header [data-action='open-cart']"); if (global.Motion && Motion.pulse && tg) { Motion.pulse(tg, true); const b = tg.querySelector(".badge-count"); b && setTimeout(() => Motion.pulse(b), 40); const h = doc.getElementById("cartCount"); h && Motion.pulse(h); } };
+    if (!target) return Promise.resolve();
+    if (rmq.matches || !hasWAAPI || !src) { pulse(); return Promise.resolve(); }
+    const r = src.getBoundingClientRect(), tr = target.getBoundingClientRect();
+    if (!r.width || !tr.width) { pulse(); return Promise.resolve(); }
+    const END = 30, s = END / Math.max(r.width, r.height);
+    const ex = tr.left + tr.width / 2 - r.width * s / 2, ey = tr.top + tr.height / 2 - 6 - r.height * s / 2;
+    const lift = Math.min(r.top, ey) - 60;
+    const mid = s + (1 - s) * 0.4;
+    const outer = doc.createElement("div");
+    outer.className = "mb-fly";
+    outer.style.cssText = "position:fixed;top:0;left:0;z-index:80;pointer-events:none;transform-origin:0 0;width:" + r.width + "px;height:" + r.height + "px;will-change:transform";
+    const inner = doc.createElement("div");
+    inner.className = "mo-fly";
+    inner.style.cssText = "width:" + r.width + "px;height:" + r.height + "px;transform-origin:0 0;position:relative";
+    inner.appendChild(src.cloneNode(true));
+    outer.appendChild(inner); doc.body.appendChild(outer);
+    const D = 650;
+    const ax = outer.animate([{ transform: "translateX(" + r.left + "px)" }, { transform: "translateX(" + ex + "px)" }], { duration: D, easing: "cubic-bezier(.5,.05,.55,.95)", fill: "forwards" });
+    const ay = inner.animate([
+      { transform: "translateY(" + r.top + "px) scale(1)", opacity: 1, offset: 0, easing: "cubic-bezier(.2,.65,.35,1)" },
+      { transform: "translateY(" + lift + "px) scale(" + mid.toFixed(4) + ")", opacity: 1, offset: 0.45, easing: "cubic-bezier(.6,0,.9,.5)" },
+      { transform: "translateY(" + ey + "px) scale(" + s.toFixed(4) + ")", opacity: 0.9, offset: 1 }
+    ], { duration: D, fill: "forwards" });
+    return new Promise(resolve => {
+      let done = false;
+      const fin = () => { if (done) return; done = true; outer.remove(); pulse(); resolve(); };
+      Promise.all([ax.finished, ay.finished]).then(fin, fin);
+      setTimeout(fin, D + 150);
+    });
+  }
+  function setupFly() {
+    if (!global.Motion || !Motion.flyToCart || Motion.flyToCart._mb) return;
+    const orig = Motion.flyToCart;
+    const patched = function (fromEl) { return (isPhone() && dockCart()) ? flyToDock(fromEl) : orig.call(Motion, fromEl); };
+    patched._mb = 1;
+    Motion.flyToCart = patched;
+  }
+
+  /* ================= misc: route changes, viewport changes, search results ================= */
+  function setupMisc() {
+    global.addEventListener("hashchange", () => { closeSheet(false); closeZoom(); });
+    const onMQ = () => MB.pageEnter(doc.getElementById("app"));
+    try { mqLayout.addEventListener("change", onMQ); mqTouch.addEventListener("change", onMQ); } catch (e) {}
+    if ("MutationObserver" in global) {
+      const sr = doc.getElementById("searchResults");
+      if (sr) new MutationObserver(() => { if (isTouch()) enhanceCards(sr); }).observe(sr, { childList: true });
+      // fallback when the integrator did not add the pageEnter hook: enhance after any #app re-render
+      const app = doc.getElementById("app");
+      if (app) { let raf = 0; new MutationObserver(() => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; MB.pageEnter(app); }); }).observe(app, { childList: true }); }
+      // the site's renderChrome() re-renders the dock on every render; nothing to do, the bar sits below it
+    }
+    // keep the cart drawer handle after the site re-renders its body (head is untouched, so this is a safety net)
+  }
+
+  // self-boot when the integrator only included the script (hooks are still recommended)
+  const boot = () => { try { MB.init(); } catch (e) { /* site not ready */ } };
+  if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot); else setTimeout(boot, 0);
+
+  global.MBCommerce = MB;
 })(window);
 
 </script>
@@ -3264,6 +4001,7 @@ function render(){
   const app=document.getElementById("app");
   app.innerHTML=fn(params,id);
   Motion.pageEnter(app);
+  if(window.MBCommerce)MBCommerce.pageEnter(app,page);
   if(page==="home")initHero(app);
   initHomeWidgets(page==="home"?app:null);
   renderChrome();
@@ -3368,6 +4106,7 @@ window.addEventListener("hashchange",()=>{closeAll()});
 
 /* boot */
 Motion.init();
+if(window.MBCommerce)MBCommerce.init();
 render();
 </script>
 </body>
