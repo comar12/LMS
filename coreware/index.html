@@ -1841,6 +1841,281 @@ main>.wrap.section:not(.tight)>.empty p{font-size:17px;margin-bottom:22px}
   .mb-fly{display:none!important}
 }
 
+
+/* ===== MOBILE HOME (agent) ===== */
+/* ==========================================================================
+   COREWARE — mobile-home.css  (agent: mobile/home, prefix mb-)
+   Phone layout for the HOME page sections (hm-*), the SHOP page and the
+   FOOTER. Every rule is scoped to (max-width:979px) or (hover:none); desktop
+   is untouched. Append as the LAST layer of the page style element (after
+   the review fixes). Pairs with mobile-home.js (window.MBHome) which adds
+   the trust marquee clones, the strip dots / progress bar, the end-of-strip
+   "View all" pills, the reviews strip wrapper and the footer accordion.
+   Animates only transform / opacity. Hero, header, dock, card internals,
+   product page and cart belong to other agents and are not touched.
+   ========================================================================== */
+
+/* ---------- 0. shared bits (hidden on desktop, shown on phones) ---------- */
+.mb-nav,.mb-end,.mb-more,.mb-rev-strip-wrap-only{display:none}
+.hm-trust li[data-mb-clone]{display:none}
+
+@media (max-width:979px){
+  :root{--mb-gutter:var(--gutter,16px);--mb-ease:cubic-bezier(.22,1,.36,1);--mb-sec:48px}
+  body{overflow-x:clip}
+  main,footer{overflow-x:clip}
+
+  /* ---------- 1. section rhythm ----------
+     48px vertical rhythm, index + title on one baseline, titles clamp(28px,9vw,40px),
+     the top-right "View all" link is hidden (JS moves it to the end of the strip / under the grid). */
+  .hm{--hm-h2:clamp(28px,9vw,40px);--hm-h3:20px}
+  .hm-sec{padding:var(--mb-sec) 0}
+  .hm-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-bottom:20px}
+  .hm-head .hm-idx{flex:none;font-size:11px;letter-spacing:.14em;gap:8px;transform:translateY(-.22em)}
+  html[dir="rtl"] .hm-head .hm-idx{font-size:12px;letter-spacing:0}
+  .hm-head .hm-idx::before{width:6px;height:6px}
+  .hm-head h2{flex:1 1 auto;min-width:0;max-width:none;font-size:clamp(28px,9vw,40px);overflow-wrap:anywhere}
+  html[dir="rtl"] .hm-head h2{font-size:clamp(26px,8vw,36px)}
+  .hm-sub{flex:0 0 100%;font-size:14px;margin:0;max-width:none}
+  .hm-head>.hm-link,.hm-head-tools{display:none}
+
+  /* the end-of-strip / under-grid pill (44px) */
+  .mb-end{display:flex;flex:0 0 auto;align-items:center;justify-content:center;scroll-snap-align:end;min-width:0;padding-inline-end:var(--mb-gutter)}
+  .mb-pill,.hm-drop-copy>.hm-link{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:0 20px;border:1.5px solid currentColor;border-radius:22px;font-family:var(--hm-display);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;line-height:1;white-space:nowrap;transition:background .2s var(--mb-ease),color .2s var(--mb-ease),transform .12s var(--mb-ease);color:inherit}
+  html[dir="rtl"] .mb-pill,html[dir="rtl"] .hm-drop-copy>.hm-link{letter-spacing:0;text-transform:none;font-size:14px}
+  .hm-dark .mb-pill{border-color:var(--hm-volt);color:var(--hm-volt)}
+  .mb-pill:active,.hm-drop-copy>.hm-link:active{transform:scale(.97)}
+  .mb-more{display:flex;width:100%;margin-top:16px}
+  .mb-more.mb-pill{width:100%}
+  .hm-drop-copy>.hm-link{width:100%;background:var(--hm-ink);color:var(--hm-chalk);border-color:var(--hm-ink);margin-top:4px}
+  .hm-drop-copy>.hm-link:hover{gap:10px}
+
+  /* strip navigation: dots + progress bar. transform/opacity only. */
+  .mb-nav{display:flex;align-items:center;justify-content:center;gap:6px;height:24px;margin-top:8px;padding-inline:var(--mb-gutter)}
+  .mb-nav i{display:block;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.22;transition:opacity .25s var(--mb-ease),transform .25s var(--mb-ease)}
+  .mb-nav i.on{opacity:1;transform:scale(1.35)}
+  /* progress bar: <b> is the 2px track, <s> the thumb (scaleX = visible fraction, translateX = position) */
+  .mb-nav.mb-bar{position:relative;justify-content:flex-start}
+  .mb-bar b{display:block;width:100%;height:2px;background:currentColor;opacity:.16}
+  .mb-bar s{position:absolute;inset-inline:var(--mb-gutter);top:11px;height:2px;background:currentColor;transform-origin:0 50%;transform:translateX(0) scaleX(.25);will-change:transform;text-decoration:none}
+  html[dir="rtl"] .mb-bar s{transform-origin:100% 50%}
+
+  /* generic snap strip: full-bleed, visible peek, no page leak */
+  .mb-strip{display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:var(--mb-gutter);padding:4px var(--mb-gutter) 6px;margin:0;list-style:none;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .mb-strip::-webkit-scrollbar{display:none}
+  .wrap>.mb-strip,.wrap>.hm-feats,.wrap>.hm-pieces,.hm-reviews>.mb-rev-strip,.hm-drop>.hm-feats{margin-inline:calc(-1 * var(--mb-gutter))}
+  .mb-strip>*{flex:none;scroll-snap-align:start;min-width:0}
+
+  /* ---------- 2. trust strip: one auto-scrolling 48px line ---------- */
+  .hm-trust{height:48px;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .hm-trust ul{overflow:visible;width:max-content;height:48px;-webkit-mask-image:none;mask-image:none;will-change:transform}
+  html[dir="rtl"] .hm-trust ul{-webkit-mask-image:none;mask-image:none}
+  .hm-trust li{padding:0 18px;height:48px;font-size:12px;letter-spacing:.1em;border-inline-end:0;gap:10px}
+  .hm-trust li::before{width:5px;height:5px;background:var(--hm-volt);outline:1px solid var(--hm-ink)}
+  html[dir="rtl"] .hm-trust li{font-size:13px}
+  .hm-trust li[data-mb-clone]{display:flex}
+  .hm-trust[data-mb-marquee] ul{animation:mb-marquee var(--mb-marquee-dur,22s) linear infinite}
+  html[dir="rtl"] .hm-trust[data-mb-marquee] ul{animation-name:mb-marquee-rtl}
+  @keyframes mb-marquee{to{transform:translate3d(-50%,0,0)}}
+  @keyframes mb-marquee-rtl{to{transform:translate3d(50%,0,0)}}
+
+  /* ---------- 3. drop 01: full-bleed 4:5 card, countdown on its bottom edge ---------- */
+  .hm-drop{display:flex;flex-direction:column;gap:16px}
+  .hm-drop-copy{display:contents}
+  .hm-drop-copy>.hm-idx{order:-3;font-size:11px;letter-spacing:.14em}
+  .hm-drop-copy>h2{order:-2;font-size:clamp(28px,9vw,40px);max-width:none;margin-top:-6px}
+  html[dir="rtl"] .hm-drop-copy>h2{font-size:clamp(26px,8vw,36px)}
+  .hm-drop-card{order:-1;margin-inline:calc(-1 * var(--mb-gutter));border-radius:0;box-shadow:none;aspect-ratio:4/5;margin-top:4px}
+  .hm-drop-card .hm-art{inset:7% 10% 20%}
+  .hm-drop-tag{top:14px;inset-inline-start:var(--mb-gutter)}
+  .hm-drop-tag span:nth-child(2){display:none}
+  .hm-drop-name{top:14px;inset-inline-end:var(--mb-gutter);font-size:12px}
+  .hm-count{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:0 var(--mb-gutter);height:64px;background:var(--hm-ink);backdrop-filter:none;border-top:1px solid var(--hm-dark-line)}
+  .hm-count-k{font-size:10px;max-width:9ch;line-height:1.25}
+  html[dir="rtl"] .hm-count-k{font-size:12px;max-width:12ch}
+  .hm-count-v{gap:4px}
+  .hm-count-cell{gap:3px}
+  .hm-count-cell b{font-size:26px;letter-spacing:-.03em}
+  .hm-count-cell i{font-size:8.5px;letter-spacing:.08em}
+  .hm-count-sep{font-size:22px;padding-top:0}
+  .hm-lead{order:1;font-size:15px;line-height:1.5;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:none}
+  .hm-feats-k{order:2;margin:4px 0 -6px;font-size:11px}
+  .hm-feats{order:3;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:var(--mb-gutter);padding:0 var(--mb-gutter) 4px;border-top:0;width:auto;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .hm-feats::-webkit-scrollbar{display:none}
+  .hm-feat{flex:0 0 160px;display:flex;flex-direction:column;gap:0;padding:0;border:0;scroll-snap-align:start;min-width:0;background:var(--hm-paper);border-radius:12px;overflow:hidden;border:1px solid var(--hm-line)}
+  .hm-feat-thumb{width:100%;aspect-ratio:5/4;border-radius:0;background:var(--hm-chalk)}
+  .hm-feat-thumb svg>rect{display:none}
+  .hm-feat-info{padding:10px 12px 0;gap:1px}
+  .hm-feat-name{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
+  .hm-feat-sub{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hm-feat-end{flex-direction:row;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px 12px}
+  .hm-feat-price{font-size:13px}
+  .hm-add{min-height:36px;padding:0 10px;font-size:11px;gap:5px}
+  .hm-drop-copy>.hm-link{order:4}
+
+  /* ---------- 4. fit finder: 72vw cards + peek + dots ---------- */
+  .hm-fits{gap:12px;padding:2px var(--mb-gutter) 4px}
+  .hm-fit{flex:0 0 72vw}
+  .hm-fit-art{aspect-ratio:4/3.4}
+  .hm-fit-art>span{inset:5% 18% 0}
+  .hm-fit-body{padding:14px 16px 16px;gap:6px}
+  .hm-fit-n{font-size:10px}
+  .hm-fit-t{font-size:22px}
+  .hm-fit-d{font-size:13px;line-height:1.4}
+  .hm-chip{font-size:10px;padding:7px 9px;margin-top:4px}
+
+  /* ---------- 5. new in: 2 columns, 12px gaps, 6 items + "View all" pill ---------- */
+  .hm-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}
+  .hm-grid .card:nth-child(n+5){display:none}
+
+  /* ---------- 6. lookbook: 2-column mosaic (tall + squares), quote full width ---------- */
+  .hm-look{gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"a b" "a c" "d d" "e f"}
+  .hm-tile-a{aspect-ratio:auto;min-height:0}
+  .hm-tile-e,.hm-tile-f{aspect-ratio:4/3}
+  .hm-tile-e>svg,.hm-tile-f>svg{inset:4% 14%;width:72%;height:92%}
+  .hm-tile-a>svg{inset:6% 8% auto;width:84%;height:52%}
+  .hm-look-type{font-size:clamp(30px,20cqw,46px);inset-inline-start:6%;bottom:6%}
+  html[dir="rtl"] .hm-look-type{font-size:clamp(28px,19cqw,44px)}
+  .hm-tile-cap{top:10px;inset-inline-start:10px;font-size:10px;padding:7px 8px;max-width:calc(100% - 20px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hm-quote{min-height:0;padding:18px 18px 16px;gap:10px;border-radius:var(--hm-media)}
+  .hm-quote-stars{font-size:12px}
+  .hm-quote p{font-size:16px;line-height:1.35;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;max-width:none}
+  .hm-quote-foot{font-size:12px;gap:6px 10px}
+
+  /* ---------- 7. best sellers: 68vw snap slides, no arrows, progress bar ---------- */
+  .hm-track{gap:12px;padding:2px var(--mb-gutter) 4px}
+  .hm-slide{flex:0 0 68vw;max-width:none}
+  [data-hm-carousel] .hm-head{padding-inline:0}
+  .hm-arrows{display:none}
+
+  /* ---------- 8. outfit: 140px piece row, total + Add outfit pinned under ---------- */
+  .hm-outfit{gap:16px}
+  .hm-pieces{display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:var(--mb-gutter);padding:2px var(--mb-gutter) 4px;margin-inline:calc(-1 * var(--mb-gutter));scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .hm-pieces::-webkit-scrollbar{display:none}
+  .hm-piece{flex:0 0 140px;scroll-snap-align:start}
+  .hm-piece-art{aspect-ratio:4/5;border-radius:12px}
+  .hm-piece+.hm-piece::before{top:76px;font-size:22px;inset-inline-start:-6px}
+  .hm-piece:nth-child(3)::before{display:block}
+  .hm-piece-k{margin-top:10px;margin-bottom:2px;font-size:10px}
+  .hm-piece-n{font-size:13px;line-height:1.25}
+  .hm-piece-m{font-size:12px}
+  .hm-outfit-sum{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"k total" "btn btn" "note note";align-items:center;gap:6px 12px;padding:16px;border-radius:12px}
+  .hm-outfit-k{grid-area:k;font-size:10px}
+  .hm-total{grid-area:total;font-size:28px;margin:0;letter-spacing:-.03em;line-height:1}
+  .hm-outfit-sum .hm-btn{grid-area:btn;width:100%;min-height:52px;margin-top:6px;font-size:13px}
+  .hm-outfit-note{grid-area:note;font-size:12px;line-height:1.4}
+
+  /* ---------- 9. reviews: compact stat tile + 82vw snap strip ---------- */
+  .hm-reviews{display:flex;flex-direction:column;gap:14px}
+  .hm-stat{flex-direction:row;align-items:center;justify-content:space-between;gap:16px;min-height:0;padding:16px 20px;border-radius:12px}
+  .hm-big{font-size:56px;line-height:1;letter-spacing:-.04em}
+  .hm-stat-foot{align-items:flex-end;text-align:end;gap:4px;font-size:13px}
+  .hm-stars{font-size:12px;letter-spacing:2px}
+  .mb-rev-strip{display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:var(--mb-gutter);padding:2px var(--mb-gutter) 4px;margin:0 calc(-1 * var(--mb-gutter));list-style:none;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .mb-rev-strip::-webkit-scrollbar{display:none}
+  .mb-rev-strip>li{flex:0 0 82vw;scroll-snap-align:start;min-width:0;display:flex}
+  .mb-rev-strip .review{flex:1;padding:18px 18px 16px;border-radius:12px}
+  .mb-rev-strip .review::before{font-size:48px;top:6px;inset-inline-end:14px}
+  .mb-rev-strip .review p{font-size:15px;line-height:1.4;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+  .mb-rev-strip .review .who{margin-top:10px;font-size:11px}
+  .mb-rev-strip .review .tag{font-size:11px;margin-top:10px}
+
+  /* ---------- 10. stores: 70vw snap strip ---------- */
+  .hm-stores{gap:12px;padding:2px var(--mb-gutter) 4px}
+  .hm-store{flex:0 0 70vw;min-height:0;padding:16px 16px 14px;gap:6px;border-radius:12px}
+  .hm-store h3{font-size:19px}
+  .hm-store p{font-size:13px;margin-bottom:4px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .hm-open{font-size:11px;padding:6px 9px 6px 8px}
+  .hm-store-link{min-height:40px;font-size:11px}
+
+  /* ---------- 11. newsletter ---------- */
+  .hm-news{padding:var(--mb-sec) 0 !important}
+  .hm-news .note{padding:22px 18px;gap:14px !important;border-radius:12px}
+  .hm-news .note h3{font-size:24px;margin-bottom:6px}
+  .hm-news .note p{font-size:14px}
+  .hm-news .news{flex-direction:row;gap:8px}
+  .hm-news .news input{height:48px;flex:1 1 0;min-width:0}
+  .hm-news .news .btn{min-height:48px;padding:0 16px;font-size:11px}
+
+  /* ---------- 12. touch press feedback (no hover on phones) ---------- */
+  @media (hover:none){
+    .hm-fit-card,.hm-store,.hm-piece-art,.hm-tile,.hm-drop-card,.hm-feat,.hm-reviews .review,.hm-add,.hm-btn,.hm-link{transition:transform .12s var(--mb-ease)}
+    .hm-fit-card:active,.hm-store:active,.hm-piece-art:active,.hm-tile:active,.hm-feat:active,.hm-reviews .review:active{transform:scale(.97)}
+    .hm-drop-card:active .hm-art{transform:scale(.98)}
+    .hm-add:active,.hm-btn:active{transform:scale(.96)}
+    .hm-fit-card:hover{transform:none}
+  }
+
+  /* ---------- 13. shop page: 2-column grid, compact toolbar (two 44px pills), count inline ---------- */
+  main>.wrap.section.tight:has(>.shop){padding-top:20px}
+  main>.wrap.section.tight:has(>.shop)>.crumbs{margin-bottom:10px}
+  main>.wrap.section.tight:has(>.shop)>h1[style]{font-size:clamp(30px,9vw,40px)!important;margin-bottom:12px!important}
+  .shop{gap:0}
+  .toolbar{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"count count" "f s";gap:8px;margin-bottom:18px;padding-bottom:0;border-bottom:0;align-items:center}
+  .toolbar>div{display:contents}
+  .toolbar>div>.btn{grid-area:f;width:100%;min-height:44px;border-radius:22px;padding:0 14px;font-size:12px;border-width:1px;border-color:var(--ink)}
+  .toolbar>div>span{grid-area:count;font-size:12px!important;color:var(--mute);font-weight:500;padding-bottom:2px}
+  html[dir="ltr"] .toolbar>div>span{text-transform:uppercase;letter-spacing:.08em;font-size:11px!important}
+  .toolbar>label{grid-area:s;display:block;min-width:0}
+  .toolbar select{width:100%;height:44px;border-radius:22px;padding-inline:16px;border:1px solid var(--ink);font-weight:600;font-size:12px;background-position:calc(100% - 16px) 50%}
+  html[dir="rtl"] .toolbar select{background-position:16px 50%}
+  html[dir="ltr"] .toolbar select{text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+  .shop .grid,.shop .grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}
+  .shop .empty{padding:48px 18px}
+  .shop .empty h2{font-size:clamp(56px,16vw,96px)}
+  /* the full-screen filter panel: breathing room + 44px rows */
+  .filters.open{padding:14px var(--mb-gutter) calc(var(--dock-h,64px) + 16px)}
+  .filters.open .fgroup label{min-height:40px}
+  .filters.open .chip{min-height:40px}
+  .filters.open>div:last-child{position:sticky;bottom:0;background:var(--paper);padding-bottom:10px;margin-top:8px}
+  .filters.open>div:last-child .btn{min-height:52px}
+
+  /* ---------- 14. footer: newsletter first, accordion groups, badges row, social row ---------- */
+  footer{padding:20px 0 calc(var(--dock-h,64px) + 16px)}
+  footer .wrap{padding-inline:var(--mb-gutter)}
+  .fgrid,.fgrid[data-mb]{display:flex;flex-direction:column;gap:0}
+  .fgrid>div{grid-column:auto}
+  .mb-fnews{padding:0 0 20px;border-bottom:1px solid var(--line-dark,rgba(243,240,234,.14))}
+  .mb-fnews h4{margin:0 0 4px;font-size:20px;letter-spacing:-.02em;font-weight:800}
+  html[dir="rtl"] .mb-fnews h4{font-size:20px;letter-spacing:0}
+  .mb-fnews p{margin:0 0 12px;font-size:13px;color:var(--on-dark,rgba(243,240,234,.66))}
+  .mb-fnews .news{margin-top:0;flex-direction:row;gap:8px;max-width:none}
+  .mb-fnews .news input{height:48px;flex:1 1 0;min-width:0}
+  .mb-fnews .news .btn{min-height:48px;padding:0 16px;font-size:11px}
+  .mb-fdet{border-bottom:1px solid var(--line-dark,rgba(243,240,234,.14))}
+  .mb-fdet summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:0;font-family:var(--font-display,"Syne",sans-serif);font-weight:700;font-size:13px;color:var(--chalk,#F3F0EA);-webkit-tap-highlight-color:transparent}
+  html[dir="ltr"] .mb-fdet summary{text-transform:uppercase;letter-spacing:.14em}
+  .mb-fdet summary::-webkit-details-marker{display:none}
+  /* physical borders on purpose: the chevron must point down in LTR and RTL alike */
+  .mb-fdet summary::after{content:"";width:9px;height:9px;flex:none;margin-inline-end:4px;border-right:1.5px solid var(--on-dark,rgba(243,240,234,.66));border-bottom:1.5px solid var(--on-dark,rgba(243,240,234,.66));transform:rotate(45deg) translate(-2px,-2px);transition:transform .25s var(--mb-ease)}
+  .mb-fdet[open] summary::after{transform:rotate(225deg) translate(-1px,-1px)}
+  .mb-fdet summary h4{margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit}
+  .mb-fdet>div{padding:0 0 10px;display:flex;flex-wrap:wrap;gap:0 18px}
+  .mb-fdet>div a{display:inline-flex;align-items:center;min-height:40px;padding:0;font-size:14px;color:var(--on-dark,rgba(243,240,234,.66))}
+  .mb-fbrand{padding:20px 0 0;display:flex;flex-direction:column;gap:8px}
+  .mb-fbrand .logo{font-size:16px}
+  .mb-fbrand p{margin:0!important;font-size:12px!important;max-width:none!important;line-height:1.45}
+  .mb-fbrand p:first-of-type{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .mb-fbrand .pay-row{margin-top:0;gap:6px}
+  .fbottom{margin-top:18px;padding-top:14px;flex-direction:column;align-items:flex-start;gap:8px}
+  .mb-social{display:flex;flex-wrap:wrap;gap:8px}
+  .mb-social a{display:inline-flex;align-items:center;min-height:36px;padding:0 12px;border:1px solid var(--line-dark,rgba(243,240,234,.14));border-radius:18px;font-size:12px;font-weight:600;color:var(--chalk,#F3F0EA);transition:transform .12s var(--mb-ease)}
+  .mb-social a:active{transform:scale(.96)}
+}
+
+/* ---------- 15. motion safety ---------- */
+@media (prefers-reduced-motion:reduce){
+  .hm-trust[data-mb-marquee] ul{animation:none!important}
+  .mb-nav i,.mb-bar s{transition:none!important}
+  .hm-fit-card:active,.hm-store:active,.hm-piece-art:active,.hm-tile:active,.hm-feat:active,.mb-pill:active,.hm-add:active,.hm-btn:active{transform:none!important}
+}
+@media (prefers-reduced-motion:reduce) and (max-width:979px){
+  /* marquee off: show the four items as a tidy 2x2 grid instead */
+  .hm-trust{height:auto;-webkit-mask-image:none;mask-image:none}
+  .hm-trust ul{display:grid;grid-template-columns:1fr 1fr;width:auto;height:auto}
+  .hm-trust li{height:40px;font-size:10px;padding:0 var(--mb-gutter);white-space:normal}
+  .hm-trust li[data-mb-clone]{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -2709,6 +2984,246 @@ main>.wrap.section:not(.tight)>.empty p{font-size:17px;margin-bottom:22px}
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot); else setTimeout(boot, 0);
 
   global.MBCommerce = MB;
+})(window);
+
+</script>
+<script>
+/* ===== MOBILE HOME (agent) ===== */
+/* ============================================================
+   COREWARE — mobile-home.js  (agent: mobile/home)
+   window.MBHome = { pageEnter(root, page), footer(), destroy() }
+   Phone-only DOM helpers for what CSS cannot do:
+     - trust strip: clones the items once so the 48px line loops seamlessly
+     - snap strips: dots (fits, stores, reviews) / progress bar (best sellers)
+       that track scroll position with transform only
+     - the top-right "View all" link becomes a 44px pill at the end of the
+       strip (or under the grid)
+     - reviews: wraps the three review cards in a snap strip
+     - footer: the link columns become <details> accordions, newsletter first,
+       social links become a row (re-applied whenever renderChrome() rewrites it)
+   Idempotent: every transform is guarded by a data-mb-* marker and undone
+   when the viewport grows past 979px. No libraries. Only transform/opacity
+   change at runtime.
+   ============================================================ */
+(function (global) {
+  "use strict";
+  if (global.MBHome) return;
+  const doc = document;
+  const mq = global.matchMedia ? matchMedia("(max-width:979px)") : { matches: false, addEventListener() {} };
+  const isPhone = () => mq.matches;
+  let liveRoot = null, livePage = "", scrollHandlers = [], footerObs = null;
+
+  /* ---------- helpers ---------- */
+  function rafScroll(el, fn) {
+    let ticking = false;
+    const h = () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { ticking = false; fn(); }); };
+    el.addEventListener("scroll", h, { passive: true });
+    scrollHandlers.push([el, h]);
+    fn();
+  }
+  const rtl = el => getComputedStyle(el).direction === "rtl";
+  const absLeft = el => Math.abs(el.scrollLeft);
+
+  /* ---------- strips: dots / bar ---------- */
+  function dots(strip, items) {
+    if (strip.dataset.mbNav) return;
+    strip.dataset.mbNav = "dots";
+    const nav = doc.createElement("div");
+    nav.className = "mb-nav"; nav.setAttribute("aria-hidden", "true");
+    nav.innerHTML = items.map(() => "<i></i>").join("");
+    strip.insertAdjacentElement("afterend", nav);
+    const ds = [...nav.children];
+    let cur = -1;
+    rafScroll(strip, () => {
+      const first = items[0]; if (!first) return;
+      const step = first.getBoundingClientRect().width + (parseFloat(getComputedStyle(strip).columnGap) || 12);
+      const max = strip.scrollWidth - strip.clientWidth;
+      let i = Math.round(absLeft(strip) / step);
+      if (absLeft(strip) >= max - 2) i = items.length - 1;
+      i = Math.max(0, Math.min(items.length - 1, i));
+      if (i === cur) return; cur = i;
+      ds.forEach((d, k) => d.classList.toggle("on", k === i));
+    });
+  }
+  function bar(strip) {
+    if (strip.dataset.mbNav) return;
+    strip.dataset.mbNav = "bar";
+    const nav = doc.createElement("div");
+    nav.className = "mb-nav mb-bar"; nav.setAttribute("aria-hidden", "true");
+    nav.innerHTML = "<b></b><s></s>";
+    strip.insertAdjacentElement("afterend", nav);
+    const thumb = nav.lastElementChild;
+    rafScroll(strip, () => {
+      const sw = strip.scrollWidth || 1, cw = strip.clientWidth;
+      const frac = Math.min(1, cw / sw);
+      const pos = (absLeft(strip) / sw) * 100;             // % of the full track width
+      thumb.style.transform = `translateX(${rtl(strip) ? -pos : pos}%) scaleX(${frac})`;
+    });
+  }
+
+  /* ---------- the "View all" link -> pill at the end of the strip / under the grid ---------- */
+  function movePill(section, strip, { asItem }) {
+    if (!section || section.querySelector(".mb-end, .mb-more")) return;
+    const link = section.querySelector(".hm-head .hm-link, .hm-head-tools .hm-link");
+    if (!link) return;
+    const a = link.cloneNode(true);
+    a.className = "mb-pill" + (asItem ? "" : " mb-more");
+    a.removeAttribute("id");
+    if (asItem) {
+      const li = doc.createElement(strip.tagName === "UL" || strip.tagName === "OL" ? "li" : "div");
+      li.className = "mb-end"; li.appendChild(a);
+      strip.appendChild(li);
+    } else {
+      strip.insertAdjacentElement("afterend", a);
+    }
+  }
+
+  /* ---------- trust marquee ---------- */
+  function trust(root) {
+    const el = root.querySelector(".hm-trust");
+    if (!el || el.dataset.mbMarquee) return;
+    const ul = el.querySelector("ul"); if (!ul) return;
+    const items = [...ul.children];
+    items.forEach(li => { const c = li.cloneNode(true); c.setAttribute("aria-hidden", "true"); c.removeAttribute("role"); c.dataset.mbClone = "1"; ul.appendChild(c); });
+    el.dataset.mbMarquee = "1";
+    // duration proportional to the width so the speed is constant (~45px/s)
+    requestAnimationFrame(() => { const w = ul.scrollWidth / 2; el.style.setProperty("--mb-marquee-dur", Math.max(14, Math.round(w / 45)) + "s"); });
+  }
+
+  /* ---------- reviews: wrap the review cards in a snap strip ---------- */
+  function reviews(root) {
+    const box = root.querySelector(".hm-reviews");
+    if (!box || box.querySelector(".mb-rev-strip")) return;
+    const cards = [...box.querySelectorAll(":scope > .review")];
+    if (!cards.length) return;
+    const ul = doc.createElement("ul"); ul.className = "mb-rev-strip"; ul.setAttribute("role", "list");
+    cards.forEach(c => { const li = doc.createElement("li"); li.appendChild(c); ul.appendChild(li); });
+    box.appendChild(ul);
+    return ul;
+  }
+  function unwrapReviews(root) {
+    const ul = root.querySelector(".hm-reviews > .mb-rev-strip"); if (!ul) return;
+    const box = ul.parentElement;
+    [...ul.querySelectorAll(":scope > li > .review")].forEach(c => box.appendChild(c));
+    ul.remove();
+  }
+
+  /* ---------- footer accordion ---------- */
+  function footer() {
+    const grid = doc.getElementById("footerGrid"), bottom = doc.getElementById("footerBottom");
+    if (!grid) return;
+    if (!isPhone()) { restoreFooter(); return; }
+    // renderChrome() rewrites innerHTML but keeps the container, so test for our children, not a marker
+    if (!grid.querySelector(".mb-fdet")) {
+      const cols = [...grid.children];
+      if (cols.length < 4) return;
+      grid.__mbOrig = grid.innerHTML;
+      const [brand, shop, help, company] = cols;
+      // newsletter block out of the company column
+      const newsH = company.querySelector("h4:last-of-type"), form = company.querySelector("form.news");
+      const news = doc.createElement("div"); news.className = "mb-fnews";
+      if (newsH) news.appendChild(newsH);
+      if (form) news.appendChild(form);
+      const det = (col) => {
+        const d = doc.createElement("details"); d.className = "mb-fdet";
+        const s = doc.createElement("summary");
+        const h = col.querySelector("h4"); if (h) s.appendChild(h); else s.textContent = col.textContent.trim().slice(0, 24);
+        const body = doc.createElement("div");
+        [...col.children].forEach(ch => body.appendChild(ch));
+        d.appendChild(s); d.appendChild(body); return d;
+      };
+      const frag = doc.createDocumentFragment();
+      frag.appendChild(news);
+      frag.appendChild(det(shop)); frag.appendChild(det(help)); frag.appendChild(det(company));
+      brand.className = "mb-fbrand"; frag.appendChild(brand);
+      grid.dataset.mb = "1";
+      grid.innerHTML = ""; grid.appendChild(frag);
+    }
+    if (bottom && !bottom.querySelector(".mb-social")) {
+      const social = bottom.querySelector("span:last-child");
+      if (social && social.querySelector("a")) {
+        const nav = doc.createElement("nav"); nav.className = "mb-social"; nav.setAttribute("aria-label", "Social");
+        bottom.__mbOrig = social.outerHTML;           // capture BEFORE the anchors move
+        [...social.querySelectorAll("a")].forEach(a => nav.appendChild(a));
+        social.replaceWith(nav);
+      }
+      bottom.dataset.mb = "1";
+    }
+  }
+  function restoreFooter() {
+    const grid = doc.getElementById("footerGrid"), bottom = doc.getElementById("footerBottom");
+    // only undo our own transform; a fresh render (no .mb-fdet) is left alone so a stale copy never overwrites it
+    if (grid && grid.querySelector(".mb-fdet") && grid.__mbOrig != null) { delete grid.dataset.mb; grid.innerHTML = grid.__mbOrig; }
+    if (bottom) { delete bottom.dataset.mb; const n = bottom.querySelector(".mb-social"); if (n && bottom.__mbOrig) n.outerHTML = bottom.__mbOrig; }
+  }
+  function watchFooter() {
+    if (footerObs || !("MutationObserver" in global)) return;
+    const f = doc.querySelector("footer"); if (!f) return;
+    // renderChrome() rewrites #footerGrid / #footerBottom innerHTML on every render and cart change
+    footerObs = new MutationObserver(muts => {
+      for (const m of muts) {
+        const t = m.target;
+        if ((t.id === "footerGrid" && !t.querySelector(".mb-fdet")) || (t.id === "footerBottom" && !t.querySelector(".mb-social"))) { footer(); return; }
+      }
+    });
+    footerObs.observe(f, { childList: true, subtree: true });
+  }
+
+  /* ---------- page ---------- */
+  function teardown() {
+    scrollHandlers.forEach(([el, h]) => el.removeEventListener("scroll", h));
+    scrollHandlers = [];
+  }
+  function applyHome(root) {
+    trust(root);
+    // fits
+    const fits = root.querySelector(".hm-fits");
+    if (fits) { movePill(fits.closest("section"), fits, { asItem: true }); dots(fits, [...fits.querySelectorAll(":scope > .hm-fit")]); }
+    // new in: pill under the grid
+    const grid = root.querySelector(".hm-grid");
+    if (grid) movePill(grid.closest("section"), grid, { asItem: false });
+    // lookbook: pill under the mosaic
+    const look = root.querySelector(".hm-look");
+    if (look) movePill(look.closest("section"), look, { asItem: false });
+    // best sellers: pill in the track + progress bar
+    const track = root.querySelector(".hm-track");
+    if (track) { movePill(track.closest("section"), track, { asItem: true }); bar(track); }
+    // outfit pieces: nothing to add (4 pieces + pinned summary)
+    // reviews: strip + dots
+    const rev = reviews(root) || root.querySelector(".mb-rev-strip");
+    if (rev) dots(rev, [...rev.children]);
+    // stores: pill in the strip + dots
+    const stores = root.querySelector(".hm-stores");
+    if (stores) { movePill(stores.closest("section"), stores, { asItem: true }); dots(stores, [...stores.querySelectorAll(":scope > .hm-store")]); }
+  }
+  function undoHome(root) {
+    unwrapReviews(root);
+    root.querySelectorAll(".mb-nav, .mb-end, .mb-more").forEach(n => n.remove());
+    root.querySelectorAll("[data-mb-nav]").forEach(n => delete n.dataset.mbNav);
+    const tr = root.querySelector(".hm-trust[data-mb-marquee]");
+    if (tr) { tr.querySelectorAll("[data-mb-clone]").forEach(n => n.remove()); delete tr.dataset.mbMarquee; }
+  }
+
+  const MBHome = {
+    version: "1.0",
+    pageEnter(root, page) {
+      root = root || doc.getElementById("app");
+      if (!root) return;
+      teardown();
+      liveRoot = root; livePage = page || ((location.hash || "#/").replace(/^#\/?/, "").split(/[/?]/)[0] || "home");
+      if (livePage === "home" && root.querySelector(".hm")) {
+        if (isPhone()) applyHome(root); else undoHome(root);
+      }
+      footer(); watchFooter();
+    },
+    footer,
+    destroy() { teardown(); if (liveRoot) undoHome(liveRoot); restoreFooter(); if (footerObs) { footerObs.disconnect(); footerObs = null; } }
+  };
+  // viewport crosses 979px (rotation, resize): re-apply or undo
+  const onChange = () => { if (liveRoot && livePage === "home" && liveRoot.querySelector(".hm")) { teardown(); if (isPhone()) applyHome(liveRoot); else undoHome(liveRoot); } footer(); };
+  if (mq.addEventListener) mq.addEventListener("change", onChange); else if (mq.addListener) mq.addListener(onChange);
+
+  global.MBHome = MBHome;
 })(window);
 
 </script>
@@ -4005,6 +4520,7 @@ function render(){
   if(page==="home")initHero(app);
   initHomeWidgets(page==="home"?app:null);
   renderChrome();
+  if(window.MBHome)MBHome.pageEnter(app,page);
   if(lastPage!==page||page!=="shop")window.scrollTo({top:0,behavior:"instant"});
   const titles={home:"",shop:t("shop"),product:id&&PRODUCTS.find(p=>p.id===id)?pname(PRODUCTS.find(p=>p.id===id)):"",cart:t("cart"),checkout:t("checkout"),stores:t("storesPage"),faq:t("faqTitle"),contact:t("contactTitle"),about:t("aboutTitle"),track:t("trackTitle"),wishlist:t("wishlist"),account:t("account"),admin:t("adminTitle"),"size-guide":t("sizeTitle"),policies:t("policyTitle"),drops:t("dropTitle")};
   document.title=(titles[page]?titles[page]+" — ":"")+"Coreware";
