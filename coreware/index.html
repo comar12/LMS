@@ -3387,10 +3387,10 @@ html.mb-lite.mb-js.mb-touch .mb-cue svg{animation:none}
 /* ===== REVEAL SAFETY NET (Safari): anything in view that is still hidden gets revealed ===== */
 (function(){
   function sweep(){var h=innerHeight,w=innerWidth,els=document.querySelectorAll(".mo-reveal:not(.mo-in)");for(var i=0;i<els.length;i++){var el=els[i],r=el.getBoundingClientRect();if(r.width>0&&r.height>0&&r.bottom>-80&&r.top<h+80&&r.right>0&&r.left<w){el.classList.add("mo-in");(function(el){setTimeout(function(){el.classList.remove("mo-reveal","mo-in","mo-up","mo-scale","mo-clip","mo-fade");el.style.transitionDelay="";},950);})(el);}}}
-  var t=0;function sched(){if(t)return;t=setTimeout(function(){t=0;sweep();},160);}
+  var t=0;function sched(){if(t)return;t=setTimeout(function(){t=0;sweep();},70);}
   addEventListener("scroll",sched,{capture:true,passive:true});addEventListener("resize",sched);addEventListener("orientationchange",sched);
   addEventListener("hashchange",function(){setTimeout(sweep,600);setTimeout(sweep,1400);});
-  setTimeout(sweep,1200);setTimeout(sweep,2600);setInterval(sweep,1500);
+  setTimeout(sweep,1200);setTimeout(sweep,2600);setInterval(sweep,600);
 })();
 </script>
 <script>
