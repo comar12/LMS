@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Coreware — Streetwear built from the core</title>
 <meta name="description" content="Coreware: baggy denim, heavyweight cotton tees and hoodies, made in Egypt. Cash on delivery, 14-day returns, free in-store exchange at 5 stores.">
 <meta property="og:title" content="Coreware — Streetwear built from the core">
@@ -2116,6 +2116,186 @@ main>.wrap.section:not(.tight)>.empty p{font-size:17px;margin-bottom:22px}
   .hm-trust li[data-mb-clone]{display:none}
 }
 
+
+/* ===== MOBILE HERO + CHROME (agent) ===== */
+/* ============================================================
+   COREWARE — MOBILE HERO + CHROME  (agent: mobile/hero, prefix: mb-)
+   Scope: phones only. Every rule lives inside @media (max-width:979px)
+   or @media (hover:none). Desktop (≥980px, fine pointer) is untouched.
+   Depends on: .hx-* hero markup, .announce, .header/.bar/.logo/.lang,
+   .dock, tokens --ink --chalk --volt --ease --header-h --dock-h.
+   Animates only transform / opacity / clip-path.
+   ============================================================ */
+
+@media (max-width:979px){
+
+/* ------------------------------------------------------------
+   0. chrome tokens
+   ------------------------------------------------------------ */
+:root{--header-h:56px;--mb-header-min:48px;--mb-ann-h:36px;--mb-ease:cubic-bezier(.22,1,.36,1)}
+
+/* ------------------------------------------------------------
+   1. ANNOUNCEMENT BAR — one line, auto-scrolling marquee, 36px
+   ------------------------------------------------------------ */
+.announce{height:var(--mb-ann-h);padding:0;display:flex;align-items:center;overflow:hidden;white-space:nowrap;text-align:start;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.mb-ann-track{display:flex;flex:0 0 auto;align-items:center;will-change:transform;animation:mb-ann 26s linear infinite}
+html[dir="rtl"] .mb-ann-track{animation-name:mb-ann-rtl}
+.mb-ann-set{display:flex;align-items:center;flex:0 0 auto;padding-inline-end:28px;gap:28px}
+.mb-ann-item{display:inline-flex;align-items:center;gap:28px;white-space:nowrap}
+.mb-ann-item b{color:var(--volt)}
+.mb-ann-sep{display:block;width:5px;height:5px;background:var(--volt);transform:rotate(45deg);flex:0 0 auto}
+@keyframes mb-ann{to{transform:translate3d(-50%,0,0)}}
+@keyframes mb-ann-rtl{to{transform:translate3d(50%,0,0)}}
+
+/* ------------------------------------------------------------
+   2. HEADER — 56px, shrinks to 48px with hairline + blur after 40px
+   (transform-only: the bar is translated, never re-laid-out)
+   ------------------------------------------------------------ */
+.header{will-change:transform;transition:transform .32s var(--mb-ease),background .32s var(--mb-ease),box-shadow .32s var(--mb-ease);border-bottom-width:0}
+.header .bar{height:var(--header-h);gap:2px;transition:transform .32s var(--mb-ease)}
+.logo{font-size:15px;gap:8px;transform-origin:0 50%;transition:transform .32s var(--mb-ease)}
+html[dir="rtl"] .logo{transform-origin:100% 50%}
+.logo .mark{width:24px;height:24px}
+.logo .mark i{width:11px;height:11px;border-width:2.5px}
+.header.mb-shrunk{transform:translate3d(0,calc(var(--mb-header-min) - var(--header-h)),0);
+  background:rgba(243,240,234,.86);-webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);
+  box-shadow:0 1px 0 rgba(10,10,10,.1),0 8px 24px -16px rgba(10,10,10,.25)}
+.header.mb-shrunk .bar{transform:translate3d(0,calc((var(--header-h) - var(--mb-header-min)) / 2),0)}
+.header.mb-shrunk .logo{transform:scale(.86)}
+.header .icon-btn{width:40px;height:44px}
+/* language toggle → 36px pill reading the *other* language's code */
+.lang{position:relative;height:36px;min-width:40px;padding:0 9px;margin-inline-end:4px;border-radius:18px;border:1px solid var(--ink);
+  font-family:var(--font-display);font-weight:700;font-size:11px;letter-spacing:.08em;line-height:1}
+.lang span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.lang::before{content:"AR"}
+html[lang="ar"] .lang::before{content:"EN"}
+.lang::after{content:"";position:absolute;inset:-4px;border-radius:inherit}  /* 44px tap area */
+
+/* ------------------------------------------------------------
+   3. DOCK — app tab bar: 24px icons, 11px labels, hairline, blur,
+   sliding volt indicator (fixed sibling, transform-only)
+   ------------------------------------------------------------ */
+.dock{height:calc(var(--dock-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);
+  background:rgba(243,240,234,.92);-webkit-backdrop-filter:saturate(1.5) blur(18px);backdrop-filter:saturate(1.5) blur(18px);
+  border-top:0;box-shadow:0 -1px 0 rgba(10,10,10,.08)}
+.dock a,.dock button{gap:5px;font-size:11px;font-weight:600;letter-spacing:.02em;text-transform:none;-webkit-tap-highlight-color:transparent}
+html[dir="ltr"] .dock a,html[dir="ltr"] .dock button{text-transform:none;letter-spacing:.02em}
+.dock svg{width:24px;height:24px;stroke-width:1.7;transition:transform .2s var(--mb-ease)}
+.dock a.active svg,.dock button.mb-on svg{stroke-width:2}
+.dock a.active::after{display:none}
+.dock .badge-count{top:4px;inset-inline-end:calc(50% - 22px);will-change:transform}
+.dock .badge-count.mb-pop{animation:mb-pop .5s var(--mb-ease)}
+@keyframes mb-pop{0%{transform:scale(1)}30%{transform:scale(1.55)}60%{transform:scale(.9)}100%{transform:scale(1)}}
+.mb-dock-ind{position:fixed;left:0;bottom:calc(var(--dock-h) + env(safe-area-inset-bottom,0px) - 2px);width:20%;height:2px;z-index:56;pointer-events:none;
+  display:flex;justify-content:center;will-change:transform;transition:transform .42s var(--mb-ease),opacity .2s;opacity:0}
+.mb-dock-ind.mb-show{opacity:1}
+.mb-dock-ind::before{content:"";width:28px;height:2px;background:var(--volt);box-shadow:0 0 0 .5px var(--ink),0 2px 10px rgba(216,255,61,.6)}
+
+/* ------------------------------------------------------------
+   4. HERO — full first viewport, cards fanned under the headline
+   ------------------------------------------------------------ */
+.hx-hero{min-height:0;--mb-chrome:calc(var(--header-h) + var(--mb-ann-h));--mb-dock:calc(var(--dock-h) + env(safe-area-inset-bottom,0px))}
+.hx-wrap{display:flex;flex-direction:column;gap:0;
+  /* first-screen height: svh (viewport with the URL bar shown) so the box never resizes mid-scroll; vh is the fallback */
+  min-height:calc(100vh - var(--mb-chrome));
+  min-height:calc(100svh - var(--mb-chrome));
+  padding:10px var(--hx-gutter) calc(var(--mb-dock) + 10px)}
+
+/* copy: eyebrow + title pinned top, lead + CTA pinned bottom (margin-top:auto) */
+.hx-copy{flex:1 1 auto;gap:8px;z-index:2;padding-bottom:0}
+/* static scrim under lead + CTAs (painted once; MBHero fades the lead/link while the cards rise past it) */
+.hx-copy::after{content:"";position:absolute;z-index:-1;inset-inline:calc(var(--hx-gutter) * -1);bottom:calc((var(--mb-dock) + 10px) * -1);height:var(--mb-scrim,52%);pointer-events:none;
+  background:linear-gradient(to top,var(--hx-ink) 0,var(--hx-ink) 40%,rgba(10,10,10,.9) 58%,rgba(10,10,10,.55) 76%,rgba(10,10,10,0) 100%)}
+.hx-lead,.hx-btn-ghost{will-change:opacity}
+.hx-eyebrow{font-size:11px;letter-spacing:.18em;gap:10px}
+.hx-hero[dir="rtl"] .hx-eyebrow{font-size:13px}
+.hx-title{font-size:min(15vw,8.8svh);line-height:.92;transform-origin:0 0;will-change:transform;position:relative}
+.hx-hero[dir="rtl"] .hx-title{font-size:min(14vw,8.4svh);line-height:1.15;transform-origin:100% 0}
+/* MBHero writes the scroll transform inline on the h1; the theme's `main h1[style]` normaliser must not resize it */
+main .hx-hero .hx-title[style]{font-size:min(15vw,8.8svh)!important}
+main .hx-hero[dir="rtl"] .hx-title[style]{font-size:min(14vw,8.4svh)!important}
+.hx-lead{margin-top:auto;align-self:stretch;max-width:none;font-size:14px;line-height:1.4;color:rgba(243,240,234,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hx-hero[dir="rtl"] .hx-lead{font-size:15px}
+.hx-cta{flex-direction:column;gap:2px;width:100%;margin-top:0}
+.hx-btn{height:52px;width:100%;padding:0 18px;font-size:13px;letter-spacing:.12em;font-family:var(--hx-display);font-weight:700}
+.hx-hero[dir="rtl"] .hx-btn{font-size:15px}
+.hx-btn-primary{box-shadow:0 14px 34px -14px rgba(216,255,61,.55)}
+/* secondary becomes a text link: 44px tap height, volt underline, centred */
+.hx-btn-ghost{box-shadow:none;height:42px;width:auto;align-self:center;padding:0 6px;gap:8px;font-size:12px;letter-spacing:.14em;color:rgba(243,240,234,.86)}
+.hx-btn-ghost::before{display:none}
+.hx-btn-ghost span{box-shadow:inset 0 -1.5px 0 var(--hx-volt);padding-bottom:3px}
+.hx-btn-ghost svg{width:15px;height:15px}
+/* touch press feedback */
+.hx-btn:active{transform:scale(.97)!important;transition:transform .12s var(--hx-ease)}
+
+/* visual band sits behind the copy, under the headline */
+.hx-visual{position:absolute;inset-inline:calc(var(--hx-gutter) * -1);top:var(--mb-band-top,41%);aspect-ratio:auto;
+  height:min(46svh,420px);z-index:1;perspective:1100px;overflow:visible;pointer-events:none}
+.hx-ring{opacity:0;transform:scale(.9) rotate(-8deg);transition:opacity .8s ease .1s,transform .9s var(--hx-ease) .1s}
+.hx-hero.is-in .hx-ring{opacity:.9;transform:none}
+.hx-ring-in{width:128vw;max-width:none;will-change:auto}   /* static after the reveal: no per-frame layer */
+.hx-hero.is-done .hx-ring{will-change:auto}
+.hx-ring text{font-size:12px;letter-spacing:3px}
+.hx-stage{will-change:transform}
+.hx-slot{--w:min(36svh,56vw);transform:none!important}  /* kill initHero's desktop parallax; MBHero drives the cards */
+/* fan geometry — MBHero mirrors these numbers (MB_FAN) when it takes over after .is-done */
+.hx-slot-1{--x:-42%;--y:12%;--r:-11deg;--z:1;--mb-z:0px}
+.hx-slot-2{--x:0%;--y:-7%;--r:0deg;--z:3;--mb-z:44px}
+.hx-slot-3{--x:42%;--y:14%;--r:10deg;--z:2;--mb-z:20px}
+.hx-card{will-change:transform,opacity}
+.hx-hero.is-in .hx-card{transform:translate3d(calc(var(--x) * var(--hx-dir)),var(--y),var(--mb-z,0px)) rotate(calc(var(--r) * var(--hx-dir))) scale(1)}
+.hx-hero.is-done .hx-card{transition:opacity .3s ease}   /* scroll-linked: no transform lag */
+.hx-card-in{box-shadow:0 34px 60px -20px rgba(0,0,0,.85),0 14px 24px -12px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07)}
+.hx-tag{font-size:9px;letter-spacing:.1em;flex-direction:row;gap:6px;padding:5px 8px;white-space:nowrap}
+.hx-coords{display:none}
+
+/* strip: lives below the first screen on phones */
+.hx-strip{height:48px}
+.hx-cue{padding-inline:var(--hx-gutter) 14px;font-size:9px}
+.hx-group{font-size:12px;gap:20px;padding-inline-end:20px}
+
+/* shorter load sequence on phones (≤1.1s total) */
+.hx-line-in{transition-duration:.7s,.7s}
+.hx-line:nth-child(1) .hx-line-in{transition-delay:.06s}
+.hx-line:nth-child(2) .hx-line-in{transition-delay:.13s}
+.hx-line:nth-child(3) .hx-line-in{transition-delay:.2s}
+.hx-line:nth-child(4) .hx-line-in{transition-delay:.27s}
+.hx-rv{transition-duration:.5s,.6s}
+.hx-eyebrow.hx-rv{transition-delay:.02s}
+.hx-lead.hx-rv{transition-delay:.34s}
+.hx-cta .hx-rv:nth-child(1){transition-delay:.42s}
+.hx-cta .hx-rv:nth-child(2){transition-delay:.5s}
+.hx-btn{transition:color .22s ease,opacity .5s ease,transform .6s var(--hx-ease)}
+.hx-card{transition:opacity .5s ease,transform .8s var(--hx-ease)}
+.hx-slot-1 .hx-card{transition-delay:.18s}
+.hx-slot-2 .hx-card{transition-delay:.26s}
+.hx-slot-3 .hx-card{transition-delay:.34s}
+.hx-glow{transition-duration:.9s}
+.hx-strip{transition-delay:.55s,.55s}
+.hx-hero.is-done .hx-rv,.hx-hero.is-done .hx-btn,.hx-hero.is-done .hx-line-in,.hx-hero.is-done .hx-ring,.hx-hero.is-done .hx-strip,.hx-hero.is-done .hx-glow{transition-delay:0s}
+
+/* reduced motion: no scroll/tilt motion (JS checks too), keep fades */
+@media (prefers-reduced-motion:reduce){
+  .mb-ann-track{animation:none}
+  .announce{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
+  .header,.header .bar,.logo,.mb-dock-ind{transition:none}
+  .dock .badge-count.mb-pop{animation:none}
+  .hx-title,.hx-stage,.hx-ring-in,.hx-slot{transform:none!important}
+  .hx-btn:active{transform:none!important}
+}
+} /* end ≤979px */
+
+/* the dock indicator element is appended to <body> once; it must not exist visually on desktop */
+@media (min-width:980px){.mb-dock-ind{display:none}}
+
+/* touch-only behaviour (any width) */
+@media (hover:none){
+  .dock a:active svg,.dock button:active svg{transform:scale(.86)}
+  .hx-hero.is-done .hx-slot:hover{--lift:0%}
+}
+
+.mb-bar{bottom:calc(var(--dock-h) + env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
@@ -3236,7 +3416,7 @@ en:{
   skip:"Skip to content", close:"Close", yourCart:"Your cart",
   announce:"<b>Free shipping</b> over EGP 1,800 · 14-day returns · Cash on delivery · Free exchange in 5 stores",
   nav:{new:"New",drops:"Drops",denim:"Denim",tops:"Tops",bottoms:"Bottoms",outer:"Outerwear",shoes:"Shoes",acc:"Accessories",sale:"Sale",stores:"Stores"},
-  heroEyebrow:"Drop 01 · Fall 26", heroTitle:"Built from the core.", heroLead:"Heavyweight cotton, baggy denim and clean cuts, made in Egypt. No noise, just the pieces you actually wear.",
+  heroEyebrow:"Drop 01 · Fall 26", heroLeadShort:"Heavyweight cotton. Baggy denim. Made in Egypt.", heroTitle:"Built from the core.", heroLead:"Heavyweight cotton, baggy denim and clean cuts, made in Egypt. No noise, just the pieces you actually wear.",
   shopDrop:"Shop the drop", findFit:"Find your fit",
   trust:["Cash on delivery across Egypt","14-day returns, free in-store exchange","Delivery in 1–4 days","5 stores in Cairo & Alexandria"],
   marquee:"Cash on delivery · Free exchange in-store · 14-day returns · Delivery in 1–4 days · Made in Egypt",
@@ -3288,7 +3468,7 @@ ar:{
   skip:"انتقل إلى المحتوى", close:"إغلاق", yourCart:"سلة التسوق",
   announce:"<b>شحن مجاني</b> للطلبات فوق 1,800 جنيه · إرجاع خلال 14 يوم · الدفع عند الاستلام · استبدال مجاني في 5 فروع",
   nav:{new:"جديد",drops:"الإصدارات",denim:"جينز",tops:"تيشيرتات",bottoms:"بناطيل",outer:"جواكت",shoes:"أحذية",acc:"إكسسوارات",sale:"تخفيضات",stores:"الفروع"},
-  heroEyebrow:"الإصدار 01 · خريف 26", heroTitle:"مبني من الأساس.", heroLead:"قطن ثقيل، جينز واسع وقصّات نظيفة، صناعة مصرية. بدون ضجيج، فقط القطع التي ترتديها فعلاً.",
+  heroEyebrow:"الإصدار 01 · خريف 26", heroLeadShort:"قطن ثقيل، جينز واسع، صناعة مصرية.", heroTitle:"مبني من الأساس.", heroLead:"قطن ثقيل، جينز واسع وقصّات نظيفة، صناعة مصرية. بدون ضجيج، فقط القطع التي ترتديها فعلاً.",
   shopDrop:"تسوّق الإصدار", findFit:"اعرف مقاسك",
   trust:["الدفع عند الاستلام في كل مصر","إرجاع خلال 14 يوم واستبدال مجاني في الفرع","التوصيل خلال 1–4 أيام","5 فروع في القاهرة والإسكندرية"],
   marquee:"الدفع عند الاستلام · استبدال مجاني في الفرع · إرجاع خلال 14 يوم · التوصيل خلال 1–4 أيام · صناعة مصرية",
@@ -4518,6 +4698,7 @@ function render(){
   Motion.pageEnter(app);
   if(window.MBCommerce)MBCommerce.pageEnter(app,page);
   if(page==="home")initHero(app);
+  if(page==="home"&&window.MBHero)MBHero.init(app);
   initHomeWidgets(page==="home"?app:null);
   renderChrome();
   if(window.MBHome)MBHome.pageEnter(app,page);
@@ -4620,8 +4801,317 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
 // close panels on navigation
 window.addEventListener("hashchange",()=>{closeAll()});
 
+/* ===== MOBILE HERO + CHROME (agent) ===== */
+/* ============================================================
+   COREWARE — MOBILE HERO + CHROME  (agent: mobile/hero)
+   window.MBHero   = { init(root), destroy() }   call after initHero(app) on home
+   window.MBChrome = { init(), destroy() }       call once at boot (idempotent)
+   window.MB       = { badgePop() }
+   Vanilla, no deps. Phones only: everything no-ops above 979px and
+   re-arms itself when the viewport crosses the breakpoint.
+   Only transform / opacity / custom-props are written per frame.
+   ============================================================ */
+(function (win, doc) {
+  "use strict";
+  if (!win || !doc) return;
+
+  var mq = win.matchMedia ? win.matchMedia("(max-width:979px)") : null;
+  var isPhone = function () { return !!(mq && mq.matches); };
+  var reduced = function () { return !!(win.matchMedia && win.matchMedia("(prefers-reduced-motion: reduce)").matches); };
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var onMQ = function (fn) {
+    if (!mq) return function () {};
+    if (mq.addEventListener) { mq.addEventListener("change", fn); return function () { mq.removeEventListener("change", fn); }; }
+    mq.addListener(fn); return function () { mq.removeListener(fn); };
+  };
+
+  /* ============================================================
+     MBHero
+     ============================================================ */
+  var MB_LEAD = {
+    en: "Heavyweight cotton. Baggy denim. Made in Egypt.",
+    ar: "قطن ثقيل، جينز واسع، صناعة مصرية."
+  };
+  var hero = null;        // live instance
+  var heroRoot = null;    // last root passed to init (for MQ re-arm)
+  var heroMQOff = null;
+
+  function resolveHero(root) {
+    if (!root) return doc.querySelector(".hx-hero");
+    if (root.matches && root.matches(".hx-hero")) return root;
+    return root.querySelector ? root.querySelector(".hx-hero") : null;
+  }
+
+  function heroInit(root) {
+    heroRoot = root || null;
+    if (hero) hero.destroy();
+    if (!heroMQOff) heroMQOff = onMQ(function () { heroInit(heroRoot); });
+    if (!isPhone()) return null;
+    var el = resolveHero(root);
+    if (!el || !el.isConnected) return null;
+
+    var wrap = el.querySelector(".hx-wrap");
+    var copy = el.querySelector(".hx-copy");
+    var title = el.querySelector(".hx-title");
+    var lead = el.querySelector(".hx-lead");
+    var stage = el.querySelector(".hx-stage");
+    var ringIn = el.querySelector(".hx-ring-in");
+    var slots = Array.prototype.slice.call(el.querySelectorAll(".hx-slot"));
+    if (!wrap || !copy || !title) return null;
+
+    var offs = [], timers = [], raf = 0, destroyed = false;
+    var on = function (tgt, ev, fn, opt) { tgt.addEventListener(ev, fn, opt); offs.push(function () { tgt.removeEventListener(ev, fn, opt); }); };
+    var noMotion = reduced();
+    var lang = (el.getAttribute("lang") || doc.documentElement.lang || "en").slice(0, 2) === "ar" ? "ar" : "en";
+
+    /* --- one-line lead (restored on destroy); i18n key heroLeadShort wins if present --- */
+    if (lead && !lead.dataset.mbFull) {
+      lead.dataset.mbFull = lead.textContent;
+      var s = null;
+      try { if (typeof win.t === "function") { var v = win.t("heroLeadShort"); if (typeof v === "string" && v !== "heroLeadShort") s = v; } } catch (e) {}
+      lead.textContent = s || MB_LEAD[lang];
+    }
+
+    /* --- composition: card band starts under the headline; scrim starts above the lead --- */
+    var H = 0;
+    var vis = el.querySelector(".hx-visual");
+    var measure = function () {
+      if (destroyed) return;
+      H = wrap.offsetHeight || 1;
+      var titleBottom = copy.offsetTop + title.offsetTop + title.offsetHeight;
+      /* the fan is centred in the visual box and the middle card is raised 7%:
+         push the box down just enough that the middle card clears the headline by 6px,
+         but never below titleBottom-6 (tall viewports keep their breathing room) */
+      var bandTop = titleBottom - 6;
+      if (vis && slots[1]) {
+        var cardH = slots[1].offsetHeight, off = (vis.offsetHeight - cardH) / 2 - cardH * 0.07;
+        bandTop = Math.max(titleBottom - 6, Math.round(titleBottom + 6 - off));
+      }
+      el.style.setProperty("--mb-band-top", bandTop + "px");
+      if (lead) {
+        var scrim = (copy.offsetTop + copy.offsetHeight) - (copy.offsetTop + lead.offsetTop) + 64;
+        el.style.setProperty("--mb-scrim", "calc(" + scrim + "px + var(--mb-dock) + 10px)");
+      }
+    };
+    measure();
+    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { if (!destroyed) measure(); });
+    timers.push(setTimeout(measure, 1200));
+    var rsz = 0;
+    on(win, "resize", function () { clearTimeout(rsz); rsz = setTimeout(function () { measure(); kick(); }, 120); }, { passive: true });
+    on(win, "orientationchange", function () { clearTimeout(rsz); rsz = setTimeout(function () { measure(); kick(); }, 220); }, { passive: true });
+
+    /* --- shorter reveal: flag done at 1.1s (initHero flags again at 1.6s, harmless) --- */
+    var done = false;
+    timers.push(setTimeout(function () { el.classList.add("is-done"); done = true; lastP = -1; kick(); }, noMotion ? 260 : 1100));
+
+    /* --- scroll-linked motion + orientation tilt, one rAF loop, transform-only ---
+       Per frame we write inline transforms on 5 elements only (3 cards, title, ring)
+       and one custom prop on .hx-copy (scrim). No custom props on the hero/slots:
+       that would re-style the whole SVG subtree every frame. */
+    var MB_FAN = { x: [-42, 0, 42], y: [12, -7, 14], r: [-11, 0, 10], z: [0, 44, 20] };   /* mirrors the CSS fan */
+    var SIGN = [-1, 0, 1], RATE = [78, 138, 104], ROT = [-7, 0, 7];
+    var dir = el.getAttribute("dir") === "rtl" ? -1 : 1;
+    var cards = slots.map(function (s) { return s.querySelector(".hx-card"); });
+    var ghost = el.querySelector(".hx-btn-ghost");
+    var sy = 0, lastP = -1;
+    var tx = 0, ty = 0, cx = 0, cy = 0, tiltOn = false, base = null;
+    var tick = function () {
+      raf = 0;
+      if (destroyed) return;
+      if (!el.isConnected) { hero && hero.destroy(); return; }
+      if (noMotion) return;
+      var p = clamp(sy / (H * 0.85), 0, 1);
+      if (p !== lastP && done) {
+        lastP = p;
+        var spread = win.innerWidth * 0.12;
+        for (var i = 0; i < cards.length; i++) {
+          if (!cards[i]) continue;
+          cards[i].style.transform = "translate3d(calc(" + (MB_FAN.x[i] * dir) + "% + " + (SIGN[i] * p * spread).toFixed(1) + "px),calc(" + MB_FAN.y[i] + "% + " + (-p * RATE[i]).toFixed(1) + "px)," + MB_FAN.z[i] + "px) rotate(" + (MB_FAN.r[i] * dir + ROT[i] * p).toFixed(2) + "deg)";
+        }
+        title.style.transform = "translate3d(0," + (-p * 22).toFixed(1) + "px,0) scale(" + (1 - p * 0.14).toFixed(4) + ")";
+        /* cards rise past the lead/link: fade them so text never sits on a light card */
+        var fade = clamp(1 - p * 1.6, 0, 1).toFixed(3);
+        if (lead) lead.style.opacity = fade;
+        if (ghost) ghost.style.opacity = fade;
+      }
+      if (tiltOn && stage) {
+        cx += (tx - cx) * 0.09; cy += (ty - cy) * 0.09;
+        stage.style.transform = "rotateX(" + cy.toFixed(3) + "deg) rotateY(" + cx.toFixed(3) + "deg)";
+        if (Math.abs(tx - cx) > 0.02 || Math.abs(ty - cy) > 0.02) raf = win.requestAnimationFrame(tick);
+      }
+    };
+    var kick = function () { if (!raf) raf = win.requestAnimationFrame(tick); };
+    on(win, "scroll", function () {
+      sy = win.pageYOffset || doc.documentElement.scrollTop || 0;
+      if (sy > H + 160 && lastP === 1) return;   // hero fully gone: nothing to update
+      kick();
+    }, { passive: true });
+    sy = win.pageYOffset || 0; kick();
+
+    var onOrient = function (e) {
+      if (e.gamma == null || e.beta == null) return;
+      if (!base) base = { g: e.gamma, b: e.beta };
+      tx = clamp((e.gamma - base.g) / 22 * 8, -8, 8);
+      ty = clamp(-(e.beta - base.b) / 22 * 6, -6, 6);
+      kick();
+    };
+    var enableTilt = function () {
+      if (tiltOn || noMotion || !win.DeviceOrientationEvent) return;
+      tiltOn = true;
+      on(win, "deviceorientation", onOrient, { passive: true });
+    };
+    var DOE = win.DeviceOrientationEvent;
+    if (DOE && !noMotion) {
+      if (typeof DOE.requestPermission === "function") {
+        /* iOS 13+: must be requested from a user gesture — first touch on the hero */
+        var ask = function () {
+          try { DOE.requestPermission().then(function (st) { if (st === "granted") enableTilt(); }).catch(function () {}); } catch (e) {}
+        };
+        on(el, "touchend", ask, { once: true, passive: true });
+      } else {
+        enableTilt();   /* Android / other: fires silently if sensors exist; scroll parallax remains the fallback */
+      }
+    }
+
+    var inst = {
+      el: el,
+      destroy: function () {
+        if (destroyed) return;
+        destroyed = true;
+        offs.forEach(function (f) { f(); });
+        timers.forEach(clearTimeout);
+        clearTimeout(rsz);
+        if (raf) win.cancelAnimationFrame(raf);
+        title.style.transform = "";
+        if (ringIn) ringIn.style.transform = "";
+        if (stage) stage.style.transform = "";
+        cards.forEach(function (c) { if (c) c.style.transform = ""; });
+        if (lead) lead.style.opacity = "";
+        if (ghost) ghost.style.opacity = "";
+        el.style.removeProperty("--mb-band-top"); el.style.removeProperty("--mb-scrim");
+        if (lead && lead.dataset.mbFull != null) { lead.textContent = lead.dataset.mbFull; delete lead.dataset.mbFull; }
+        if (hero === inst) hero = null;
+      }
+    };
+    hero = inst;
+    return inst;
+  }
+
+  win.MBHero = { init: heroInit, destroy: function () { if (hero) hero.destroy(); } };
+
+  /* ============================================================
+     MBChrome
+     ============================================================ */
+  var chrome = null;
+
+  function chromeInit() {
+    if (chrome) chrome.destroy();
+    var offs = [], obs = [], timers = [];
+    var on = function (tgt, ev, fn, opt) { tgt.addEventListener(ev, fn, opt); offs.push(function () { tgt.removeEventListener(ev, fn, opt); }); };
+    var observe = function (tgt, fn, cfg) { if (!tgt || !win.MutationObserver) return; var o = new MutationObserver(fn); o.observe(tgt, cfg); obs.push(o); };
+    var header = doc.querySelector(".header");
+    var ann = doc.getElementById("announce");
+    var dock = doc.getElementById("dock");
+    var cartCount = doc.getElementById("cartCount");
+
+    /* --- header: shrink after 40px (hysteresis 24px), rAF-throttled --- */
+    var raf = 0, shrunk = false;
+    var headTick = function () {
+      raf = 0;
+      if (!header) return;
+      var y = win.pageYOffset || doc.documentElement.scrollTop || 0;
+      var want = isPhone() && (shrunk ? y > 24 : y > 40);
+      if (want !== shrunk) { shrunk = want; header.classList.toggle("mb-shrunk", want); }
+    };
+    var headKick = function () { if (!raf) raf = win.requestAnimationFrame(headTick); };
+    on(win, "scroll", headKick, { passive: true });
+    on(win, "resize", headKick, { passive: true });
+    headKick();
+
+    /* --- announcement bar → marquee (re-applied whenever renderChrome rewrites it) --- */
+    var buildAnn = function (raw) {
+      var parts = raw.split(/\s*·\s*/).filter(function (x) { return x.trim(); });
+      var set = parts.map(function (x) { return '<span class="mb-ann-item">' + x + "</span>"; }).join('<i class="mb-ann-sep" aria-hidden="true"></i>') + '<i class="mb-ann-sep" aria-hidden="true"></i>';
+      return '<div class="mb-ann-track"><span class="mb-ann-set">' + set + '</span><span class="mb-ann-set" aria-hidden="true">' + set + "</span></div>";
+    };
+    var applyAnn = function () {
+      if (!ann) return;
+      var hasTrack = !!ann.querySelector(".mb-ann-track");
+      if (isPhone()) {
+        if (hasTrack) return;
+        var raw = ann.innerHTML.trim();
+        if (!raw) return;
+        ann.dataset.mbRaw = raw;
+        ann.innerHTML = buildAnn(raw);
+      } else if (hasTrack && ann.dataset.mbRaw != null) {
+        ann.innerHTML = ann.dataset.mbRaw;
+      }
+    };
+    applyAnn();
+    observe(ann, applyAnn, { childList: true });
+
+    /* --- dock: sliding indicator (fixed sibling so it survives innerHTML rewrites) --- */
+    var ind = doc.querySelector(".mb-dock-ind");
+    if (!ind) { ind = doc.createElement("span"); ind.className = "mb-dock-ind"; ind.setAttribute("aria-hidden", "true"); doc.body.appendChild(ind); }
+    var placeInd = function (target, instant) {
+      if (!dock) return;
+      var a = target || dock.querySelector("a.active");
+      if (!a || !isPhone() || !dock.offsetWidth) { ind.classList.remove("mb-show"); return; }
+      var first = !ind.classList.contains("mb-show");
+      if (instant || first) ind.style.transition = "none";
+      ind.style.width = a.offsetWidth + "px";
+      ind.style.transform = "translate3d(" + a.offsetLeft + "px,0,0)";
+      if (instant || first) { void ind.offsetWidth; ind.style.transition = ""; }
+      ind.classList.add("mb-show");
+    };
+    placeInd(null, true);
+    observe(dock, function () { placeInd(); }, { childList: true });
+    on(win, "resize", function () { placeInd(null, true); }, { passive: true });
+    if (dock) on(dock, "click", function (e) {
+      var a = e.target.closest && e.target.closest("a[href]");
+      if (a && dock.contains(a)) placeInd(a);          /* optimistic: slide before the router re-renders */
+    }, { passive: true });
+
+    /* --- cart badge pop on count change --- */
+    var badgePop = function () {
+      var b = doc.querySelector(".dock .badge-count");
+      if (!b) return;
+      b.classList.remove("mb-pop"); void b.offsetWidth; b.classList.add("mb-pop");
+      timers.push(setTimeout(function () { b.classList.remove("mb-pop"); }, 650));
+    };
+    var lastCount = cartCount ? (cartCount.hidden ? "" : cartCount.textContent) : "";
+    observe(cartCount, function () {
+      var now = cartCount.hidden ? "" : cartCount.textContent;
+      if (now !== lastCount) { lastCount = now; if (now) badgePop(); }
+    }, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
+    win.MB = win.MB || {};
+    win.MB.badgePop = badgePop;
+
+    /* --- breakpoint crossings --- */
+    offs.push(onMQ(function () { applyAnn(); headKick(); placeInd(null, true); }));
+
+    chrome = {
+      destroy: function () {
+        offs.forEach(function (f) { f(); });
+        obs.forEach(function (o) { o.disconnect(); });
+        timers.forEach(clearTimeout);
+        if (raf) win.cancelAnimationFrame(raf);
+        if (header) header.classList.remove("mb-shrunk");
+        if (ann && ann.dataset.mbRaw != null && ann.querySelector(".mb-ann-track")) ann.innerHTML = ann.dataset.mbRaw;
+        if (ind && ind.parentNode) ind.parentNode.removeChild(ind);
+        chrome = null;
+      }
+    };
+    return chrome;
+  }
+
+  win.MBChrome = { init: chromeInit, destroy: function () { if (chrome) chrome.destroy(); } };
+  win.MB = win.MB || {};
+})(typeof window !== "undefined" ? window : null, typeof document !== "undefined" ? document : null);
+
 /* boot */
 Motion.init();
+if(window.MBChrome)MBChrome.init();
 if(window.MBCommerce)MBCommerce.init();
 render();
 </script>
