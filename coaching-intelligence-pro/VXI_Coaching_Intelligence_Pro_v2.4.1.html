@@ -5965,6 +5965,23 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
   .an-pick > .pick { flex: 1 1 auto; }
   .an-count { display: none; }
 }
+/* ===== layer: layers/87-myagents.css ===== */
+/* 87-myagents: My agents */
+.ma-card { padding: 14px 16px 12px; }
+.ma-table { min-width: 560px; }
+.ma-table tbody tr.is-alt { background: color-mix(in srgb, var(--text) 2.5%, transparent); }
+.ma-n { width: 36px; text-align: center; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.ma-table thead th.ma-n { color: #fff; }
+.ma-id { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease; }
+.ma-id:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.ma-id:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ma-id .icon { color: var(--accent-text, var(--accent)); }
+.ma-missing { color: var(--text-2); font-size: 0.85rem; font-style: italic; }
+.ma-act { width: 52px; }
+.ma-foot { display: flex; align-items: center; gap: 6px; margin: 12px 4px 2px; color: var(--text-2); font-size: 0.82rem; }
+@media (prefers-reduced-motion: reduce) {
+  .ma-id { transition: none; }
+}
 </style>
 </head>
 <body>
@@ -6074,7 +6091,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.4.0';
+const APP_VERSION = '2.4.1';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -30000,6 +30017,161 @@ kwCard = function () {
   }
   return card;
 };
+/* ===== layer: layers/87-myagents.js ===== */
+/* ==========================================================================
+   87-myagents: My agents, the one page that shows HR IDs and BP-IDs
+   - Every agent with a copy button for the HR ID and the BP-ID, and "Copy all" for Excel.
+   - "Load roster" reads the TSX roster (HRID, Agent Name, BP-ID) and fills the IDs.
+   - The IDs live in this browser and in the backup file only, never in the app file,
+     and no other page shows them.
+   ========================================================================== */
+
+const maReal = (bp) => /^bp-/i.test(String(bp || ''));
+
+/** Read the TSX roster and fill each member's HR ID and BP-ID. Returns how many were filled. */
+function maApplyRoster(sheet) {
+  const rows = (sheet.rows || []).filter((r) => r && r.some((c) => c !== null && c !== undefined && c !== ''));
+  const isText = (c, re) => typeof c === 'string' && re.test(c.trim());
+  const headAt = rows.findIndex((r) => r.some((c) => isText(c, /^hr\s*-?id$/i)) && r.some((c) => isText(c, /^agent name$/i)));
+  if (headAt < 0) return { error: 'No header row with "HRID" and "Agent Name" was found. Load the TSX roster sheet.' };
+  const head = rows[headAt];
+  const col = (re) => head.findIndex((c) => isText(c, re));
+  const cHr = col(/^hr\s*-?id$/i);
+  const cName = col(/^agent name$/i);
+  const cBp = col(/^bp\s*-?id$/i);
+  const list = rows.slice(headAt + 1).map((r) => ({ name: String(r[cName] ?? '').replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(String(r[cHr] ?? '').replace(/\.0+$/, '')), bpid: cBp >= 0 ? String(r[cBp] ?? '').trim().toLowerCase() : '' })).filter((x) => x.name);
+  let filled = 0;
+  const missing = [];
+  state.team.members.forEach((m) => {
+    const key = rsHash(m);
+    let hit = key ? list.find((x) => maReal(x.bpid) && idHash(x.bpid) === key) : null;
+    if (!hit && m.name) {
+      const hits = list.filter((x) => rosterSameName(x.name, m.name));
+      if (hits.length === 1) hit = hits[0];
+    }
+    if (!hit) return missing.push(m.name || m.code);
+    let changed = false;
+    if (hit.hrid && hit.hrid !== m.hrid) {
+      m.hrid = hit.hrid;
+      changed = true;
+    }
+    if (maReal(hit.bpid) && hit.bpid !== String(m.bpid || '').toLowerCase()) {
+      m.bpid = cleanStaffId(hit.bpid);
+      changed = true;
+    }
+    if (changed) filled++;
+  });
+  persist('team');
+  return { filled, missing, total: state.team.members.length };
+}
+
+function maLoadRoster() {
+  const input = h('input', { type: 'file', accept: '.xlsx,.csv', style: 'display:none' });
+  input.addEventListener('change', async () => {
+    const file = input.files && input.files[0];
+    input.remove();
+    if (!file) return;
+    let sheet;
+    try {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      sheet = ext === 'csv' ? readCsv(await file.text()) : await readXlsx(await file.arrayBuffer());
+    } catch (e) {
+      toast(e && e.message ? e.message : 'The file could not be read.', { type: 'error', duration: 7000 });
+      return;
+    }
+    const r = maApplyRoster(sheet);
+    if (r.error) return toast(r.error, { type: 'error', duration: 8000 });
+    refresh({ panel: false });
+    toast(`IDs updated for ${plural(r.total - r.missing.length, 'agent')}${r.missing.length ? `. Not in the roster: ${joinList(r.missing)}` : ''}.`, { duration: 8000 });
+  });
+  document.body.appendChild(input);
+  input.click();
+}
+
+function maEdit(m) {
+  const hr = h('input', { class: 'input', id: 'ma-hr', value: m.hrid || '', maxlength: 30, autocomplete: 'off' });
+  const bp = h('input', { class: 'input', id: 'ma-bp', value: maReal(m.bpid) ? m.bpid : '', maxlength: 30, autocomplete: 'off', placeholder: 'bp-…' });
+  const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
+  const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('save'), 'Save');
+  const modal = openModal({
+    title: `${m.name || m.code}: IDs`,
+    size: 'sm',
+    body: h('div', { class: 'tr-form' }, h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'ma-hr' }, 'HR ID'), hr), h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'ma-bp' }, 'BP-ID'), bp)),
+    footer: [cancel, h('span', { class: 'spacer' }), save],
+    initialFocus: hr,
+  });
+  cancel.addEventListener('click', () => modal.close());
+  save.addEventListener('click', () => {
+    m.hrid = cleanStaffId(hr.value);
+    const b = cleanStaffId(bp.value).toLowerCase();
+    if (b) m.bpid = b;
+    persist('team');
+    modal.close();
+    refresh({ panel: false });
+    toast(`IDs saved for ${m.name || m.code}`);
+  });
+}
+
+function maRender(main) {
+  const members = state.team.members.slice().sort((a, b) => (a.name || a.code).localeCompare(b.name || b.code));
+  const withAll = members.filter((m) => m.hrid && maReal(m.bpid)).length;
+  const copyBtn = (value, label, fk) =>
+    value
+      ? h('button', { type: 'button', class: 'ma-id', 'data-fk': fk, title: `Copy ${label}`, onclick: (e) => copyText(value, { label, button: e.currentTarget }) }, h('span', { class: 'ma-id__v' }, value), icon('copy', 'icon--sm'))
+      : h('span', { class: 'ma-missing' }, 'Not loaded');
+  const copyAll = () => {
+    const lines = ['Agent\tHR ID\tBP-ID', ...members.map((m) => `${m.name || m.code}\t${m.hrid || ''}\t${maReal(m.bpid) ? m.bpid : ''}`)];
+    copyText(lines.join('\n'), { label: 'Agent list' });
+  };
+  main.append(
+    pageHead({
+      eyebrow: 'My team',
+      title: 'My agents',
+      sub: 'Every agent with a copyable HR ID and BP-ID. Click an ID to copy it.',
+      actions: [
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'ma-copy-all', onclick: copyAll, title: 'Copy the whole list, ready to paste in Excel' }, icon('copy'), 'Copy all'),
+        h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'ma-load', onclick: maLoadRoster, title: 'Load the TSX roster (.xlsx) to fill the IDs' }, icon('upload'), 'Load roster'),
+      ],
+    }),
+    withAll < members.length
+      ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, `${plural(members.length - withAll, 'agent')} ${members.length - withAll === 1 ? 'is' : 'are'} missing an ID. Load the TSX roster once, or click the pencil to type it.`))
+      : null,
+    h(
+      'section',
+      { class: 'card kt-card ma-card', 'aria-label': 'My agents' },
+      h(
+        'div',
+        { class: 'kt-scroll' },
+        h(
+          'table',
+          { class: 'kt-table ma-table' },
+          h('thead', null, h('tr', null, h('th', { scope: 'col', class: 'ma-n' }, '#'), h('th', { class: 'kt-name', scope: 'col' }, 'Agent'), h('th', { scope: 'col' }, 'HR ID'), h('th', { scope: 'col' }, 'BP-ID'), h('th', { scope: 'col' }, ''))),
+          h(
+            'tbody',
+            null,
+            members.map((m, i) =>
+              h(
+                'tr',
+                { class: `kt-tr${i % 2 ? ' is-alt' : ''}` },
+                h('td', { class: 'ma-n' }, String(i + 1)),
+                h('th', { class: 'kt-name', scope: 'row' }, m.name || m.code),
+                h('td', { class: 'kt-td' }, copyBtn(m.hrid, 'HR ID', `ma-hr:${i}`)),
+                h('td', { class: 'kt-td' }, copyBtn(maReal(m.bpid) ? m.bpid : '', 'BP-ID', `ma-bp:${i}`)),
+                h('td', { class: 'kt-td ma-act' }, h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': `ma-edit:${i}`, 'aria-label': `Edit IDs for ${m.name || m.code}`, onclick: () => maEdit(m) }, icon('edit')))
+              )
+            )
+          )
+        )
+      ),
+      h('p', { class: 'ma-foot' }, icon('lock', 'icon--sm'), ' The IDs stay in this browser and in your backup file. They are not in the online app, and no other page shows them.')
+    )
+  );
+}
+
+EXT.view('agents', { title: 'My agents', label: 'My agents', icon: 'users', render: maRender });
+/* My agents sits after Agent numbers. */
+EXT.order.splice(EXT.order.indexOf('agents'), 1);
+EXT.order.splice(EXT.order.indexOf('numbers') + 1, 0, 'agents');
 /* ===== layer: layers/90-integration.js ===== */
 /* ==========================================================================
    90-integration — glue between the area layers, for functions no single area owns.
