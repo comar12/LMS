@@ -6152,7 +6152,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.5.1';
+const APP_VERSION = '2.5.2';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -30276,21 +30276,24 @@ EXT.order.splice(EXT.order.indexOf('numbers') + 1, 0, 'agents');
      teams can be picked from that roster or typed in. Everything stays in this browser.
    ========================================================================== */
 
+/* VXI colors for the email: orange title sign, navy header row. */
+const VXI_ORANGE = '#F26522';
+const VXI_NAVY = '#0B1630';
 const RTA_TYPES = [
-  { id: 'system', title: 'System Issue', color: '#C55A11', kind: 'time', ask: 'update the following system issue' },
-  { id: 'swap', title: 'Swap', color: '#BF9000', kind: 'swap', ask: 'update the following shift swap', transport: true },
-  { id: 'ot', title: 'Over Time', color: '#7030A0', kind: 'time', ask: 'cover the OT for the following {emp} so we can save the intervals', transport: true },
-  { id: 'vto', title: 'Early Leave/ Late Arrival/ VTO', color: '#44546A', kind: 'time', ask: 'update the following early leave, late arrival or VTO' },
-  { id: 'cancel', title: 'Cancel Day Off', color: '#2E75B6', kind: 'time', ask: 'cancel the day off for the following {emp} so we can save the intervals', transport: true },
-  { id: 'coaching', title: 'Coaching', color: '#00838F', kind: 'time', ask: 'update the following coaching time' },
-  { id: 'meeting', title: 'Team Meeting', color: '#00838F', kind: 'time', ask: 'update the following team meeting', team: true },
-  { id: 'break', title: 'Late Break/ Late Lunch', color: '#0070C0', kind: 'time', ask: 'update the following late break or late lunch' },
-  { id: 'transport', title: 'VXI Transportation issue', color: '#548235', kind: 'request', ask: 'update the following transportation issue' },
-  { id: 'other', title: 'Vacations or Other Requests', color: '#548235', kind: 'request', ask: 'update the following request' },
-  { id: 'abs', title: 'ABS Compensation', color: '#C00000', kind: 'time', ask: 'update the following ABS compensation' },
+  { id: 'system', title: 'System Issue', color: VXI_ORANGE, kind: 'time', ask: 'update the following system issue' },
+  { id: 'swap', title: 'Swap', color: VXI_ORANGE, kind: 'swap', ask: 'update the following shift swap', transport: true },
+  { id: 'ot', title: 'Over Time', color: VXI_ORANGE, kind: 'time', ask: 'cover the OT for the following {emp} so we can save the intervals', transport: true },
+  { id: 'vto', title: 'Early Leave/ Late Arrival/ VTO', color: VXI_ORANGE, kind: 'time', ask: 'update the following early leave, late arrival or VTO' },
+  { id: 'cancel', title: 'Cancel Day Off', color: VXI_ORANGE, kind: 'time', ask: 'cancel the day off for the following {emp} so we can save the intervals', transport: true },
+  { id: 'coaching', title: 'Coaching', color: VXI_ORANGE, kind: 'time', ask: 'update the following coaching time' },
+  { id: 'meeting', title: 'Team Meeting', color: VXI_ORANGE, kind: 'time', ask: 'update the following team meeting', team: true },
+  { id: 'break', title: 'Late Break/ Late Lunch', color: VXI_ORANGE, kind: 'time', ask: 'update the following late break or late lunch' },
+  { id: 'transport', title: 'VXI Transportation issue', color: VXI_ORANGE, kind: 'request', ask: 'update the following transportation issue' },
+  { id: 'other', title: 'Vacations or Other Requests', color: VXI_ORANGE, kind: 'request', ask: 'update the following request' },
+  { id: 'abs', title: 'ABS Compensation', color: VXI_ORANGE, kind: 'time', ask: 'update the following ABS compensation' },
 ];
-const RTA_HEAD = '#1F4E79';
-const RTA_SWAP_HEAD = '#2F5597';
+const RTA_HEAD = VXI_NAVY;
+const RTA_SWAP_HEAD = VXI_NAVY;
 const RTA_GREETING = 'Hello Team,';
 const rtaType = (id) => RTA_TYPES.find((t) => t.id === id);
 
@@ -30394,11 +30397,14 @@ function rtaTransportLine(draft) {
   const n = t.reduce((k, x) => k + x.rows.length, 0);
   return `Appreciate your help to update the Transportation for the respective ${n === 1 ? 'employee' : 'employees'}${rtaWhen(t)}, Thanks !!`;
 }
+/** Subject: request type | LOB | HR IDs, for example "Swap Request | TSX | 100078336". */
 function rtaSubject() {
   const R = EXT.data.rta;
   if (R.subject) return R.subject;
-  const d = rtaDates(R.draft)[0] || rtaTomorrow();
-  return `EG TSX 4P | The updated ${d === rtaTomorrow() ? "Tomorrow's" : d === todayDay() ? "Today's" : ''} plan for ${rtaShort(d)}`.replace(/\s+/g, ' ');
+  const types = [...new Set(R.draft.map((t) => rtaType(t.type).title))];
+  const what = types.length === 0 ? 'Workforce Request' : types.length <= 2 ? `${types.join(' & ')} Request` : 'Workforce Requests';
+  const ids = [...new Set(R.draft.flatMap((t) => t.rows).map(rtaHr).filter(Boolean))];
+  return [what, R.lob, ids.join(', ')].filter(Boolean).join(' | ');
 }
 
 /** The email as Outlook-friendly HTML (inline styles and bgcolor) and as plain text. */
@@ -30500,6 +30506,7 @@ function rtaAdd() {
     if (!t) R.draft.push((t = { id: uid('rt'), type: T.id, dates: [], rows: [] }));
     agents.forEach((m) => t.rows.push({ mid: m.id, name: m.name, hrid: m.hrid, date: T.kind === 'time' ? rtaPick.date : '', from: T.kind === 'time' ? rtaPick.from : '', to: T.kind === 'time' ? rtaPick.to : '', request: T.kind === 'request' ? rtaPick.request : '', fromText: rtaPick.fromText, toText: rtaPick.toText, times: [] }));
   }
+  R.subject = '';
   EXT.data.rta = rtaClean(R);
   EXT.save('rta');
   rtaPick.agents = [];
@@ -30652,6 +30659,7 @@ function rtaRender(main) {
   const saveMeta = () => {
     R.lob = lob.value.trim() || 'TSX';
     EXT.save('rta');
+    if (!R.subject) subj.value = rtaSubject();
     paint();
   };
   lob.addEventListener('input', saveMeta);
