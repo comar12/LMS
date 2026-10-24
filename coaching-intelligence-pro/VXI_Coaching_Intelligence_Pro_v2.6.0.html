@@ -6048,6 +6048,54 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 @media (prefers-reduced-motion: reduce) {
   .rta-type { transition: none; }
 }
+/* ===== layer: layers/89-it.css ===== */
+/* 89-it: IT requests */
+.it-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
+.it-mode { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit; text-align: left; cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease; }
+.it-mode:hover { border-color: #F26522; }
+.it-mode:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.it-mode__t { font-weight: 800; font-size: 1rem; }
+.it-mode__s { font-size: 0.84rem; color: var(--text-2); }
+/* The chosen side looks like the email title sign: deep ink with an orange line. */
+.it-mode.is-on { background: #121826; border-color: #121826; color: #fff; box-shadow: inset 0 -3px 0 #F26522; }
+.it-mode.is-on .it-mode__s { color: #C9D3E6; }
+:root[data-theme='dark'] .it-mode.is-on { border-color: rgba(242, 101, 34, 0.55); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .it-mode.is-on { border-color: rgba(242, 101, 34, 0.55); }
+}
+.it-fields { grid-template-columns: minmax(0, 240px) minmax(0, 1fr) minmax(0, 260px); align-items: end; }
+.it-fields .it-wide { grid-column: span 1; }
+.it-jfields { grid-template-columns: minmax(0, 240px) minmax(0, 1fr); align-items: start; }
+.it-check { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; height: 38px; cursor: pointer; }
+.it-check input { width: 18px; height: 18px; accent-color: #F26522; }
+.it-meta { display: grid; grid-template-columns: minmax(0, 220px); margin-bottom: 12px; }
+.it-meta .field { margin: 0; }
+.it-empty { padding: 14px 4px; }
+.it-scroll { border: 1px solid var(--border); border-radius: 10px; }
+.it-form { border-collapse: collapse; min-width: 100%; font-size: 0.84rem; }
+.it-form th { background: #121826; color: #fff; font-weight: 700; padding: 8px 8px; white-space: nowrap; text-align: center; border-bottom: 3px solid #F26522; }
+.it-form td { border-top: 1px solid var(--border); padding: 3px 4px; }
+.it-form tbody tr:nth-child(even) { background: color-mix(in srgb, #F26522 4%, var(--surface)); }
+.it-n { width: 34px; text-align: center; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.it-form th.it-n { color: #fff; }
+.it-cell { width: 100%; min-width: 96px; height: 30px; padding: 0 8px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--text); font: inherit; text-align: center; font-variant-numeric: tabular-nums; }
+.it-c-error .it-cell { min-width: 300px; text-align: left; }
+.it-c-tool .it-cell, .it-c-first .it-cell, .it-c-last .it-cell { min-width: 110px; }
+.it-c-bpid .it-cell, .it-c-mirror .it-cell, .it-c-ntid .it-cell { min-width: 140px; }
+.it-cell:hover { border-color: var(--border); }
+.it-cell:focus { border-color: var(--accent); outline: none; background: var(--surface); }
+.it-cell.is-missing { background: color-mix(in srgb, #F26522 14%, transparent); border-color: color-mix(in srgb, #F26522 45%, transparent); }
+.it-out { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
+.it-out .field { flex: 1 1 auto; margin: 0; }
+.it-out--desc { justify-content: space-between; align-items: center; margin: 4px 0 0; }
+.it-desc { margin-top: 8px; }
+@media (max-width: 760px) {
+  .it-modes, .it-fields { grid-template-columns: 1fr; }
+  .it-out { flex-direction: column; align-items: stretch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .it-mode { transition: none; }
+}
 </style>
 </head>
 <body>
@@ -6157,7 +6205,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.5.4';
+const APP_VERSION = '2.6.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -30107,17 +30155,28 @@ EXT.slice('agentInfo', {
     return { items };
   },
 });
-/* Name and HR ID of everyone in the last roster loaded, so workforce requests can include
-   agents from other teams. Nothing else from the roster is kept. */
+/* Name and work IDs of everyone in the last roster loaded (HR ID, BP-ID, BPERNR, Avaya ID,
+   extension, NTID), so workforce and IT requests can be filled for any agent. Personal
+   details in the roster (email, phone, birth date, contacts) are never kept. */
+const MA_WORK_IDS = ['bpid', 'bpernr', 'avaya', 'ext', 'ntid'];
 EXT.slice('siteRoster', {
   initial: () => ({ items: [] }),
   clean: (raw) => ({
     items: (Array.isArray(raw && raw.items) ? raw.items : [])
       .slice(0, 5000)
-      .map((x) => ({ name: str(x && x.name, 100).replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(str(x && x.hrid, 30)) }))
+      .map((x) => {
+        const o = { name: str(x && x.name, 100).replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(str(x && x.hrid, 30)) };
+        MA_WORK_IDS.forEach((k) => {
+          const v = cleanStaffId(str(x && x[k], 30));
+          if (v) o[k] = k === 'bpid' ? v.toLowerCase() : v;
+        });
+        return o;
+      })
       .filter((x) => x.name && x.hrid),
   }),
 });
+/** The roster entry for an HR ID (from the last roster loaded), or null. */
+const maRosterInfo = (hrid) => (hrid ? EXT.data.siteRoster.items.find((x) => x.hrid === hrid) || null : null);
 const maFullName = (m) => (EXT.data.agentInfo.items[m.id] || {}).full || m.name || m.code;
 
 /** Read the TSX roster and fill each member's HR ID and BP-ID. Returns how many were filled. */
@@ -30131,9 +30190,19 @@ function maApplyRoster(sheet) {
   const cHr = col(/^hr\s*-?id$/i);
   const cName = col(/^agent name$/i);
   const cBp = col(/^bp\s*-?id$/i);
-  const list = rows.slice(headAt + 1).map((r) => ({ name: String(r[cName] ?? '').replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(String(r[cHr] ?? '').replace(/\.0+$/, '')), bpid: cBp >= 0 ? String(r[cBp] ?? '').trim().toLowerCase() : '' })).filter((x) => x.name);
+  const cNt = col(/^nt\s*-?id$/i);
+  const cols = { bpernr: col(/^bpernr$/i), avaya: col(/^avaya\s*id$/i), ext: col(/^avaya\s*ext/i), ntid: cNt >= 0 ? cNt : col(/^okta$/i) };
+  /* "NA", "N/A" or "-" in the roster means the ID is not there yet. */
+  const cellId = (r, c) => {
+    const v = c >= 0 ? String(r[c] ?? '').trim().replace(/\.0+$/, '') : '';
+    return /^(n\/?a|-+|none|null|tbd)$/i.test(v) ? '' : v;
+  };
+  const list = rows
+    .slice(headAt + 1)
+    .map((r) => ({ name: String(r[cName] ?? '').replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(cellId(r, cHr)), bpid: cBp >= 0 ? String(r[cBp] ?? '').trim().toLowerCase() : '', bpernr: cellId(r, cols.bpernr), avaya: cellId(r, cols.avaya), ext: cellId(r, cols.ext), ntid: cellId(r, cols.ntid) }))
+    .filter((x) => x.name);
   const seen = new Set();
-  EXT.data.siteRoster = { items: list.filter((x) => x.hrid && !seen.has(x.hrid) && seen.add(x.hrid)).slice(0, 5000).map((x) => ({ name: x.name, hrid: x.hrid })) };
+  EXT.data.siteRoster = EXT.slices.siteRoster.clean({ items: list.filter((x) => x.hrid && !seen.has(x.hrid) && seen.add(x.hrid)).map((x) => ({ name: x.name, hrid: x.hrid, bpid: maReal(x.bpid) ? x.bpid : '', bpernr: x.bpernr, avaya: x.avaya, ext: x.ext, ntid: x.ntid })) });
   EXT.save('siteRoster');
   let filled = 0;
   const missing = [];
@@ -30520,24 +30589,20 @@ function rtaAdd() {
   toast(`Added to the email: ${T.title}, ${plural(agents.length, 'agent')}`);
 }
 
-function rtaRender(main) {
+/** The agent picker shared by Workforce requests and IT requests: my team plus agents from
+    other teams (picked from the loaded roster or typed in). Returns [tools, team chips, other teams]. */
+function rtaAgentPicker(pick, redraw) {
   const R = EXT.data.rta;
   const members = state.team.members.slice().sort((a, b) => (a.name || a.code).localeCompare(b.name || b.code));
-  if (!rtaPick.date) rtaPick.date = rtaTomorrow();
-  const T = rtaType(rtaPick.type);
-  const redraw = () => refresh({ panel: false });
-
-  /* 1. New request */
-  const typeChips = h('div', { class: 'rta-types', role: 'group', 'aria-label': 'Request type' }, RTA_TYPES.map((t) => h('button', { type: 'button', class: `rta-type${t.id === rtaPick.type ? ' is-on' : ''}`, style: `--tc:${t.color}`, 'aria-pressed': String(t.id === rtaPick.type), 'data-fk': `rta-type:${t.id}`, onclick: () => { rtaPick.type = t.id; redraw(); } }, h('span', { class: 'rta-type__dot', 'aria-hidden': 'true' }), t.title)));
   const agentChips = h(
     'div',
     { class: 'rta-agents' },
     members.map((m) => {
-      const on = rtaPick.agents.includes(m.id);
-      return h('button', { type: 'button', class: `rta-agent${on ? ' is-on' : ''}`, 'aria-pressed': String(on), 'data-fk': `rta-agent:${m.id}`, onclick: () => { rtaPick.agents = on ? rtaPick.agents.filter((x) => x !== m.id) : [...rtaPick.agents, m.id]; redraw(); } }, on ? icon('check', 'icon--sm') : null, m.name || m.code);
+      const on = pick.agents.includes(m.id);
+      return h('button', { type: 'button', class: `rta-agent${on ? ' is-on' : ''}`, 'aria-pressed': String(on), 'data-fk': `rta-agent:${m.id}`, onclick: () => { pick.agents = on ? pick.agents.filter((x) => x !== m.id) : [...pick.agents, m.id]; redraw(); } }, on ? icon('check', 'icon--sm') : null, m.name || m.code);
     })
   );
-  const agentTools = h('div', { class: 'rta-agent-tools' }, h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': 'rta-all', onclick: () => { rtaPick.agents = members.map((m) => m.id); redraw(); } }, icon('users'), 'Whole team'), rtaPick.agents.length ? h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': 'rta-none', onclick: () => { rtaPick.agents = []; redraw(); } }, icon('x'), 'Clear') : null, h('span', { class: 'rta-count' }, rtaPick.agents.length ? `${plural(rtaPick.agents.length, 'agent')} chosen` : 'Choose the agents'));
+  const agentTools = h('div', { class: 'rta-agent-tools' }, h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': 'rta-all', onclick: () => { pick.agents = members.map((m) => m.id); redraw(); } }, icon('users'), 'Whole team'), pick.agents.length ? h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': 'rta-none', onclick: () => { pick.agents = []; redraw(); } }, icon('x'), 'Clear') : null, h('span', { class: 'rta-count' }, pick.agents.length ? `${plural(pick.agents.length, 'agent')} chosen` : 'Choose the agents'));
   /* Agents from other teams: pick from the loaded roster or type the name and HR ID. */
   const others = R.others.slice().sort((a, b) => a.name.localeCompare(b.name));
   const otherChips = others.length
@@ -30545,12 +30610,12 @@ function rtaRender(main) {
         'div',
         { class: 'rta-agents' },
         others.map((o) => {
-          const on = rtaPick.agents.includes(o.id);
+          const on = pick.agents.includes(o.id);
           return h(
             'span',
             { class: `rta-agent rta-agent--other${on ? ' is-on' : ''}` },
-            h('button', { type: 'button', class: 'rta-agent__pick', 'aria-pressed': String(on), 'data-fk': `rta-other:${o.id}`, onclick: () => { rtaPick.agents = on ? rtaPick.agents.filter((x) => x !== o.id) : [...rtaPick.agents, o.id]; redraw(); } }, on ? icon('check', 'icon--sm') : null, rtaCase(o.name), o.hrid ? h('span', { class: 'rta-agent__hr' }, o.hrid) : null),
-            h('button', { type: 'button', class: 'rta-agent__x', 'aria-label': `Remove ${o.name} from this list`, title: 'Remove from this list', 'data-fk': `rta-other-x:${o.id}`, onclick: () => { R.others = R.others.filter((x) => x.id !== o.id); rtaPick.agents = rtaPick.agents.filter((x) => x !== o.id); EXT.save('rta'); redraw(); } }, icon('x', 'icon--sm'))
+            h('button', { type: 'button', class: 'rta-agent__pick', 'aria-pressed': String(on), 'data-fk': `rta-other:${o.id}`, onclick: () => { pick.agents = on ? pick.agents.filter((x) => x !== o.id) : [...pick.agents, o.id]; redraw(); } }, on ? icon('check', 'icon--sm') : null, rtaCase(o.name), o.hrid ? h('span', { class: 'rta-agent__hr' }, o.hrid) : null),
+            h('button', { type: 'button', class: 'rta-agent__x', 'aria-label': `Remove ${o.name} from this list`, title: 'Remove from this list', 'data-fk': `rta-other-x:${o.id}`, onclick: () => { R.others = R.others.filter((x) => x.id !== o.id); pick.agents = pick.agents.filter((x) => x !== o.id); EXT.save('rta'); redraw(); } }, icon('x', 'icon--sm'))
           );
         })
       )
@@ -30575,7 +30640,7 @@ function rtaRender(main) {
     if (o) Object.assign(o, { name, hrid });
     else R.others.unshift((o = { id: uid('ot'), name, hrid }));
     R.others = R.others.slice(0, 40);
-    if (!rtaPick.agents.includes(o.id)) rtaPick.agents.push(o.id);
+    if (!pick.agents.includes(o.id)) pick.agents.push(o.id);
     EXT.save('rta');
     redraw();
   };
@@ -30588,6 +30653,18 @@ function rtaRender(main) {
     h('div', { class: 'rta-others__form' }, oName, oHr, h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'rta-oadd', onclick: addOther }, icon('plus'), 'Add agent')),
     roster.length ? h('datalist', { id: 'rta-roster' }, roster.map((x) => h('option', { value: `${rtaCase(x.name)} | ${x.hrid}` }))) : null
   );
+  return [agentTools, agentChips, otherBox];
+}
+
+function rtaRender(main) {
+  const R = EXT.data.rta;
+  if (!rtaPick.date) rtaPick.date = rtaTomorrow();
+  const T = rtaType(rtaPick.type);
+  const redraw = () => refresh({ panel: false });
+
+  /* 1. New request */
+  const typeChips = h('div', { class: 'rta-types', role: 'group', 'aria-label': 'Request type' }, RTA_TYPES.map((t) => h('button', { type: 'button', class: `rta-type${t.id === rtaPick.type ? ' is-on' : ''}`, style: `--tc:${t.color}`, 'aria-pressed': String(t.id === rtaPick.type), 'data-fk': `rta-type:${t.id}`, onclick: () => { rtaPick.type = t.id; redraw(); } }, h('span', { class: 'rta-type__dot', 'aria-hidden': 'true' }), t.title)));
+  const [agentTools, agentChips, otherBox] = rtaAgentPicker(rtaPick, redraw);
   const field = (label, input) => h('label', { class: 'field rta-field' }, h('span', { class: 'field__label' }, label), input);
   const bind = (key, attrs) => {
     const el = h('input', { class: 'input', ...attrs, value: rtaPick[key] || '' });
@@ -30752,6 +30829,408 @@ function rtaRender(main) {
 EXT.view('rta', { title: 'Workforce requests', label: 'Workforce requests', icon: 'calendar', render: rtaRender });
 EXT.order.splice(EXT.order.indexOf('rta'), 1);
 EXT.order.splice(EXT.order.indexOf('agents') + 1, 0, 'rta');
+/* ===== layer: layers/89-it.js ===== */
+/* ==========================================================================
+   89-it: IT requests
+   - ID Admin (external IT): pick the request, the agents and the tool; the Comcast Tool
+     Access Request / Modification form fills itself and downloads as Excel, in the same
+     layout as the form ID Admin sends.
+   - Onsite IT (Jira): pick the issue and the agents; the ticket summary and description
+     are written for you to copy into Jira.
+   - IDs come from the roster loaded in My agents and stay in this browser.
+   ========================================================================== */
+
+const IT_ADMIN_KINDS = [
+  { id: 'avaya', title: 'Avaya login issue', tool: 'Avaya', msg: () => 'Agent is unable to log in to Avaya.' },
+  { id: 'cti', title: 'One CTI issue', tool: 'One CTI', msg: () => 'One CTI is not working for the agent.' },
+  { id: 'noaccess', title: 'No access to a tool', msg: (t) => `Agent does not have access to ${t}.` },
+  { id: 'new', title: 'New access request', msg: (t, mirror) => `New access request for ${t}${mirror ? ', same access as the Mirror BPID' : ''}.` },
+  { id: 'other', title: 'Other access issue', msg: (t) => `Access issue with ${t}.` },
+];
+const IT_JIRA_KINDS = [
+  { id: 'pcdown', title: 'PC not working' },
+  { id: 'pcissue', title: 'PC issue', hint: 'Slow, freezing, apps crashing' },
+  { id: 'headset', title: 'Headset not working' },
+  { id: 'locked', title: 'User locked out', ntid: true },
+  { id: 'yubikey', title: 'YubiKey reset', ntid: true },
+  { id: 'badge', title: 'New ID badge' },
+  { id: 'other', title: 'Other' },
+];
+const IT_TOOLS = ['Avaya', 'One CTI', 'Einstein 360', 'iDash', 'Precision Monitoring'];
+/* The form columns, in the order of the ID Admin sheet. */
+const IT_COLS = [
+  ['bpid', 'BPID'],
+  ['bpernr', 'BPERNR'],
+  ['hrid', 'HRID'],
+  ['first', 'First Name'],
+  ['last', 'Last Name'],
+  ['lob', 'LOB'],
+  ['site', 'Site'],
+  ['tool', 'Tool'],
+  ['avaya', 'Avaya ID'],
+  ['ext', 'Extension'],
+  ['ntid', 'NTID'],
+  ['mirror', 'Mirror BPID'],
+  ['error', 'Error Message'],
+  ['shot', 'Screenshot'],
+];
+const IT_NEED = ['bpid', 'hrid', 'first', 'last', 'tool', 'error'];
+const itAdminKind = (id) => IT_ADMIN_KINDS.find((k) => k.id === id) || IT_ADMIN_KINDS[0];
+const itJiraKind = (id) => IT_JIRA_KINDS.find((k) => k.id === id) || IT_JIRA_KINDS[0];
+
+EXT.slice('it', {
+  initial: () => ({ mode: 'admin', site: 'Cairo', rows: [], tools: [] }),
+  clean: (raw) => {
+    const src = raw && typeof raw === 'object' ? raw : {};
+    const s = (v, n) => str(v, n).replace(/\s+/g, ' ').trim();
+    return {
+      mode: src.mode === 'jira' ? 'jira' : 'admin',
+      site: s(src.site, 40) || 'Cairo',
+      rows: (Array.isArray(src.rows) ? src.rows : []).slice(0, 200).map((r) => {
+        const o = { id: isId(r && r.id) ? r.id : uid('ir') };
+        IT_COLS.forEach(([k]) => (o[k] = s(r && r[k], k === 'error' ? 400 : 100)));
+        return o;
+      }),
+      tools: (Array.isArray(src.tools) ? src.tools : []).map((t) => s(t, 60)).filter(Boolean).slice(0, 20),
+    };
+  },
+});
+
+/** Everything the forms need about a picked agent (my team or another team). */
+function itInfo(id) {
+  const m = rtaMember(id);
+  const o = m ? null : rtaOther(id);
+  if (!m && !o) return null;
+  const hrid = m ? m.hrid || '' : o.hrid;
+  const r = maRosterInfo(hrid) || {};
+  const full = rtaCase(m ? maFullName(m) : o.name);
+  const parts = full.split(' ').filter(Boolean);
+  return {
+    id,
+    full,
+    first: parts[0] || '',
+    last: parts.length > 1 ? parts[parts.length - 1] : '',
+    hrid,
+    bpid: m && maReal(m.bpid) ? m.bpid : r.bpid || '',
+    bpernr: r.bpernr || '',
+    avaya: r.avaya || '',
+    ext: r.ext || '',
+    ntid: r.ntid || '',
+  };
+}
+
+/* ---------- a small Excel (.xlsx) writer: one sheet, inline text, stored zip ---------- */
+const IT_CRC = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function itCrc32(bytes) {
+  let c = 0xffffffff;
+  for (let i = 0; i < bytes.length; i++) c = IT_CRC[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+function itZip(files) {
+  const enc = new TextEncoder();
+  const parts = [];
+  const central = [];
+  let offset = 0;
+  const u16 = (v) => [v & 0xff, (v >>> 8) & 0xff];
+  const u32 = (v) => [v & 0xff, (v >>> 8) & 0xff, (v >>> 16) & 0xff, (v >>> 24) & 0xff];
+  files.forEach(([name, text]) => {
+    const nameB = enc.encode(name);
+    const data = enc.encode(text);
+    const crc = itCrc32(data);
+    const head = [...u32(0x04034b50), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(nameB.length), ...u16(0)];
+    parts.push(new Uint8Array(head), nameB, data);
+    central.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(nameB.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(offset)]), nameB);
+    offset += head.length + nameB.length + data.length;
+  });
+  const cdSize = central.reduce((n, p) => n + p.length, 0);
+  const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length), ...u32(cdSize), ...u32(offset), ...u16(0)]);
+  return new Blob([...parts, ...central, end], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+const itXml = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+
+/** The Tool Access Request / Modification form, laid out like the sheet ID Admin sends. */
+function itFormXlsx(rows) {
+  const colL = (i) => String.fromCharCode(66 + i); /* B.. */
+  const cell = (ref, v, s) => `<c r="${ref}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${itXml(v)}</t></is></c>`;
+  const blank = (ref, s) => `<c r="${ref}" s="${s}"/>`;
+  const total = Math.max(15, rows.length);
+  const xmlRows = [
+    `<row r="2" ht="18" customHeight="1">${cell('B2', 'TOOL ACCESS REQUEST / MODIFICATION', 1)}</row>`,
+    `<row r="3" ht="18" customHeight="1">${cell('B3', 'COMCAST', 1)}</row>`,
+    `<row r="4" ht="18" customHeight="1">${IT_COLS.map(([, t], i) => cell(`${colL(i)}4`, t, 2)).join('')}</row>`,
+  ];
+  for (let k = 0; k < total; k++) {
+    const r = rows[k];
+    const n = 5 + k;
+    xmlRows.push(`<row r="${n}" ht="18" customHeight="1">${IT_COLS.map(([key], i) => (r && r[key] ? cell(`${colL(i)}${n}`, r[key], 3) : blank(`${colL(i)}${n}`, 3))).join('')}</row>`);
+  }
+  const sheet = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols><col min="1" max="1" width="2.57" customWidth="1"/><col min="2" max="13" width="20.57" customWidth="1"/><col min="14" max="14" width="45" customWidth="1"/><col min="15" max="15" width="63.28" customWidth="1"/><col min="16" max="16" width="2.57" customWidth="1"/></cols><sheetData>${xmlRows.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="4"><font><sz val="11"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="12"/><color rgb="FF000000"/><name val="Biome Light"/><family val="2"/></font><font><sz val="8"/><color rgb="FFFFFFFF"/><name val="Biome"/><family val="2"/></font><font><sz val="8"/><color rgb="FF000000"/><name val="Biome Light"/><family val="2"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF104862"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFBFBFBF"/></left><right style="thin"><color rgb="FFBFBFBF"/></right><top style="thin"><color rgb="FFBFBFBF"/></top><bottom style="thin"><color rgb="FFBFBFBF"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf><xf numFmtId="49" fontId="2" fillId="2" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="49" fontId="3" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  return itZip([
+    ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'],
+    ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+    ['xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="form" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+    ['xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+    ['xl/worksheets/sheet1.xml', sheet],
+    ['xl/styles.xml', styles],
+  ]);
+}
+function itDownloadBlob(name, blob) {
+  try {
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: name, style: 'display:none' });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/* ---------- Jira ticket text ---------- */
+function itJiraText(p) {
+  const K = itJiraKind(p.jira);
+  const lob = EXT.data.rta.lob;
+  const people = p.agents.map(itInfo).filter(Boolean);
+  const issue = K.id === 'other' ? p.other || 'Other' : K.title;
+  const who = people.length === 1 ? `${people[0].full}${people[0].hrid ? ` (${people[0].hrid})` : ''}` : plural(people.length, 'agent');
+  const summary = `${lob} | ${issue} | ${who}`;
+  const lines = [`Issue: ${issue}`, `Site: ${EXT.data.it.site}`, `LOB: ${lob}`, '', people.length === 1 ? 'Agent:' : 'Agents:'];
+  people.forEach((a, i) => {
+    const bits = [a.full, a.hrid ? `HRID ${a.hrid}` : '', K.ntid && a.ntid ? `NTID ${a.ntid}` : '', p.seats[a.id] ? `Seat/PC ${p.seats[a.id].trim()}` : ''].filter(Boolean);
+    lines.push(`${i + 1}. ${bits.join(' | ')}`);
+  });
+  if (p.since.trim()) lines.push('', `Since: ${p.since.trim()}`);
+  if (p.details.trim()) lines.push('', `Details: ${p.details.trim()}`);
+  lines.push('', 'Thank you.');
+  return { summary, description: lines.join('\n') };
+}
+
+/* ---------- the page ---------- */
+let itPick = { kind: 'avaya', jira: 'pcdown', agents: [], tool: '', error: '', mirror: '', shot: false, other: '', seats: {}, since: '', details: '' };
+
+function itAddRows() {
+  const I = EXT.data.it;
+  const K = itAdminKind(itPick.kind);
+  const people = itPick.agents.map(itInfo).filter(Boolean);
+  if (!people.length) return toast('Choose at least one agent.', { type: 'warn' });
+  const tool = (K.tool || itPick.tool).trim();
+  if (!tool) return toast('Choose or type the tool.', { type: 'warn' });
+  if (K.id === 'other' && !itPick.error.trim()) return toast('Write the issue or the error the agent sees.', { type: 'warn' });
+  const mirror = K.id === 'new' && itPick.mirror ? (itInfo(itPick.mirror) || {}).bpid || '' : '';
+  const seen = itPick.error.trim();
+  const error = K.id === 'other' ? seen : `${K.msg(tool, mirror)}${seen ? ` Error: ${seen}` : ''}`;
+  people.forEach((a) => I.rows.push({ id: uid('ir'), bpid: a.bpid, bpernr: a.bpernr, hrid: a.hrid, first: a.first, last: a.last, lob: EXT.data.rta.lob, site: I.site, tool, avaya: a.avaya, ext: a.ext, ntid: a.ntid, mirror, error, shot: itPick.shot ? 'Attached' : '' }));
+  if (!K.tool && !IT_TOOLS.includes(tool)) I.tools = [tool, ...I.tools.filter((t) => t !== tool)].slice(0, 20);
+  EXT.data.it = EXT.slices.it.clean(I);
+  EXT.save('it');
+  itPick.agents = [];
+  itPick.error = '';
+  itPick.shot = false;
+  refresh({ panel: false });
+  toast(`Added to the form: ${K.title}, ${plural(people.length, 'agent')}`);
+}
+
+function itRender(main) {
+  const I = EXT.data.it;
+  const redraw = () => refresh({ panel: false });
+  const field = (label, input, cls = '') => h('label', { class: `field rta-field ${cls}` }, h('span', { class: 'field__label' }, label), input);
+  const step = (n, t) => h('div', { class: 'rta-step' }, h('span', { class: 'rta-step__n' }, String(n)), h('span', { class: 'rta-step__t' }, t));
+  const chips = (list, cur, fk, set) => h('div', { class: 'rta-types', role: 'group' }, list.map((k) => h('button', { type: 'button', class: `rta-type${k.id === cur ? ' is-on' : ''}`, style: `--tc:${VXI_ORANGE}`, 'aria-pressed': String(k.id === cur), 'data-fk': `${fk}:${k.id}`, title: k.hint || null, onclick: () => { set(k.id); redraw(); } }, h('span', { class: 'rta-type__dot', 'aria-hidden': 'true' }), k.title)));
+  const bindIn = (key, attrs, tag = 'input') => {
+    const el = h(tag, { class: tag === 'textarea' ? 'textarea' : 'input', ...attrs, value: itPick[key] || '' });
+    el.addEventListener('input', () => (itPick[key] = el.value));
+    return el;
+  };
+  const [agentTools, agentChips, otherBox] = rtaAgentPicker(itPick, redraw);
+
+  const modes = h(
+    'div',
+    { class: 'it-modes', role: 'group', 'aria-label': 'Who is the request for' },
+    [
+      ['admin', 'ID Admin access form', 'External IT · tool access, Avaya, One CTI · Excel file'],
+      ['jira', 'Jira ticket', 'Onsite IT · PC, headset, lockout, YubiKey, ID badge'],
+    ].map(([id, t, sub]) => h('button', { type: 'button', class: `it-mode${I.mode === id ? ' is-on' : ''}`, 'aria-pressed': String(I.mode === id), 'data-fk': `it-mode:${id}`, onclick: () => { I.mode = id; EXT.save('it'); redraw(); } }, h('span', { class: 'it-mode__t' }, t), h('span', { class: 'it-mode__s' }, sub)))
+  );
+
+  let cards;
+  if (I.mode === 'admin') {
+    const K = itAdminKind(itPick.kind);
+    const toolList = [...IT_TOOLS, ...I.tools.filter((t) => !IT_TOOLS.includes(t))];
+    const toolIn = K.tool ? h('input', { class: 'input', value: K.tool, disabled: true }) : bindIn('tool', { type: 'text', maxlength: 60, list: 'it-tools', placeholder: 'Pick or type the tool', 'data-fk': 'it-tool' });
+    const pool = [...state.team.members.map((m) => m.id), ...EXT.data.rta.others.map((o) => o.id)].map(itInfo).filter((a) => a && a.bpid).sort((a, b) => a.full.localeCompare(b.full));
+    const mirrorSel = h('select', { class: 'select', 'data-fk': 'it-mirror' }, h('option', { value: '' }, 'No mirror'), pool.map((a) => h('option', { value: a.id, selected: itPick.mirror === a.id }, a.full)));
+    mirrorSel.addEventListener('change', () => (itPick.mirror = mirrorSel.value));
+    const shot = h('input', { type: 'checkbox', checked: itPick.shot, 'data-fk': 'it-shot' });
+    shot.addEventListener('change', () => (itPick.shot = shot.checked));
+    const details = h(
+      'div',
+      { class: 'rta-fields it-fields' },
+      field('Tool', toolIn),
+      field(K.id === 'other' ? 'Issue' : 'Error the agent sees (optional)', bindIn('error', { type: 'text', maxlength: 240, placeholder: K.id === 'other' ? 'Describe the access issue' : 'The exact error message', 'data-fk': 'it-error' }), 'it-wide'),
+      K.id === 'new' ? field('Mirror BPID (an agent who has this access)', mirrorSel) : null,
+      h('label', { class: 'it-check' }, shot, h('span', null, 'Screenshot attached'))
+    );
+    const newCard = h(
+      'section',
+      { class: 'card kt-card rta-card', 'aria-labelledby': 'it-new' },
+      h('h2', { class: 'kt-title', id: 'it-new' }, icon('plus'), 'New access request'),
+      h('p', { class: 'kt-sub' }, 'Pick the request, the agents and the tool. Every agent becomes one row in the ID Admin form.'),
+      step(1, 'Request'),
+      chips(IT_ADMIN_KINDS, itPick.kind, 'it-kind', (id) => (itPick.kind = id)),
+      step(2, 'Agents'),
+      agentTools,
+      agentChips,
+      otherBox,
+      step(3, 'Details'),
+      details,
+      h('datalist', { id: 'it-tools' }, toolList.map((t) => h('option', { value: t }))),
+      h('div', { class: 'rta-add' }, h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'it-add', onclick: itAddRows }, icon('plus'), 'Add to the form'))
+    );
+
+    const missing = I.rows.filter((r) => IT_NEED.some((k) => !r[k])).length;
+    const site = h('input', { class: 'input', value: I.site, maxlength: 40, 'data-fk': 'it-site' });
+    site.addEventListener('change', () => {
+      I.site = site.value.trim() || 'Cairo';
+      EXT.save('it');
+    });
+    const table = I.rows.length
+      ? h(
+          'div',
+          { class: 'kt-scroll it-scroll' },
+          h(
+            'table',
+            { class: 'it-form' },
+            h('thead', null, h('tr', null, h('th', { scope: 'col', class: 'it-n' }, '#'), IT_COLS.map(([k, t]) => h('th', { scope: 'col', class: `it-c-${k}` }, t)), h('th', { scope: 'col' }, h('span', { class: 'sr-only' }, 'Remove')))),
+            h(
+              'tbody',
+              null,
+              I.rows.map((r, i) =>
+                h(
+                  'tr',
+                  null,
+                  h('td', { class: 'it-n' }, String(i + 1)),
+                  IT_COLS.map(([k, t]) => {
+                    const el = h('input', { class: `it-cell${!r[k] && IT_NEED.includes(k) ? ' is-missing' : ''}`, value: r[k], 'aria-label': `${t}, row ${i + 1}`, 'data-fk': `it-cell:${i}:${k}`, maxlength: k === 'error' ? 400 : 100 });
+                    el.addEventListener('change', () => {
+                      r[k] = el.value.replace(/\s+/g, ' ').trim();
+                      el.classList.toggle('is-missing', !r[k] && IT_NEED.includes(k));
+                      EXT.save('it');
+                    });
+                    return h('td', { class: `it-c-${k}` }, el);
+                  }),
+                  h('td', null, h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'aria-label': `Remove row ${i + 1}`, 'data-fk': `it-del:${i}`, onclick: () => { I.rows.splice(i, 1); EXT.save('it'); redraw(); } }, icon('x')))
+                )
+              )
+            )
+          )
+        )
+      : h('p', { class: 'rta-empty it-empty' }, 'Add a request above to fill the form.');
+    const download = () => {
+      if (!I.rows.length) return toast('Add a request first.', { type: 'warn' });
+      const name = `Comcast_Tool_Access_Request_Modification_Form_${todayDay()}.xlsx`;
+      if (itDownloadBlob(name, itFormXlsx(I.rows))) toast(`Downloaded ${name}. Attach it to the ID Admin ticket.`, { duration: 6000 });
+      else toast('The browser blocked the download.', { type: 'error' });
+    };
+    const formCard = h(
+      'section',
+      { class: 'card kt-card rta-card', 'aria-labelledby': 'it-form' },
+      h(
+        'div',
+        { class: 'kt-head' },
+        h('div', null, h('h2', { class: 'kt-title', id: 'it-form' }, icon('clipboard'), 'The ID Admin form'), h('p', { class: 'kt-sub' }, 'Same columns as the Comcast Tool Access Request / Modification form. Click any cell to change it.')),
+        h(
+          'div',
+          { class: 'kt-actions' },
+          h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'it-download', onclick: download, disabled: !I.rows.length }, icon('download'), 'Download Excel'),
+          I.rows.length ? h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'it-clear', onclick: async () => { if (await confirmDialog({ title: 'Clear the form?', message: 'All rows in this form are removed.', confirmLabel: 'Clear', danger: true })) { I.rows = []; EXT.save('it'); redraw(); } } }, icon('trash'), 'Clear') : null
+        )
+      ),
+      h('div', { class: 'it-meta' }, field('Site', site)),
+      missing ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `${plural(missing, 'row')} ${missing === 1 ? 'is' : 'are'} missing an ID or detail (the orange cells). Load the roster in My agents, or type it in the cell.`)) : null,
+      table
+    );
+    cards = [newCard, formCard];
+  } else {
+    const K = itJiraKind(itPick.jira);
+    const people = itPick.agents.map(itInfo).filter(Boolean);
+    const seats = people.length
+      ? h(
+          'table',
+          { class: 'rta-swap-grid' },
+          h('thead', null, h('tr', null, h('th', null, 'Agent'), h('th', null, 'Seat or PC number'))),
+          h(
+            'tbody',
+            null,
+            people.map((a) => {
+              const el = h('input', { class: 'input', type: 'text', maxlength: 40, placeholder: 'Optional', value: itPick.seats[a.id] || '', 'data-fk': `it-seat:${a.id}` });
+              el.addEventListener('input', () => {
+                itPick.seats[a.id] = el.value;
+                paint();
+              });
+              return h('tr', null, h('th', { scope: 'row' }, a.full), h('td', null, el));
+            })
+          )
+        )
+      : null;
+    const sumOut = h('input', { class: 'input', readonly: true, 'data-fk': 'it-summary' });
+    const descOut = h('pre', { class: 'an-msg it-desc', 'data-fk': 'it-desc' });
+    const paint = () => {
+      const t = itJiraText(itPick);
+      sumOut.value = people.length ? t.summary : '';
+      descOut.textContent = people.length ? t.description : 'Choose the issue and the agents to write the ticket.';
+    };
+    const live = (key, attrs, tag) => {
+      const el = bindIn(key, attrs, tag);
+      el.addEventListener('input', paint);
+      return el;
+    };
+    const newCard = h(
+      'section',
+      { class: 'card kt-card rta-card', 'aria-labelledby': 'it-jnew' },
+      h('h2', { class: 'kt-title', id: 'it-jnew' }, icon('plus'), 'Onsite IT ticket'),
+      h('p', { class: 'kt-sub' }, 'Pick the issue and the agents. The ticket is written below, ready to paste into Jira.'),
+      step(1, 'Issue'),
+      chips(IT_JIRA_KINDS, itPick.jira, 'it-jira', (id) => (itPick.jira = id)),
+      K.id === 'other' ? h('div', { class: 'rta-fields' }, field('The issue', live('other', { type: 'text', maxlength: 80, placeholder: 'Keyboard, monitor, network…', 'data-fk': 'it-other' }), 'it-wide')) : null,
+      step(2, 'Agents'),
+      agentTools,
+      agentChips,
+      otherBox,
+      step(3, 'Details'),
+      seats,
+      h('div', { class: 'rta-fields it-fields it-jfields' }, field('Since', live('since', { type: 'text', maxlength: 60, placeholder: 'This morning, 10:30 AM…', 'data-fk': 'it-since' })), field('Details (optional)', live('details', { maxlength: 600, rows: 3, placeholder: 'What happens, what was tried already', 'data-fk': 'it-details' }, 'textarea'), 'it-wide'))
+    );
+    paint();
+    const ticketCard = h(
+      'section',
+      { class: 'card kt-card rta-card', 'aria-labelledby': 'it-ticket' },
+      h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'it-ticket' }, icon('clipboard'), 'The Jira ticket'), h('p', { class: 'kt-sub' }, 'Copy the summary and the description into the new ticket.'))),
+      h('div', { class: 'it-out' }, field('Summary', sumOut, 'it-wide'), h('button', { type: 'button', class: 'btn', 'data-fk': 'it-copy-summary', onclick: (e) => copyText(sumOut.value, { label: 'Summary', button: e.currentTarget, emptyMessage: 'Choose the agents first.' }) }, icon('copy'), 'Copy summary')),
+      h('div', { class: 'it-out it-out--desc' }, h('span', { class: 'field__label' }, 'Description'), h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'it-copy-desc', onclick: (e) => (people.length ? copyText(descOut.textContent, { label: 'Description', button: e.currentTarget }) : toast('Choose the agents first.', { type: 'warn' })) }, icon('copy'), 'Copy description')),
+      descOut
+    );
+    cards = [newCard, ticketCard];
+  }
+
+  main.append(pageHead({ eyebrow: 'Workspace', title: 'IT requests', sub: 'The ID Admin form as an Excel file, or a Jira ticket for onsite IT, in a few clicks.' }), modes, ...cards);
+}
+
+EXT.view('it', { title: 'IT requests', label: 'IT requests', icon: 'monitor', render: itRender });
+EXT.order.splice(EXT.order.indexOf('it'), 1);
+EXT.order.splice(EXT.order.indexOf('rta') + 1, 0, 'it');
 /* ===== layer: layers/90-integration.js ===== */
 /* ==========================================================================
    90-integration — glue between the area layers, for functions no single area owns.
