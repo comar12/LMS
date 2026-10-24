@@ -11,28 +11,41 @@ def tenure_bucket(days):
 
 def read_roster(path, as_of=None, prev=None):
     """Roster as one row per agent: HRID, Agent Name, Team Leader, Ops Manager, Phase, Tenure Bucket, Wave, LOB Start Date, Tenure Days.
-    Reads the original "Roster" sheet or the monthly HC layout (New TL / New Ops Manager, e.g. TSX November roster)."""
+    Reads the original "Roster" sheet, the monthly HC layout (New TL / New Ops Manager) or the distro layout (1UP / 2UP Manager)."""
     xl = pd.ExcelFile(path)
-    if "Roster" in xl.sheet_names:
-        r = pd.read_excel(xl, sheet_name="Roster")
+    heads = {n: {str(c).strip() for c in pd.read_excel(xl, sheet_name=n, nrows=0).columns} for n in xl.sheet_names}
+    pick = lambda need: next((n for n in xl.sheet_names if need <= heads[n]), None)
+    ref = pd.Timestamp(as_of or dt.date.today())
+    def active(r):  # active agents only; PALs are senior agents who still sell
+        if "Status" in r: r = r[r["Status"].astype(str).str.strip().str.lower().isin(["active", "nan"])]
+        if "Role" in r: r = r[r["Role"].astype(str).str.strip().str.lower().isin(["agent", "pal", "nan"])]
+        return r
+    def tenure_from_hire(r):
+        r["LOB Start Date"] = pd.to_datetime(r.get("Hiring Date"), errors="coerce").fillna(pd.to_datetime(r.get("PST Date"), errors="coerce"))
+        r["Tenure Days"] = (ref - r["LOB Start Date"]).dt.days
+        r["Tenure Bucket"] = r["Tenure Days"].apply(tenure_bucket)
+    if (sh := pick({"LOB", "Team Leader", "Ops Manager", "Agent Name"})):  # original TSX roster
+        r = pd.read_excel(xl, sheet_name=sh)
         r.columns = [str(c).strip() for c in r.columns]
         r = r[r["LOB"].notna()].copy()
         r["Tenure Days"] = pd.to_numeric(r["Tenurity"], errors="coerce")
         r["LOB Start Date"] = pd.to_datetime(r["LOB Start Date"], errors="coerce")
-    else:
-        sheet = next(n for n in xl.sheet_names if {"Agent Name", "New TL"} <= {str(c).strip() for c in pd.read_excel(xl, sheet_name=n, nrows=0).columns})
-        r = pd.read_excel(xl, sheet_name=sheet)
+    elif (sh := pick({"Agent Name", "New TL"})):  # monthly HC layout: Old/New TL, Old/New Ops Manager
+        r = pd.read_excel(xl, sheet_name=sh)
         r.columns = [str(c).strip() for c in r.columns]
-        r = r[r["HRID"].notna() & r["Agent Name"].notna()].copy()
-        if "Status" in r: r = r[r["Status"].astype(str).str.strip().str.lower().isin(["active", "nan"])]
-        if "Role" in r: r = r[r["Role"].astype(str).str.strip().str.lower().isin(["agent", "nan"])]
-        tl = r["New TL"].where(r["New TL"].notna(), np.where(r["Phase"].astype(str).str.strip() == "Training", "Training", r.get("TEAM-2")))
-        r["Team Leader"] = tl
+        r = active(r[r["HRID"].notna() & r["Agent Name"].notna()].copy())
+        r["Team Leader"] = r["New TL"].where(r["New TL"].notna(), np.where(r["Phase"].astype(str).str.strip() == "Training", "Training", r.get("TEAM-2")))
         r["Ops Manager"] = r["New Ops Manager"]
-        r["LOB Start Date"] = pd.to_datetime(r.get("Hiring Date"), errors="coerce").fillna(pd.to_datetime(r.get("PST Date"), errors="coerce"))
-        ref = pd.Timestamp(as_of or dt.date.today())
-        r["Tenure Days"] = (ref - r["LOB Start Date"]).dt.days
-        r["Tenure Bucket"] = r["Tenure Days"].apply(tenure_bucket)
+        tenure_from_hire(r)
+    elif (sh := pick({"Agent Name", "1UP Manager", "2UP Manager"})):  # distro layout: 1UP = team leader, 2UP = ops manager
+        r = pd.read_excel(xl, sheet_name=sh)
+        r.columns = [str(c).strip() for c in r.columns]
+        r = active(r[r["HRID"].notna() & r["Agent Name"].notna()].copy())
+        r["Team Leader"] = r["1UP Manager"]
+        r["Ops Manager"] = r["2UP Manager"]
+        tenure_from_hire(r)
+    else:
+        raise ValueError(f"{os.path.basename(path)}: no roster sheet found")
     r["HRID"] = r["HRID"].astype(str).str.extract(r"(\d+)")[0]
     r = r[r["HRID"].notna()].drop_duplicates("HRID")
     r["Agent Name"] = r["Agent Name"].astype(str).str.strip().str.title()
