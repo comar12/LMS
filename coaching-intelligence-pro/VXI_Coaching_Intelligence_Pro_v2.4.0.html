@@ -5908,6 +5908,63 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 @media (prefers-reduced-motion: reduce) {
   .kw-chip { transition: none; }
 }
+/* ===== layer: layers/86-numbers.css ===== */
+/* 86-numbers: Agent numbers */
+.an-pick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 18px; }
+.an-select { flex: 0 1 320px; min-width: 220px; }
+.an-count { color: var(--text-2); font-size: 0.85rem; margin-left: 4px; }
+.an-card { margin-bottom: 18px; }
+.an-table { min-width: 680px; }
+.an-table tbody tr.is-alt { background: color-mix(in srgb, var(--text) 2.5%, transparent); }
+.an-target { color: var(--text-2); font-weight: 600; font-size: 0.86rem; white-space: nowrap; }
+
+.an-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.an-stat { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); }
+.an-stat__n { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.an-stat__t { font-size: 0.82rem; color: var(--text-2); }
+.an-stat--met { background: #E3F2EC; border-color: transparent; }
+.an-stat--met .an-stat__n { color: #1E7F5C; }
+.an-stat--close { background: #FFF1CC; border-color: transparent; }
+.an-stat--close .an-stat__n { color: #8A5A00; }
+.an-stat--below { background: #FDE4E1; border-color: transparent; }
+.an-stat--below .an-stat__n { color: #B42318; }
+:root[data-theme='dark'] .an-stat--met { background: rgba(30, 127, 92, 0.22); }
+:root[data-theme='dark'] .an-stat--met .an-stat__n { color: #7FD8B4; }
+:root[data-theme='dark'] .an-stat--close { background: rgba(214, 160, 30, 0.2); }
+:root[data-theme='dark'] .an-stat--close .an-stat__n { color: #F2CF6B; }
+:root[data-theme='dark'] .an-stat--below { background: rgba(180, 35, 24, 0.24); }
+:root[data-theme='dark'] .an-stat--below .an-stat__n { color: #FF9C91; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .an-stat--met { background: rgba(30, 127, 92, 0.22); }
+  :root:not([data-theme='light']) .an-stat--met .an-stat__n { color: #7FD8B4; }
+  :root:not([data-theme='light']) .an-stat--close { background: rgba(214, 160, 30, 0.2); }
+  :root:not([data-theme='light']) .an-stat--close .an-stat__n { color: #F2CF6B; }
+  :root:not([data-theme='light']) .an-stat--below { background: rgba(180, 35, 24, 0.24); }
+  :root:not([data-theme='light']) .an-stat--below .an-stat__n { color: #FF9C91; }
+}
+
+.an-goals { display: grid; gap: 8px; margin: 4px 0 14px; }
+.an-goal-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; align-items: center; gap: 6px 14px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.an-goal-k { font-weight: 700; }
+.an-goal-meta { color: var(--text-2); font-size: 0.84rem; }
+.an-goal-in { display: inline-flex; align-items: center; gap: 8px; }
+.an-goal { width: 96px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.an-goal-unit { color: var(--text-2); font-size: 0.84rem; min-width: 92px; }
+.an-note-l { display: block; margin: 4px 0 6px; }
+.an-note { width: 100%; }
+.an-msg { margin: 6px 0 0; padding: 14px 16px; border-radius: 12px; background: color-mix(in srgb, var(--text) 4%, var(--surface)); border: 1px solid var(--border); white-space: pre-wrap; font: inherit; font-size: 0.92rem; line-height: 1.55; max-height: 420px; overflow: auto; }
+
+@media (max-width: 760px) {
+  .an-stats { grid-template-columns: 1fr; }
+  .an-goal-row { grid-template-columns: 1fr auto; }
+  .an-goal-meta { grid-column: 1 / -1; order: 3; }
+}
+.an-pick { flex-wrap: nowrap; }
+.an-pick > .pick { flex: 0 1 340px; min-width: 0; width: auto; }
+@media (max-width: 560px) {
+  .an-pick > .pick { flex: 1 1 auto; }
+  .an-count { display: none; }
+}
 </style>
 </head>
 <body>
@@ -6017,7 +6074,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.3.9';
+const APP_VERSION = '2.4.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -29585,6 +29642,363 @@ loadState = function () {
   } catch (e) {
     /* never block the app start */
   }
+};
+/* ===== layer: layers/86-numbers.js ===== */
+/* ==========================================================================
+   86-numbers: Agent numbers, a one-agent talk about results
+   - Last week: each KPI against the week before, the change, the month to date, the target.
+   - Where they stand: KPIs on target this month, the biggest step up, the biggest gap.
+   - Next week: a goal per KPI (suggested, editable) and an optional "how we get there".
+   - A ready message and a picture to send the agent. Goals are kept per agent and week,
+     so the next talk shows whether last week's goals were met. Names only, never IDs.
+   ========================================================================== */
+
+const AN_STEP = { tNPS: 10, aiCR: 1.5, ITG: 2.5, GSR: 1 };
+KT_LOOK.goal = { word: 'Goal', bg: '#FDE9DF', fg: '#C94A10' };
+
+EXT.slice('goals', {
+  initial: () => ({ items: {} }),
+  clean: (raw) => {
+    const nn = (v) => (typeof v === 'number' && Number.isFinite(v) ? Math.round(Math.max(-100, Math.min(1000, v)) * 10) / 10 : null);
+    const items = {};
+    Object.entries(raw && raw.items && typeof raw.items === 'object' ? raw.items : {})
+      .slice(0, 300)
+      .forEach(([key, weeks]) => {
+        if (!/^(h[0-9a-z]{6,14}|n:[a-z0-9 ]{2,80})$/.test(key) || !weeks || typeof weeks !== 'object') return;
+        const out = {};
+        Object.entries(weeks)
+          .slice(-26)
+          .forEach(([d, g]) => {
+            if (!isIsoDate(d) || !g || typeof g !== 'object') return;
+            out[d] = { ...Object.fromEntries(KT_KPIS.map(({ k }) => [k, nn(g[k])])), note: str(g.note, 300).trim() };
+          });
+        items[key] = out;
+      });
+    return { items };
+  },
+});
+
+const anKey = (m) => kwKey(m) || `n:${normalizeText(m.name || m.code || '')}`;
+const anWeekTarget = (k) => (k === 'XM' ? KW_WEEK_XM : snapTarget(k));
+const anFirst = (m) => String(m.name || m.code || '').split(' ')[0];
+
+/** The weeks this talk is about: the last full week, the one before it, and the week the goals are for. */
+function anWeeks() {
+  const W = EXT.data.weeks;
+  const full = kwFull();
+  const last = full.length ? full[full.length - 1].start : '';
+  const prev = full.length > 1 ? full[full.length - 2].start : '';
+  const tail = W.weeks[W.weeks.length - 1];
+  // The week in progress ("so far") is next; otherwise the week after the last full one.
+  const next = tail && tail.part && tail.start > last ? tail.start : last ? addDays(last, 7) : '';
+  return { last, prev, next, soFar: !!(tail && tail.part && tail.start === next) };
+}
+
+/** Suggested goal: hold the target when it was met; otherwise close half the gap (at least one step), never past the target. */
+function anSuggest(k, last) {
+  const t = anWeekTarget(k);
+  if (t === null) return null;
+  if (last === null || last === undefined || last >= t || k === 'XM') return t;
+  const g = Math.min(t, last + Math.max(AN_STEP[k] || 1, (t - last) / 2));
+  return k === 'aiCR' || k === 'GSR' ? Math.round(g * 10) / 10 : Math.round(g);
+}
+
+function anData(m) {
+  const wk = anWeeks();
+  const weeks = kwAgentWeeks(m) || {};
+  const mk = memberKpis(m);
+  const saved = (EXT.data.goals.items[anKey(m)] || {});
+  const goalNow = saved[wk.next] || null;
+  const goalLast = saved[wk.last] || null;
+  const rows = KT_KPIS.map(({ k, label }) => {
+    const val = (d) => (d && weeks[d] && weeks[d][k] !== null && weeks[d][k] !== undefined ? weeks[d][k] : null);
+    const last = val(wk.last);
+    const prev = val(wk.prev);
+    const it = mk.items.find((x) => x.k === k);
+    const suggested = anSuggest(k, last);
+    const goal = goalNow && goalNow[k] !== null && goalNow[k] !== undefined ? goalNow[k] : suggested;
+    const lastGoal = goalLast && goalLast[k] !== null && goalLast[k] !== undefined ? goalLast[k] : null;
+    return {
+      k,
+      label,
+      target: anWeekTarget(k),
+      last,
+      prev,
+      change: last !== null && prev !== null ? Math.round((last - prev) * 10) / 10 : null,
+      month: it ? it.v : null,
+      soFar: wk.soFar ? val(wk.next) : null,
+      suggested,
+      goal,
+      custom: !!(goalNow && goalNow[k] !== null && goalNow[k] !== undefined),
+      lastGoal,
+      lastGoalMet: lastGoal !== null && last !== null ? last >= lastGoal : null,
+    };
+  });
+  return { wk, rows, note: goalNow ? goalNow.note : '', hasWeeks: Object.keys(weeks).length > 0 };
+}
+
+function anSaveGoal(m, k, v) {
+  const G = EXT.data.goals;
+  const key = anKey(m);
+  const wk = anWeeks();
+  if (!wk.next) return;
+  const cur = (G.items[key] = G.items[key] || {});
+  const g = (cur[wk.next] = cur[wk.next] || { ...Object.fromEntries(KT_KPIS.map((x) => [x.k, null])), note: '' });
+  if (k === 'note') g.note = str(v, 300);
+  else g[k] = v === '' || v === null || !Number.isFinite(Number(v)) ? null : Math.round(Number(v) * 10) / 10;
+  EXT.save('goals');
+}
+
+const anFmt = (k, v) => (v === null || v === undefined ? '–' : ktFmt(k, v));
+const anGoalText = (k, v) => (v === null || v === undefined ? '–' : k === 'ITG' && v >= 100 ? '100%' : k === 'XM' ? `${v}+ line${v === 1 ? '' : 's'}` : `${anFmt(k, v)}+`);
+const anWord = (lv) => ({ met: 'on target', close: 'almost there', below: 'below target', none: 'no number yet' }[lv]);
+
+/** The message for the agent, in plain words. */
+function anMessage(m, d) {
+  const wk = d.wk;
+  const lines = [`Hi ${anFirst(m)}, here are your numbers.`, ''];
+  if (d.hasWeeks && wk.last) {
+    lines.push(`Last week (week of ${textDay(wk.last)}):`);
+    d.rows.forEach((r) => {
+      if (r.last === null) return lines.push(`• ${r.label}: no number yet`);
+      const unit = r.k === 'XM' ? (Math.abs(r.change) === 1 ? ' line' : ' lines') : ' points';
+      const ch = r.change === null ? '' : r.change > 0 ? `, up ${Math.abs(r.change)}${unit} from ${anFmt(r.k, r.prev)}` : r.change < 0 ? `, down ${Math.abs(r.change)}${unit} from ${anFmt(r.k, r.prev)}` : ', same as the week before';
+      const goal = r.lastGoal !== null ? ` Goal was ${anGoalText(r.k, r.lastGoal)}: ${r.lastGoalMet ? 'met' : 'not met'}.` : '';
+      lines.push(`• ${r.label}: ${anFmt(r.k, r.last)}${ch}. ${anWord(kwLevel(r.k, r.last)).replace(/^./, (c) => c.toUpperCase())}.${goal}`);
+    });
+    lines.push('');
+  }
+  lines.push('Month to date:');
+  d.rows.forEach((r) => lines.push(`• ${r.label}: ${anFmt(r.k, r.month)} (target ${r.k === 'XM' ? `${snapTarget('XM')} lines` : ktTargetText(r.k)})`));
+  lines.push('');
+  lines.push(`What I expect for the week of ${wk.next ? textDay(wk.next) : 'next week'}:`);
+  d.rows.forEach((r) => lines.push(`• ${r.label}: ${r.k === 'XM' ? `at least ${r.goal} line${r.goal === 1 ? '' : 's'}` : r.k === 'ITG' && r.goal >= 100 ? '100%' : `${anFmt(r.k, r.goal)} or higher`}`));
+  if (d.note) lines.push('', `How we get there: ${d.note}`);
+  const ups = d.rows.filter((r) => r.change !== null && r.change > 0).length;
+  lines.push('', ups >= 3 ? 'Great progress last week. Let\'s keep it going.' : ups ? 'Good steps last week. Let\'s build on them.' : 'I know you can do this, and I am here to help.');
+  return lines.join('\n');
+}
+
+function anCanvas(m) {
+  const d = anData(m);
+  const wk = d.wk;
+  return ktDraw({
+    title: `${m.name || m.code} · your numbers`,
+    sub: `${wk.last ? `Last week: ${fmtDay(wk.last)}` : ''}${wk.next ? ` · goals for the week of ${fmtDay(wk.next)}` : ''}`,
+    firstLabel: 'KPI',
+    nameW: 150,
+    colW: 118,
+    cols: [
+      { label: 'Target', sub: 'month' },
+      { label: wk.prev ? fmtDay(wk.prev) : 'Week before', sub: 'week before' },
+      { label: wk.last ? fmtDay(wk.last) : 'Last week', sub: 'last week' },
+      { label: 'Change', sub: 'week over week' },
+      { label: 'Month', sub: 'to date' },
+      { label: 'Next week', sub: 'my goal for you' },
+    ],
+    rows: d.rows.map((r) => ({
+      name: r.label,
+      cells: [
+        { text: r.k === 'XM' ? `${snapTarget('XM')} lines` : ktTargetText(r.k), level: 'none' },
+        { text: anFmt(r.k, r.prev), level: kwLevel(r.k, r.prev) },
+        { text: anFmt(r.k, r.last), level: kwLevel(r.k, r.last) },
+        { text: kwChangeText(r.change, r.k), level: kwChangeLevel(r.change) },
+        { text: anFmt(r.k, r.month), level: ktLevel(r.k, r.month) },
+        { text: anGoalText(r.k, r.goal), level: 'goal' },
+      ],
+    })),
+    note: `Weekly XM target: ${KW_WEEK_XM} line`,
+  });
+}
+
+let anAgent = '';
+
+function anRender(main) {
+  const members = state.team.members.slice().sort((a, b) => (a.name || a.code).localeCompare(b.name || b.code));
+  if (!members.length) {
+    main.append(pageHead({ eyebrow: 'Insights', title: 'Agent numbers', sub: 'Add your team in Team Pulse to see each agent\'s numbers.' }));
+    return;
+  }
+  if (!members.some((m) => m.id === anAgent)) anAgent = members[0].id;
+  const m = members.find((x) => x.id === anAgent);
+  const d = anData(m);
+  const wk = d.wk;
+  const at = members.indexOf(m);
+  const go = (n) => {
+    anAgent = members[(at + n + members.length) % members.length].id;
+    refresh({ panel: false });
+  };
+
+  const sel = h(
+    'select',
+    { class: 'select an-select', 'data-fk': 'an-agent', 'aria-label': 'Agent', onchange: (e) => { anAgent = e.target.value; refresh({ panel: false }); } },
+    members.map((x) => h('option', { value: x.id, selected: x.id === anAgent }, x.name || x.code))
+  );
+  const msgBox = h('pre', { class: 'an-msg', 'data-fk': 'an-msg' }, anMessage(m, d));
+  const redrawMsg = () => (msgBox.textContent = anMessage(m, anData(m)));
+
+  // 1. Last week
+  const lv = (k, v) => `kt-val kt-val--${kwLevel(k, v)}`;
+  const lastCard = h(
+    'section',
+    { class: 'card kt-card an-card', 'aria-labelledby': 'an-last' },
+    h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'an-last' }, icon('trend'), 'Last week'), h('p', { class: 'kt-sub' }, d.hasWeeks && wk.last ? `Week of ${fmtDay(wk.last, true)} against the week of ${fmtDay(wk.prev, true)}, with the month to date.` : 'No weekly numbers for this agent yet. Load the weekly export to see week over week.'))),
+    h(
+      'div',
+      { class: 'kt-scroll' },
+      h(
+        'table',
+        { class: 'kt-table an-table' },
+        h('thead', null, h('tr', null, h('th', { class: 'kt-name', scope: 'col' }, 'KPI'), ['Target', wk.prev ? fmtDay(wk.prev) : 'Week before', wk.last ? fmtDay(wk.last) : 'Last week', 'Change', 'Month to date', ...(wk.soFar ? [`${fmtDay(wk.next)} so far`] : []), ...(d.rows.some((r) => r.lastGoal !== null) ? ['Last goal'] : [])].map((t) => h('th', { scope: 'col' }, h('span', { class: 'kt-th' }, t))))),
+        h(
+          'tbody',
+          null,
+          d.rows.map((r, i) =>
+            h(
+              'tr',
+              { class: `kt-tr${i % 2 ? ' is-alt' : ''}` },
+              h('th', { class: 'kt-name', scope: 'row' }, r.label),
+              h('td', { class: 'kt-td an-target' }, r.k === 'XM' ? `${snapTarget('XM')} a month · 1 a week` : ktTargetText(r.k)),
+              h('td', { class: 'kt-td' }, h('span', { class: lv(r.k, r.prev) }, anFmt(r.k, r.prev))),
+              h('td', { class: 'kt-td' }, h('span', { class: lv(r.k, r.last) }, anFmt(r.k, r.last))),
+              h('td', { class: 'kt-td' }, h('span', { class: `kt-val kt-val--${kwChangeLevel(r.change)}` }, kwChangeText(r.change, r.k))),
+              h('td', { class: 'kt-td' }, h('span', { class: `kt-val kt-val--${ktLevel(r.k, r.month)}` }, anFmt(r.k, r.month))),
+              wk.soFar ? h('td', { class: 'kt-td' }, h('span', { class: lv(r.k, r.soFar) }, anFmt(r.k, r.soFar))) : null,
+              d.rows.some((x) => x.lastGoal !== null) ? h('td', { class: 'kt-td' }, r.lastGoal === null ? '–' : h('span', { class: `kt-val kt-val--${r.lastGoalMet ? 'met' : 'below'}` }, `${anGoalText(r.k, r.lastGoal)} ${r.lastGoalMet ? '✓' : '✗'}`)) : null
+            )
+          )
+        )
+      )
+    )
+  );
+
+  // 2. Where they stand
+  const onT = d.rows.filter((r) => ktLevel(r.k, r.month) === 'met').length;
+  const measured = d.rows.filter((r) => r.month !== null).length;
+  const best = d.rows.filter((r) => r.change !== null && r.change > 0).sort((a, b) => b.change / Math.max(1, Math.abs(b.target || 1)) - a.change / Math.max(1, Math.abs(a.target || 1)))[0];
+  const gaps = d.rows.filter((r) => r.month !== null && ktLevel(r.k, r.month) !== 'met' && snapTarget(r.k) !== null).sort((a, b) => (snapTarget(b.k) - b.month) / Math.max(1, Math.abs(snapTarget(b.k))) - (snapTarget(a.k) - a.month) / Math.max(1, Math.abs(snapTarget(a.k))));
+  const stat = (n, t, tone) => h('div', { class: `an-stat an-stat--${tone}` }, h('span', { class: 'an-stat__n' }, n), h('span', { class: 'an-stat__t' }, t));
+  const standCard = h(
+    'section',
+    { class: 'card kt-card an-card', 'aria-labelledby': 'an-stand' },
+    h('h2', { class: 'kt-title', id: 'an-stand' }, icon('target'), 'Where they stand'),
+    h(
+      'div',
+      { class: 'an-stats' },
+      stat(measured ? `${onT} of ${measured}` : '–', 'KPIs on target this month', onT && onT === measured ? 'met' : onT ? 'close' : 'below'),
+      stat(best ? `${best.label} ${kwChangeText(best.change, best.k)}` : '–', best ? 'biggest step up last week' : 'no step up last week', best ? 'met' : 'none'),
+      stat(gaps[0] ? `${gaps[0].label} ${anFmt(gaps[0].k, gaps[0].month)}` : 'None', gaps[0] ? `biggest gap, target ${gaps[0].k === 'XM' ? `${snapTarget('XM')} lines` : ktTargetText(gaps[0].k)}` : 'every KPI is on target', gaps[0] ? 'below' : 'met')
+    )
+  );
+
+  // 3. Next week
+  const inputs = d.rows.map((r) => {
+    const inp = h('input', { class: 'input an-goal', type: 'number', step: r.k === 'XM' ? '1' : '0.1', value: r.goal === null ? '' : String(r.goal), 'data-fk': `an-goal:${r.k}`, 'aria-label': `${r.label} goal for next week` });
+    inp.addEventListener('change', () => {
+      anSaveGoal(m, r.k, inp.value);
+      redrawMsg();
+    });
+    return { r, inp };
+  });
+  const note = h('textarea', { class: 'textarea an-note', rows: 2, maxlength: 300, placeholder: 'Optional: the one or two behaviors that will get there, in plain words.', 'data-fk': 'an-note' }, d.note || '');
+  note.addEventListener('input', () => {
+    anSaveGoal(m, 'note', note.value);
+    redrawMsg();
+  });
+  const setAll = (fn) => {
+    inputs.forEach(({ r, inp }) => {
+      const v = fn(r);
+      inp.value = v === null ? '' : String(v);
+      anSaveGoal(m, r.k, inp.value);
+    });
+    redrawMsg();
+  };
+  const nextCard = h(
+    'section',
+    { class: 'card kt-card an-card', 'aria-labelledby': 'an-next' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('h2', { class: 'kt-title', id: 'an-next' }, icon('flag'), `What I expect${wk.next ? `: week of ${fmtDay(wk.next, true)}` : ' next week'}`), h('p', { class: 'kt-sub' }, 'Suggested goals hold the target where it was met, and close half the gap where it was not. Change any of them.')),
+      h('div', { class: 'kt-actions' }, h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'an-suggested', onclick: () => setAll((r) => r.suggested) }, icon('refresh'), 'Use suggested'), h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'an-targets', onclick: () => setAll((r) => r.target) }, icon('target'), 'Full targets'))
+    ),
+    h(
+      'div',
+      { class: 'an-goals' },
+      inputs.map(({ r, inp }) =>
+        h(
+          'label',
+          { class: 'an-goal-row' },
+          h('span', { class: 'an-goal-k' }, r.label),
+          h('span', { class: 'an-goal-meta' }, `last week ${anFmt(r.k, r.last)} · target ${r.k === 'XM' ? `${KW_WEEK_XM} a week` : ktTargetText(r.k)}`),
+          h('span', { class: 'an-goal-in' }, inp, h('span', { class: 'an-goal-unit' }, r.k === 'XM' ? 'lines or more' : KPI_MEASURE[r.k].unit === '%' ? '% or higher' : 'or higher'))
+        )
+      )
+    ),
+    h('label', { class: 'field__label an-note-l' }, 'How we get there'),
+    note
+  );
+
+  // 4. Message and picture
+  const fileName = () => `${(m.name || m.code).replace(/[^A-Za-z0-9]+/g, '_')}_numbers_${wk.next || todayDay()}.png`;
+  const msgCard = h(
+    'section',
+    { class: 'card kt-card an-card', 'aria-labelledby': 'an-send' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('h2', { class: 'kt-title', id: 'an-send' }, icon('chat'), 'Send it to the agent'), h('p', { class: 'kt-sub' }, 'Copy the message, or send the picture with the same numbers and goals.')),
+      h(
+        'div',
+        { class: 'kt-actions' },
+        h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'an-copy-msg', onclick: (e) => copyText(msgBox.textContent, { label: 'Message', button: e.currentTarget }) }, icon('copy'), 'Copy message'),
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'an-copy-img', onclick: () => ktShare(() => anCanvas(m), fileName(), true) }, icon('copy'), 'Copy image'),
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'an-save-img', onclick: () => ktShare(() => anCanvas(m), fileName(), false) }, icon('download'), 'Save image')
+      )
+    ),
+    msgBox
+  );
+
+  main.append(
+    pageHead({
+      eyebrow: 'Insights',
+      title: 'Agent numbers',
+      sub: 'Their week, where they stand, and what you expect next week. Pick an agent, set the goals, and send it.',
+    }),
+    h(
+      'div',
+      { class: 'an-pick' },
+      h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'an-prev', 'aria-label': 'Previous agent', onclick: () => go(-1) }, icon('chev-left')),
+      sel,
+      h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'an-next-agent', 'aria-label': 'Next agent', onclick: () => go(1) }, icon('chev-right')),
+      h('span', { class: 'an-count' }, `${at + 1} of ${members.length}`)
+    ),
+    lastCard,
+    standCard,
+    nextCard,
+    msgCard
+  );
+}
+
+EXT.view('numbers', {
+  title: 'Agent numbers',
+  label: 'Agent numbers',
+  icon: 'trend',
+  render: anRender,
+});
+/* Agent numbers sits right after Coach by KPI. */
+EXT.order.splice(EXT.order.indexOf('numbers'), 1);
+EXT.order.splice(EXT.order.indexOf('kpi-coach') + 1, 0, 'numbers');
+
+/* From the week over week card on Home: open the chosen agent's numbers. */
+const _anKwCard = kwCard;
+kwCard = function () {
+  const card = _anKwCard();
+  if (card && kwAgent) {
+    const ctl = card.querySelector('.kw-controls');
+    if (ctl) ctl.append(h('a', { class: 'btn btn--sm btn--primary', href: '#/numbers', 'data-fk': 'kw-open-numbers', onclick: () => { anAgent = kwAgent; } }, icon('arrow-right'), 'Agent numbers and goals'));
+  }
+  return card;
 };
 /* ===== layer: layers/90-integration.js ===== */
 /* ==========================================================================
