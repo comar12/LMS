@@ -6152,7 +6152,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.5.2';
+const APP_VERSION = '2.5.3';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -30276,9 +30276,10 @@ EXT.order.splice(EXT.order.indexOf('numbers') + 1, 0, 'agents');
      teams can be picked from that roster or typed in. Everything stays in this browser.
    ========================================================================== */
 
-/* VXI colors for the email: orange title sign, navy header row. */
+/* The coaching theme for the email: deep ink title with an orange line, a soft orange
+   header, cream striped rows and light borders, all in Calibri. */
 const VXI_ORANGE = '#F26522';
-const VXI_NAVY = '#0B1630';
+const RTA_MAIL = { ink: '#121826', text: '#1C2437', tint: '#FDE9DF', stripe: '#FAF7F2', line: '#E3DED7', font: 'Calibri,Carlito,Arial,sans-serif' };
 const RTA_TYPES = [
   { id: 'system', title: 'System Issue', color: VXI_ORANGE, kind: 'time', ask: 'update the following system issue' },
   { id: 'swap', title: 'Swap', color: VXI_ORANGE, kind: 'swap', ask: 'update the following shift swap', transport: true },
@@ -30292,8 +30293,6 @@ const RTA_TYPES = [
   { id: 'other', title: 'Vacations or Other Requests', color: VXI_ORANGE, kind: 'request', ask: 'update the following request' },
   { id: 'abs', title: 'ABS Compensation', color: VXI_ORANGE, kind: 'time', ask: 'update the following ABS compensation' },
 ];
-const RTA_HEAD = VXI_NAVY;
-const RTA_SWAP_HEAD = VXI_NAVY;
 const RTA_GREETING = 'Hello Team,';
 const rtaType = (id) => RTA_TYPES.find((t) => t.id === id);
 
@@ -30366,11 +30365,10 @@ function rtaGrid(t, lob = EXT.data.rta.lob) {
     return {
       head: ['LOB', 'HRID', 'Name', ...t.dates.map(rtaDate)],
       rows: t.rows.map((r) => [lob, rtaHr(r), rtaName(r), ...t.dates.map((_, i) => r.times[i] || '')]),
-      headColor: RTA_SWAP_HEAD,
     };
   }
-  if (T.kind === 'request') return { head: ['LOB', 'HRID', 'Name', 'Request', 'From', 'To'], rows: t.rows.map((r) => [lob, rtaHr(r), rtaName(r), r.request, r.fromText, r.toText]), headColor: RTA_HEAD };
-  return { head: ['LOB', 'HRID', 'Name', 'Date', 'From', 'To'], rows: t.rows.map((r) => [lob, rtaHr(r), rtaName(r), rtaDate(r.date), rtaTime(r.from), rtaTime(r.to)]), headColor: RTA_HEAD };
+  if (T.kind === 'request') return { head: ['LOB', 'HRID', 'Name', 'Request', 'From', 'To'], rows: t.rows.map((r) => [lob, rtaHr(r), rtaName(r), r.request, r.fromText, r.toText]) };
+  return { head: ['LOB', 'HRID', 'Name', 'Date', 'From', 'To'], rows: t.rows.map((r) => [lob, rtaHr(r), rtaName(r), rtaDate(r.date), rtaTime(r.from), rtaTime(r.to)]) };
 }
 
 const rtaDates = (draft) => draft.flatMap((t) => [...t.dates, ...t.rows.map((r) => r.date)]).filter(Boolean).sort();
@@ -30411,17 +30409,19 @@ function rtaSubject() {
 function rtaEmail(source) {
   const R = source || EXT.data.rta;
   const draft = R.draft;
-  const font = 'font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#000000';
-  const cell = 'border:1px solid #000000;padding:2px 8px;white-space:nowrap';
+  const C = RTA_MAIL;
+  const font = `font-family:${C.font};font-size:11pt;color:${C.text}`;
+  /* Every cell names the font too: Outlook does not pass the table font down to its cells. */
+  const cell = `border:1px solid ${C.line};padding:4px 12px;white-space:nowrap;font-family:${C.font};font-size:11pt;color:${C.text}`;
   const p = (t) => `<p style="margin:0 0 0 0;${font}">${t}</p>`;
   const blank = `<p style="margin:0;${font}">&nbsp;</p>`;
   const tables = draft.map((t) => {
     const T = rtaType(t.type);
     const g = rtaGrid(t, R.lob);
-    /* The request color runs across the whole table, as a big sign. */
-    const title = `<tr><td colspan="${g.head.length}" bgcolor="${T.color}" style="${cell};background:${T.color};color:#FFFFFF;font-weight:bold;font-size:14pt;text-align:center;padding:5px 8px">${rtaEsc(T.title)}</td></tr>`;
-    const head = `<tr>${g.head.map((c) => `<td bgcolor="${g.headColor}" style="${cell};background:${g.headColor};color:#FFFFFF;font-weight:bold;text-align:center">${rtaEsc(c)}</td>`).join('')}</tr>`;
-    const body = g.rows.map((r) => `<tr>${r.map((c, i) => `<td style="${cell};text-align:${i === 2 ? 'left' : 'center'}">${rtaEsc(c)}</td>`).join('')}</tr>`).join('');
+    /* The request name runs across the whole table, as a big sign. */
+    const title = `<tr><td colspan="${g.head.length}" bgcolor="${C.ink}" style="${cell};border-color:${C.ink};border-bottom:3px solid ${VXI_ORANGE};background:${C.ink};color:#FFFFFF;font-weight:bold;font-size:14pt;letter-spacing:0.5px;text-align:center;padding:7px 12px">${rtaEsc(T.title)}</td></tr>`;
+    const head = `<tr>${g.head.map((c) => `<td bgcolor="${C.tint}" style="${cell};background:${C.tint};color:${C.ink};font-weight:bold;text-align:center">${rtaEsc(c)}</td>`).join('')}</tr>`;
+    const body = g.rows.map((r, k) => `<tr>${r.map((c, i) => `<td${k % 2 ? ` bgcolor="${C.stripe}"` : ''} style="${cell};${k % 2 ? `background:${C.stripe};` : ''}text-align:${i === 2 ? 'left' : 'center'}">${rtaEsc(c)}</td>`).join('')}</tr>`).join('');
     return `<table cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;${font}">${title}${head}${body}</table>`;
   });
   const transport = rtaTransportLine(draft);
