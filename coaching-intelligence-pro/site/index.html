@@ -5989,8 +5989,13 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .rta-type { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease; }
 .rta-type__dot { width: 10px; height: 10px; border-radius: 3px; background: var(--tc); }
 .rta-type:hover { border-color: var(--tc); }
-.rta-type.is-on { background: var(--tc); border-color: var(--tc); color: #fff; }
-.rta-type.is-on .rta-type__dot { background: #fff; }
+/* Same look as the email title sign: deep ink with an orange line. */
+.rta-type.is-on { background: #121826; border-color: #121826; color: #fff; box-shadow: inset 0 -3px 0 #F26522; }
+.rta-type.is-on .rta-type__dot { background: #F26522; }
+:root[data-theme='dark'] .rta-type.is-on { border-color: rgba(242, 101, 34, 0.55); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .rta-type.is-on { border-color: rgba(242, 101, 34, 0.55); }
+}
 .rta-type:focus-visible, .rta-agent:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .rta-step { display: flex; align-items: center; gap: 8px; margin: 16px 0 8px; font-weight: 700; }
 .rta-step__n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; font-size: 0.78rem; }
@@ -6152,7 +6157,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.5.3';
+const APP_VERSION = '2.5.4';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
