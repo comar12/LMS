@@ -5982,6 +5982,58 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 @media (prefers-reduced-motion: reduce) {
   .ma-id { transition: none; }
 }
+/* ===== layer: layers/88-rta.css ===== */
+/* 88-rta: Workforce requests */
+.rta-card { margin-bottom: 18px; }
+.rta-types { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 6px; }
+.rta-type { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease; }
+.rta-type__dot { width: 10px; height: 10px; border-radius: 3px; background: var(--tc); }
+.rta-type:hover { border-color: var(--tc); }
+.rta-type.is-on { background: var(--tc); border-color: var(--tc); color: #fff; }
+.rta-type.is-on .rta-type__dot { background: #fff; }
+.rta-type:focus-visible, .rta-agent:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rta-step { display: flex; align-items: center; gap: 8px; margin: 16px 0 8px; font-weight: 700; }
+.rta-step__n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; font-size: 0.78rem; }
+.rta-agent-tools { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.rta-count { color: var(--text-2); font-size: 0.85rem; margin-left: 6px; }
+.rta-agents { display: flex; flex-wrap: wrap; gap: 6px; }
+.rta-agent { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-size: 0.86rem; cursor: pointer; }
+.rta-agent.is-on { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); border-color: var(--accent); color: var(--accent-text, var(--accent)); font-weight: 700; }
+.rta-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 220px)); gap: 10px 14px; }
+.rta-fields .field { margin: 0; }
+.rta-swap { display: grid; gap: 12px; }
+.rta-sdates { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rta-sdate { display: inline-flex; align-items: center; gap: 2px; }
+.rta-swap-grid { border-collapse: separate; border-spacing: 6px; }
+.rta-swap-grid th { text-align: left; font-size: 0.85rem; color: var(--text-2); font-weight: 700; white-space: nowrap; }
+.rta-swap-grid .input { min-width: 170px; }
+.rta-hint { color: var(--text-2); margin: 0; }
+.rta-add { margin-top: 16px; }
+
+.rta-meta { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 110px; gap: 10px 14px; margin-bottom: 12px; }
+.rta-meta .field { margin: 0; }
+.rta-preview { background: #fff; color: #000; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; overflow-x: auto; }
+.rta-preview table { margin: 2px 0; }
+.rta-empty { color: #6B7280 !important; font-family: inherit !important; margin: 0; }
+.rta-rows { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.rta-row { display: grid; grid-template-columns: 200px minmax(0, 1fr) minmax(0, 1.2fr) auto; align-items: center; gap: 10px; padding: 6px 10px; border: 1px solid var(--border); border-left: 4px solid var(--tc); border-radius: 8px; font-size: 0.88rem; }
+.rta-row__type { font-weight: 700; }
+.rta-row__when { color: var(--text-2); }
+.rta-hist { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.rta-hist__row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; }
+.rta-hist__s { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rta-hist__m { color: var(--text-2); font-size: 0.82rem; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .rta-fields, .rta-meta { grid-template-columns: 1fr; }
+  .rta-row { grid-template-columns: 1fr auto; }
+  .rta-row__when { grid-column: 1 / -1; }
+  .rta-hist__row { grid-template-columns: 1fr auto; }
+  .rta-hist__m { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rta-type { transition: none; }
+}
 </style>
 </head>
 <body>
@@ -6091,7 +6143,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.4.1';
+const APP_VERSION = '2.5.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -30028,6 +30080,21 @@ kwCard = function () {
 
 const maReal = (bp) => /^bp-/i.test(String(bp || ''));
 
+/* The full roster name per member (for workforce requests), kept in this browser only. */
+EXT.slice('agentInfo', {
+  initial: () => ({ items: {} }),
+  clean: (raw) => {
+    const items = {};
+    Object.entries(raw && raw.items && typeof raw.items === 'object' ? raw.items : {})
+      .slice(0, 200)
+      .forEach(([id, v]) => {
+        if (isId(id) && v && typeof v === 'object') items[id] = { full: str(v.full, 100).replace(/\s+/g, ' ').trim() };
+      });
+    return { items };
+  },
+});
+const maFullName = (m) => (EXT.data.agentInfo.items[m.id] || {}).full || m.name || m.code;
+
 /** Read the TSX roster and fill each member's HR ID and BP-ID. Returns how many were filled. */
 function maApplyRoster(sheet) {
   const rows = (sheet.rows || []).filter((r) => r && r.some((c) => c !== null && c !== undefined && c !== ''));
@@ -30051,6 +30118,7 @@ function maApplyRoster(sheet) {
     }
     if (!hit) return missing.push(m.name || m.code);
     let changed = false;
+    EXT.data.agentInfo.items[m.id] = { full: hit.name };
     if (hit.hrid && hit.hrid !== m.hrid) {
       m.hrid = hit.hrid;
       changed = true;
@@ -30062,6 +30130,7 @@ function maApplyRoster(sheet) {
     if (changed) filled++;
   });
   persist('team');
+  EXT.save('agentInfo');
   return { filled, missing, total: state.team.members.length };
 }
 
@@ -30172,6 +30241,422 @@ EXT.view('agents', { title: 'My agents', label: 'My agents', icon: 'users', rend
 /* My agents sits after Agent numbers. */
 EXT.order.splice(EXT.order.indexOf('agents'), 1);
 EXT.order.splice(EXT.order.indexOf('numbers') + 1, 0, 'agents');
+/* ===== layer: layers/88-rta.js ===== */
+/* ==========================================================================
+   88-rta: Workforce requests, the RTA email in a few clicks
+   - Pick the request, the agents and the times; the tables follow the RTA sheet
+     (title cell in the request color, dark header, LOB | HRID | Name | ...).
+   - One email can carry several tables. "Copy email" puts a real formatted table on the
+     clipboard for Outlook (not a picture), with the greeting, the ask, the CLT note,
+     the transportation line when it applies, and "BR,".
+   - HRID and the full name come from the roster loaded in My agents. Everything stays
+     in this browser.
+   ========================================================================== */
+
+const RTA_TYPES = [
+  { id: 'system', title: 'System Issue', color: '#C55A11', kind: 'time', ask: 'update the following system issue' },
+  { id: 'swap', title: 'Swap', color: '#BF9000', kind: 'swap', ask: 'update the following shift swap', transport: true },
+  { id: 'ot', title: 'Over Time', color: '#7030A0', kind: 'time', ask: 'cover the OT for the following {emp} so we can save the intervals', transport: true },
+  { id: 'vto', title: 'Early Leave/ Late Arrival/ VTO', color: '#44546A', kind: 'time', ask: 'update the following early leave, late arrival or VTO' },
+  { id: 'cancel', title: 'Cancel Day Off', color: '#2E75B6', kind: 'time', ask: 'cancel the day off for the following {emp} so we can save the intervals', transport: true },
+  { id: 'coaching', title: 'Coaching', color: '#00838F', kind: 'time', ask: 'update the following coaching time' },
+  { id: 'meeting', title: 'Team Meeting', color: '#00838F', kind: 'time', ask: 'update the following team meeting', team: true },
+  { id: 'break', title: 'Late Break/ Late Lunch', color: '#0070C0', kind: 'time', ask: 'update the following late break or late lunch' },
+  { id: 'transport', title: 'VXI Transportation issue', color: '#548235', kind: 'request', ask: 'update the following transportation issue' },
+  { id: 'other', title: 'Vacations or Other Requests', color: '#548235', kind: 'request', ask: 'update the following request' },
+  { id: 'abs', title: 'ABS Compensation', color: '#C00000', kind: 'time', ask: 'update the following ABS compensation' },
+];
+const RTA_HEAD = '#1F4E79';
+const RTA_SWAP_HEAD = '#2F5597';
+const rtaType = (id) => RTA_TYPES.find((t) => t.id === id);
+
+const rtaClean = (raw) => {
+  const src = raw && typeof raw === 'object' ? raw : {};
+  const s = (v, n) => str(v, n).trim();
+  const day = (v) => (isIsoDate(v) ? v : '');
+  const tm = (v) => (/^\d{2}:\d{2}$/.test(String(v || '')) ? v : '');
+  const row = (r) => ({ mid: isId(r && r.mid) ? r.mid : '', name: s(r && r.name, 100), date: day(r && r.date), from: tm(r && r.from), to: tm(r && r.to), request: s(r && r.request, 120), fromText: s(r && r.fromText, 40), toText: s(r && r.toText, 40), times: (Array.isArray(r && r.times) ? r.times : []).slice(0, 5).map((t) => s(t, 40)) });
+  const tables = (list) =>
+    (Array.isArray(list) ? list : [])
+      .slice(0, 20)
+      .filter((t) => t && rtaType(t.type))
+      .map((t) => ({ id: isId(t.id) ? t.id : uid('rt'), type: t.type, dates: (Array.isArray(t.dates) ? t.dates : []).map(day).filter(Boolean).slice(0, 5), rows: (Array.isArray(t.rows) ? t.rows : []).slice(0, 60).map(row) }));
+  return {
+    greeting: s(src.greeting, 80) || 'Hello Abadi,',
+    lob: s(src.lob, 20) || 'TSX',
+    subject: s(src.subject, 200),
+    draft: tables(src.draft),
+    history: (Array.isArray(src.history) ? src.history : []).slice(0, 15).map((x) => ({ at: s(x && x.at, 30), subject: s(x && x.subject, 200), draft: tables(x && x.draft), greeting: s(x && x.greeting, 80), lob: s(x && x.lob, 20) || 'TSX' })),
+  };
+};
+EXT.slice('rta', { initial: () => rtaClean(null), clean: rtaClean });
+
+/* ---------- formatting ---------- */
+const rtaEsc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const rtaDate = (d) => {
+  if (!isIsoDate(d)) return '';
+  const [y, m, dd] = d.split('-').map(Number);
+  return `${m}/${dd}/${y}`;
+};
+const rtaTime = (t) => {
+  if (!/^\d{2}:\d{2}$/.test(t || '')) return '';
+  let [hh, mm] = t.split(':').map(Number);
+  const pm = hh >= 12;
+  hh = hh % 12 || 12;
+  return `${hh}:${String(mm).padStart(2, '0')} ${pm ? 'PM' : 'AM'}`;
+};
+const rtaShort = (d) => {
+  if (!isIsoDate(d)) return '';
+  const dt = parseDay(d);
+  return `${dt.getDate()}-${dt.toLocaleDateString('en-US', { month: 'short' })}`;
+};
+const rtaTomorrow = () => addDays(todayDay(), 1);
+const rtaMember = (mid) => state.team.members.find((m) => m.id === mid) || null;
+const rtaHr = (r) => {
+  const m = rtaMember(r.mid);
+  return (m && m.hrid) || '';
+};
+/* Roster names come in any case; a word written all in lowercase gets a capital first letter. */
+const rtaCase = (n) => String(n || '').split(' ').map((w) => (w && w === w.toLowerCase() ? w[0].toUpperCase() + w.slice(1) : w)).join(' ');
+const rtaName = (r) => {
+  const m = rtaMember(r.mid);
+  return rtaCase(m ? maFullName(m) : r.name);
+};
+
+/** Header and cells for one table. */
+function rtaGrid(t, lob = EXT.data.rta.lob) {
+  const T = rtaType(t.type);
+  if (T.kind === 'swap') {
+    return {
+      head: ['LOB', 'HRID', 'Name', ...t.dates.map(rtaDate)],
+      rows: t.rows.map((r) => [lob, rtaHr(r), rtaName(r), ...t.dates.map((_, i) => r.times[i] || '')]),
+      headColor: RTA_SWAP_HEAD,
+    };
+  }
+  if (T.kind === 'request') return { head: ['LOB', 'HRID', 'Name', 'Request', 'From', 'To'], rows: t.rows.map((r) => [lob, rtaHr(r), rtaName(r), r.request, r.fromText, r.toText]), headColor: RTA_HEAD };
+  return { head: ['LOB', 'HRID', 'Name', 'Date', 'From', 'To'], rows: t.rows.map((r) => [lob, rtaHr(r), rtaName(r), rtaDate(r.date), rtaTime(r.from), rtaTime(r.to)]), headColor: RTA_HEAD };
+}
+
+const rtaDates = (draft) => draft.flatMap((t) => [...t.dates, ...t.rows.map((r) => r.date)]).filter(Boolean).sort();
+const rtaRowCount = (draft) => draft.reduce((n, t) => n + t.rows.length, 0);
+function rtaWhen(draft) {
+  const ds = [...new Set(rtaDates(draft))];
+  if (!ds.length) return '';
+  if (ds.length === 1) return ds[0] === rtaTomorrow() ? ' tomorrow' : ds[0] === todayDay() ? ' today' : ` on ${rtaDate(ds[0])}`;
+  return '';
+}
+function rtaAsk(draft) {
+  const n = rtaRowCount(draft);
+  const emp = n === 1 ? 'employee' : 'employees';
+  if (draft.length === 1) {
+    const T = rtaType(draft[0].type);
+    const ask = T.ask.replace('{emp}', emp);
+    return `I would really appreciate your help to ${ask}${/\{emp\}/.test(T.ask) ? rtaWhen(draft) : ''}.`;
+  }
+  return `I would really appreciate your help to update the following requests${rtaWhen(draft)}.`;
+}
+function rtaTransportLine(draft) {
+  const t = draft.filter((x) => rtaType(x.type).transport);
+  if (!t.length) return '';
+  const n = t.reduce((k, x) => k + x.rows.length, 0);
+  return `Appreciate your help to update the Transportation for the respective ${n === 1 ? 'employee' : 'employees'}${rtaWhen(t)}, Thanks !!`;
+}
+function rtaSubject() {
+  const R = EXT.data.rta;
+  if (R.subject) return R.subject;
+  const d = rtaDates(R.draft)[0] || rtaTomorrow();
+  return `EG TSX 4P | The updated ${d === rtaTomorrow() ? "Tomorrow's" : d === todayDay() ? "Today's" : ''} plan for ${rtaShort(d)}`.replace(/\s+/g, ' ');
+}
+
+/** The email as Outlook-friendly HTML (inline styles and bgcolor) and as plain text. */
+function rtaEmail(source) {
+  const R = source || EXT.data.rta;
+  const draft = R.draft;
+  const font = 'font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#000000';
+  const cell = 'border:1px solid #000000;padding:2px 8px;white-space:nowrap';
+  const p = (t) => `<p style="margin:0 0 0 0;${font}">${t}</p>`;
+  const blank = `<p style="margin:0;${font}">&nbsp;</p>`;
+  const tables = draft.map((t) => {
+    const T = rtaType(t.type);
+    const g = rtaGrid(t, R.lob);
+    const title = `<tr><td colspan="2" bgcolor="${T.color}" style="${cell};background:${T.color};color:#FFFFFF;font-weight:bold;text-align:center">${rtaEsc(T.title)}</td></tr>`;
+    const head = `<tr>${g.head.map((c) => `<td bgcolor="${g.headColor}" style="${cell};background:${g.headColor};color:#FFFFFF;font-weight:bold;text-align:center">${rtaEsc(c)}</td>`).join('')}</tr>`;
+    const body = g.rows.map((r) => `<tr>${r.map((c, i) => `<td style="${cell};text-align:${i === 2 ? 'left' : 'center'}">${rtaEsc(c)}</td>`).join('')}</tr>`).join('');
+    return `<table cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;${font}">${title}${head}${body}</table>`;
+  });
+  const transport = rtaTransportLine(draft);
+  const html = [
+    `<div style="${font}">`,
+    p(rtaEsc(R.greeting)),
+    blank,
+    p(rtaEsc(rtaAsk(draft))),
+    blank,
+    tables.join(blank),
+    blank,
+    p('All times are in CLT (Cairo local time).'),
+    transport ? blank + p(`<b>@Transportation-EG</b> ${rtaEsc(transport)}`) : '',
+    blank,
+    p('BR,'),
+    '</div>',
+  ].join('');
+  const text = [
+    R.greeting,
+    '',
+    rtaAsk(draft),
+    '',
+    ...draft.flatMap((t) => {
+      const g = rtaGrid(t, R.lob);
+      return [rtaType(t.type).title, g.head.join('\t'), ...g.rows.map((r) => r.join('\t')), ''];
+    }),
+    'All times are in CLT (Cairo local time).',
+    ...(transport ? ['', `@Transportation-EG ${transport}`] : []),
+    '',
+    'BR,',
+  ].join('\n');
+  return { html, text };
+}
+
+/** Put rich HTML on the clipboard (Outlook keeps the table), with plain text as a fallback. */
+async function rtaCopyHtml(html, text) {
+  try {
+    if (navigator.clipboard && typeof ClipboardItem !== 'undefined' && window.isSecureContext) {
+      await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([text], { type: 'text/plain' }) })]);
+      return true;
+    }
+  } catch (e) {
+    /* fall back to selecting a hidden copy */
+  }
+  const box = document.createElement('div');
+  box.setAttribute('contenteditable', 'true');
+  box.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0';
+  box.innerHTML = html;
+  document.body.appendChild(box);
+  const range = document.createRange();
+  range.selectNodeContents(box);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  let ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch (e) {
+    ok = false;
+  }
+  sel.removeAllRanges();
+  box.remove();
+  return ok;
+}
+
+/* ---------- the page ---------- */
+let rtaPick = { type: 'ot', agents: [], date: '', from: '', to: '', request: '', fromText: '', toText: '', dates: [], times: {} };
+
+function rtaAdd() {
+  const T = rtaType(rtaPick.type);
+  const R = EXT.data.rta;
+  const agents = rtaPick.agents.map(rtaMember).filter(Boolean);
+  if (!agents.length) return toast('Choose at least one agent.', { type: 'warn' });
+  if (T.kind === 'time' && (!rtaPick.date || !rtaPick.from || !rtaPick.to)) return toast('Add the date and the from and to times.', { type: 'warn' });
+  if (T.kind === 'request' && !rtaPick.request) return toast('Write the request.', { type: 'warn' });
+  if (T.kind === 'swap') {
+    const dates = rtaPick.dates.filter(Boolean);
+    if (!dates.length) return toast('Add at least one shift date.', { type: 'warn' });
+    R.draft.push({ id: uid('rt'), type: T.id, dates, rows: agents.map((m) => ({ mid: m.id, name: m.name, date: '', from: '', to: '', request: '', fromText: '', toText: '', times: dates.map((_, i) => (rtaPick.times[`${m.id}:${i}`] || '').trim()) })) });
+  } else {
+    let t = R.draft.find((x) => x.type === T.id);
+    if (!t) R.draft.push((t = { id: uid('rt'), type: T.id, dates: [], rows: [] }));
+    agents.forEach((m) => t.rows.push({ mid: m.id, name: m.name, date: T.kind === 'time' ? rtaPick.date : '', from: T.kind === 'time' ? rtaPick.from : '', to: T.kind === 'time' ? rtaPick.to : '', request: T.kind === 'request' ? rtaPick.request : '', fromText: rtaPick.fromText, toText: rtaPick.toText, times: [] }));
+  }
+  EXT.data.rta = rtaClean(R);
+  EXT.save('rta');
+  rtaPick.agents = [];
+  rtaPick.times = {};
+  refresh({ panel: false });
+  toast(`Added to the email: ${T.title}, ${plural(agents.length, 'agent')}`);
+}
+
+function rtaRender(main) {
+  const R = EXT.data.rta;
+  const members = state.team.members.slice().sort((a, b) => (a.name || a.code).localeCompare(b.name || b.code));
+  if (!rtaPick.date) rtaPick.date = rtaTomorrow();
+  const T = rtaType(rtaPick.type);
+  const redraw = () => refresh({ panel: false });
+
+  /* 1. New request */
+  const typeChips = h('div', { class: 'rta-types', role: 'group', 'aria-label': 'Request type' }, RTA_TYPES.map((t) => h('button', { type: 'button', class: `rta-type${t.id === rtaPick.type ? ' is-on' : ''}`, style: `--tc:${t.color}`, 'aria-pressed': String(t.id === rtaPick.type), 'data-fk': `rta-type:${t.id}`, onclick: () => { rtaPick.type = t.id; redraw(); } }, h('span', { class: 'rta-type__dot', 'aria-hidden': 'true' }), t.title)));
+  const agentChips = h(
+    'div',
+    { class: 'rta-agents' },
+    members.map((m) => {
+      const on = rtaPick.agents.includes(m.id);
+      return h('button', { type: 'button', class: `rta-agent${on ? ' is-on' : ''}`, 'aria-pressed': String(on), 'data-fk': `rta-agent:${m.id}`, onclick: () => { rtaPick.agents = on ? rtaPick.agents.filter((x) => x !== m.id) : [...rtaPick.agents, m.id]; redraw(); } }, on ? icon('check', 'icon--sm') : null, m.name || m.code);
+    })
+  );
+  const agentTools = h('div', { class: 'rta-agent-tools' }, h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': 'rta-all', onclick: () => { rtaPick.agents = members.map((m) => m.id); redraw(); } }, icon('users'), 'Whole team'), rtaPick.agents.length ? h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': 'rta-none', onclick: () => { rtaPick.agents = []; redraw(); } }, icon('x'), 'Clear') : null, h('span', { class: 'rta-count' }, rtaPick.agents.length ? `${plural(rtaPick.agents.length, 'agent')} chosen` : 'Choose the agents'));
+  const field = (label, input) => h('label', { class: 'field rta-field' }, h('span', { class: 'field__label' }, label), input);
+  const bind = (key, attrs) => {
+    const el = h('input', { class: 'input', ...attrs, value: rtaPick[key] || '' });
+    el.addEventListener('input', () => (rtaPick[key] = el.value));
+    return el;
+  };
+  let fields;
+  if (T.kind === 'time') {
+    fields = h('div', { class: 'rta-fields' }, field('Date', bind('date', { type: 'date', 'data-fk': 'rta-date' })), field('From (CLT)', bind('from', { type: 'time', 'data-fk': 'rta-from' })), field('To (CLT)', bind('to', { type: 'time', 'data-fk': 'rta-to' })));
+  } else if (T.kind === 'request') {
+    fields = h('div', { class: 'rta-fields' }, field('Request', bind('request', { type: 'text', maxlength: 120, placeholder: T.id === 'transport' ? 'Pickup was late, no car, wrong address…' : 'Vacation, schedule change, project time…', 'data-fk': 'rta-request' })), field('From', bind('fromText', { type: 'text', maxlength: 40, placeholder: 'Date or time', 'data-fk': 'rta-ftext' })), field('To', bind('toText', { type: 'text', maxlength: 40, placeholder: 'Date or time', 'data-fk': 'rta-ttext' })));
+  } else {
+    if (!rtaPick.dates.length) rtaPick.dates = [rtaTomorrow()];
+    const dateInputs = rtaPick.dates.map((d, i) => {
+      const el = h('input', { class: 'input', type: 'date', value: d, 'data-fk': `rta-sdate:${i}` });
+      el.addEventListener('change', () => { rtaPick.dates[i] = el.value; redraw(); });
+      return h('div', { class: 'rta-sdate' }, el, rtaPick.dates.length > 1 ? h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'aria-label': 'Remove this date', onclick: () => { rtaPick.dates.splice(i, 1); redraw(); } }, icon('x')) : null);
+    });
+    const chosen = rtaPick.agents.map(rtaMember).filter(Boolean);
+    fields = h(
+      'div',
+      { class: 'rta-swap' },
+      h('div', { class: 'rta-sdates' }, h('span', { class: 'field__label' }, 'Shift dates'), ...dateInputs, rtaPick.dates.length < 5 ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'rta-adddate', onclick: () => { rtaPick.dates.push(addDays(rtaPick.dates[rtaPick.dates.length - 1] || rtaTomorrow(), 1)); redraw(); } }, icon('plus'), 'Add date') : null),
+      chosen.length
+        ? h(
+            'table',
+            { class: 'rta-swap-grid' },
+            h('thead', null, h('tr', null, h('th', null, 'Agent'), rtaPick.dates.map((d) => h('th', null, rtaDate(d))))),
+            h(
+              'tbody',
+              null,
+              chosen.map((m) =>
+                h(
+                  'tr',
+                  null,
+                  h('th', { scope: 'row' }, m.name || m.code),
+                  rtaPick.dates.map((_, i) => {
+                    const key = `${m.id}:${i}`;
+                    const el = h('input', { class: 'input', type: 'text', maxlength: 40, placeholder: '4:00 PM - 1:00 AM or OFF', value: rtaPick.times[key] || '', 'data-fk': `rta-stime:${key}` });
+                    el.addEventListener('input', () => (rtaPick.times[key] = el.value));
+                    return h('td', null, el);
+                  })
+                )
+              )
+            )
+          )
+        : h('p', { class: 'rta-hint' }, 'Choose the agents who swap, then type each one\'s new shift time (IEX) for every date.')
+    );
+  }
+  const newCard = h(
+    'section',
+    { class: 'card kt-card rta-card', 'aria-labelledby': 'rta-new' },
+    h('h2', { class: 'kt-title', id: 'rta-new' }, icon('plus'), 'New request'),
+    h('p', { class: 'kt-sub' }, 'Pick the request, the agents and the times. Add as many as you need to one email.'),
+    h('div', { class: 'rta-step' }, h('span', { class: 'rta-step__n' }, '1'), h('span', { class: 'rta-step__t' }, 'Request')),
+    typeChips,
+    h('div', { class: 'rta-step' }, h('span', { class: 'rta-step__n' }, '2'), h('span', { class: 'rta-step__t' }, 'Agents')),
+    agentTools,
+    agentChips,
+    h('div', { class: 'rta-step' }, h('span', { class: 'rta-step__n' }, '3'), h('span', { class: 'rta-step__t' }, T.kind === 'swap' ? 'Dates and shift times' : 'Details')),
+    fields,
+    h('div', { class: 'rta-add' }, h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-add', onclick: rtaAdd }, icon('plus'), `Add ${T.title} to the email`))
+  );
+
+  /* 2. The email */
+  const missingHr = [...new Set(R.draft.flatMap((t) => t.rows).filter((r) => !rtaHr(r)).map((r) => rtaName(r)))];
+  const greet = h('input', { class: 'input', value: R.greeting, maxlength: 80, 'data-fk': 'rta-greeting' });
+  const lob = h('input', { class: 'input rta-lob', value: R.lob, maxlength: 20, 'data-fk': 'rta-lob-in' });
+  const subj = h('input', { class: 'input', value: rtaSubject(), maxlength: 200, 'data-fk': 'rta-subject' });
+  const preview = h('div', { class: 'rta-preview', 'data-fk': 'rta-preview' });
+  const paint = () => {
+    preview.innerHTML = R.draft.length ? rtaEmail().html : '<p class="rta-empty">Add a request above to build the email.</p>';
+  };
+  const saveMeta = () => {
+    R.greeting = greet.value.trim() || 'Hello Abadi,';
+    R.lob = lob.value.trim() || 'TSX';
+    EXT.save('rta');
+    paint();
+  };
+  greet.addEventListener('input', saveMeta);
+  lob.addEventListener('input', saveMeta);
+  subj.addEventListener('input', () => {
+    R.subject = subj.value.trim();
+    EXT.save('rta');
+  });
+  paint();
+  const rowsList = R.draft.length
+    ? h(
+        'ul',
+        { class: 'rta-rows' },
+        R.draft.flatMap((t) =>
+          t.rows.map((r, i) =>
+            h(
+              'li',
+              { class: 'rta-row', style: `--tc:${rtaType(t.type).color}` },
+              h('span', { class: 'rta-row__type' }, rtaType(t.type).title),
+              h('span', { class: 'rta-row__who' }, r.name || rtaName(r)),
+              h('span', { class: 'rta-row__when' }, t.dates.length ? t.dates.map(rtaDate).join(', ') : r.date ? `${rtaDate(r.date)} · ${rtaTime(r.from)} to ${rtaTime(r.to)}` : [r.request, r.fromText, r.toText].filter(Boolean).join(' · ')),
+              h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'aria-label': 'Remove this row', 'data-fk': `rta-del:${t.id}:${i}`, onclick: () => { t.rows.splice(i, 1); R.draft = R.draft.filter((x) => x.rows.length); EXT.save('rta'); redraw(); } }, icon('x'))
+            )
+          )
+        )
+      )
+    : null;
+  const copyEmail = async (e) => {
+    if (!R.draft.length) return toast('Add a request first.', { type: 'warn' });
+    const { html, text } = rtaEmail();
+    const ok = await rtaCopyHtml(html, text);
+    if (!ok) return toast('The browser blocked copying. Select the email below and copy it.', { type: 'error' });
+    R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaSubject(), draft: JSON.parse(JSON.stringify(R.draft)), greeting: R.greeting, lob: R.lob });
+    R.history = R.history.slice(0, 15);
+    EXT.save('rta');
+    toast('Email copied. Paste it in Outlook, then copy the subject.', { duration: 6000 });
+    redraw();
+  };
+  const emailCard = h(
+    'section',
+    { class: 'card kt-card rta-card', 'aria-labelledby': 'rta-mail' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('h2', { class: 'kt-title', id: 'rta-mail' }, icon('chat'), 'The email'), h('p', { class: 'kt-sub' }, 'Copy it and paste it in Outlook. The tables stay tables, not a picture.')),
+      h(
+        'div',
+        { class: 'kt-actions' },
+        h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-copy', onclick: copyEmail, disabled: !R.draft.length }, icon('copy'), 'Copy email'),
+        h('button', { type: 'button', class: 'btn', 'data-fk': 'rta-copy-subject', onclick: (e) => copyText(subj.value, { label: 'Subject', button: e.currentTarget }) }, icon('copy'), 'Copy subject'),
+        R.draft.length ? h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'rta-clear', onclick: async () => { if (await confirmDialog({ title: 'Clear this email?', message: 'All requests in this email are removed. Emails you copied stay in the list below.', confirmLabel: 'Clear', danger: true })) { R.draft = []; R.subject = ''; EXT.save('rta'); redraw(); } } }, icon('trash'), 'Clear') : null
+      )
+    ),
+    h('div', { class: 'rta-meta' }, field('Subject', subj), field('Greeting', greet), field('LOB', lob)),
+    missingHr.length ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `No HR ID for ${joinList(missingHr)}. Load the roster in My agents, or add it with the pencil there.`)) : null,
+    preview,
+    rowsList
+  );
+
+  /* 3. Sent */
+  const sent = R.history.length
+    ? h(
+        'section',
+        { class: 'card kt-card rta-card', 'aria-labelledby': 'rta-sent' },
+        h('h2', { class: 'kt-title', id: 'rta-sent' }, icon('calendar'), 'Copied before'),
+        h(
+          'ul',
+          { class: 'rta-hist' },
+          R.history.map((x, i) =>
+            h(
+              'li',
+              { class: 'rta-hist__row' },
+              h('span', { class: 'rta-hist__s' }, x.subject),
+              h('span', { class: 'rta-hist__m' }, `${x.at.replace('T', ' ')} · ${plural(rtaRowCount(x.draft), 'row')}`),
+              h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `rta-recopy:${i}`, onclick: async (e) => { const { html, text } = rtaEmail({ ...x }); if (await rtaCopyHtml(html, text)) { flashCopied(e.currentTarget); toast('Email copied again.'); } } }, icon('copy'), 'Copy again'),
+              h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': `rta-reuse:${i}`, onclick: () => { R.draft = JSON.parse(JSON.stringify(x.draft)); R.subject = ''; EXT.data.rta = rtaClean(R); EXT.save('rta'); redraw(); toast('Loaded into the email. Change the dates, then copy.'); } }, icon('edit'), 'Reuse')
+            )
+          )
+        )
+      )
+    : null;
+
+  main.append(...[pageHead({ eyebrow: 'Workspace', title: 'Workforce requests', sub: 'The RTA email in a few clicks. Times are CLT (Cairo local time).' }), newCard, emailCard, sent].filter(Boolean));
+}
+
+EXT.view('rta', { title: 'Workforce requests', label: 'Workforce requests', icon: 'calendar', render: rtaRender });
+EXT.order.splice(EXT.order.indexOf('rta'), 1);
+EXT.order.splice(EXT.order.indexOf('agents') + 1, 0, 'rta');
 /* ===== layer: layers/90-integration.js ===== */
 /* ==========================================================================
    90-integration — glue between the area layers, for functions no single area owns.
