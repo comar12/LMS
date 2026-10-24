@@ -5999,6 +5999,15 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .rta-agents { display: flex; flex-wrap: wrap; gap: 6px; }
 .rta-agent { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-size: 0.86rem; cursor: pointer; }
 .rta-agent.is-on { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); border-color: var(--accent); color: var(--accent-text, var(--accent)); font-weight: 700; }
+.rta-others { margin-top: 14px; padding: 12px; border: 1px dashed var(--border); border-radius: 10px; display: grid; gap: 10px; }
+.rta-others__head { display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+.rta-others__form { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 150px) max-content; justify-content: start; gap: 8px; align-items: center; }
+.rta-agent--other { padding: 0 4px 0 0; gap: 0; }
+.rta-agent__pick { display: inline-flex; align-items: center; gap: 6px; padding: 6px 6px 6px 12px; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; border-radius: 999px; }
+.rta-agent__hr { color: var(--text-2); font-weight: 500; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.rta-agent__x { display: inline-grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 50%; background: none; color: var(--text-2); cursor: pointer; }
+.rta-agent__x:hover { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
+.rta-agent__pick:focus-visible, .rta-agent__x:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .rta-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 220px)); gap: 10px 14px; }
 .rta-fields .field { margin: 0; }
 .rta-swap { display: grid; gap: 12px; }
@@ -6010,7 +6019,7 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .rta-hint { color: var(--text-2); margin: 0; }
 .rta-add { margin-top: 16px; }
 
-.rta-meta { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 110px; gap: 10px 14px; margin-bottom: 12px; }
+.rta-meta { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 10px 14px; margin-bottom: 12px; }
 .rta-meta .field { margin: 0; }
 .rta-preview { background: #fff; color: #000; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; overflow-x: auto; }
 .rta-preview table { margin: 2px 0; }
@@ -6025,7 +6034,7 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .rta-hist__m { color: var(--text-2); font-size: 0.82rem; white-space: nowrap; }
 
 @media (max-width: 760px) {
-  .rta-fields, .rta-meta { grid-template-columns: 1fr; }
+  .rta-fields, .rta-meta, .rta-others__form { grid-template-columns: 1fr; }
   .rta-row { grid-template-columns: 1fr auto; }
   .rta-row__when { grid-column: 1 / -1; }
   .rta-hist__row { grid-template-columns: 1fr auto; }
@@ -6143,7 +6152,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.5.0';
+const APP_VERSION = '2.5.1';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -30093,6 +30102,17 @@ EXT.slice('agentInfo', {
     return { items };
   },
 });
+/* Name and HR ID of everyone in the last roster loaded, so workforce requests can include
+   agents from other teams. Nothing else from the roster is kept. */
+EXT.slice('siteRoster', {
+  initial: () => ({ items: [] }),
+  clean: (raw) => ({
+    items: (Array.isArray(raw && raw.items) ? raw.items : [])
+      .slice(0, 5000)
+      .map((x) => ({ name: str(x && x.name, 100).replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(str(x && x.hrid, 30)) }))
+      .filter((x) => x.name && x.hrid),
+  }),
+});
 const maFullName = (m) => (EXT.data.agentInfo.items[m.id] || {}).full || m.name || m.code;
 
 /** Read the TSX roster and fill each member's HR ID and BP-ID. Returns how many were filled. */
@@ -30107,6 +30127,9 @@ function maApplyRoster(sheet) {
   const cName = col(/^agent name$/i);
   const cBp = col(/^bp\s*-?id$/i);
   const list = rows.slice(headAt + 1).map((r) => ({ name: String(r[cName] ?? '').replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(String(r[cHr] ?? '').replace(/\.0+$/, '')), bpid: cBp >= 0 ? String(r[cBp] ?? '').trim().toLowerCase() : '' })).filter((x) => x.name);
+  const seen = new Set();
+  EXT.data.siteRoster = { items: list.filter((x) => x.hrid && !seen.has(x.hrid) && seen.add(x.hrid)).slice(0, 5000).map((x) => ({ name: x.name, hrid: x.hrid })) };
+  EXT.save('siteRoster');
   let filled = 0;
   const missing = [];
   state.team.members.forEach((m) => {
@@ -30249,8 +30272,8 @@ EXT.order.splice(EXT.order.indexOf('numbers') + 1, 0, 'agents');
    - One email can carry several tables. "Copy email" puts a real formatted table on the
      clipboard for Outlook (not a picture), with the greeting, the ask, the CLT note,
      the transportation line when it applies, and "BR,".
-   - HRID and the full name come from the roster loaded in My agents. Everything stays
-     in this browser.
+   - HRID and the full name come from the roster loaded in My agents. Agents from other
+     teams can be picked from that roster or typed in. Everything stays in this browser.
    ========================================================================== */
 
 const RTA_TYPES = [
@@ -30268,6 +30291,7 @@ const RTA_TYPES = [
 ];
 const RTA_HEAD = '#1F4E79';
 const RTA_SWAP_HEAD = '#2F5597';
+const RTA_GREETING = 'Hello Team,';
 const rtaType = (id) => RTA_TYPES.find((t) => t.id === id);
 
 const rtaClean = (raw) => {
@@ -30275,18 +30299,19 @@ const rtaClean = (raw) => {
   const s = (v, n) => str(v, n).trim();
   const day = (v) => (isIsoDate(v) ? v : '');
   const tm = (v) => (/^\d{2}:\d{2}$/.test(String(v || '')) ? v : '');
-  const row = (r) => ({ mid: isId(r && r.mid) ? r.mid : '', name: s(r && r.name, 100), date: day(r && r.date), from: tm(r && r.from), to: tm(r && r.to), request: s(r && r.request, 120), fromText: s(r && r.fromText, 40), toText: s(r && r.toText, 40), times: (Array.isArray(r && r.times) ? r.times : []).slice(0, 5).map((t) => s(t, 40)) });
+  const row = (r) => ({ mid: isId(r && r.mid) ? r.mid : '', name: s(r && r.name, 100), hrid: s(r && r.hrid, 30), date: day(r && r.date), from: tm(r && r.from), to: tm(r && r.to), request: s(r && r.request, 120), fromText: s(r && r.fromText, 40), toText: s(r && r.toText, 40), times: (Array.isArray(r && r.times) ? r.times : []).slice(0, 5).map((t) => s(t, 40)) });
   const tables = (list) =>
     (Array.isArray(list) ? list : [])
       .slice(0, 20)
       .filter((t) => t && rtaType(t.type))
       .map((t) => ({ id: isId(t.id) ? t.id : uid('rt'), type: t.type, dates: (Array.isArray(t.dates) ? t.dates : []).map(day).filter(Boolean).slice(0, 5), rows: (Array.isArray(t.rows) ? t.rows : []).slice(0, 60).map(row) }));
   return {
-    greeting: s(src.greeting, 80) || 'Hello Abadi,',
     lob: s(src.lob, 20) || 'TSX',
     subject: s(src.subject, 200),
     draft: tables(src.draft),
-    history: (Array.isArray(src.history) ? src.history : []).slice(0, 15).map((x) => ({ at: s(x && x.at, 30), subject: s(x && x.subject, 200), draft: tables(x && x.draft), greeting: s(x && x.greeting, 80), lob: s(x && x.lob, 20) || 'TSX' })),
+    /* Agents from other teams, kept so they can be picked again. */
+    others: (Array.isArray(src.others) ? src.others : []).slice(0, 40).filter((o) => o && isId(o.id) && s(o.name, 100)).map((o) => ({ id: o.id, name: s(o.name, 100), hrid: s(o.hrid, 30) })),
+    history: (Array.isArray(src.history) ? src.history : []).slice(0, 15).map((x) => ({ at: s(x && x.at, 30), subject: s(x && x.subject, 200), draft: tables(x && x.draft), lob: s(x && x.lob, 20) || 'TSX' })),
   };
 };
 EXT.slice('rta', { initial: () => rtaClean(null), clean: rtaClean });
@@ -30312,9 +30337,17 @@ const rtaShort = (d) => {
 };
 const rtaTomorrow = () => addDays(todayDay(), 1);
 const rtaMember = (mid) => state.team.members.find((m) => m.id === mid) || null;
+const rtaOther = (id) => EXT.data.rta.others.find((o) => o.id === id) || null;
+/** A picked agent, from my team or another team: { id, name, hrid }. */
+const rtaWho = (id) => {
+  const m = rtaMember(id);
+  if (m) return { id, name: m.name || m.code, hrid: m.hrid || '' };
+  const o = rtaOther(id);
+  return o ? { id, name: o.name, hrid: o.hrid } : null;
+};
 const rtaHr = (r) => {
   const m = rtaMember(r.mid);
-  return (m && m.hrid) || '';
+  return (m && m.hrid) || r.hrid || '';
 };
 /* Roster names come in any case; a word written all in lowercase gets a capital first letter. */
 const rtaCase = (n) => String(n || '').split(' ').map((w) => (w && w === w.toLowerCase() ? w[0].toUpperCase() + w.slice(1) : w)).join(' ');
@@ -30379,7 +30412,8 @@ function rtaEmail(source) {
   const tables = draft.map((t) => {
     const T = rtaType(t.type);
     const g = rtaGrid(t, R.lob);
-    const title = `<tr><td colspan="2" bgcolor="${T.color}" style="${cell};background:${T.color};color:#FFFFFF;font-weight:bold;text-align:center">${rtaEsc(T.title)}</td></tr>`;
+    /* The request color runs across the whole table, as a big sign. */
+    const title = `<tr><td colspan="${g.head.length}" bgcolor="${T.color}" style="${cell};background:${T.color};color:#FFFFFF;font-weight:bold;font-size:14pt;text-align:center;padding:5px 8px">${rtaEsc(T.title)}</td></tr>`;
     const head = `<tr>${g.head.map((c) => `<td bgcolor="${g.headColor}" style="${cell};background:${g.headColor};color:#FFFFFF;font-weight:bold;text-align:center">${rtaEsc(c)}</td>`).join('')}</tr>`;
     const body = g.rows.map((r) => `<tr>${r.map((c, i) => `<td style="${cell};text-align:${i === 2 ? 'left' : 'center'}">${rtaEsc(c)}</td>`).join('')}</tr>`).join('');
     return `<table cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;${font}">${title}${head}${body}</table>`;
@@ -30387,20 +30421,20 @@ function rtaEmail(source) {
   const transport = rtaTransportLine(draft);
   const html = [
     `<div style="${font}">`,
-    p(rtaEsc(R.greeting)),
+    p(rtaEsc(RTA_GREETING)),
     blank,
     p(rtaEsc(rtaAsk(draft))),
     blank,
     tables.join(blank),
     blank,
-    p('All times are in CLT (Cairo local time).'),
+    p('All times are in CLT.'),
     transport ? blank + p(`<b>@Transportation-EG</b> ${rtaEsc(transport)}`) : '',
     blank,
     p('BR,'),
     '</div>',
   ].join('');
   const text = [
-    R.greeting,
+    RTA_GREETING,
     '',
     rtaAsk(draft),
     '',
@@ -30408,7 +30442,7 @@ function rtaEmail(source) {
       const g = rtaGrid(t, R.lob);
       return [rtaType(t.type).title, g.head.join('\t'), ...g.rows.map((r) => r.join('\t')), ''];
     }),
-    'All times are in CLT (Cairo local time).',
+    'All times are in CLT.',
     ...(transport ? ['', `@Transportation-EG ${transport}`] : []),
     '',
     'BR,',
@@ -30453,18 +30487,18 @@ let rtaPick = { type: 'ot', agents: [], date: '', from: '', to: '', request: '',
 function rtaAdd() {
   const T = rtaType(rtaPick.type);
   const R = EXT.data.rta;
-  const agents = rtaPick.agents.map(rtaMember).filter(Boolean);
+  const agents = rtaPick.agents.map(rtaWho).filter(Boolean);
   if (!agents.length) return toast('Choose at least one agent.', { type: 'warn' });
   if (T.kind === 'time' && (!rtaPick.date || !rtaPick.from || !rtaPick.to)) return toast('Add the date and the from and to times.', { type: 'warn' });
   if (T.kind === 'request' && !rtaPick.request) return toast('Write the request.', { type: 'warn' });
   if (T.kind === 'swap') {
     const dates = rtaPick.dates.filter(Boolean);
     if (!dates.length) return toast('Add at least one shift date.', { type: 'warn' });
-    R.draft.push({ id: uid('rt'), type: T.id, dates, rows: agents.map((m) => ({ mid: m.id, name: m.name, date: '', from: '', to: '', request: '', fromText: '', toText: '', times: dates.map((_, i) => (rtaPick.times[`${m.id}:${i}`] || '').trim()) })) });
+    R.draft.push({ id: uid('rt'), type: T.id, dates, rows: agents.map((m) => ({ mid: m.id, name: m.name, hrid: m.hrid, date: '', from: '', to: '', request: '', fromText: '', toText: '', times: dates.map((_, i) => (rtaPick.times[`${m.id}:${i}`] || '').trim()) })) });
   } else {
     let t = R.draft.find((x) => x.type === T.id);
     if (!t) R.draft.push((t = { id: uid('rt'), type: T.id, dates: [], rows: [] }));
-    agents.forEach((m) => t.rows.push({ mid: m.id, name: m.name, date: T.kind === 'time' ? rtaPick.date : '', from: T.kind === 'time' ? rtaPick.from : '', to: T.kind === 'time' ? rtaPick.to : '', request: T.kind === 'request' ? rtaPick.request : '', fromText: rtaPick.fromText, toText: rtaPick.toText, times: [] }));
+    agents.forEach((m) => t.rows.push({ mid: m.id, name: m.name, hrid: m.hrid, date: T.kind === 'time' ? rtaPick.date : '', from: T.kind === 'time' ? rtaPick.from : '', to: T.kind === 'time' ? rtaPick.to : '', request: T.kind === 'request' ? rtaPick.request : '', fromText: rtaPick.fromText, toText: rtaPick.toText, times: [] }));
   }
   EXT.data.rta = rtaClean(R);
   EXT.save('rta');
@@ -30492,6 +30526,56 @@ function rtaRender(main) {
     })
   );
   const agentTools = h('div', { class: 'rta-agent-tools' }, h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': 'rta-all', onclick: () => { rtaPick.agents = members.map((m) => m.id); redraw(); } }, icon('users'), 'Whole team'), rtaPick.agents.length ? h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': 'rta-none', onclick: () => { rtaPick.agents = []; redraw(); } }, icon('x'), 'Clear') : null, h('span', { class: 'rta-count' }, rtaPick.agents.length ? `${plural(rtaPick.agents.length, 'agent')} chosen` : 'Choose the agents'));
+  /* Agents from other teams: pick from the loaded roster or type the name and HR ID. */
+  const others = R.others.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const otherChips = others.length
+    ? h(
+        'div',
+        { class: 'rta-agents' },
+        others.map((o) => {
+          const on = rtaPick.agents.includes(o.id);
+          return h(
+            'span',
+            { class: `rta-agent rta-agent--other${on ? ' is-on' : ''}` },
+            h('button', { type: 'button', class: 'rta-agent__pick', 'aria-pressed': String(on), 'data-fk': `rta-other:${o.id}`, onclick: () => { rtaPick.agents = on ? rtaPick.agents.filter((x) => x !== o.id) : [...rtaPick.agents, o.id]; redraw(); } }, on ? icon('check', 'icon--sm') : null, rtaCase(o.name), o.hrid ? h('span', { class: 'rta-agent__hr' }, o.hrid) : null),
+            h('button', { type: 'button', class: 'rta-agent__x', 'aria-label': `Remove ${o.name} from this list`, title: 'Remove from this list', 'data-fk': `rta-other-x:${o.id}`, onclick: () => { R.others = R.others.filter((x) => x.id !== o.id); rtaPick.agents = rtaPick.agents.filter((x) => x !== o.id); EXT.save('rta'); redraw(); } }, icon('x', 'icon--sm'))
+          );
+        })
+      )
+    : null;
+  const roster = EXT.data.siteRoster.items;
+  const oName = h('input', { class: 'input', type: 'text', maxlength: 100, list: roster.length ? 'rta-roster' : null, placeholder: roster.length ? 'Type a name or HR ID to search the roster' : 'Full name', autocomplete: 'off', 'data-fk': 'rta-oname' });
+  const oHr = h('input', { class: 'input', type: 'text', maxlength: 30, placeholder: 'HR ID', autocomplete: 'off', 'data-fk': 'rta-ohr' });
+  /* Picking a roster suggestion ("Name | HRID") fills both boxes. */
+  oName.addEventListener('input', () => {
+    const m = /^(.+?)\s*\|\s*(\S+)$/.exec(oName.value);
+    if (m && roster.some((x) => x.hrid === m[2])) {
+      oName.value = m[1];
+      oHr.value = m[2];
+    }
+  });
+  const addOther = () => {
+    const name = oName.value.replace(/\s+/g, ' ').trim();
+    const hrid = cleanStaffId(oHr.value);
+    if (!name) return toast('Type the agent name.', { type: 'warn' });
+    if (!hrid) return toast(`Add the HR ID for ${name}.`, { type: 'warn' });
+    let o = R.others.find((x) => x.hrid === hrid) || R.others.find((x) => x.name.toLowerCase() === name.toLowerCase());
+    if (o) Object.assign(o, { name, hrid });
+    else R.others.unshift((o = { id: uid('ot'), name, hrid }));
+    R.others = R.others.slice(0, 40);
+    if (!rtaPick.agents.includes(o.id)) rtaPick.agents.push(o.id);
+    EXT.save('rta');
+    redraw();
+  };
+  [oName, oHr].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addOther(); } }));
+  const otherBox = h(
+    'div',
+    { class: 'rta-others' },
+    h('div', { class: 'rta-others__head' }, h('span', { class: 'field__label' }, 'Agents from other teams'), h('span', { class: 'rta-count' }, roster.length ? `Search ${plural(roster.length, 'agent')} from the roster you loaded` : 'Load the roster in My agents to search everyone, or type the name and HR ID')),
+    otherChips,
+    h('div', { class: 'rta-others__form' }, oName, oHr, h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'rta-oadd', onclick: addOther }, icon('plus'), 'Add agent')),
+    roster.length ? h('datalist', { id: 'rta-roster' }, roster.map((x) => h('option', { value: `${rtaCase(x.name)} | ${x.hrid}` }))) : null
+  );
   const field = (label, input) => h('label', { class: 'field rta-field' }, h('span', { class: 'field__label' }, label), input);
   const bind = (key, attrs) => {
     const el = h('input', { class: 'input', ...attrs, value: rtaPick[key] || '' });
@@ -30510,7 +30594,7 @@ function rtaRender(main) {
       el.addEventListener('change', () => { rtaPick.dates[i] = el.value; redraw(); });
       return h('div', { class: 'rta-sdate' }, el, rtaPick.dates.length > 1 ? h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'aria-label': 'Remove this date', onclick: () => { rtaPick.dates.splice(i, 1); redraw(); } }, icon('x')) : null);
     });
-    const chosen = rtaPick.agents.map(rtaMember).filter(Boolean);
+    const chosen = rtaPick.agents.map(rtaWho).filter(Boolean);
     fields = h(
       'div',
       { class: 'rta-swap' },
@@ -30527,7 +30611,7 @@ function rtaRender(main) {
                 h(
                   'tr',
                   null,
-                  h('th', { scope: 'row' }, m.name || m.code),
+                  h('th', { scope: 'row' }, rtaCase(m.name)),
                   rtaPick.dates.map((_, i) => {
                     const key = `${m.id}:${i}`;
                     const el = h('input', { class: 'input', type: 'text', maxlength: 40, placeholder: '4:00 PM - 1:00 AM or OFF', value: rtaPick.times[key] || '', 'data-fk': `rta-stime:${key}` });
@@ -30551,6 +30635,7 @@ function rtaRender(main) {
     h('div', { class: 'rta-step' }, h('span', { class: 'rta-step__n' }, '2'), h('span', { class: 'rta-step__t' }, 'Agents')),
     agentTools,
     agentChips,
+    otherBox,
     h('div', { class: 'rta-step' }, h('span', { class: 'rta-step__n' }, '3'), h('span', { class: 'rta-step__t' }, T.kind === 'swap' ? 'Dates and shift times' : 'Details')),
     fields,
     h('div', { class: 'rta-add' }, h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-add', onclick: rtaAdd }, icon('plus'), `Add ${T.title} to the email`))
@@ -30558,7 +30643,6 @@ function rtaRender(main) {
 
   /* 2. The email */
   const missingHr = [...new Set(R.draft.flatMap((t) => t.rows).filter((r) => !rtaHr(r)).map((r) => rtaName(r)))];
-  const greet = h('input', { class: 'input', value: R.greeting, maxlength: 80, 'data-fk': 'rta-greeting' });
   const lob = h('input', { class: 'input rta-lob', value: R.lob, maxlength: 20, 'data-fk': 'rta-lob-in' });
   const subj = h('input', { class: 'input', value: rtaSubject(), maxlength: 200, 'data-fk': 'rta-subject' });
   const preview = h('div', { class: 'rta-preview', 'data-fk': 'rta-preview' });
@@ -30566,12 +30650,10 @@ function rtaRender(main) {
     preview.innerHTML = R.draft.length ? rtaEmail().html : '<p class="rta-empty">Add a request above to build the email.</p>';
   };
   const saveMeta = () => {
-    R.greeting = greet.value.trim() || 'Hello Abadi,';
     R.lob = lob.value.trim() || 'TSX';
     EXT.save('rta');
     paint();
   };
-  greet.addEventListener('input', saveMeta);
   lob.addEventListener('input', saveMeta);
   subj.addEventListener('input', () => {
     R.subject = subj.value.trim();
@@ -30601,7 +30683,7 @@ function rtaRender(main) {
     const { html, text } = rtaEmail();
     const ok = await rtaCopyHtml(html, text);
     if (!ok) return toast('The browser blocked copying. Select the email below and copy it.', { type: 'error' });
-    R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaSubject(), draft: JSON.parse(JSON.stringify(R.draft)), greeting: R.greeting, lob: R.lob });
+    R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaSubject(), draft: JSON.parse(JSON.stringify(R.draft)), lob: R.lob });
     R.history = R.history.slice(0, 15);
     EXT.save('rta');
     toast('Email copied. Paste it in Outlook, then copy the subject.', { duration: 6000 });
@@ -30622,7 +30704,7 @@ function rtaRender(main) {
         R.draft.length ? h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'rta-clear', onclick: async () => { if (await confirmDialog({ title: 'Clear this email?', message: 'All requests in this email are removed. Emails you copied stay in the list below.', confirmLabel: 'Clear', danger: true })) { R.draft = []; R.subject = ''; EXT.save('rta'); redraw(); } } }, icon('trash'), 'Clear') : null
       )
     ),
-    h('div', { class: 'rta-meta' }, field('Subject', subj), field('Greeting', greet), field('LOB', lob)),
+    h('div', { class: 'rta-meta' }, field('Subject', subj), field('LOB', lob)),
     missingHr.length ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `No HR ID for ${joinList(missingHr)}. Load the roster in My agents, or add it with the pencil there.`)) : null,
     preview,
     rowsList
