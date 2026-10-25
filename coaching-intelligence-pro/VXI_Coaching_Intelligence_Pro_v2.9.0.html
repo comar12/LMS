@@ -6133,6 +6133,33 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 @media (max-width: 860px) {
   .sc-total, .sc-grid { grid-template-columns: minmax(0, 1fr); }
 }
+/* ===== layer: layers/8c-potential.css ===== */
+/* 8c-potential: Earning potential */
+.pt-strip { display: flex; align-items: center; gap: 20px 28px; flex-wrap: wrap; margin: 0 0 18px; padding: 18px 20px; border-radius: 14px; background: #121826; color: #fff; box-shadow: inset 0 -3px 0 #F26522; }
+.pt-strip__big { display: flex; flex-direction: column; }
+.pt-strip__n { font-size: 2rem; font-weight: 800; color: #F26522; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.pt-strip__t { font-size: 0.85rem; color: #C9D3E6; }
+.pt-strip__rules { display: flex; flex-wrap: wrap; gap: 8px; }
+.pt-chip { padding: 6px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.14); font-size: 0.82rem; font-weight: 600; color: #E6EAF2; }
+.pt-card { margin-bottom: 18px; }
+.pt-table { min-width: 860px; }
+.pt-table tbody tr.is-alt { background: color-mix(in srgb, var(--text) 2.5%, transparent); }
+.pt-table tbody tr.is-picked { box-shadow: inset 4px 0 0 #F26522; }
+.pt-now { font-weight: 700; font-variant-numeric: tabular-nums; }
+.pt-step { text-align: left; color: var(--text-2); font-size: 0.86rem; min-width: 220px; }
+.pt-one { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 18px; align-items: start; margin-top: 8px; }
+.pt-imgwrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #fff; }
+.pt-img { display: block; width: 100%; height: auto; }
+.pt-msg { margin: 0; max-height: none; }
+.pt-card .kt-actions .select { min-width: 200px; }
+@media (max-width: 860px) {
+  .pt-one { grid-template-columns: minmax(0, 1fr); }
+}
+.pt-target { background: color-mix(in srgb, #F26522 12%, transparent); color: #C94A10; }
+:root[data-theme='dark'] .pt-target { color: #FFA06B; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .pt-target { color: #FFA06B; }
+}
 </style>
 </head>
 <body>
@@ -6242,7 +6269,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.8.0';
+const APP_VERSION = '2.9.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -29209,11 +29236,11 @@ function ktDraw(spec) {
     }
     y += rowH;
   });
-  // legend
+  // legend (left out when spec.legend is false)
   y += 22;
   g.textAlign = 'left';
   let x = pad;
-  ['met', 'close', 'below'].forEach((key) => {
+  (spec.legend === false ? [] : ['met', 'close', 'below']).forEach((key) => {
     const lv = KT_LOOK[key];
     g.fillStyle = lv.bg;
     round(x, y, 22, 22, 6);
@@ -31583,8 +31610,10 @@ function scBonus(m) {
     const it = mk.items.find((x) => x.k === k);
     return it && typeof it.v === 'number' ? it.v : null;
   };
-  const v = { aiCR: val('aiCR'), GSR: val('GSR'), tNPS: val('tNPS'), XM: val('XM') };
-  const abs = scAbs(m);
+  return scCalc({ aiCR: val('aiCR'), GSR: val('GSR'), tNPS: val('tNPS'), XM: val('XM') }, scAbs(m));
+}
+/** The pay for a set of month numbers ({ aiCR, GSR, tNPS, XM }) and an ABS ({ v }). */
+function scCalc(v, abs) {
   const kpis = KT_KPIS.map(({ k, label, weight }) => {
     const share = (SC_KPI_BONUS * weight) / 100;
     const met = v[k] !== null && v[k] >= SC_TARGETS[k];
@@ -31723,6 +31752,308 @@ function scBonusCard(m, redraw) {
     b.abs.v === null ? h('p', { class: 'field__hint' }, icon('info', 'icon--sm'), ' Type the ABS % to apply the ABS gates. Until then the estimate assumes the full amount.') : null
   );
 }
+/* ===== layer: layers/8c-potential.js ===== */
+/* ==========================================================================
+   8c-potential: Earning potential, what every agent can earn this month
+   - For each agent: the estimate now, the pay on every target, the money waiting,
+     and the steps that get it, each with its value in EGP.
+   - A personal picture and message per agent to send on WhatsApp, and a team picture.
+   - "On every target" and "Top" assume clean attendance (ABS under 6%).
+   ========================================================================== */
+
+const PT_TOP = { aiCR: 62, GSR: 11, tNPS: 37, XM: 5 };
+const PT_ORDER = ['XM', 'GSR', 'tNPS', 'aiCR'];
+const ptRaise = (v, goal) => Object.fromEntries(PT_ORDER.map((k) => [k, v[k] === null || v[k] === undefined ? goal[k] : Math.max(v[k], goal[k])]));
+const ptShow = (k, v) => (v === null || v === undefined ? '–' : k === 'XM' ? String(v) : ktFmt(k, v));
+
+/**
+ * Steps from where the agent is to a goal, biggest money first. Lines and tNPS often pay only
+ * together (3 lines and tNPS 25 unlock the commission), so each KPI's share is its average
+ * gain over every order the agent could hit them in. The shares add up to the whole gap.
+ */
+function ptSteps(now, goal) {
+  const steps = [];
+  const clean = { v: null };
+  const start = { ...now.v };
+  const cleanPay = scCalc(start, clean).total;
+  if (cleanPay > now.total) steps.push({ k: 'ABS', text: 'Keep ABS under 6%', gain: cleanPay - now.total });
+  const left = PT_ORDER.filter((k) => start[k] === null || start[k] < goal[k]);
+  if (left.length) {
+    const perms = (arr) => (arr.length <= 1 ? [arr] : arr.flatMap((x, i) => perms([...arr.slice(0, i), ...arr.slice(i + 1)]).map((p) => [x, ...p])));
+    const all = perms(left);
+    const credit = Object.fromEntries(left.map((k) => [k, 0]));
+    all.forEach((order) => {
+      const cur = { ...start };
+      let prev = cleanPay;
+      order.forEach((k) => {
+        cur[k] = goal[k];
+        const p = scCalc(cur, clean).total;
+        credit[k] += p - prev;
+        prev = p;
+      });
+    });
+    const gap = scCalc({ ...start, ...Object.fromEntries(left.map((k) => [k, goal[k]])) }, clean).total - cleanPay;
+    const kpiSteps = left.map((k) => ({ k, text: `${KT_KPIS.find((x) => x.k === k).label} ${ptShow(k, start[k])} → ${ptShow(k, goal[k])}`, gain: Math.round(credit[k] / all.length / 50) * 50 }));
+    const diff = gap - kpiSteps.reduce((n, x) => n + x.gain, 0);
+    if (diff && kpiSteps.length) kpiSteps.sort((x, y) => y.gain - x.gain)[0].gain += diff;
+    steps.push(...kpiSteps);
+  }
+  return steps.sort((x, y) => y.gain - x.gain);
+}
+
+/** Everything the page needs for one agent. */
+function ptAgent(m) {
+  const now = scBonus(m);
+  const targetV = ptRaise(now.v, SC_TARGETS);
+  const onTarget = scCalc(targetV, { v: null });
+  const top = scCalc(ptRaise(now.v, PT_TOP), { v: null });
+  const atTarget = onTarget.total <= now.total + 0.5;
+  const steps = atTarget ? ptSteps(now, ptRaise(now.v, PT_TOP)) : ptSteps(now, targetV);
+  return { m, name: m.name || m.code, first: String(m.name || m.code).split(' ')[0], now: now.total, target: onTarget.total, top: top.total, waiting: Math.max(0, (atTarget ? top.total : onTarget.total) - now.total), atTarget, steps, hasData: Object.values(now.v).some((x) => x !== null) };
+}
+
+function ptMessage(a) {
+  const lines = [];
+  if (!a.atTarget) {
+    lines.push(`${a.first}, this month you can earn ${scEgp(a.target)} when you hit every target.`);
+    lines.push(`You're at ${scEgp(a.now)} now, so ${scEgp(a.waiting)} is waiting for you.`);
+  } else {
+    lines.push(`${a.first}, you're on every target, great work. You're at ${scEgp(a.now)} this month.`);
+    lines.push(`You can still reach ${scEgp(a.top)}: that's ${scEgp(a.waiting)} more.`);
+  }
+  if (a.steps.length) {
+    lines.push('', 'How to get it:');
+    a.steps.forEach((s) => lines.push(`• ${s.text}: +${scEgp(s.gain)}`));
+  }
+  if (!a.atTarget) lines.push('', `Want more? The top is ${scEgp(a.top)} with 5 lines, GSR 11% and tNPS 37 or more.`);
+  lines.push('Keep your ABS under 6% so you keep all of it.', '', 'You can do it, and I am here to help.');
+  return lines.join('\n');
+}
+
+/** The personal picture, portrait for WhatsApp. Name only, never IDs. */
+function ptCanvas(a) {
+  const S = 2;
+  const W = 900;
+  const pad = 56;
+  const stepH = 64;
+  const H = 520 + Math.max(1, a.steps.length) * stepH + 250;
+  const cv = document.createElement('canvas');
+  cv.width = W * S;
+  cv.height = H * S;
+  const g = cv.getContext('2d');
+  g.scale(S, S);
+  const font = (w, px) => `${w} ${px}px "Segoe UI", Calibri, system-ui, -apple-system, Roboto, Arial, sans-serif`;
+  const round = (x, y, w, hh, r) => {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + hh, r);
+    g.arcTo(x + w, y + hh, x, y + hh, r);
+    g.arcTo(x, y + hh, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  };
+  g.fillStyle = '#FFFFFF';
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = '#F26522';
+  g.fillRect(0, 0, W, 10);
+  g.textBaseline = 'alphabetic';
+  g.textAlign = 'left';
+  g.fillStyle = '#F26522';
+  g.font = font(800, 18);
+  g.fillText(a.atTarget ? 'YOU ARE ON EVERY TARGET' : 'THIS MONTH YOU CAN EARN', pad, 80);
+  g.fillStyle = '#121826';
+  g.font = font(800, 34);
+  g.fillText(a.name, pad, 126);
+  g.fillStyle = '#F26522';
+  g.font = font(800, 84);
+  g.fillText(scEgp(a.atTarget ? a.top : a.target), pad, 228);
+  g.fillStyle = '#3D4453';
+  g.font = font(500, 22);
+  g.fillText(a.atTarget ? `You're at ${scEgp(a.now)}. The top is ${scEgp(a.top)}.` : `You're at ${scEgp(a.now)} now.`, pad, 276);
+  // progress
+  const goal = a.atTarget ? a.top : a.target;
+  const barY = 304;
+  g.fillStyle = '#F1F2F4';
+  round(pad, barY, W - pad * 2, 22, 11);
+  g.fill();
+  const frac = goal > 0 ? Math.max(0, Math.min(1, a.now / goal)) : 0;
+  if (frac > 0) {
+    g.fillStyle = '#1E7F5C';
+    round(pad, barY, Math.max(22, (W - pad * 2) * frac), 22, 11);
+    g.fill();
+  }
+  // waiting
+  g.fillStyle = '#E3F2EC';
+  round(pad, 352, W - pad * 2, 96, 16);
+  g.fill();
+  g.fillStyle = '#1E7F5C';
+  g.font = font(800, 40);
+  g.fillText(`+${scEgp(a.waiting)}`, pad + 28, 414);
+  const bw = g.measureText(`+${scEgp(a.waiting)}`).width;
+  g.font = font(600, 22);
+  g.fillText('is waiting for you', pad + 28 + bw + 16, 412);
+  // steps
+  let y = 500;
+  g.fillStyle = '#121826';
+  g.font = font(800, 24);
+  g.fillText('How to get it', pad, y);
+  y += 20;
+  const steps = a.steps.length ? a.steps : [{ text: 'Keep every target and keep ABS under 6%', gain: 0 }];
+  steps.forEach((s, i) => {
+    const top = y + i * stepH;
+    g.fillStyle = i % 2 ? '#FFFFFF' : '#F6F3EE';
+    round(pad, top, W - pad * 2, stepH - 10, 12);
+    g.fill();
+    g.fillStyle = '#F26522';
+    round(pad + 18, top + 18, 18, 18, 9);
+    g.fill();
+    g.fillStyle = '#FFFFFF';
+    g.font = font(800, 12);
+    g.textAlign = 'center';
+    g.fillText(String(i + 1), pad + 27, top + 32);
+    g.textAlign = 'left';
+    g.fillStyle = '#121826';
+    g.font = font(600, 22);
+    g.fillText(s.text, pad + 50, top + 35);
+    if (s.gain > 0) {
+      g.textAlign = 'right';
+      g.fillStyle = '#1E7F5C';
+      g.font = font(800, 22);
+      g.fillText(`+${scEgp(s.gain)}`, W - pad - 20, top + 35);
+      g.textAlign = 'left';
+    }
+  });
+  y += steps.length * stepH + 24;
+  // top box
+  g.fillStyle = '#121826';
+  round(pad, y, W - pad * 2, 104, 16);
+  g.fill();
+  g.fillStyle = '#F26522';
+  g.fillRect(pad + 16, y + 100, W - pad * 2 - 32, 4);
+  g.fillStyle = '#FFFFFF';
+  g.font = font(800, 26);
+  g.fillText(`Go for the top: ${scEgp(a.top)}`, pad + 26, y + 44);
+  g.fillStyle = '#C9D3E6';
+  g.font = font(500, 19);
+  g.fillText('5 lines · GSR 11% · tNPS 37+ · every KPI target · ABS under 6%', pad + 26, y + 78);
+  y += 150;
+  g.fillStyle = '#8C96AC';
+  g.font = font(500, 16);
+  g.fillText('Estimate from the month-to-date numbers. The official report decides the final pay.', pad, y);
+  return cv;
+}
+
+/** The team picture: every agent's now, on target, waiting and top. */
+function ptTeamCanvas(list) {
+  return ktDraw({
+    title: 'What every agent can earn this month',
+    sub: `${state.kpis.tl ? `${state.kpis.tl}'s team` : 'My team'} · ${state.kpis.label || ''}`,
+    colW: 150,
+    cols: [{ label: 'Now' }, { label: 'On every target' }, { label: 'Waiting for you' }, { label: 'Top possible' }],
+    tail: null,
+    rows: list.map((a) => ({ name: a.name, team: false, cells: [{ text: scEgp(a.now), level: 'plain' }, { text: scEgp(a.target), level: 'goal' }, { text: `+${scEgp(a.waiting)}`, level: a.waiting > 0 ? 'met' : 'none' }, { text: scEgp(a.top), level: 'plain' }] })),
+    legend: false,
+    note: 'On every target and top possible assume ABS under 6% · estimate from the month-to-date numbers',
+  });
+}
+
+let ptPick = '';
+function ptRender(main) {
+  const members = state.team.members.slice().sort((a, b) => (a.name || a.code).localeCompare(b.name || b.code));
+  if (!members.length || !hasSnapshot()) {
+    main.append(pageHead({ eyebrow: 'Insights', title: 'Earning potential', sub: 'Load the team numbers to see what every agent can earn.' }));
+    return;
+  }
+  const list = members.map(ptAgent);
+  if (!list.some((a) => a.m.id === ptPick)) ptPick = list.slice().sort((a, b) => b.waiting - a.waiting)[0].m.id;
+  const redraw = () => refresh({ panel: false });
+  const totalWaiting = list.reduce((n, a) => n + a.waiting, 0);
+  const teamFile = `Earning_potential_${state.kpis.asOf || todayDay()}.png`;
+
+  const table = h(
+    'section',
+    { class: 'card kt-card pt-card', 'aria-labelledby': 'pt-team' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('h2', { class: 'kt-title', id: 'pt-team' }, icon('award'), 'Every agent this month'), h('p', { class: 'kt-sub' }, `${scEgp(totalWaiting)} is waiting across the team. Click an agent to open their picture and message.`)),
+      h('div', { class: 'kt-actions' }, h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'pt-team-copy', onclick: () => ktShare(() => ptTeamCanvas(list), teamFile, true) }, icon('copy'), 'Copy image'), h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'pt-team-save', onclick: () => ktShare(() => ptTeamCanvas(list), teamFile, false) }, icon('download'), 'Save image'))
+    ),
+    h(
+      'div',
+      { class: 'kt-scroll' },
+      h(
+        'table',
+        { class: 'kt-table pt-table' },
+        h('thead', null, h('tr', null, ['Agent', 'Now', 'On every target', 'Waiting for you', 'Biggest step', ''].map((t, i) => h('th', { scope: 'col', class: i ? '' : 'kt-name' }, h('span', { class: 'kt-th' }, t))))),
+        h(
+          'tbody',
+          null,
+          list.map((a, i) =>
+            h(
+              'tr',
+              { class: `kt-tr${i % 2 ? ' is-alt' : ''}${a.m.id === ptPick ? ' is-picked' : ''}` },
+              h('th', { class: 'kt-name', scope: 'row' }, a.name),
+              h('td', { class: 'kt-td' }, h('span', { class: 'pt-now' }, scEgp(a.now))),
+              h('td', { class: 'kt-td' }, h('span', { class: 'kt-val pt-target' }, scEgp(a.target))),
+              h('td', { class: 'kt-td' }, h('span', { class: `kt-val kt-val--${a.waiting > 0 ? 'met' : 'none'}`, 'data-fk': `pt-wait:${i}` }, `+${scEgp(a.waiting)}`)),
+              h('td', { class: 'kt-td pt-step' }, a.steps[0] ? `${a.steps[0].text}: +${scEgp(a.steps[0].gain)}` : '–'),
+              h('td', { class: 'kt-td' }, h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `pt-open:${i}`, onclick: () => { ptPick = a.m.id; redraw(); setTimeout(() => document.getElementById('pt-one')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); } }, icon('arrow-right'), 'Open'))
+            )
+          )
+        )
+      )
+    )
+  );
+
+  const a = list.find((x) => x.m.id === ptPick);
+  const img = new Image();
+  img.className = 'pt-img';
+  img.alt = `${a.name}: earning potential picture`;
+  try {
+    img.src = ptCanvas(a).toDataURL('image/png');
+  } catch (e) {
+    /* the picture still saves from the buttons */
+  }
+  const msg = ptMessage(a);
+  const file = `${a.name.replace(/[^A-Za-z0-9]+/g, '_')}_earning_potential.png`;
+  const sel = h('select', { class: 'select', 'data-fk': 'pt-agent', 'aria-label': 'Agent', onchange: (e) => { ptPick = e.target.value; redraw(); } }, list.map((x) => h('option', { value: x.m.id, selected: x.m.id === ptPick }, x.name)));
+  const one = h(
+    'section',
+    { class: 'card kt-card pt-card', id: 'pt-one', 'aria-labelledby': 'pt-one-t' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('h2', { class: 'kt-title', id: 'pt-one-t' }, icon('chat'), 'Send it to the agent'), h('p', { class: 'kt-sub' }, 'Their own picture and message: what they can earn, and each step with its value.')),
+      h(
+        'div',
+        { class: 'kt-actions' },
+        sel,
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'pt-copy-img', onclick: () => ktShare(() => ptCanvas(a), file, true) }, icon('copy'), 'Copy image'),
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'pt-save-img', onclick: () => ktShare(() => ptCanvas(a), file, false) }, icon('download'), 'Save image'),
+        h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'pt-copy-msg', onclick: (e) => copyText(msg, { label: 'Message', button: e.currentTarget }) }, icon('copy'), 'Copy message')
+      )
+    ),
+    !a.hasData ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `No numbers for ${a.name} yet, so this shows the pay from zero.`)) : null,
+    h('div', { class: 'pt-one' }, h('div', { class: 'pt-imgwrap' }, img), h('pre', { class: 'an-msg pt-msg', 'data-fk': 'pt-msg' }, msg))
+  );
+
+  main.append(
+    pageHead({ eyebrow: 'Insights', title: 'Earning potential', sub: 'What every agent can earn this month, and the steps to get there. Send each agent their own picture to keep them going.' }),
+    h(
+      'div',
+      { class: 'pt-strip' },
+      h('div', { class: 'pt-strip__big' }, h('span', { class: 'pt-strip__n' }, scEgp(scCalc(PT_TOP, { v: null }).total)), h('span', { class: 'pt-strip__t' }, 'top possible for any agent this month')),
+      h('div', { class: 'pt-strip__rules' }, ['KPI bonus up to 3,000', 'Lines up to 3,000', 'GSR up to 4,000', 'NPS up to 1.5x', 'ABS under 6% keeps it all'].map((t) => h('span', { class: 'pt-chip' }, t)))
+    ),
+    table,
+    one
+  );
+}
+
+EXT.view('potential', { title: 'Earning potential', label: 'Earning potential', icon: 'award', render: ptRender });
+EXT.order.splice(EXT.order.indexOf('potential'), 1);
+EXT.order.splice(EXT.order.indexOf('numbers') + 1, 0, 'potential');
 /* ===== layer: layers/90-integration.js ===== */
 /* ==========================================================================
    90-integration — glue between the area layers, for functions no single area owns.
