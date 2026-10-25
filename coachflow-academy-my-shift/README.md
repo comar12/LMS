@@ -284,32 +284,40 @@ and HR ID), and the CSV carries it in a `team_leader` column. On the board:
 
 ## Depth across the Academy
 
-`elevation.css` loads last on every page and gives the Academy depth. The
-Academy's own theme sets the card shadow to nothing; this layer brings it back
-as four steps:
+`elevation.css` and `elevation.js` load last on every page and give the
+Academy depth. The Academy's own theme sets the card shadow to nothing; this
+layer brings it back as four steps:
 
-- **Controls:** chips, pills and buttons sit just above the page.
-- **Resting cards and panels:** lesson and scenario cards, the gate cards, the
-  My Shift boxes, the board's tiles, files and repeat callers. A soft, warm
-  shadow with a top highlight.
-- **Lifted:** a card you point at rises 3px onto a deeper shadow. Pressing
-  settles it back down.
-- **Floating:** the header bar and the side rails.
+- **Controls:** chips, pills, buttons and the numbered step discs sit just
+  above the page.
+- **Resting cards and panels:** lesson and scenario cards, the gate cards,
+  and the My Shift boxes (who, warm-up, repeat caller, next practice,
+  check-in, Customer said). On the board: the tiles, files, repeat callers
+  and worth-a-check-in list. All have a soft, warm shadow with a top
+  highlight.
+- **Lifted:** a card you point at rises 4px onto a deeper shadow, tilts a few
+  degrees toward the mouse (wider cards tilt less), and a soft light follows
+  the pointer across it. Pressing settles it back down.
+- **Floating:** the header bar and the side rails. Once the page scrolls under
+  the header, the header rises further.
 
-A chip or pill you pick sinks in (an inset shadow), the current My Shift tab
-is a raised thumb in a recessed track, and inputs are slightly recessed.
-Primary buttons get back their orange glow.
+Wells sit into the page: the My Shift tab track, the gate's tick boxes,
+progress bars and goal meters, and inputs. What fills them stands up: the
+current tab, the progress fill, and a field you are typing in. A chip or pill
+you pick sinks in. Primary buttons get back their orange glow.
 
 - **Night mode:** deeper shadows with a faint top highlight, and a lifted
   card's surface lightens a little, because shadow alone is hard to see on a
   dark page.
-- **Phones and touch:** lifts happen only on devices that hover, so nothing
-  stays raised after a tap.
-- **Reduced motion:** keeps the shadows and drops the movement.
+- **Phones and touch:** the tilt follows the mouse only, and lifts happen only
+  on devices that hover.
+- **Reduced motion:** keeps the shadows and drops the movement and tilt.
 - **Forced colours:** drops the shadows, as browsers do.
 
-The offline file and the standalone My Shift page include it.
-`depth-before-after.png` shows a scenario card before, then lifted in day and night mode.
+The offline file and the standalone My Shift page include both files.
+`depth-before-after.png` shows a scenario card before, then lifted in day and
+night mode; `academy-depth.mp4` shows the tilt and light, recorded from the
+offline file.
 
 ## Motion across the Academy
 

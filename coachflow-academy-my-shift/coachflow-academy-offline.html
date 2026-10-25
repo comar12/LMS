@@ -520,54 +520,65 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 </style>
 <style>/* elevation.css */
 /* CoachFlow elevation layer: depth on every station. Four steps, from controls that sit just above the page to the header that floats over it.
-   Cards and panels rest on a soft, warm shadow; anything you can open lifts toward you when you point at it and settles when you press; choices you pick sink in.
+   Cards and panels rest on a soft, warm shadow; anything you can open lifts toward you when you point at it, tilts a little toward the pointer with a soft light under it (elevation.js), and settles when you press; choices you pick sink in; the header rises off the page once you scroll.
    Night mode uses deeper shadows with a faint top highlight, and a lifted card's surface lightens a little, because a shadow alone is hard to see on a dark page.
-   Hover lifts only on devices that hover; reduced motion keeps the shadows and drops the movement; forced colours drop the shadows, as browsers do. */
+   Hover lifts only on devices that hover; reduced motion keeps the shadows and drops the movement and tilt; forced colours drop the shadows, as browsers do. */
 :root{
   --el-ink:52 36 24;
-  --el-ctl:0 1px 1px rgb(var(--el-ink) / .05),0 2px 5px -1px rgb(var(--el-ink) / .10);
-  --el-ctl-up:0 2px 3px rgb(var(--el-ink) / .06),0 8px 18px -8px rgb(var(--el-ink) / .26);
-  --el-in:inset 0 1px 3px rgb(var(--el-ink) / .14),inset 0 0 0 1px rgb(var(--el-ink) / .02);
-  --el-1:0 1px 2px rgb(var(--el-ink) / .06),0 3px 8px -2px rgb(var(--el-ink) / .07),0 12px 24px -16px rgb(var(--el-ink) / .22);
-  --el-2:0 2px 4px rgb(var(--el-ink) / .06),0 10px 20px -8px rgb(var(--el-ink) / .14),0 24px 44px -18px rgb(var(--el-ink) / .30);
-  --el-3:0 2px 6px rgb(var(--el-ink) / .06),0 16px 32px -12px rgb(var(--el-ink) / .18),0 36px 64px -28px rgb(var(--el-ink) / .34);
+  --el-ctl:0 1px 1px rgb(var(--el-ink) / .06),0 2px 6px -1px rgb(var(--el-ink) / .14);
+  --el-ctl-up:0 2px 3px rgb(var(--el-ink) / .08),0 10px 20px -8px rgb(var(--el-ink) / .32);
+  --el-in:inset 0 1px 3px rgb(var(--el-ink) / .16),inset 0 0 0 1px rgb(var(--el-ink) / .03);
+  --el-1:0 1px 2px rgb(var(--el-ink) / .07),0 4px 10px -2px rgb(var(--el-ink) / .09),0 16px 30px -18px rgb(var(--el-ink) / .30);
+  --el-2:0 2px 4px rgb(var(--el-ink) / .07),0 14px 26px -10px rgb(var(--el-ink) / .18),0 32px 56px -22px rgb(var(--el-ink) / .38);
+  --el-3:0 2px 6px rgb(var(--el-ink) / .07),0 18px 36px -12px rgb(var(--el-ink) / .22),0 44px 80px -30px rgb(var(--el-ink) / .42);
   --el-hi:inset 0 1px 0 rgb(255 255 255 / .9);
+  --el-sheen:rgb(255 109 16 / .075);
   --el-lift-bg:var(--color-surface);
   --el-move:var(--m-hover,.18s) var(--e-out,cubic-bezier(.2,0,0,1));
   --shadow-card:var(--el-1);
   --shadow-brand-glow:0 2px 4px #b04a0a29,0 10px 24px -8px #ff6d106b,inset 0 1px 0 #ffffff6b;
-  --shadow-brand-glow-hover:0 3px 6px #b04a0a33,0 16px 32px -8px #ff6d1085,inset 0 1px 0 #ffffff80;
+  --shadow-brand-glow-hover:0 3px 6px #b04a0a33,0 18px 34px -8px #ff6d108f,inset 0 1px 0 #ffffff80;
 }
 .coachflow-night{
-  --el-ctl:0 1px 2px rgb(0 0 0 / .45),inset 0 1px 0 rgb(255 255 255 / .05);
-  --el-ctl-up:0 3px 6px rgb(0 0 0 / .45),0 10px 22px -8px rgb(0 0 0 / .85),inset 0 1px 0 rgb(255 255 255 / .08);
-  --el-in:inset 0 2px 5px rgb(0 0 0 / .55),inset 0 0 0 1px rgb(0 0 0 / .1);
-  --el-1:0 1px 2px rgb(0 0 0 / .4),0 12px 26px -14px rgb(0 0 0 / .8),inset 0 1px 0 rgb(255 255 255 / .05);
-  --el-2:0 2px 4px rgb(0 0 0 / .45),0 22px 44px -16px rgb(0 0 0 / .95),inset 0 1px 0 rgb(255 255 255 / .09);
-  --el-3:0 4px 8px rgb(0 0 0 / .45),0 32px 64px -22px rgb(0 0 0 / 1),inset 0 1px 0 rgb(255 255 255 / .1);
-  --el-hi:inset 0 1px 0 rgb(255 255 255 / .06);
-  --el-lift-bg:color-mix(in srgb,var(--color-surface) 93%,#fff);
+  --el-ctl:0 1px 2px rgb(0 0 0 / .5),0 4px 10px -4px rgb(0 0 0 / .6),inset 0 1px 0 rgb(255 255 255 / .06);
+  --el-ctl-up:0 3px 6px rgb(0 0 0 / .5),0 12px 24px -8px rgb(0 0 0 / .9),inset 0 1px 0 rgb(255 255 255 / .09);
+  --el-in:inset 0 2px 5px rgb(0 0 0 / .6),inset 0 0 0 1px rgb(0 0 0 / .12);
+  --el-1:0 1px 2px rgb(0 0 0 / .45),0 14px 30px -14px rgb(0 0 0 / .9),inset 0 1px 0 rgb(255 255 255 / .06);
+  --el-2:0 2px 4px rgb(0 0 0 / .5),0 26px 50px -16px rgb(0 0 0 / 1),inset 0 1px 0 rgb(255 255 255 / .1);
+  --el-3:0 4px 8px rgb(0 0 0 / .5),0 36px 72px -22px rgb(0 0 0 / 1),inset 0 1px 0 rgb(255 255 255 / .1);
+  --el-hi:inset 0 1px 0 rgb(255 255 255 / .07);
+  --el-sheen:rgb(255 255 255 / .07);
+  --el-lift-bg:color-mix(in srgb,var(--color-surface) 92%,#fff);
   --shadow-card:var(--el-1);
   --shadow-brand-glow:0 2px 6px #00000073,0 10px 24px -10px #ff6d1066,inset 0 1px 0 #ffffff40;
-  --shadow-brand-glow-hover:0 3px 8px #00000080,0 16px 32px -10px #ff6d108c,inset 0 1px 0 #ffffff59;
+  --shadow-brand-glow-hover:0 3px 8px #00000080,0 18px 34px -10px #ff6d1099,inset 0 1px 0 #ffffff59;
 }
 
 /* 1 · resting cards and panels */
-:is(.sl-entry,.sl-guide-next-link,.sl-measure,.sl-ending,.sl-guide-before,.gs-card,.tb-tile,.tb-rep,.tb-file,.ms-who[data-state="edit"],.ms-warm[data-state="todo"]){box-shadow:var(--el-1),var(--el-hi)}
+:is(.sl-entry,.sl-guide-next-link,.sl-measure,.sl-ending,.sl-guide-before,.gs-card,.gs-ok-panel,.tb-tile,.tb-rep,.tb-file,.tb-care-list>li,.ms-who[data-state="edit"],.ms-warm[data-state="todo"],.ms-repeat,.ms-next,.ms-checkin,.ms-said,.tb-example){box-shadow:var(--el-1),var(--el-hi)}
 :is(.sl-entry,.sl-guide-next-link,.ca-select-card){transition:border-color var(--el-move),background-color var(--el-move),box-shadow var(--el-move),transform var(--el-move)}
 
-/* 2 · raised: the header and the side rails float over the page */
-.sl-bar{box-shadow:var(--el-2)}
+/* 2 · raised: the header and the side rails float over the page; the header rises further once the page scrolls under it */
+.sl-bar{box-shadow:var(--el-2);transition:box-shadow var(--m-segment,.32s) var(--e-out,ease-out)}
+:root.cf-raised .sl-bar{box-shadow:var(--el-3)}
 .sl-gate-rail-panel{box-shadow:var(--el-2),var(--el-hi)}
 .sl-cf-rail-panel{box-shadow:var(--el-2)}
 
-/* controls sit just above the page */
+/* controls sit just above the page; numbered nodes are raised discs */
 :is(.sl-chip,.gs-pill){box-shadow:var(--el-ctl);transition:border-color var(--el-move),background-color var(--el-move),box-shadow var(--el-move),transform var(--el-move)}
 .gs-btn{box-shadow:var(--el-ctl);transition:box-shadow var(--el-move),transform var(--el-move)}
+:is(.sl-gate-node,.sl-step-node,.sl-guide-step-node){box-shadow:var(--el-ctl),var(--el-hi)}
+.gs-box{box-shadow:var(--el-in)}
 .ms-tabs{box-shadow:var(--el-in)}
 .ms-tab[aria-current="page"]{box-shadow:var(--el-ctl-up);background:var(--color-surface)}
-.ms-input{box-shadow:inset 0 1px 2px rgb(var(--el-ink,0 0 0) / .07)}
-.coachflow-night .ms-input{box-shadow:inset 0 1px 3px rgb(0 0 0 / .45)}
+
+/* wells: fields, tracks and bars sit into the page, and what fills them stands up */
+.ms-input{box-shadow:inset 0 1px 2px rgb(var(--el-ink,0 0 0) / .08);transition:box-shadow var(--el-move)}
+.coachflow-night .ms-input{box-shadow:inset 0 1px 3px rgb(0 0 0 / .5)}
+:is(.ms-input,.coachflow-night .ms-input):focus{box-shadow:var(--el-ctl-up)}
+.ms-meter,.gs-bar{box-shadow:var(--el-in)}
+.ms-meter-fill,.gs-bar i{box-shadow:0 1px 3px rgb(var(--el-ink) / .25),inset 0 1px 0 rgb(255 255 255 / .35)}
+.coachflow-night :is(.ms-meter-fill,.gs-bar i){box-shadow:0 1px 4px rgb(0 0 0 / .6),inset 0 1px 0 rgb(255 255 255 / .2)}
 
 /* choices you pick sink in */
 :is(.sl-chip[aria-pressed="true"],.sl-chip:has(input:checked),.gs-pill[aria-pressed="true"],.gs-pill[aria-checked="true"]){box-shadow:var(--el-in)}
@@ -578,12 +589,16 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
   .ca-select-card:hover:not([aria-disabled=true]){box-shadow:var(--el-2)}
   :is(.sl-chip,.gs-pill):hover:not([aria-pressed="true"]):not(:has(input:checked)):not(:disabled){box-shadow:var(--el-ctl-up)}
   .gs-btn:hover:not(:disabled){box-shadow:var(--el-ctl-up)}
-  .tb-file:hover{box-shadow:var(--el-2),var(--el-hi)}
+  :is(.tb-file,.gs-card):hover{box-shadow:var(--el-2),var(--el-hi)}
+  .gs-card{transition:box-shadow var(--el-move)}
 }
 @media (hover:hover) and (prefers-reduced-motion:no-preference){
-  :is(.sl-entry,.sl-guide-next-link):hover{transform:translateY(-3px)}
+  :is(.sl-entry,.sl-guide-next-link):hover{transform:translateY(-4px)}
   .ca-select-card:hover:not([aria-disabled=true]){transform:translateY(-2px)}
   :is(.sl-chip,.gs-pill):hover:not([aria-pressed="true"]):not(:has(input:checked)):not(:disabled),.gs-btn:hover:not(:disabled){transform:translateY(-1px)}
+  /* tilt toward the pointer, with a soft light under it (angles and position set by elevation.js) */
+  :is(.sl-entry,.sl-guide-next-link,.ca-select-card)[data-cf-tilt]{transform:perspective(900px) rotateX(var(--cf-rx,0deg)) rotateY(var(--cf-ry,0deg)) translateY(-4px);background-image:radial-gradient(28rem circle at var(--cf-mx,50%) var(--cf-my,0%),var(--el-sheen),transparent 60%)}
+  .ca-select-card[data-cf-tilt]:not([aria-disabled=true]){transform:perspective(900px) rotateX(var(--cf-rx,0deg)) rotateY(var(--cf-ry,0deg)) translateY(-2px)}
 }
 /* pressing settles it back down */
 .sl-entry:has(.sl-entry-link:active),.sl-guide-next-link:active{box-shadow:var(--el-1),var(--el-hi)}
@@ -1869,6 +1884,37 @@ function start(){ var r=document.getElementById("root"); if(!r){ setTimeout(star
   mo.observe(r,{subtree:true,childList:true,characterData:true,characterDataOldValue:true,attributes:true,attributeOldValue:true,attributeFilter:["hidden","open","aria-pressed"]}); }
 start();
 window.CFMotion={settle:settle,arrive:function(){ arrive(mainEl()); }};
+})();
+
+</script>
+<script>/* elevation.js */
+/* CoachFlow elevation: the moving part of the depth layer (elevation.css does the drawing). A card you can open tilts a few degrees toward the mouse, with a soft light where the pointer is; the header rises off the page once the page scrolls under it. Mouse only, and nothing moves with reduced motion. */
+(function(){
+"use strict";
+var TILT=".sl-entry,.sl-guide-next-link,.ca-select-card", MAX=5, REACH=420, PROPS=["--cf-rx","--cf-ry","--cf-mx","--cf-my"];
+var cur=null, ev=null, raf=0, raised=null;
+
+function mq(q){ try{ return window.matchMedia(q).matches; }catch(e){ return false; } }
+function canTilt(){ return mq("(hover: hover) and (pointer: fine)")&&!mq("(prefers-reduced-motion: reduce)"); }
+function clear(el){ if(!el) return; el.removeAttribute("data-cf-tilt"); PROPS.forEach(function(p){ el.style.removeProperty(p); }); }
+
+/* Tilt: wider cards tilt less, so their far edge moves about as much as a small card's. */
+function frame(){ raf=0; var e=ev, el=e&&e.target&&e.target.closest?e.target.closest(TILT):null;
+  if(el&&(el.getAttribute("aria-disabled")==="true"||!el.isConnected||!canTilt())) el=null;
+  if(el!==cur){ clear(cur); cur=el; } if(!el) return;
+  var r=el.getBoundingClientRect(); if(!r.width||!r.height) return;
+  var x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)), y=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)), k=Math.min(1,REACH/Math.max(r.width,r.height));
+  el.style.setProperty("--cf-rx",((0.5-y)*MAX*k).toFixed(2)+"deg"); el.style.setProperty("--cf-ry",((x-0.5)*MAX*k).toFixed(2)+"deg");
+  el.style.setProperty("--cf-mx",(x*100).toFixed(1)+"%"); el.style.setProperty("--cf-my",(y*100).toFixed(1)+"%");
+  if(!el.hasAttribute("data-cf-tilt")) el.setAttribute("data-cf-tilt",""); }
+document.addEventListener("pointermove",function(e){ if(e.pointerType&&e.pointerType!=="mouse") return; ev=e; if(!raf) raf=requestAnimationFrame(frame); },{passive:true});
+document.documentElement.addEventListener("pointerleave",function(){ ev=null; clear(cur); cur=null; });
+window.addEventListener("blur",function(){ clear(cur); cur=null; });
+window.addEventListener("hashchange",function(){ clear(cur); cur=null; });
+
+/* The header: rises once the page scrolls under it. */
+function onScroll(){ var up=(window.scrollY||document.documentElement.scrollTop||0)>8; if(up!==raised){ raised=up; document.documentElement.classList.toggle("cf-raised",up); } }
+window.addEventListener("scroll",onScroll,{passive:true}); window.addEventListener("hashchange",function(){ setTimeout(onScroll,0); }); onScroll();
 })();
 
 </script>
