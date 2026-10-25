@@ -6096,6 +6096,12 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 @media (prefers-reduced-motion: reduce) {
   .it-mode { transition: none; }
 }
+/* ===== layer: layers/8a-lastday.css ===== */
+/* 8a-lastday: Last day */
+.ld-table { min-width: 860px; }
+.kt-val--plain { background: transparent; color: var(--text); font-weight: 600; min-width: 56px; }
+.ld-off .kt-name { color: var(--text-2); }
+.ld-tag { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text-2); font-size: 0.72rem; font-weight: 600; vertical-align: middle; }
 </style>
 </head>
 <body>
@@ -6205,7 +6211,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '2.6.0';
+const APP_VERSION = '2.7.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -31231,6 +31237,230 @@ function itRender(main) {
 EXT.view('it', { title: 'IT requests', label: 'IT requests', icon: 'monitor', render: itRender });
 EXT.order.splice(EXT.order.indexOf('it'), 1);
 EXT.order.splice(EXT.order.indexOf('rta') + 1, 0, 'it');
+/* ===== layer: layers/8a-lastday.js ===== */
+/* ==========================================================================
+   8a-lastday: the last day of data, on Home under the KPI table
+   - Every daily export (one row per agent per day) keeps its latest day here: calls, ITG,
+     tNPS and surveys, aiCR, XM lines and GSR per agent, colored against the targets.
+   - A file with a single day only updates "Last day": the month-to-date numbers stay.
+   - "Copy image" and "Save image" draw the table as a picture for the agents. Names only.
+   ========================================================================== */
+
+const LD_KPIS = [
+  { k: 'calls', label: 'Calls', plain: true },
+  { k: 'ITG', label: 'ITG' },
+  { k: 'tNPS', label: 'tNPS' },
+  { k: 'surveys', label: 'Surveys', plain: true },
+  { k: 'aiCR', label: 'aiCR' },
+  { k: 'XM', label: 'XM lines' },
+  { k: 'GSR', label: 'GSR' },
+];
+const LD_SCORED = ['ITG', 'tNPS', 'aiCR', 'XM', 'GSR'];
+KT_LOOK.plain = { word: '', bg: 'rgba(255, 255, 255, 0)', fg: '#3D4453' };
+
+EXT.slice('lastDay', {
+  initial: () => ({ date: '', source: '', rows: {} }),
+  clean: (raw) => {
+    const src = raw && typeof raw === 'object' ? raw : {};
+    const nn = (v) => (typeof v === 'number' && Number.isFinite(v) ? Math.round(v * 100) / 100 : null);
+    const rows = {};
+    Object.entries(src.rows && typeof src.rows === 'object' ? src.rows : {})
+      .slice(0, 80)
+      .forEach(([id, r]) => {
+        if (!isId(id) || !r || typeof r !== 'object') return;
+        rows[id] = { calls: clampInt(r.calls, 0, 100000, 0), surveys: clampInt(r.surveys, 0, 100000, 0), tNPS: nn(r.tNPS), aiCR: nn(r.aiCR), XM: nn(r.XM), GSR: nn(r.GSR), ITG: nn(r.ITG) };
+      });
+    return { date: isIsoDate(src.date) ? src.date : '', source: str(src.source, 120).trim(), rows };
+  },
+});
+
+/** Daily target for lines: one line sold on the day is on target. */
+function ldLevel(k, v) {
+  if (v === null || v === undefined) return 'none';
+  if (k === 'XM') return v >= 1 ? 'met' : 'none';
+  return ktLevel(k, v);
+}
+const ldFmt = (k, v) => (v === null || v === undefined ? '–' : k === 'calls' || k === 'surveys' ? String(v) : ktFmt(k, v, false));
+const ldTargetText = (k) => (k === 'XM' ? '1 line' : ktTargetText(k));
+
+/* ---------- picking up the last day from a daily export ---------- */
+let ldPending = null;
+const _ldSnapshotFromDaily = snapshotFromDaily;
+snapshotFromDaily = function (sheet, fileName) {
+  ldPending = null;
+  const r = _ldSnapshotFromDaily(sheet, fileName);
+  if (!r || r.error || !r.snapshot) return r;
+  const S = r.snapshot;
+  const date = S.to;
+  if (!isIsoDate(date) || !S.agents.some((a) => (a.days || []).some((d) => d.d === date))) return r;
+  const old = state.kpis;
+  /* One day only, in a month that already has fuller numbers: keep those numbers. */
+  const keep = S.from === S.to && hasSnapshot() && old && isIsoDate(old.asOf) && old.asOf.slice(0, 7) === date.slice(0, 7) && !(old.from && old.from === old.to) ? old : null;
+  if (keep) S.label = `Last day ${fmtDay(date, true)} · your month-to-date numbers stay as they are`;
+  ldPending = { snapshot: S, date, keep, source: fileName || '' };
+  return r;
+};
+
+const _ldPersist = persist;
+persist = function (...keys) {
+  if (keys.includes('kpis') && ldPending && state.kpis === ldPending.snapshot) {
+    const p = ldPending;
+    ldPending = null;
+    try {
+      const rows = {};
+      state.team.members.forEach((m) => {
+        const row = snapRow(m);
+        if (!row) return;
+        const d = (row.days || []).find((x) => x.d === p.date);
+        rows[m.id] = d ? { calls: d.calls, surveys: d.surveys, tNPS: d.surveys ? d.tNPS : null, aiCR: d.calls ? d.aiCR : null, XM: d.XM, GSR: d.GSR, ITG: d.calls ? d.ITG : null } : { calls: 0, surveys: 0 };
+      });
+      EXT.data.lastDay = EXT.slices.lastDay.clean({ date: p.date, source: p.source, rows });
+      EXT.save('lastDay');
+    } catch (e) {
+      /* the month-to-date numbers still save */
+    }
+    if (p.keep) {
+      state.kpis = p.keep;
+      setTimeout(() => toast(`Last day saved: ${fmtDay(p.date, true)}. Your month-to-date numbers stay as they are.`, { duration: 6000 }), 50);
+    }
+  }
+  _ldPersist(...keys);
+};
+
+/* ---------- the table ---------- */
+function ldRows() {
+  const L = EXT.data.lastDay;
+  const agents = state.team.members
+    .map((m) => {
+      const r = L.rows[m.id] || null;
+      const vals = {};
+      LD_KPIS.forEach(({ k }) => (vals[k] = r ? (r[k] === undefined ? null : r[k]) : null));
+      const off = !r || !r.calls;
+      return { name: m.name || m.code, vals, off, met: LD_SCORED.filter((k) => ldLevel(k, vals[k]) === 'met').length, measured: LD_SCORED.filter((k) => vals[k] !== null && !(k === 'XM' && off)).length };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const on = agents.filter((a) => !a.off);
+  const wmean = (k, w) => {
+    let n = 0;
+    let d = 0;
+    on.forEach((a) => {
+      const v = a.vals[k];
+      const ww = a.vals[w] || 0;
+      if (v !== null && ww > 0) {
+        n += v * ww;
+        d += ww;
+      }
+    });
+    return d ? Math.round((n / d) * 10) / 10 : null;
+  };
+  const gsr = on.map((a) => a.vals.GSR).filter((v) => v !== null);
+  const team = {
+    name: 'Team',
+    team: true,
+    vals: {
+      calls: on.reduce((n, a) => n + (a.vals.calls || 0), 0),
+      surveys: on.reduce((n, a) => n + (a.vals.surveys || 0), 0),
+      ITG: wmean('ITG', 'calls'),
+      tNPS: wmean('tNPS', 'surveys'),
+      aiCR: wmean('aiCR', 'calls'),
+      XM: on.length ? on.reduce((n, a) => n + (a.vals.XM || 0), 0) : null,
+      GSR: gsr.length ? Math.round((gsr.reduce((n, v) => n + v, 0) / gsr.length) * 10) / 10 : null,
+    },
+  };
+  team.met = LD_SCORED.filter((k) => ldLevel(k, team.vals[k]) === 'met').length;
+  team.measured = LD_SCORED.filter((k) => team.vals[k] !== null).length;
+  return { agents, team, worked: on.length };
+}
+
+const ldTitle = () => `Last day · ${fmtDay(EXT.data.lastDay.date, true)}`;
+const ldSub = (worked) => `${state.kpis.tl ? `${state.kpis.tl}'s team` : 'My team'} · ${plural(worked, 'agent')} took calls · daily export`;
+const LD_NOTE = 'Almost there: within ITG 5 · tNPS 10 · aiCR 3 · GSR 1 · XM: 1 line on the day is on target';
+const ldCell = (k, r) => {
+  if (r.off && !r.team && k !== 'calls') return { text: '–', level: 'none' };
+  const plain = LD_KPIS.find((x) => x.k === k).plain;
+  return { text: ldFmt(k, r.vals[k]), level: plain ? 'plain' : ldLevel(k, r.vals[k]) };
+};
+function ldCanvas() {
+  const { agents, team, worked } = ldRows();
+  return ktDraw({
+    title: ldTitle(),
+    sub: ldSub(worked),
+    colW: 116,
+    cols: LD_KPIS.map(({ k, label, plain }) => ({ label, sub: plain ? '' : `Target ${ldTargetText(k)}` })),
+    tail: { label: 'On target', w: 112 },
+    rows: [...agents, team].map((r) => ({
+      name: r.off && !r.team ? `${r.name} (no calls)` : r.name,
+      team: !!r.team,
+      cells: LD_KPIS.map(({ k }) => ldCell(k, r)),
+      tail: { text: r.measured && !(r.off && !r.team) ? `${r.met} of ${r.measured}` : '–', color: r.measured && r.met === r.measured ? '#1E7F5C' : '#3D4453' },
+    })),
+    note: LD_NOTE,
+  });
+}
+const ldFileName = () => `Last_day_${EXT.data.lastDay.date || todayDay()}.png`;
+
+function ldCard() {
+  if (!hasSnapshot() || !state.team.members.length) return null;
+  const L = EXT.data.lastDay;
+  const loadBtn = (primary) => h('button', { type: 'button', class: `btn btn--sm${primary ? ' btn--primary' : ''}`, 'data-fk': 'ld-load', onclick: importSnapshotFromFile, title: 'Load the daily export (one row per agent per day)' }, icon('upload'), 'Load daily export');
+  if (!L.date) {
+    return h(
+      'section',
+      { class: 'card kt-card ld-card', 'aria-labelledby': 'ld-title' },
+      h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'ld-title' }, icon('calendar'), 'Last day'), h('p', { class: 'kt-sub' }, 'Load the daily export each day to see the latest day here, ready to share with the agents.')), loadBtn(true))
+    );
+  }
+  const { agents, team, worked } = ldRows();
+  const row = (r, i) =>
+    h(
+      'tr',
+      { class: `kt-tr${r.team ? ' kt-tr--team' : ''}${r.off && !r.team ? ' ld-off' : ''}`, style: `--d:${i}` },
+      h('th', { class: 'kt-name', scope: 'row' }, r.name, r.off && !r.team ? h('span', { class: 'ld-tag' }, 'No calls') : null),
+      LD_KPIS.map(({ k }) => {
+        const c = ldCell(k, r);
+        return h('td', { class: 'kt-td' }, h('span', { class: `kt-val kt-val--${c.level}` }, c.text));
+      }),
+      h('td', { class: 'kt-td' }, h('span', { class: `kt-met${r.measured && r.met === r.measured ? ' is-all' : ''}` }, r.measured && !(r.off && !r.team) ? `${r.met} of ${r.measured}` : '–'))
+    );
+  return h(
+    'section',
+    { class: 'card kt-card ld-card', 'aria-labelledby': 'ld-title' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('h2', { class: 'kt-title', id: 'ld-title' }, icon('calendar'), ldTitle()), h('p', { class: 'kt-sub' }, ldSub(worked))),
+      h(
+        'div',
+        { class: 'kt-actions' },
+        loadBtn(false),
+        h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'ld-copy', onclick: () => ktShare(ldCanvas, ldFileName(), true), title: 'Copy the table as a picture, then paste it in WhatsApp' }, icon('copy'), 'Copy image'),
+        h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'ld-save', onclick: () => ktShare(ldCanvas, ldFileName(), false), title: 'Save the table as a picture' }, icon('download'), 'Save image')
+      )
+    ),
+    h(
+      'div',
+      { class: 'kt-scroll' },
+      h(
+        'table',
+        { class: 'kt-table ld-table' },
+        h('thead', null, h('tr', null, h('th', { class: 'kt-name', scope: 'col' }, 'Agent'), LD_KPIS.map(({ k, label, plain }) => h('th', { scope: 'col' }, h('span', { class: 'kt-th' }, label), plain ? null : h('span', { class: 'kt-target' }, `Target ${ldTargetText(k)}`))), h('th', { scope: 'col' }, h('span', { class: 'kt-th' }, 'On target')))),
+        h('tbody', null, agents.map(row), row(team, agents.length))
+      )
+    ),
+    h('div', { class: 'kt-legend' }, ['met', 'close', 'below'].map((key) => h('span', { class: `kt-key kt-key--${key}` }, h('span', { class: 'kt-dot', 'aria-hidden': 'true' }), KT_LOOK[key].word)), h('span', { class: 'kt-note' }, LD_NOTE))
+  );
+}
+
+/* On Home, right under the KPI table. */
+const _ldRenderHome = renderHome;
+renderHome = function (main) {
+  _ldRenderHome(main);
+  const card = ldCard();
+  if (!card) return;
+  const after = main.querySelector('.kt-card:not(.kw-card)') || main.querySelector('.hero');
+  if (after && after.parentNode) after.parentNode.insertBefore(card, after.nextSibling);
+  else main.prepend(card);
+};
 /* ===== layer: layers/90-integration.js ===== */
 /* ==========================================================================
    90-integration — glue between the area layers, for functions no single area owns.
