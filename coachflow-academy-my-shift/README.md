@@ -282,6 +282,34 @@ and HR ID), and the CSV carries it in a `team_leader` column. On the board:
   with the team last viewed (`coachflow.myshift.leaders.v1`); no call data is
   kept. Example data has three made-up leaders.
 
+## Depth across the Academy
+
+`elevation.css` loads last on every page and gives the Academy depth. The
+Academy's own theme sets the card shadow to nothing; this layer brings it back
+as four steps:
+
+- **Controls:** chips, pills and buttons sit just above the page.
+- **Resting cards and panels:** lesson and scenario cards, the gate cards, the
+  My Shift boxes, the board's tiles, files and repeat callers. A soft, warm
+  shadow with a top highlight.
+- **Lifted:** a card you point at rises 3px onto a deeper shadow. Pressing
+  settles it back down.
+- **Floating:** the header bar and the side rails.
+
+A chip or pill you pick sinks in (an inset shadow), the current My Shift tab
+is a raised thumb in a recessed track, and inputs are slightly recessed.
+Primary buttons get back their orange glow.
+
+- **Night mode:** deeper shadows with a faint top highlight, and a lifted
+  card's surface lightens a little, because shadow alone is hard to see on a
+  dark page.
+- **Phones and touch:** lifts happen only on devices that hover, so nothing
+  stays raised after a tap.
+- **Reduced motion:** keeps the shadows and drops the movement.
+- **Forced colours:** drops the shadows, as browsers do.
+
+The offline file and the standalone My Shift page include it.
+
 ## Motion across the Academy
 
 `motion.js` watches the Academy's own page updates and marks what should

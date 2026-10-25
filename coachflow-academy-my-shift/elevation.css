@@ -1,0 +1,77 @@
+/* CoachFlow elevation layer: depth on every station. Four steps, from controls that sit just above the page to the header that floats over it.
+   Cards and panels rest on a soft, warm shadow; anything you can open lifts toward you when you point at it and settles when you press; choices you pick sink in.
+   Night mode uses deeper shadows with a faint top highlight, and a lifted card's surface lightens a little, because a shadow alone is hard to see on a dark page.
+   Hover lifts only on devices that hover; reduced motion keeps the shadows and drops the movement; forced colours drop the shadows, as browsers do. */
+:root{
+  --el-ink:52 36 24;
+  --el-ctl:0 1px 1px rgb(var(--el-ink) / .05),0 2px 5px -1px rgb(var(--el-ink) / .10);
+  --el-ctl-up:0 2px 3px rgb(var(--el-ink) / .06),0 8px 18px -8px rgb(var(--el-ink) / .26);
+  --el-in:inset 0 1px 3px rgb(var(--el-ink) / .14),inset 0 0 0 1px rgb(var(--el-ink) / .02);
+  --el-1:0 1px 2px rgb(var(--el-ink) / .06),0 3px 8px -2px rgb(var(--el-ink) / .07),0 12px 24px -16px rgb(var(--el-ink) / .22);
+  --el-2:0 2px 4px rgb(var(--el-ink) / .06),0 10px 20px -8px rgb(var(--el-ink) / .14),0 24px 44px -18px rgb(var(--el-ink) / .30);
+  --el-3:0 2px 6px rgb(var(--el-ink) / .06),0 16px 32px -12px rgb(var(--el-ink) / .18),0 36px 64px -28px rgb(var(--el-ink) / .34);
+  --el-hi:inset 0 1px 0 rgb(255 255 255 / .9);
+  --el-lift-bg:var(--color-surface);
+  --el-move:var(--m-hover,.18s) var(--e-out,cubic-bezier(.2,0,0,1));
+  --shadow-card:var(--el-1);
+  --shadow-brand-glow:0 2px 4px #b04a0a29,0 10px 24px -8px #ff6d106b,inset 0 1px 0 #ffffff6b;
+  --shadow-brand-glow-hover:0 3px 6px #b04a0a33,0 16px 32px -8px #ff6d1085,inset 0 1px 0 #ffffff80;
+}
+.coachflow-night{
+  --el-ctl:0 1px 2px rgb(0 0 0 / .45),inset 0 1px 0 rgb(255 255 255 / .05);
+  --el-ctl-up:0 3px 6px rgb(0 0 0 / .45),0 10px 22px -8px rgb(0 0 0 / .85),inset 0 1px 0 rgb(255 255 255 / .08);
+  --el-in:inset 0 2px 5px rgb(0 0 0 / .55),inset 0 0 0 1px rgb(0 0 0 / .1);
+  --el-1:0 1px 2px rgb(0 0 0 / .4),0 12px 26px -14px rgb(0 0 0 / .8),inset 0 1px 0 rgb(255 255 255 / .05);
+  --el-2:0 2px 4px rgb(0 0 0 / .45),0 22px 44px -16px rgb(0 0 0 / .95),inset 0 1px 0 rgb(255 255 255 / .09);
+  --el-3:0 4px 8px rgb(0 0 0 / .45),0 32px 64px -22px rgb(0 0 0 / 1),inset 0 1px 0 rgb(255 255 255 / .1);
+  --el-hi:inset 0 1px 0 rgb(255 255 255 / .06);
+  --el-lift-bg:color-mix(in srgb,var(--color-surface) 93%,#fff);
+  --shadow-card:var(--el-1);
+  --shadow-brand-glow:0 2px 6px #00000073,0 10px 24px -10px #ff6d1066,inset 0 1px 0 #ffffff40;
+  --shadow-brand-glow-hover:0 3px 8px #00000080,0 16px 32px -10px #ff6d108c,inset 0 1px 0 #ffffff59;
+}
+
+/* 1 · resting cards and panels */
+:is(.sl-entry,.sl-guide-next-link,.sl-measure,.sl-ending,.sl-guide-before,.gs-card,.tb-tile,.tb-rep,.tb-file,.ms-who[data-state="edit"],.ms-warm[data-state="todo"]){box-shadow:var(--el-1),var(--el-hi)}
+:is(.sl-entry,.sl-guide-next-link,.ca-select-card){transition:border-color var(--el-move),background-color var(--el-move),box-shadow var(--el-move),transform var(--el-move)}
+
+/* 2 · raised: the header and the side rails float over the page */
+.sl-bar{box-shadow:var(--el-2)}
+.sl-gate-rail-panel{box-shadow:var(--el-2),var(--el-hi)}
+.sl-cf-rail-panel{box-shadow:var(--el-2)}
+
+/* controls sit just above the page */
+:is(.sl-chip,.gs-pill){box-shadow:var(--el-ctl);transition:border-color var(--el-move),background-color var(--el-move),box-shadow var(--el-move),transform var(--el-move)}
+.gs-btn{box-shadow:var(--el-ctl);transition:box-shadow var(--el-move),transform var(--el-move)}
+.ms-tabs{box-shadow:var(--el-in)}
+.ms-tab[aria-current="page"]{box-shadow:var(--el-ctl-up);background:var(--color-surface)}
+.ms-input{box-shadow:inset 0 1px 2px rgb(var(--el-ink,0 0 0) / .07)}
+.coachflow-night .ms-input{box-shadow:inset 0 1px 3px rgb(0 0 0 / .45)}
+
+/* choices you pick sink in */
+:is(.sl-chip[aria-pressed="true"],.sl-chip:has(input:checked),.gs-pill[aria-pressed="true"],.gs-pill[aria-checked="true"]){box-shadow:var(--el-in)}
+
+/* pointing lifts what you can open or choose */
+@media (hover:hover){
+  :is(.sl-entry,.sl-guide-next-link):hover{box-shadow:var(--el-2),var(--el-hi);background-color:var(--el-lift-bg)}
+  .ca-select-card:hover:not([aria-disabled=true]){box-shadow:var(--el-2)}
+  :is(.sl-chip,.gs-pill):hover:not([aria-pressed="true"]):not(:has(input:checked)):not(:disabled){box-shadow:var(--el-ctl-up)}
+  .gs-btn:hover:not(:disabled){box-shadow:var(--el-ctl-up)}
+  .tb-file:hover{box-shadow:var(--el-2),var(--el-hi)}
+}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  :is(.sl-entry,.sl-guide-next-link):hover{transform:translateY(-3px)}
+  .ca-select-card:hover:not([aria-disabled=true]){transform:translateY(-2px)}
+  :is(.sl-chip,.gs-pill):hover:not([aria-pressed="true"]):not(:has(input:checked)):not(:disabled),.gs-btn:hover:not(:disabled){transform:translateY(-1px)}
+}
+/* pressing settles it back down */
+.sl-entry:has(.sl-entry-link:active),.sl-guide-next-link:active{box-shadow:var(--el-1),var(--el-hi)}
+:is(.sl-chip,.gs-pill,.gs-btn):active:not(:disabled){box-shadow:var(--el-in)}
+@media (prefers-reduced-motion:no-preference){
+  .sl-entry:has(.sl-entry-link:active){transform:translateY(-1px) scale(.99)}
+  .sl-guide-next-link:active{transform:translateY(-1px) scale(.985)}
+  :is(.sl-chip,.gs-pill,.gs-btn):active:not(:disabled){transform:translateY(0)}
+}
+@media (prefers-reduced-motion:reduce){
+  :is(.sl-entry,.sl-guide-next-link,.ca-select-card,.sl-chip,.gs-pill,.gs-btn,.aura-control,.aura-brand):is(:hover,:active){transform:none!important}
+}
