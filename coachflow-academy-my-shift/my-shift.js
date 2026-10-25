@@ -1,7 +1,7 @@
 /* My Shift: shift timer and call log as an Academy station at #/academy/my-shift, and a team board for leaders at #/academy/my-shift/team-board. Built from the Academy's own components. The call log is saved only in this browser; the board reads the files a leader adds, in this browser only, and keeps nothing. */
 (function(){
 "use strict";
-var ROUTE="#/academy/my-shift", BOARD=ROUTE+"/team-board", LABEL="My Shift", KEY="coachflow.myshift.v1", PLANNED_H=8, DAY=86400000, REPEAT_DAYS=7, SAME_CONTACT=30*60000;
+var ROUTE="#/academy/my-shift", BOARD=ROUTE+"/team-board", LABEL="My Shift", KEY="coachflow.myshift.v1", PLANNED_H=9, DAY=86400000, REPEAT_DAYS=7, SAME_CONTACT=30*60000;
 var TITLES={shift:"My Shift · CoachFlow Academy",board:"Team board · My Shift · CoachFlow Academy"};
 var OFFLINE=window.CF_STANDALONE||null, LIVE=OFFLINE&&OFFLINE.live||"";
 var BTN_P="inline-flex items-center justify-center gap-2 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-55 aura-brand text-brand-contrast min-h-11 rounded-[var(--radius-control-md)] px-4 py-2.5 text-sm";
@@ -63,12 +63,15 @@ function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){}
 function q(id){ return root.querySelector("#"+id); }
 function pad(n){ return (n<10?"0":"")+n; }
 function dkey(t){ var d=new Date(t); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
-/* Operating hours run overnight (14:00 to 07:00 Cairo time), so a work day runs from WORKDAY_START to the same hour the next day and is named by the date it starts. A call belongs to the shift it was logged in, and the shift keeps counting until End shift, whatever the clock says. */
-var WORKDAY_START=10, LONG_SHIFT_H=13;
+/* A shift is marked with the day the agent clocked in: start Monday at 7 pm or 10 pm and every call of that shift, after midnight too, is Monday's. The shift keeps counting until End shift, whatever the clock says. Operating hours run overnight (14:00 to 07:00 Cairo time), so a work day runs from WORKDAY_START to the same hour the next day: a shift started after midnight, and a call logged with no shift running, count for the night they belong to. After End shift, that shift stays the one shown for SHIFT_GRACE hours. */
+var WORKDAY_START=10, LONG_SHIFT_H=13, SHIFT_GRACE=6;
 function wkey(t){ return dkey(t-WORKDAY_START*3600000); }
 function shiftOf(id){ if(!id) return null; if(st.shift&&st.shift.id===id) return st.shift; for(var i=st.history.length-1;i>=0;i--) if(st.history[i].id===id) return st.history[i]; return null; }
-function callDay(c){ if(c.date) return c.date; var sh=shiftOf(c.shiftId); return wkey(sh&&c.ts>=sh.startedAt&&(!sh.endedAt||c.ts<=sh.endedAt+60000)?sh.startedAt:c.ts); }
-function curDay(){ var sh=st.shift; return wkey(sh&&!sh.endedAt?sh.startedAt:Date.now()); }
+function callShift(c){ var sh=shiftOf(c.shiftId); return sh&&c.ts>=sh.startedAt&&(!sh.endedAt||c.ts<=sh.endedAt+60000)?sh:null; }
+function callDay(c){ if(c.date) return c.date; var sh=callShift(c); return wkey(sh?sh.startedAt:c.ts); }
+function curDay(){ var sh=st.shift; return sh&&(!sh.endedAt||Date.now()-sh.endedAt<SHIFT_GRACE*3600000)?wkey(sh.startedAt):wkey(Date.now()); }
+function shiftWorked(sh){ return sh.breaks?elapsed(sh,sh.endedAt||Date.now()):Math.max(0,sh.endedAt-sh.startedAt-(sh.breakMs||0)); }
+function hmDur(ms){ var m=Math.round(Math.max(0,ms)/60000); return Math.floor(m/60)+":"+pad(m%60); }
 function hm(t){ var d=new Date(t); return pad(d.getHours())+":"+pad(d.getMinutes()); }
 function dur(ms){ ms=Math.max(0,ms); var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60); return h+":"+pad(m)+":"+pad(s%60); }
 function durShort(ms){ var m=Math.round(Math.max(0,ms)/60000); return Math.floor(m/60)+"h "+pad(m%60)+"m"; }
@@ -128,8 +131,8 @@ function shiftMarkup(){ return '<header class="role-rail mb-6" data-ms-i="0"><di
     '<p class="ms-who-help ms-week-lead">Your own last 7 days against the 7 before. Only you see this.</p><div class="ms-days" id="ms-days"></div><div class="tb-tiles" id="ms-week"></div><div class="ms-wins" id="ms-wins"></div></section>'+
    '<section class="sl-gate-final" aria-labelledby="ms-h4" data-ms-i="5"><h2 id="ms-h4" class="sl-gate-h">End of shift</h2><div class="ms-checkin" id="ms-checkin" hidden></div><p class="mt-2 max-w-prose text-sm leading-relaxed text-body">One line for your team leader. Nothing leaves this browser unless you copy or download it.</p><p class="tabular mt-3 max-w-prose text-sm font-semibold text-ink" id="ms-summary"></p>'+
     '<div class="ms-next" id="ms-next" hidden></div>'+
-    '<div class="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4"><button type="button" class="'+BTN_S+'" id="ms-copy">Copy summary</button><button type="button" class="'+BTN_S+'" id="ms-csv">Download CSV</button><button type="button" class="sl-link-button" id="ms-clear">Clear calls older than 30 days</button></div>'+
-    '<p class="ms-note-p">Your team leader adds the CSV to the <a class="ms-inline" href="'+BOARD+'">team board</a>. Account numbers are kept so you can find a follow-up. They are on this computer only; clear them when you no longer need them.</p></section>'+
+    '<div class="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4"><button type="button" class="'+BTN_S+'" id="ms-copy">Copy summary</button><button type="button" class="'+BTN_S+'" id="ms-csv">Download this shift (CSV)</button><button type="button" class="sl-link-button" id="ms-csv-all">Download all days</button><button type="button" class="sl-link-button" id="ms-clear">Clear calls older than 30 days</button></div>'+
+    '<p class="ms-note-p">Your team leader adds the CSV to the <a class="ms-inline" href="'+BOARD+'">team board</a>. The file holds this shift, dated the day you clocked in; "Download all days" gives every call saved here. Account numbers are kept so you can find a follow-up. They are on this computer only; clear them when you no longer need them.</p></section>'+
   '</div>'+
   '<nav class="sl-gate-rail" data-sl-sticky="strip" aria-label="Your shift so far" data-ms-i="6"><div class="sl-gate-rail-panel rounded-[var(--radius-card)] border border-line bg-surface p-4"><p class="sl-gate-rail-count tabular text-sm font-semibold text-ink" id="ms-railcount">Nothing logged yet</p><dl class="ms-dl" id="ms-dl"></dl><div class="ms-reasons" id="ms-reasons" hidden></div><p class="mt-3 text-xs text-muted" id="ms-railnote">Counts come from the calls you log today.</p></div></nav>'+
   '</div>'; }
@@ -203,8 +206,12 @@ function build(){
     if(a==="save"){ var g={}; ["gsr","xm","sales"].forEach(function(k){ var v=q("ms-g-"+k).value.replace(/\D/g,""); if(v!=="") g[k]=Math.min(k==="sales"?50:100,+v); }); st.goalsBy[st.hrId||"_"]=g; save(); goalEdit=false; }
     else goalEdit=a==="edit"; renderGoals(); if(goalEdit) q("ms-g-gsr").focus(); });
   q("ms-goals").addEventListener("keydown",function(e){ if(e.key==="Enter"&&e.target.tagName==="INPUT"){ e.preventDefault(); q("ms-goals").querySelector('[data-goal="save"]').click(); } });
-  q("ms-csv").addEventListener("click",function(){ if(!st.hrId){ whoEdit=true; renderWho("Add your name and HR ID first, so your team leader knows the file is yours."); scrollToEl(q("ms-who")); q("ms-name").focus(); return; }
-    var name=(st.agent||"").replace(/[\\\/:*?"<>|]+/g,"").trim().replace(/\s+/g,"-").slice(0,40); download(csvText(),"my-shift-"+(name?name+"-":"")+st.hrId+"-"+curDay()+".csv"); });
+  var csvGo=function(all,btn,label){ if(!st.hrId){ whoEdit=true; renderWho("Add your name and HR ID first, so your team leader knows the file is yours."); scrollToEl(q("ms-who")); q("ms-name").focus(); return; }
+    var name=(st.agent||"").replace(/[\\\/:*?"<>|]+/g,"").trim().replace(/\s+/g,"-").slice(0,40), text=csvText(all);
+    if(!csvText.n){ btn.textContent=all?"No calls saved yet":"No calls on this shift yet"; setTimeout(function(){ btn.textContent=label; },1800); return; }
+    download(text,"my-shift-"+(name?name+"-":"")+st.hrId+"-"+(all?"all-days-to-":"")+curDay()+".csv"); };
+  q("ms-csv").addEventListener("click",function(){ csvGo(false,this,"Download this shift (CSV)"); });
+  q("ms-csv-all").addEventListener("click",function(){ csvGo(true,this,"Download all days"); });
   q("ms-clear").addEventListener("click",function(){ var cut=Date.now()-30*86400000, n=st.calls.filter(function(c){ return c.ts<cut; }).length, self=this, reset=function(t){ setTimeout(function(){ self.textContent="Clear calls older than 30 days"; },t); };
     if(!n){ self.textContent="Nothing older than 30 days"; reset(1500); return; } if(self.textContent.indexOf("Really")!==0){ self.textContent="Really clear "+n+"?"; reset(4000); return; } st.calls=st.calls.filter(function(c){ return c.ts>=cut; }); save(); self.textContent="Cleared"; reset(1500); renderList(); });
   q("ms-date").textContent=todayStr(); renderWho();
@@ -615,9 +622,9 @@ function summaryText(){ var c=myCounts(todayCalls()); var sh=st.shift&&wkey(st.s
 function tickCell(a){ return Array.isArray(a)?(a.length?a.join(" "):"none"):""; }
 function tickParse(v){ return v===undefined||v===""?null:v==="none"?[]:v.split(/\s+/); }
 function csvCell(v){ v=String(v==null?"":v); return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
-function csvText(){ var warm={}, me=st.hrId||null; st.warmups.forEach(function(w){ if(w.done&&(w.hrId||null)===me) warm[w.date]=w.title; }); var idx=byAccount(), head=["date","time","account","call_type","issue","satisfied","gsr_offered","gsr_not_offered_why","gsr_result","gsr_which","gsr_why","xm_offered","xm_not_offered_why","xm_result","xm_why","what_happened","transfer_reason","repeat_7d","agent","hr_id","call_id","warmup","next_steps","qa_check","what_worked","holds","hold_secs","longest_hold_secs","long_holds","shift_day","checkin","checkin_why","article_sent"];
-  var rows=mine().sort(function(a,b){ return a.ts-b.ts; }).map(function(c){ return [dkey(c.ts),hm(c.ts),c.account,c.callType||"",c.resolved,c.satisfied,c.gsrOffered,c.gsrNotWhy||"",c.gsrResult||"",c.gsrWhich||"",c.gsrWhy||"",c.xmOffered,c.xmNotWhy||"",c.xmResult||"",c.xmWhy||c.xmReason||"",c.note||"",c.transferWhy||"",isRepeat(c,idx)?"yes":"",st.agent||"",c.hrId||st.hrId||"",c.id,warm[callDay(c)]||"",tickCell(c.close),tickCell(c.qa),c.worked||"",c.hold?c.hold.n:"",c.hold?c.hold.secs:"",c.hold?c.hold.max:"",c.hold?c.hold.long:"",callDay(c)].concat((function(k){ return k&&k.share?[k.mood,k.why.join("; ")]:["",""]; })(checkinFor(callDay(c)))).concat([c.article||""]); });
-  return [head].concat(rows).map(function(r){ return r.map(csvCell).join(","); }).join("\r\n"); }
+function csvText(all){ var warm={}, me=st.hrId||null; st.warmups.forEach(function(w){ if(w.done&&(w.hrId||null)===me) warm[w.date]=w.title; }); var idx=byAccount(), head=["date","time","account","call_type","issue","satisfied","gsr_offered","gsr_not_offered_why","gsr_result","gsr_which","gsr_why","xm_offered","xm_not_offered_why","xm_result","xm_why","what_happened","transfer_reason","repeat_7d","agent","hr_id","call_id","warmup","next_steps","qa_check","what_worked","holds","hold_secs","longest_hold_secs","long_holds","checkin","checkin_why","article_sent","call_date","clock_in","clock_out","shift_hours"];
+  var day=curDay(), rows=mine().filter(function(c){ return all||callDay(c)===day; }).sort(function(a,b){ return a.ts-b.ts; }).map(function(c){ var sh=callShift(c); return [callDay(c),hm(c.ts),c.account,c.callType||"",c.resolved,c.satisfied,c.gsrOffered,c.gsrNotWhy||"",c.gsrResult||"",c.gsrWhich||"",c.gsrWhy||"",c.xmOffered,c.xmNotWhy||"",c.xmResult||"",c.xmWhy||c.xmReason||"",c.note||"",c.transferWhy||"",isRepeat(c,idx)?"yes":"",st.agent||"",c.hrId||st.hrId||"",c.id,warm[callDay(c)]||"",tickCell(c.close),tickCell(c.qa),c.worked||"",c.hold?c.hold.n:"",c.hold?c.hold.secs:"",c.hold?c.hold.max:"",c.hold?c.hold.long:""].concat((function(k){ return k&&k.share?[k.mood,k.why.join("; ")]:["",""]; })(checkinFor(callDay(c)))).concat([c.article||"",dkey(c.ts),sh?hm(sh.startedAt):"",sh&&sh.endedAt?hm(sh.endedAt):"",sh?hmDur(shiftWorked(sh)):""]); });
+  csvText.n=rows.length; return [head].concat(rows).map(function(r){ return r.map(csvCell).join(","); }).join("\r\n"); }
 
 /* ---------- team board: reads My Shift CSV files in this browser, keeps nothing ---------- */
 function boardMsg(t,ok){ var m=q("tb-msg"); m.innerHTML=(ok&&t?SEAL:"")+esc(t); m.className="ms-msg"+(ok?" ok":""); }
@@ -633,7 +640,7 @@ function parseShiftCsv(text,name,i){ var rows=parseCsv(text); if(!rows.length) r
   if(["date","time","account","gsr_offered","xm_offered"].some(function(k){ return h.indexOf(k)<0; })) return null;
   var get=function(r,k){ var j=h.indexOf(k); return j<0||r[j]==null?"":String(r[j]).trim(); }, out=[], names={}, ids={}, skipped=0, damaged=0;
   rows.slice(1).forEach(function(r){ var d=get(r,"date"), tm=get(r,"time"), raw=get(r,"account"); if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!/^\d{1,2}:\d{2}$/.test(tm)){ skipped++; return; }
-    var p=d.split("-"), hh=tm.split(":"), bad=/e\+/i.test(raw); if(bad) damaged++; bump(names,get(r,"agent")); bump(ids,get(r,"hr_id").replace(/\D/g,""));
+    var cd=get(r,"call_date"), p=(/^\d{4}-\d{2}-\d{2}$/.test(cd)?cd:d).split("-"), hh=tm.split(":"), bad=/e\+/i.test(raw); if(bad) damaged++; bump(names,get(r,"agent")); bump(ids,get(r,"hr_id").replace(/\D/g,""));
     var sd=get(r,"shift_day"); out.push({ts:new Date(+p[0],+p[1]-1,+p[2],+hh[0],+hh[1]).getTime(),date:/^\d{4}-\d{2}-\d{2}$/.test(sd)?sd:d,account:bad?"":raw.replace(/\D/g,""),callType:get(r,"call_type"),resolved:get(r,"issue"),satisfied:get(r,"satisfied"),gsrOffered:get(r,"gsr_offered"),gsrNotWhy:get(r,"gsr_not_offered_why"),gsrResult:get(r,"gsr_result"),gsrWhich:get(r,"gsr_which"),gsrWhy:get(r,"gsr_why"),xmOffered:get(r,"xm_offered"),xmNotWhy:get(r,"xm_not_offered_why"),xmResult:get(r,"xm_result"),xmWhy:get(r,"xm_why"),transferWhy:get(r,"transfer_reason"),warmup:get(r,"warmup"),close:tickParse(h.indexOf("next_steps")<0?undefined:get(r,"next_steps")),qa:tickParse(h.indexOf("qa_check")<0?undefined:get(r,"qa_check")),worked:get(r,"what_worked"),article:get(r,"article_sent"),checkin:Math.max(0,Math.min(5,parseInt(get(r,"checkin"),10)||0)),checkinWhy:get(r,"checkin_why"),hold:h.indexOf("holds")<0||get(r,"holds")===""?null:{n:+get(r,"holds")||0,secs:+get(r,"hold_secs")||0,max:+get(r,"longest_hold_secs")||0,long:+get(r,"long_holds")||0},id:get(r,"call_id")||d+" "+tm+" "+get(r,"account")}); });
   var ff=fromFile(name,i); return {name:name,agent:top(names,1)[0]||ff.agent,hrId:top(ids,1)[0]||ff.hrId,rows:out,skipped:skipped,damaged:damaged}; }
 function readFile(f){ if(f.text) return f.text().catch(function(){ return ""; }); return new Promise(function(res){ var r=new FileReader(); r.onload=function(){ res(String(r.result||"")); }; r.onerror=function(){ res(""); }; r.readAsText(f); }); }

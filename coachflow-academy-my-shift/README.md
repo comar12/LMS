@@ -109,9 +109,30 @@ was logged in; and a work day runs from 10:00 to 10:00 the next morning, named
 by the date it starts (`WORKDAY_START` in `my-shift.js`). The list, the rail,
 goals, the warm-up, the summary, My week and wins all use that day. A shift
 left running for more than 13 hours (`LONG_SHIFT_H`) keeps counting and asks
-"Finished? Press End shift." The CSV keeps each call's real `date` and `time`
-and adds `shift_day`; the board groups by `shift_day`, so a night is one day
-in "Latest day" and in the shout-outs. Older files without the column are
+"Finished? Press End shift." The planned shift is 9 hours (`PLANNED_H`), so a
+22:00 start shows "ends about 07:00", plus any break time.
+
+### Shifts are marked with the clock-in day
+
+A shift belongs to the day the agent clocked in. Start Monday at 19:00 or
+22:00 and every call of that shift, after midnight too, is Monday's: in the
+app, in the CSV and on the board. (Shifts start between 14:00 and 22:00; a
+shift started after midnight, or a call logged with no shift running, counts
+for the night it belongs to.)
+
+- **Download this shift (CSV)** gives the current shift's day only, named
+  `my-shift-<name>-<hr id>-<clock-in day>.csv`. After End shift it stays that
+  shift for 6 hours (`SHIFT_GRACE`), so it can be sent in the morning.
+- **Download all days** gives every call saved on that computer, named
+  `my-shift-<name>-<hr id>-all-days-to-<day>.csv`.
+- In the CSV, `date` is the clock-in day and `time` the real time of the call.
+  At the end of each row, `call_date` keeps the calendar date the call really
+  happened, and `clock_in`, `clock_out` (empty while the shift runs) and
+  `shift_hours` (h:mm worked, breaks taken off) show the shift.
+
+The board groups by `date`, so a night is one day in "Latest day" and in the
+shout-outs. Files from the previous version (calendar `date` plus a
+`shift_day` column) are read by `shift_day`; older files without either are
 grouped by date as before.
 
 ### End-of-shift check-in
@@ -138,13 +159,14 @@ The top of My Shift asks once for the agent's name and HR ID (numbers only)
 and remembers them on that computer. Every call is stamped with the HR ID; if
 someone else uses the computer, "Not you? Change" switches agent, ends the
 previous agent's running shift, and each agent's list, summary and file hold
-only their own calls. Download CSV asks for the name and HR ID first if they
+only their own calls. Both downloads ask for the name and HR ID first if they
 are missing.
 
 The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id`,
 `warmup`, `next_steps`, `qa_check`, `what_worked`, `holds`, `hold_secs`,
-`longest_hold_secs`, `long_holds`, `shift_day`, `checkin`, `checkin_why` and `article_sent` columns, and the file is named
-`my-shift-<name>-<hr id>-<date>.csv`.
+`longest_hold_secs`, `long_holds`, `checkin`, `checkin_why`, `article_sent`,
+`call_date`, `clock_in`, `clock_out` and `shift_hours` columns, and the file is
+named `my-shift-<name>-<hr id>-<clock-in day>.csv`.
 
 ### Warm-up, goals, "Customer said" and My week
 
