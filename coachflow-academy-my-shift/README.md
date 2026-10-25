@@ -309,6 +309,7 @@ Primary buttons get back their orange glow.
 - **Forced colours:** drops the shadows, as browsers do.
 
 The offline file and the standalone My Shift page include it.
+`depth-before-after.png` shows a scenario card before, then lifted in day and night mode.
 
 ## Motion across the Academy
 
