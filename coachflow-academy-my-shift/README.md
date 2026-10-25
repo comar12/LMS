@@ -165,7 +165,7 @@ are missing.
 The CSV adds `transfer_reason`, `repeat_7d`, `agent`, `hr_id`, `call_id`,
 `warmup`, `next_steps`, `qa_check`, `what_worked`, `holds`, `hold_secs`,
 `longest_hold_secs`, `long_holds`, `checkin`, `checkin_why`, `article_sent`,
-`call_date`, `clock_in`, `clock_out` and `shift_hours` columns, and the file is
+`call_date`, `clock_in`, `clock_out`, `shift_hours` and `team_leader` columns, and the file is
 named `my-shift-<name>-<hr id>-<clock-in day>.csv`.
 
 ### Warm-up, goals, "Customer said" and My week
@@ -252,13 +252,35 @@ comes up more for that agent than for the team); the top reasons for not
 offering, for a no and for transfers, each with its practice link; and every
 account that called the team twice within 7 days, masked to the last four
 digits unless the leader asks for the full numbers. A one-line team summary
-can be copied for the supervisor. Files are read in the browser and nothing
+can be copied for the supervisor. Files are read in the browser and no call
 is stored: a reload empties the board. A call that appears in two files is
 counted once, and files with the same HR ID are one agent even if the name is
 spelt differently (the leader is told); rows whose date or account number a spreadsheet has rewritten
 are named rather than guessed. "See it with example data" fills the board
 with made-up calls for ten agents. `my-shift-new-features.mp4` shows the
 repeat-caller note, a transfer, the practice card and the board.
+
+### Team leader view
+
+My Shift asks each agent once for their team leader (optional, next to name
+and HR ID), and the CSV carries it in a `team_leader` column. On the board:
+
+- "Whose team" buttons: Whole team, each team leader, and No team leader when
+  some files have none. Picking a leader filters everything on the board to
+  their agents: the tiles, the agent table, the reasons, repeat callers,
+  shout-outs, worth a check-in, what worked and the summary line ("Mona's
+  team · ..."). A customer who calls one leader's agent and then another
+  leader's agent still counts as came back.
+- "Team leaders side by side" (whole team view): agents, calls, came back,
+  transferred, resolved, GSR and XM offered, QA check, article sent and
+  check-ins for each leader, with who is worth a check-in. A leader's name
+  opens their team; "Copy team leaders side by side" gives one line per
+  leader for the supervisor.
+- Each file has a Team leader box to add or fix the leader. Spellings that
+  differ only in capitals or spaces are one leader. What is set on the board
+  wins over what the agent typed and is remembered on that computer by HR ID,
+  with the team last viewed (`coachflow.myshift.leaders.v1`); no call data is
+  kept. Example data has three made-up leaders.
 
 ## Motion across the Academy
 

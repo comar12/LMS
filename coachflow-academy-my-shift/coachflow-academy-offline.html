@@ -172,7 +172,8 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 .ms-who[data-state="edit"]{border:1px solid var(--color-line);border-left:4px solid var(--sl-signal);border-radius:var(--radius-control-md);background:var(--color-surface);padding:.75rem 1rem}
 .ms-who-h{font-family:var(--sl-font-signal,inherit);font-weight:700;color:var(--color-ink);margin-bottom:.5rem!important}
 .ms-who-row{display:grid;gap:.75rem;align-items:end}
-@media (min-width:40rem){.ms-who-row{grid-template-columns:minmax(0,1fr) 10rem auto}}
+@media (min-width:30rem){.ms-who-row{grid-template-columns:minmax(0,1fr) 10rem}}
+@media (min-width:56rem){.ms-who-row{grid-template-columns:minmax(0,1fr) 9rem minmax(0,1fr) auto}}
 .ms-who-btns{display:flex;align-items:center;gap:.75rem}
 .ms-who-help{font-size:.8125rem;color:var(--color-muted)}
 .tb-file .ms-input.tb-id{flex:0 1 7rem;max-width:7rem;font-variant-numeric:tabular-nums}
@@ -472,6 +473,16 @@ tr.ms-row{cursor:pointer}tr.ms-row:hover td{background:var(--color-canvas)}tr.ms
 @keyframes ms-tick{0%{opacity:.3;transform:translateY(.3rem)}to{opacity:1;transform:none}}
 }
 @media (prefers-reduced-motion:reduce){.ms-ring .fg,.ms-meter-fill{transition:none}}
+
+/* Team leaders on the board */
+.tb-tlpick{margin-top:.75rem}
+.tb-tlpick .ms-lab{margin-bottom:.25rem}
+.tb-file .ms-input.tb-tlin{flex:1 1 8rem;font-weight:500}
+.tb-leads{margin-top:1.25rem}
+.tb-leads .tb-help{margin:.15rem 0 .6rem}
+.tb-leads .tb-row{margin-top:.5rem}
+.tb-tlbtn{min-height:2.25rem;padding:0;font-weight:700;text-align:left}
+@media (prefers-reduced-motion:no-preference){#my-shift .tb-leads:not([hidden]){animation:sl-coach-in var(--m-disclose,.22s) var(--e-out,ease-out) backwards}}
 
 </style>
 <style>/* motion.css */
@@ -887,11 +898,14 @@ var ckDraft=null, ckEdit=false;
 var EVERY_CALL=[LAB+"sales-practice","The every-call practice"];
 function opts(a){ return a.map(function(x){ return [x,x]; }); }
 var st=load(), whoEdit=false, goalEdit=false, saidOpen=null, root=null, view=null, form={}, editId=null, tries=0, timer=null, newId=null, tick=false, lastRail={}, arriveT=null, loggedT=null;
-var bd={files:[],rows:[],idx:{},period:"week",full:false,example:false,allReps:false,allLines:false,lineRows:[]};
+var bd={files:[],rows:[],idx:{},period:"week",full:false,example:false,allReps:false,allLines:false,lineRows:[],tl:"",leaders:[]};
+/* Which team leader each HR ID belongs to, as set on the board, and the team last viewed: the only things the board keeps on this computer. */
+var LKEY="coachflow.myshift.leaders.v1", lead=(function(){ try{ var o=JSON.parse(localStorage.getItem(LKEY)||"null"); if(o&&o.map) return o; }catch(e){} return {map:{},view:""}; })();
+function saveLead(){ try{ localStorage.setItem(LKEY,JSON.stringify(lead)); }catch(e){} }
 var SEAL='<span class="ms-seal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
 var LOOP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2.5l3 3-3 3"/><path d="M4 11.5v-2a4 4 0 0 1 4-4h12"/><path d="M7 21.5l-3-3 3-3"/><path d="M20 12.5v2a4 4 0 0 1-4 4H4"/></svg>';
 var FINE=false; try{ FINE=window.matchMedia("(hover: hover) and (pointer: fine)").matches; }catch(e){}
-function load(){ try{ var s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.calls){ if(typeof s.agent!=="string") s.agent=""; if(typeof s.hrId!=="string") s.hrId=""; if(!s.warmups) s.warmups=[]; if(!s.goalsBy) s.goalsBy={}; if(!s.winsSeen) s.winsSeen={}; if(!s.teamLines) s.teamLines=[]; if(!s.checkins) s.checkins=[]; return s; } }catch(e){} return {shift:null,calls:[],history:[],agent:"",hrId:"",warmups:[],goalsBy:{},winsSeen:{},teamLines:[],checkins:[]}; }
+function load(){ try{ var s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.calls){ if(typeof s.agent!=="string") s.agent=""; if(typeof s.hrId!=="string") s.hrId=""; if(typeof s.leader!=="string") s.leader=""; if(!s.warmups) s.warmups=[]; if(!s.goalsBy) s.goalsBy={}; if(!s.winsSeen) s.winsSeen={}; if(!s.teamLines) s.teamLines=[]; if(!s.checkins) s.checkins=[]; return s; } }catch(e){} return {shift:null,calls:[],history:[],agent:"",hrId:"",leader:"",warmups:[],goalsBy:{},winsSeen:{},teamLines:[],checkins:[]}; }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
 function q(id){ return root.querySelector("#"+id); }
 function pad(n){ return (n<10?"0":"")+n; }
@@ -969,16 +983,17 @@ function shiftMarkup(){ return '<header class="role-rail mb-6" data-ms-i="0"><di
   '</div>'+
   '<nav class="sl-gate-rail" data-sl-sticky="strip" aria-label="Your shift so far" data-ms-i="6"><div class="sl-gate-rail-panel rounded-[var(--radius-card)] border border-line bg-surface p-4"><p class="sl-gate-rail-count tabular text-sm font-semibold text-ink" id="ms-railcount">Nothing logged yet</p><dl class="ms-dl" id="ms-dl"></dl><div class="ms-reasons" id="ms-reasons" hidden></div><p class="mt-3 text-xs text-muted" id="ms-railnote">Counts come from the calls you log today.</p></div></nav>'+
   '</div>'; }
-function boardMarkup(){ return '<header class="role-rail mb-6" data-ms-i="0"><div class="min-w-0 max-w-2xl"><h1 class="text-2xl font-semibold tracking-tight text-ink sm:text-[1.7rem]">Team board</h1><div class="mt-1.5 text-[0.95rem] text-body">For team leaders. Add the CSV files your agents download from My Shift and see the team\'s offers, the reasons behind every no, repeat callers and transfers. The files are read in this browser only: nothing is uploaded, and nothing is kept once you close or reload the page.</div></div></header>'+
+function boardMarkup(){ return '<header class="role-rail mb-6" data-ms-i="0"><div class="min-w-0 max-w-2xl"><h1 class="text-2xl font-semibold tracking-tight text-ink sm:text-[1.7rem]">Team board</h1><div class="mt-1.5 text-[0.95rem] text-body">For team leaders. Add the CSV files your agents download from My Shift and see the team\'s offers, the reasons behind every no, repeat callers and transfers. The files are read in this browser only: nothing is uploaded, and no call is kept once you close or reload the page. Only which team leader each HR ID belongs to is remembered on this computer.</div></div></header>'+
   '<section class="sl-gate-phase" aria-labelledby="tb-h1" data-ms-i="1"><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">1</span><h2 id="tb-h1">Your team\'s files</h2><p class="'+TALLY+'" id="tb-t1">none yet</p></div>'+
    '<div class="tb-drop" id="tb-drop"><p class="tb-drop-h">Drop your agents\' CSV files here</p><span class="tb-drop-p">or</span><button type="button" class="'+BTN_S+'" id="tb-pick">Choose files</button><input type="file" id="tb-file" accept=".csv,text/csv" multiple hidden></div>'+
-   '<p class="tb-help">Each agent opens My Shift, goes to End of shift and presses Download CSV, then sends you the file. Their name and HR ID come with it. Add the files as they arrive, without opening and saving them in a spreadsheet first. Add as many as you like: a call that appears in two files is counted once.</p>'+
-   '<p class="tb-example" id="tb-clash" hidden></p><p class="tb-example" id="tb-example-note" hidden>Example data: made-up calls and HR IDs for ten agents over three days, to show how the board reads. Adding a real file clears it.</p>'+
-   '<ul class="tb-files" id="tb-files"></ul><p class="ms-msg" id="tb-msg" role="status" aria-live="polite"></p>'+
+   '<p class="tb-help">Each agent opens My Shift, goes to End of shift and presses Download this shift, then sends you the file. Their name, HR ID and team leader come with it; fix the team leader here if it is missing or wrong, and the board remembers it for that HR ID on this computer. Add the files as they arrive, without opening and saving them in a spreadsheet first. Add as many as you like: a call that appears in two files is counted once.</p>'+
+   '<p class="tb-example" id="tb-clash" hidden></p><p class="tb-example" id="tb-example-note" hidden>Example data: made-up calls and HR IDs for ten agents and three team leaders over three days, to show how the board reads. Adding a real file clears it.</p>'+
+   '<ul class="tb-files" id="tb-files"></ul><datalist id="tb-tl-names"></datalist><p class="ms-msg" id="tb-msg" role="status" aria-live="polite"></p>'+
    '<div class="tb-row"><button type="button" class="sl-link-button" id="tb-example">See it with example data</button><button type="button" class="sl-link-button" id="tb-clear" hidden>Clear the board</button></div></section>'+
   '<section class="sl-gate-phase" aria-labelledby="tb-h2" data-ms-i="2" data-tb-part hidden><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">2</span><h2 id="tb-h2">The team at a glance</h2><p class="'+TALLY+'" id="tb-t2"></p></div>'+
+   '<div class="tb-tlpick" id="tb-tlpick" hidden><p class="ms-lab" id="tb-tl-l">Whose team</p><div class="sl-chips ms-chips" role="group" aria-labelledby="tb-tl-l" id="tb-tl"></div></div>'+
    '<div class="sl-chips ms-chips" role="group" aria-label="Which days to count" id="tb-period"><button type="button" class="sl-chip" aria-pressed="false" data-v="latest">Latest day</button><button type="button" class="sl-chip" aria-pressed="false" data-v="week">Last 7 days</button><button type="button" class="sl-chip" aria-pressed="false" data-v="all">Every day in the files</button></div>'+
-   '<div class="tb-tiles" id="tb-tiles"></div><div class="tb-shout" id="tb-shout"></div><div class="tb-care" id="tb-care"></div></section>'+
+   '<div class="tb-tiles" id="tb-tiles"></div><div class="tb-leads" id="tb-leads" hidden></div><div class="tb-shout" id="tb-shout"></div><div class="tb-care" id="tb-care"></div></section>'+
   '<section class="sl-gate-phase" aria-labelledby="tb-h3" data-ms-i="3" data-tb-part hidden><div class="sl-gate-phase-head"><span class="'+NODE+'" aria-hidden="true">3</span><h2 id="tb-h3">Agent by agent</h2><p class="'+TALLY+'" id="tb-t3"></p></div>'+
    '<div class="overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-[var(--shadow-card)]"><div class="scrollable-x" tabindex="0" role="region" aria-label="Agents table"><table class="w-full border-collapse text-sm"><thead><tr><th '+TH+'>Agent</th><th '+TH+'>Calls</th><th '+TH+'>GSR offered</th><th '+TH+'>GSR got</th><th '+TH+'>XM offered</th><th '+TH+'>XM got</th><th '+TH+'>Resolved</th><th '+TH+'>Came back</th><th '+TH+'>Transferred</th><th '+TH+'>Warm-up</th><th '+TH+'>Next steps</th><th '+TH+'>QA check</th><th '+TH+'>Holds over '+mmss(HOLD_LONG)+'</th><th '+TH+'>Check-in</th><th '+TH+'>Article sent</th><th '+TH+'>Practise next</th></tr></thead><tbody id="tb-rows"></tbody><tfoot id="tb-foot"></tfoot></table></div></div>'+
    '<p class="tb-help">Came back: the customer called the team again within '+REPEAT_DAYS+' days. Warm-up: the days the agent did the 5-minute practice before their shift. Next steps: unresolved and escalated calls where all three "before you hang up" boxes were ticked. QA check: sales where all four QA self-check boxes were ticked. Article sent: calls where the agent sent the customer an article. Check-in: how the agent said their nights felt, 1 to 5, on the nights they chose to share it. Practise next: the Academy call for the reason that comes up more for that agent than for the team as a whole.</p></section>'+
@@ -1058,11 +1073,16 @@ function build(){
   q("tb-example").addEventListener("click",function(){ var was=bd.rows.length; bd.files=exampleFiles(); bd.example=true; mergeRows(); boardMsg("Example data loaded. Add your team's real files to replace it.",true); renderBoard(!was); });
   q("tb-clear").addEventListener("click",function(){ bd.files=[]; bd.example=false; mergeRows(); boardMsg(""); renderBoard(); });
   q("tb-files").addEventListener("click",function(e){ var b=e.target.closest("[data-remove]"); if(!b) return; bd.files.splice(+b.getAttribute("data-remove"),1); if(!bd.files.length) bd.example=false; mergeRows(); renderBoard(); });
-  q("tb-files").addEventListener("change",function(e){ var i=e.target.getAttribute("data-file"); if(i===null) return; var k=e.target.getAttribute("data-k"), v=k==="hrId"?e.target.value.replace(/\D/g,""):e.target.value.trim(); if(v||k==="hrId"){ bd.files[+i][k]=v; e.target.value=v; mergeRows(); renderBoard(); } else e.target.value=bd.files[+i].agent; });
+  q("tb-files").addEventListener("change",function(e){ var i=e.target.getAttribute("data-file"); if(i===null) return; var k=e.target.getAttribute("data-k");
+    if(k==="leader"){ var f=bd.files[+i], v0=tlName(e.target.value); bd.leaders.forEach(function(l){ if(l.key===v0.toLowerCase()) v0=l.name; }); f.leader=v0; if(f.hrId&&!bd.example){ lead.map[f.hrId]=v0; saveLead(); } e.target.value=v0; mergeRows(); renderBoard(); return; }
+    var v=k==="hrId"?e.target.value.replace(/\D/g,""):e.target.value.trim(); if(v||k==="hrId"){ bd.files[+i][k]=v; e.target.value=v; mergeRows(); renderBoard(); } else e.target.value=bd.files[+i].agent; });
+  var pickTl=function(v){ if(v===bd.tl) return; bd.tl=v; if(!bd.example){ lead.view=v; saveLead(); } tick=true; renderBoard(); tick=false; };
+  q("tb-tl").addEventListener("click",function(e){ var b=e.target.closest("button.sl-chip"); if(b) pickTl(b.getAttribute("data-v")); });
+  q("tb-leads").addEventListener("click",function(e){ var b=e.target.closest("[data-tl]"); if(b){ pickTl(b.getAttribute("data-tl")); scrollToEl(q("tb-h2")); return; } if(e.target.closest("#tb-leads-copy")) copy(leadersText(),e.target.closest("#tb-leads-copy"),"Copy team leaders side by side"); });
   q("tb-period").addEventListener("click",function(e){ var b=e.target.closest("button.sl-chip"); if(!b||b.getAttribute("data-v")===bd.period) return; bd.period=b.getAttribute("data-v"); tick=true; renderBoard(); tick=false; });
   q("tb-full").addEventListener("change",function(){ bd.full=this.checked; renderBoard(); });
   q("tb-more").addEventListener("click",function(){ bd.allReps=!bd.allReps; renderBoard(); });
-  q("tb-copy").addEventListener("click",function(){ copy(boardSummary(),this,"Copy team summary"); });
+  q("tb-copy").addEventListener("click",function(){ copy(boardSummary(),this,copyLabel()); });
   q("tb-shout").addEventListener("click",function(e){ var b=e.target.closest("#tb-shout-copy"); if(b) copy("Shout-outs: "+(bd.shout||[]).map(function(x){ return x.who+": "+lc(x.t); }).join("; ")+".",b,"Copy shout-outs"); });
   q("tb-lines-more").addEventListener("click",function(){ bd.allLines=!bd.allLines; renderBoard(); });
   q("tb-lines-copy").addEventListener("click",function(){ copy(bd.lineRows.map(function(r){ return "“"+r.worked+"” ("+r.agent+", "+(saleLabel(r)||"sale")+")"; }).join("\n"),this,"Copy the lines"); });
@@ -1071,17 +1091,18 @@ function build(){
 }
 /* Who is logging: a name and an HR ID, asked once and remembered. Each call is stamped with the HR ID, so if someone else uses this computer, each person's summary and file hold only their own calls. */
 function renderWho(msg){ var w=q("ms-who"), set=!!st.hrId;
-  if(set&&!whoEdit){ w.setAttribute("data-state","set"); w.innerHTML='<p>Logging as <b>'+esc(st.agent)+'</b> · HR ID <b class="tabular">'+esc(st.hrId)+'</b></p><button type="button" class="sl-link-button" data-who="change">Not you? Change</button>'; return; }
+  if(set&&!whoEdit){ w.setAttribute("data-state","set"); w.innerHTML='<p>Logging as <b>'+esc(st.agent)+'</b> · HR ID <b class="tabular">'+esc(st.hrId)+'</b>'+(st.leader?' · Team leader <b>'+esc(st.leader)+'</b>':'')+'</p><button type="button" class="sl-link-button" data-who="change">Not you? Change</button>'; return; }
   w.setAttribute("data-state","edit");
-  w.innerHTML='<p class="ms-who-h">'+(set?"Who is logging on this computer?":"Before your first call: who are you?")+'</p><div class="ms-who-row"><div><label class="ms-lab" for="ms-name">Your name <i>*</i></label><input class="ms-input ms-note" id="ms-name" type="text" maxlength="40" autocomplete="off" value="'+esc(set?st.agent:"")+'"></div><div><label class="ms-lab" for="ms-hrid">HR ID <i>*</i></label><input class="ms-input" id="ms-hrid" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="Numbers only" value="'+esc(set?st.hrId:"")+'"></div><div class="ms-who-btns"><button type="button" class="'+BTN_P+'" data-who="save">Save</button>'+(set?'<button type="button" class="sl-link-button" data-who="cancel">Cancel</button>':'')+'</div></div><p class="ms-msg" id="ms-who-msg" role="status" aria-live="polite">'+esc(msg||"")+'</p><p class="ms-who-help">Asked once and remembered on this computer. Your team leader\'s board uses it to know the file is yours.</p>'; }
+  w.innerHTML='<p class="ms-who-h">'+(set?"Who is logging on this computer?":"Before your first call: who are you?")+'</p><div class="ms-who-row"><div><label class="ms-lab" for="ms-name">Your name <i>*</i></label><input class="ms-input ms-note" id="ms-name" type="text" maxlength="40" autocomplete="off" value="'+esc(set?st.agent:"")+'"></div><div><label class="ms-lab" for="ms-hrid">HR ID <i>*</i></label><input class="ms-input" id="ms-hrid" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="Numbers only" value="'+esc(set?st.hrId:"")+'"></div><div><label class="ms-lab" for="ms-tl">Your team leader</label><input class="ms-input ms-note" id="ms-tl" type="text" maxlength="40" autocomplete="off" value="'+esc(st.leader)+'"></div><div class="ms-who-btns"><button type="button" class="'+BTN_P+'" data-who="save">Save</button>'+(set?'<button type="button" class="sl-link-button" data-who="cancel">Cancel</button>':'')+'</div></div><p class="ms-msg" id="ms-who-msg" role="status" aria-live="polite">'+esc(msg||"")+'</p><p class="ms-who-help">Asked once and remembered on this computer. Your team leader\'s board uses it to know the file is yours and whose team you are on.</p>'; }
 function saveWho(){ var n=q("ms-name").value.trim(), id=q("ms-hrid").value.replace(/\D/g,""), m=q("ms-who-msg");
   if(!n||id.length<3){ m.textContent=!n?"Add your name.":"Add your HR ID, numbers only."; (!n?q("ms-name"):q("ms-hrid")).focus(); return; }
   var old=st.hrId;
   if(!old) st.calls.forEach(function(c){ if(!c.hrId) c.hrId=id; });
   else if(old!==id&&st.shift&&!st.shift.endedAt){ endShift(); }
-  st.agent=n; st.hrId=id; whoEdit=false; save();
+  st.agent=n; st.hrId=id; st.leader=tlName(q("ms-tl").value); whoEdit=false; save();
   if(old&&old!==id){ resetForm(); setMsg(""); }
-  renderWho(); renderBar(); renderList(); say("Logging as "+n+", HR ID "+id+"."); }
+  renderWho(); renderBar(); renderList(); say("Logging as "+n+", HR ID "+id+(st.leader?", team leader "+st.leader:"")+"."); }
+function tlName(v){ return String(v||"").trim().replace(/\s+/g," ").slice(0,40); }
 /* Warm-up: five minutes before the shift, the practice call for the reason that came up most on the agent's last working day. */
 function warmToday(){ var k=curDay(), id=st.hrId||null; for(var i=st.warmups.length-1;i>=0;i--){ var w=st.warmups[i]; if(w.date===k&&(w.hrId||null)===id) return w; } return null; }
 function warmPick(){ var k=curDay(), days={}; mine().forEach(function(c){ var d=callDay(c); if(d<k) (days[d]=days[d]||[]).push(c); }); var last=Object.keys(days).sort().pop();
@@ -1455,8 +1476,8 @@ function summaryText(){ var c=myCounts(todayCalls()); var sh=st.shift&&wkey(st.s
 function tickCell(a){ return Array.isArray(a)?(a.length?a.join(" "):"none"):""; }
 function tickParse(v){ return v===undefined||v===""?null:v==="none"?[]:v.split(/\s+/); }
 function csvCell(v){ v=String(v==null?"":v); return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
-function csvText(all){ var warm={}, me=st.hrId||null; st.warmups.forEach(function(w){ if(w.done&&(w.hrId||null)===me) warm[w.date]=w.title; }); var idx=byAccount(), head=["date","time","account","call_type","issue","satisfied","gsr_offered","gsr_not_offered_why","gsr_result","gsr_which","gsr_why","xm_offered","xm_not_offered_why","xm_result","xm_why","what_happened","transfer_reason","repeat_7d","agent","hr_id","call_id","warmup","next_steps","qa_check","what_worked","holds","hold_secs","longest_hold_secs","long_holds","checkin","checkin_why","article_sent","call_date","clock_in","clock_out","shift_hours"];
-  var day=curDay(), rows=mine().filter(function(c){ return all||callDay(c)===day; }).sort(function(a,b){ return a.ts-b.ts; }).map(function(c){ var sh=callShift(c); return [callDay(c),hm(c.ts),c.account,c.callType||"",c.resolved,c.satisfied,c.gsrOffered,c.gsrNotWhy||"",c.gsrResult||"",c.gsrWhich||"",c.gsrWhy||"",c.xmOffered,c.xmNotWhy||"",c.xmResult||"",c.xmWhy||c.xmReason||"",c.note||"",c.transferWhy||"",isRepeat(c,idx)?"yes":"",st.agent||"",c.hrId||st.hrId||"",c.id,warm[callDay(c)]||"",tickCell(c.close),tickCell(c.qa),c.worked||"",c.hold?c.hold.n:"",c.hold?c.hold.secs:"",c.hold?c.hold.max:"",c.hold?c.hold.long:""].concat((function(k){ return k&&k.share?[k.mood,k.why.join("; ")]:["",""]; })(checkinFor(callDay(c)))).concat([c.article||"",dkey(c.ts),sh?hm(sh.startedAt):"",sh&&sh.endedAt?hm(sh.endedAt):"",sh?hmDur(shiftWorked(sh)):""]); });
+function csvText(all){ var warm={}, me=st.hrId||null; st.warmups.forEach(function(w){ if(w.done&&(w.hrId||null)===me) warm[w.date]=w.title; }); var idx=byAccount(), head=["date","time","account","call_type","issue","satisfied","gsr_offered","gsr_not_offered_why","gsr_result","gsr_which","gsr_why","xm_offered","xm_not_offered_why","xm_result","xm_why","what_happened","transfer_reason","repeat_7d","agent","hr_id","call_id","warmup","next_steps","qa_check","what_worked","holds","hold_secs","longest_hold_secs","long_holds","checkin","checkin_why","article_sent","call_date","clock_in","clock_out","shift_hours","team_leader"];
+  var day=curDay(), rows=mine().filter(function(c){ return all||callDay(c)===day; }).sort(function(a,b){ return a.ts-b.ts; }).map(function(c){ var sh=callShift(c); return [callDay(c),hm(c.ts),c.account,c.callType||"",c.resolved,c.satisfied,c.gsrOffered,c.gsrNotWhy||"",c.gsrResult||"",c.gsrWhich||"",c.gsrWhy||"",c.xmOffered,c.xmNotWhy||"",c.xmResult||"",c.xmWhy||c.xmReason||"",c.note||"",c.transferWhy||"",isRepeat(c,idx)?"yes":"",st.agent||"",c.hrId||st.hrId||"",c.id,warm[callDay(c)]||"",tickCell(c.close),tickCell(c.qa),c.worked||"",c.hold?c.hold.n:"",c.hold?c.hold.secs:"",c.hold?c.hold.max:"",c.hold?c.hold.long:""].concat((function(k){ return k&&k.share?[k.mood,k.why.join("; ")]:["",""]; })(checkinFor(callDay(c)))).concat([c.article||"",dkey(c.ts),sh?hm(sh.startedAt):"",sh&&sh.endedAt?hm(sh.endedAt):"",sh?hmDur(shiftWorked(sh)):"",st.leader||""]); });
   csvText.n=rows.length; return [head].concat(rows).map(function(r){ return r.map(csvCell).join(","); }).join("\r\n"); }
 
 /* ---------- team board: reads My Shift CSV files in this browser, keeps nothing ---------- */
@@ -1468,14 +1489,14 @@ function parseCsv(t){ t=String(t||"").replace(/^\s+/,""); var rows=[], row=[], f
     else if(ch==="\n"||ch==="\r"){ if(ch==="\r"&&t[i+1]==="\n") i++; row.push(f); rows.push(row); row=[]; f=""; } else f+=ch; }
   if(f!==""||row.length){ row.push(f); rows.push(row); }
   return rows.filter(function(r){ return r.length>1||r[0]!==""; }); }
-function fromFile(n,i){ var m=/^my-shift-(.+?)(?:-(\d{3,12}))?-\d{4}-\d{2}-\d{2}(?: ?\(\d+\))?\.csv$/i.exec(n||""); return {agent:m&&!/^\d{4}$/.test(m[1])?m[1].replace(/[-_]+/g," "):"Agent "+(i+1),hrId:m&&m[2]||""}; }
+function fromFile(n,i){ var m=/^my-shift-(.+?)(?:-(\d{3,12}))?(?:-all-days-to)?-\d{4}-\d{2}-\d{2}(?: ?\(\d+\))?\.csv$/i.exec(n||""); return {agent:m&&!/^\d{4}$/.test(m[1])?m[1].replace(/[-_]+/g," "):"Agent "+(i+1),hrId:m&&m[2]||""}; }
 function parseShiftCsv(text,name,i){ var rows=parseCsv(text); if(!rows.length) return null; var h=rows[0].map(function(x){ return x.trim().toLowerCase(); });
   if(["date","time","account","gsr_offered","xm_offered"].some(function(k){ return h.indexOf(k)<0; })) return null;
-  var get=function(r,k){ var j=h.indexOf(k); return j<0||r[j]==null?"":String(r[j]).trim(); }, out=[], names={}, ids={}, skipped=0, damaged=0;
+  var get=function(r,k){ var j=h.indexOf(k); return j<0||r[j]==null?"":String(r[j]).trim(); }, out=[], names={}, ids={}, tls={}, skipped=0, damaged=0;
   rows.slice(1).forEach(function(r){ var d=get(r,"date"), tm=get(r,"time"), raw=get(r,"account"); if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!/^\d{1,2}:\d{2}$/.test(tm)){ skipped++; return; }
-    var cd=get(r,"call_date"), p=(/^\d{4}-\d{2}-\d{2}$/.test(cd)?cd:d).split("-"), hh=tm.split(":"), bad=/e\+/i.test(raw); if(bad) damaged++; bump(names,get(r,"agent")); bump(ids,get(r,"hr_id").replace(/\D/g,""));
+    var cd=get(r,"call_date"), p=(/^\d{4}-\d{2}-\d{2}$/.test(cd)?cd:d).split("-"), hh=tm.split(":"), bad=/e\+/i.test(raw); if(bad) damaged++; bump(names,get(r,"agent")); bump(ids,get(r,"hr_id").replace(/\D/g,"")); bump(tls,tlName(get(r,"team_leader")));
     var sd=get(r,"shift_day"); out.push({ts:new Date(+p[0],+p[1]-1,+p[2],+hh[0],+hh[1]).getTime(),date:/^\d{4}-\d{2}-\d{2}$/.test(sd)?sd:d,account:bad?"":raw.replace(/\D/g,""),callType:get(r,"call_type"),resolved:get(r,"issue"),satisfied:get(r,"satisfied"),gsrOffered:get(r,"gsr_offered"),gsrNotWhy:get(r,"gsr_not_offered_why"),gsrResult:get(r,"gsr_result"),gsrWhich:get(r,"gsr_which"),gsrWhy:get(r,"gsr_why"),xmOffered:get(r,"xm_offered"),xmNotWhy:get(r,"xm_not_offered_why"),xmResult:get(r,"xm_result"),xmWhy:get(r,"xm_why"),transferWhy:get(r,"transfer_reason"),warmup:get(r,"warmup"),close:tickParse(h.indexOf("next_steps")<0?undefined:get(r,"next_steps")),qa:tickParse(h.indexOf("qa_check")<0?undefined:get(r,"qa_check")),worked:get(r,"what_worked"),article:get(r,"article_sent"),checkin:Math.max(0,Math.min(5,parseInt(get(r,"checkin"),10)||0)),checkinWhy:get(r,"checkin_why"),hold:h.indexOf("holds")<0||get(r,"holds")===""?null:{n:+get(r,"holds")||0,secs:+get(r,"hold_secs")||0,max:+get(r,"longest_hold_secs")||0,long:+get(r,"long_holds")||0},id:get(r,"call_id")||d+" "+tm+" "+get(r,"account")}); });
-  var ff=fromFile(name,i); return {name:name,agent:top(names,1)[0]||ff.agent,hrId:top(ids,1)[0]||ff.hrId,rows:out,skipped:skipped,damaged:damaged}; }
+  var ff=fromFile(name,i); return {name:name,agent:top(names,1)[0]||ff.agent,hrId:top(ids,1)[0]||ff.hrId,leader:top(tls,1)[0]||"",rows:out,skipped:skipped,damaged:damaged}; }
 function readFile(f){ if(f.text) return f.text().catch(function(){ return ""; }); return new Promise(function(res){ var r=new FileReader(); r.onload=function(){ res(String(r.result||"")); }; r.onerror=function(){ res(""); }; r.readAsText(f); }); }
 function addFiles(list){ var fs=Array.prototype.slice.call(list||[]); if(!fs.length) return;
   Promise.all(fs.map(readFile)).then(function(texts){ var bad=[], good=[], was=bd.rows.length&&!bd.example, base=bd.example?0:bd.files.length;
@@ -1486,9 +1507,15 @@ function addFiles(list){ var fs=Array.prototype.slice.call(list||[]); if(!fs.len
     var warn=(skipped?" "+plural(skipped,"row")+" left out because the date or time had been changed.":"")+(damaged?" "+plural(damaged,"account number")+" had been turned into a short form, so those calls can't be matched as repeats.":"")+(skipped||damaged?" A file opened and saved again in a spreadsheet does this; ask for the file as My Shift saved it.":"");
     boardMsg((good.length?"Added "+plural(good.length,"file")+" with "+plural(calls,"call")+".":"")+(bad.length?(good.length?" ":"")+"Not read: "+bad.join(", ")+". Only the CSV files My Shift downloads can be added.":"")+warn,!bad.length&&!warn); }); }
 function agentKey(f){ return f.hrId?"id:"+f.hrId:"name:"+f.agent.toLowerCase(); }
-function mergeRows(){ var seen={}, rows=[], shown={}, spelt={};
-  bd.files.forEach(function(f){ var key=agentKey(f); if(!shown[key]) shown[key]=f.agent; if(f.hrId){ spelt[f.hrId]=spelt[f.hrId]||[]; if(spelt[f.hrId].indexOf(f.agent)<0) spelt[f.hrId].push(f.agent); }
-    f.rows.forEach(function(r){ var k=key+"|"+r.id; if(seen[k]) return; seen[k]=1; var x=Object.assign({},r); x.key=key; x.agent=shown[key]; x.hrId=f.hrId||""; rows.push(x); }); });
+function leaderOf(f){ return tlName(!bd.example&&f.hrId&&lead.map.hasOwnProperty(f.hrId)?lead.map[f.hrId]:f.leader); }
+function tlShow(f){ var n=leaderOf(f), k=n.toLowerCase(); for(var i=0;i<bd.leaders.length;i++) if(bd.leaders[i].key===k) return bd.leaders[i].name; return n; }
+function mergeRows(){ var seen={}, rows=[], shown={}, spelt={}, tlKey={}, tlShown={};
+  bd.files.forEach(function(f){ var key=agentKey(f); if(!shown[key]) shown[key]=f.agent; var tn=leaderOf(f), tk=tn.toLowerCase(); if(tk&&!tlShown[tk]) tlShown[tk]=tn; if(!(key in tlKey)) tlKey[key]=tk; if(f.hrId){ spelt[f.hrId]=spelt[f.hrId]||[]; if(spelt[f.hrId].indexOf(f.agent)<0) spelt[f.hrId].push(f.agent); }
+    f.rows.forEach(function(r){ var k=key+"|"+r.id; if(seen[k]) return; seen[k]=1; var x=Object.assign({},r); x.key=key; x.agent=shown[key]; x.hrId=f.hrId||""; x.tl=tlKey[key]; rows.push(x); }); });
+  bd.leaders=Object.keys(tlShown).sort(function(a,b){ return tlShown[a].localeCompare(tlShown[b]); }).map(function(k){ return {key:k,name:tlShown[k]}; });
+  bd.noTl=rows.some(function(r){ return !r.tl; });
+  if(bd.tl&&(bd.tl==="-"?!bd.noTl||!bd.leaders.length:!tlShown[bd.tl])) bd.tl="";
+  if(!bd.tl&&lead.view&&!bd.example&&(lead.view==="-"?bd.noTl&&bd.leaders.length:tlShown[lead.view])) bd.tl=lead.view;
   bd.clash=Object.keys(spelt).filter(function(id){ return spelt[id].length>1; }).map(function(id){ return "HR ID "+id+" is "+spelt[id].join(" in one file and ")+" in another; counted as one agent, "+spelt[id][0]+"."; });
   rows.sort(function(a,b){ return a.ts-b.ts; }); var idx=byAccount(rows);
   /* Across the whole team: was this call a repeat, and did the customer call again within the window? */
@@ -1497,7 +1524,10 @@ function mergeRows(){ var seen={}, rows=[], shown={}, spelt={};
     for(var n=i+1;n<l.length&&l[n].ts-r.ts<=REPEAT_DAYS*DAY;n++) if(!sameContact(r,l[n])){ r.back=true; break; } }); });
   bd.rows=rows; bd.idx=idx; }
 function addDays(d,n){ var p=d.split("-"); return dkey(new Date(+p[0],+p[1]-1,+p[2]+n).getTime()); }
-function periodRows(){ var rows=bd.rows; if(!rows.length) return []; var last=rows[rows.length-1].date, from=bd.period==="latest"?last:bd.period==="week"?addDays(last,-6):"";
+function inTeam(r,tl){ return !tl||(tl==="-"?!r.tl:r.tl===tl); }
+function tlLabel(tl){ if(!tl) return ""; if(tl==="-") return "No team leader"; for(var i=0;i<bd.leaders.length;i++) if(bd.leaders[i].key===tl) return bd.leaders[i].name; return ""; }
+function teamName(tl){ return !tl?"Team":tl==="-"?"Agents with no team leader":tlLabel(tl)+"'s team"; }
+function periodRows(tl){ if(tl===undefined) tl=bd.tl; var rows=bd.rows.filter(function(r){ return inTeam(r,tl); }); if(!rows.length) return []; var last=rows[rows.length-1].date, from=bd.period==="latest"?last:bd.period==="week"?addDays(last,-6):"";
   return rows.filter(function(r){ return r.date>=from; }); }
 function periodLabel(list){ if(!list.length) return ""; var a=list[0].date, b=list[list.length-1].date; return a===b?shortDay(noon(a)):shortDay(noon(a))+" to "+shortDay(noon(b)); }
 function agentsOf(list){ var o={}; list.forEach(function(r){ (o[r.key]=o[r.key]||[]).push(r); }); return o; }
@@ -1525,11 +1555,17 @@ function bars(o,keyOf,empty){ var ks=top(o,6); if(!ks.length) return '<p class="
 function renderBoard(opening){
   if(!root) return; var has=bd.rows.length>0, list=periodRows(), files=bd.files;
   var who={}; files.forEach(function(f){ who[agentKey(f)]=1; }); var cl=q("tb-clash"); cl.textContent=(bd.clash||[]).join(" "); cl.hidden=!cl.textContent; q("tb-t1").textContent=files.length?plural(Object.keys(who).length,"agent"):"none yet"; q("tb-example-note").hidden=!bd.example; q("tb-clear").hidden=!files.length; q("tb-example").hidden=files.length>0;
-  var fk=files.map(function(f){ return f.name+"|"+f.agent+"|"+f.hrId+"|"+f.rows.length; }).join("/"), fl=q("tb-files"); if(fl.getAttribute("data-key")!==fk){ fl.setAttribute("data-key",fk);
-  fl.innerHTML=files.map(function(f,i){ var days={}; f.rows.forEach(function(r){ days[r.date]=1; }); return '<li class="tb-file"><input class="ms-input" type="text" value="'+esc(f.agent)+'" data-file="'+i+'" data-k="agent" aria-label="Agent name for '+esc(f.name)+'" maxlength="40"><input class="ms-input tb-id" type="text" inputmode="numeric" value="'+esc(f.hrId)+'" placeholder="HR ID" data-file="'+i+'" data-k="hrId" aria-label="HR ID for '+esc(f.name)+'" maxlength="12"><span class="tb-file-m">'+esc(plural(f.rows.length,"call"))+' · '+esc(plural(Object.keys(days).length,"day"))+' · '+esc(f.name)+'</span><button type="button" class="sl-link-button" data-remove="'+i+'">Remove</button></li>'; }).join(""); }
+  var fk=files.map(function(f){ return f.name+"|"+f.agent+"|"+f.hrId+"|"+tlShow(f)+"|"+f.rows.length; }).join("/"), fl=q("tb-files");
+  q("tb-tl-names").innerHTML=bd.leaders.map(function(l){ return '<option value="'+esc(l.name)+'"></option>'; }).join("");
+  if(bd.leaders.length) q("tb-t1").textContent+=" · "+plural(bd.leaders.length,"team leader"); if(fl.getAttribute("data-key")!==fk){ fl.setAttribute("data-key",fk);
+  fl.innerHTML=files.map(function(f,i){ var days={}; f.rows.forEach(function(r){ days[r.date]=1; }); return '<li class="tb-file"><input class="ms-input" type="text" value="'+esc(f.agent)+'" data-file="'+i+'" data-k="agent" aria-label="Agent name for '+esc(f.name)+'" maxlength="40"><input class="ms-input tb-id" type="text" inputmode="numeric" value="'+esc(f.hrId)+'" placeholder="HR ID" data-file="'+i+'" data-k="hrId" aria-label="HR ID for '+esc(f.name)+'" maxlength="12"><input class="ms-input tb-tlin" type="text" value="'+esc(tlShow(f))+'" placeholder="Team leader" list="tb-tl-names" data-file="'+i+'" data-k="leader" aria-label="Team leader for '+esc(f.name)+'" maxlength="40"><span class="tb-file-m">'+esc(plural(f.rows.length,"call"))+' · '+esc(plural(Object.keys(days).length,"day"))+' · '+esc(f.name)+'</span><button type="button" class="sl-link-button" data-remove="'+i+'">Remove</button></li>'; }).join(""); }
   root.querySelectorAll("[data-tb-part]").forEach(function(s){ s.hidden=!has; });
   if(!has) return;
   q("tb-period").querySelectorAll("button.sl-chip").forEach(function(b){ b.setAttribute("aria-pressed",b.getAttribute("data-v")===bd.period?"true":"false"); });
+  var tls=[["","Whole team"]].concat(bd.leaders.map(function(l){ return [l.key,l.name]; }), bd.noTl?[["-","No team leader"]]:[]), tk=tls.map(function(t){ return t.join("="); }).join("|"), tp=q("tb-tl");
+  q("tb-tlpick").hidden=!bd.leaders.length; if(tp.getAttribute("data-key")!==tk){ tp.setAttribute("data-key",tk); tp.innerHTML=tls.map(function(t){ return '<button type="button" class="sl-chip" aria-pressed="false" data-v="'+esc(t[0])+'">'+esc(t[1])+'</button>'; }).join(""); }
+  tp.querySelectorAll("button.sl-chip").forEach(function(b){ b.setAttribute("aria-pressed",b.getAttribute("data-v")===bd.tl?"true":"false"); });
+  q("tb-h2").textContent=bd.tl?teamName(bd.tl)+" at a glance":"The team at a glance"; q("tb-copy").textContent=copyLabel(); renderLeaders();
   var c=boardCounts(list), by=agentsOf(list), names=Object.keys(by).sort(function(a,b){ return by[a][0].agent.localeCompare(by[b][0].agent)||a.localeCompare(b); }), p=nextPractice(c.coach);
   q("tb-t2").textContent=periodLabel(list); q("tb-t3").textContent=plural(names.length,"agent");
   q("tb-tiles").innerHTML=tile("Calls",String(c.n),plural(names.length,"agent")+" · "+(c.res?pct(c.res,c.n)+" resolved":"none resolved"))+tile("GSR offered",pct(c.gO,c.n),c.gO+" of "+c.n+" calls · "+c.gG+" got")+tile("XM offered",pct(c.xmO,c.n),c.xmO+" of "+c.n+" calls · "+c.xmG+" got")+
@@ -1538,7 +1574,7 @@ function renderBoard(opening){
   countUp(q("tb-tiles"));
   q("tb-rows").innerHTML=names.map(function(nm){ var a=boardCounts(by[nm]), ap=standOut(a.coach,a.n,c.coach,c.n);
     var r0=by[nm][0]; return '<tr><td class="ms-td"><b>'+esc(r0.agent)+'</b><span class="tb-of">'+(r0.hrId?"HR ID "+esc(r0.hrId):"No HR ID")+'</span></td><td class="ms-td">'+a.n+'</td><td class="ms-td">'+ofCell(a.gO,a.n)+'</td><td class="ms-td">'+a.gG+'</td><td class="ms-td">'+ofCell(a.xmO,a.n)+'</td><td class="ms-td">'+a.xmG+'</td><td class="ms-td">'+ofCell(a.res,a.n)+'</td><td class="ms-td">'+ofCell(a.back,a.n)+'</td><td class="ms-td">'+ofCell(a.tr,a.n)+'</td><td class="ms-td">'+(function(w){ return '<b>'+w[0]+' of '+w[1]+'</b><span class="tb-of">'+(w[1]===1?"day":"days")+'</span>'; })(warmDays(by[nm]))+'</td><td class="ms-td">'+ofCell(a.clAll,a.clN)+'</td><td class="ms-td">'+ofCell(a.qaAll,a.qaN)+'</td><td class="ms-td">'+holdCell(a)+'</td><td class="ms-td">'+ckCell(nights(by[nm]))+'</td><td class="ms-td">'+artCell(a)+'</td><td class="ms-td tb-next">'+(ap?'<a class="ms-prac" href="'+href(ap.href)+'"'+ext()+'>'+esc(ap.title)+'</a><span class="tb-of">'+esc(practiceWhy(ap,"")+(ap.expected!==undefined?" About "+Math.round(ap.expected)+" at the team's rate.":""))+'</span>':'<span class="tb-of">Nothing stands out</span>')+'</td></tr>'; }).join("");
-  q("tb-foot").innerHTML='<tr class="tb-total"><td class="ms-td"><b>Team</b></td><td class="ms-td">'+c.n+'</td><td class="ms-td">'+ofCell(c.gO,c.n)+'</td><td class="ms-td">'+c.gG+'</td><td class="ms-td">'+ofCell(c.xmO,c.n)+'</td><td class="ms-td">'+c.xmG+'</td><td class="ms-td">'+ofCell(c.res,c.n)+'</td><td class="ms-td">'+ofCell(c.back,c.n)+'</td><td class="ms-td">'+ofCell(c.tr,c.n)+'</td><td class="ms-td"></td><td class="ms-td">'+ofCell(c.clAll,c.clN)+'</td><td class="ms-td">'+ofCell(c.qaAll,c.qaN)+'</td><td class="ms-td">'+holdCell(c)+'</td><td class="ms-td">'+ckCell(nights(list))+'</td><td class="ms-td">'+artCell(c)+'</td><td class="ms-td tb-next">'+(p?'<a class="ms-prac" href="'+href(p.href)+'"'+ext()+'>'+esc(p.title)+'</a>':'')+'</td></tr>';
+  q("tb-foot").innerHTML='<tr class="tb-total"><td class="ms-td"><b>'+esc(bd.tl&&bd.tl!=="-"?tlLabel(bd.tl)+"'s team":"Team")+'</b></td><td class="ms-td">'+c.n+'</td><td class="ms-td">'+ofCell(c.gO,c.n)+'</td><td class="ms-td">'+c.gG+'</td><td class="ms-td">'+ofCell(c.xmO,c.n)+'</td><td class="ms-td">'+c.xmG+'</td><td class="ms-td">'+ofCell(c.res,c.n)+'</td><td class="ms-td">'+ofCell(c.back,c.n)+'</td><td class="ms-td">'+ofCell(c.tr,c.n)+'</td><td class="ms-td"></td><td class="ms-td">'+ofCell(c.clAll,c.clN)+'</td><td class="ms-td">'+ofCell(c.qaAll,c.qaN)+'</td><td class="ms-td">'+holdCell(c)+'</td><td class="ms-td">'+ckCell(nights(list))+'</td><td class="ms-td">'+artCell(c)+'</td><td class="ms-td tb-next">'+(p?'<a class="ms-prac" href="'+href(p.href)+'"'+ext()+'>'+esc(p.title)+'</a>':'')+'</td></tr>';
   q("tb-not").innerHTML=bars(merge(c.gNot,c.xNot),function(k){ return "not:"+k; },"Every call had an offer.");
   q("tb-no").innerHTML=bars(merge(c.gWhy,c.xWhy),function(k){ return ((c.xWhy[k]||0)>=(c.gWhy[k]||0)?"xm:":"gsr:")+k; },"No customer said no.");
   q("tb-tr").innerHTML=bars(c.trWhy,function(k){ return "transfer:"+k; },"No transfers.");
@@ -1568,13 +1604,26 @@ function renderRepeats(list){ var inPeriod={}, chains=[]; list.forEach(function(
   q("tb-reps").innerHTML=chains.length?shown.map(function(l){ var who=[]; l.forEach(function(r){ if(who.indexOf(r.agent)<0) who.push(r.agent); });
     return '<li class="tb-rep"><p class="tb-rep-h"><span class="tabular">'+esc(bd.full?fmtAcct(l[0].account):mask(l[0].account))+'</span><b>'+plural(l.length,"call")+'</b><span class="tb-of">'+esc(who.join(", "))+'</span></p><ol class="tb-steps">'+l.map(function(r){ return '<li><span class="tabular">'+esc(shortDay(r.ts)+" "+hm(r.ts))+'</span> '+esc(r.agent)+' · '+esc(r.callType||"call")+' · '+issueTag(r)+'</li>'; }).join("")+'</ol></li>'; }).join(""):'<li class="tb-empty">No account called twice within '+REPEAT_DAYS+' days.</li>'; }
 function boardSummary(){ var list=periodRows(); if(!list.length) return ""; var c=boardCounts(list), n=Object.keys(agentsOf(list)).length, p=nextPractice(c.coach), notAll=merge(c.gNot,c.xNot), noAll=merge(c.gWhy,c.xWhy);
-  var parts=["Team · "+periodLabel(list)+" · "+plural(n,"agent")+" · "+plural(c.n,"call"), "resolved "+pct(c.res,c.n), "GSR offered "+pct(c.gO,c.n)+" ("+c.gO+"), got "+c.gG, "XM offered "+pct(c.xmO,c.n)+" ("+c.xmO+"), got "+c.xmG,
+  var parts=[teamName(bd.tl)+" · "+periodLabel(list)+" · "+plural(n,"agent")+" · "+plural(c.n,"call"), "resolved "+pct(c.res,c.n), "GSR offered "+pct(c.gO,c.n)+" ("+c.gO+"), got "+c.gG, "XM offered "+pct(c.xmO,c.n)+" ("+c.xmO+"), got "+c.xmG,
     "came back within "+REPEAT_DAYS+" days "+c.back+" ("+pct(c.back,c.n)+")", "transferred "+c.tr+" ("+pct(c.tr,c.n)+")"+(Object.keys(c.trWhy).length?": "+listStr(c.trWhy,3):"")];
   if(Object.keys(notAll).length) parts.push("not offered, top reasons: "+listStr(notAll,2)); if(Object.keys(noAll).length) parts.push("no's, top reasons: "+listStr(noAll,2)); if(c.clN) parts.push("next steps given in full "+pct(c.clAll,c.clN)+" of unresolved"); if(c.qaN) parts.push("QA self-check complete "+pct(c.qaAll,c.qaN)+" of sales"); if(c.hN) parts.push("holds over "+mmss(HOLD_LONG)+": "+c.hLong+" of "+c.hN);
   if(c.artN) parts.push("article sent "+pct(c.art,c.artN)+" of calls");
   var tn=nights(list), care=careList(list); if(tn.n) parts.push("check-ins "+tn.avg.toFixed(1)+" of 5 ("+tn.n+")"+(care.length?", worth a check-in: "+care.map(function(x){ return x.who; }).join(", "):""));
   if(p) parts.push("practise as a team: "+p.title);
   return parts.join(" · "); }
+/* Team leaders side by side: the same days for each leader's agents, so the supervisor can see where each new leader needs support. */
+function copyLabel(){ return bd.tl&&bd.tl!=="-"?"Copy "+tlLabel(bd.tl)+"'s summary":"Copy team summary"; }
+function leaderStats(){ var all=periodRows(""); if(!all.length) return null; var from=all[0].date, to=all[all.length-1].date;
+  var keys=bd.leaders.map(function(l){ return l.key; }).concat(bd.noTl?["-"]:[]);
+  return {from:from,to:to,label:periodLabel(all),list:keys.map(function(k){ var rows=all.filter(function(r){ return inTeam(r,k); }); return {key:k,name:tlLabel(k),rows:rows,c:boardCounts(rows),n:Object.keys(agentsOf(rows)).length,nt:nights(rows),care:careList(rows)}; }).filter(function(x){ return x.rows.length; })}; }
+function renderLeaders(){ var el=q("tb-leads"), s=bd.leaders.length&&!bd.tl?leaderStats():null; el.hidden=!s; if(!s){ el.innerHTML=""; return; }
+  var th=function(t){ return '<th '+TH+'>'+t+'</th>'; };
+  el.innerHTML='<h3 class="tb-shout-h">Team leaders side by side</h3><p class="tb-help">'+esc(s.label)+'. Pick a team leader to see only their agents.</p><div class="overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-[var(--shadow-card)]"><div class="scrollable-x" tabindex="0" role="region" aria-label="Team leaders table"><table class="w-full border-collapse text-sm"><thead><tr>'+
+    th("Team leader")+th("Agents")+th("Calls")+th("Came back")+th("Transferred")+th("Resolved")+th("GSR offered")+th("XM offered")+th("QA check")+th("Article sent")+th("Check-in")+'</tr></thead><tbody id="tb-lead-rows">'+
+    s.list.map(function(x){ var c=x.c; return '<tr><td class="ms-td"><button type="button" class="sl-link-button tb-tlbtn" data-tl="'+esc(x.key)+'">'+esc(x.name)+'</button>'+(x.care.length?'<span class="tb-of">Worth a check-in: '+esc(x.care.map(function(y){ return y.who; }).join(", "))+'</span>':'')+'</td><td class="ms-td">'+x.n+'</td><td class="ms-td">'+c.n+'</td><td class="ms-td">'+ofCell(c.back,c.n)+'</td><td class="ms-td">'+ofCell(c.tr,c.n)+'</td><td class="ms-td">'+ofCell(c.res,c.n)+'</td><td class="ms-td">'+ofCell(c.gO,c.n)+'</td><td class="ms-td">'+ofCell(c.xmO,c.n)+'</td><td class="ms-td">'+ofCell(c.qaAll,c.qaN)+'</td><td class="ms-td">'+artCell(c)+'</td><td class="ms-td">'+ckCell(x.nt)+'</td></tr>'; }).join("")+
+    '</tbody></table></div></div><div class="tb-row"><button type="button" class="sl-link-button" id="tb-leads-copy">Copy team leaders side by side</button></div>'; }
+function leadersText(){ var s=leaderStats(); if(!s) return ""; return "Team leaders · "+s.label+"\n"+s.list.map(function(x){ var c=x.c;
+  return x.name+" · "+plural(x.n,"agent")+" · "+plural(c.n,"call")+" · came back within "+REPEAT_DAYS+" days "+pct(c.back,c.n)+" · transferred "+pct(c.tr,c.n)+" · resolved "+pct(c.res,c.n)+" · GSR offered "+pct(c.gO,c.n)+" · XM offered "+pct(c.xmO,c.n)+(c.qaN?" · QA self-check "+pct(c.qaAll,c.qaN)+" of sales":"")+(c.artN?" · article sent "+pct(c.art,c.artN):"")+(x.nt.n?" · check-ins "+x.nt.avg.toFixed(1)+" of 5":"")+(x.care.length?" · worth a check-in: "+x.care.map(function(y){ return y.who; }).join(", "):""); }).join("\n"); }
 /* Example data so a leader can see the board before any agent has sent a file. Made up, seeded, and labelled as such. */
 function exampleFiles(){ var seed=20261011, rnd=function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
   var pick=function(a,w){ var s=0, x; w=w||a.map(function(){ return 1; }); w.forEach(function(v){ s+=v; }); x=rnd()*s; for(var i=0;i<a.length;i++){ x-=w[i]; if(x<0) return a[i]; } return a[a.length-1]; };
@@ -1608,7 +1657,7 @@ function exampleFiles(){ var seed=20261011, rnd=function(){ seed|=0; seed=seed+0
   var s6=2718, r6=function(){ s6=(s6*16807)%2147483647; return s6/2147483647; };
   files.forEach(function(f,i){ var rate=i===4?.35:i===6?.55:.7+r6()*.2; f.rows.forEach(function(r){ r.article=r6()<rate?"yes":"no"; }); });
   var ex=0; files.forEach(function(f){ f.rows.forEach(function(r){ if((r.gsrResult==="completed"||r.xmResult==="completed")&&r3()<.2) r.worked=EX[ex++%EX.length]; }); });
-  return files.map(function(f,i){ var done={}; f.rows.forEach(function(r){ if(!(r.date in done)) done[r.date]=rnd()<(i%3===0?.35:.85); if(done[r.date]) r.warmup="Example warm-up"; }); return {name:f.name,agent:f.agent,hrId:String(204117+i*311),rows:f.rows}; }); }
+  return files.map(function(f,i){ var done={}; f.rows.forEach(function(r){ if(!(r.date in done)) done[r.date]=rnd()<(i%3===0?.35:.85); if(done[r.date]) r.warmup="Example warm-up"; }); return {name:f.name,agent:f.agent,hrId:String(204117+i*311),leader:"Leader "+(i<4?1:i<7?2:3),rows:f.rows}; }); }
 document.addEventListener("dragover",function(e){ if(root&&!root.hidden&&view==="board") e.preventDefault(); });
 document.addEventListener("drop",function(e){ if(root&&!root.hidden&&view==="board"&&!(e.target&&e.target.closest&&e.target.closest("#tb-drop"))){ e.preventDefault(); addFiles(e.dataTransfer&&e.dataTransfer.files); } });
 
