@@ -6270,6 +6270,14 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
   .rta-agent-tools::before { content: ""; order: 2; flex-basis: 100%; height: 0; }
   .rta-agent-tools > .rta-count { order: 3; margin-left: 0; }
 }
+/* Exam leave: its own email to HR */
+.rta-meta--exam { grid-template-columns: minmax(0, 1fr); }
+.rta-pill--to { background: #121826; color: #fff; box-shadow: inset 0 -2px 0 #F26522; }
+:root[data-theme='dark'] .rta-pill--to { background: #0B1020; border: 1px solid rgba(242, 101, 34, 0.45); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .rta-pill--to { background: #0B1020; border: 1px solid rgba(242, 101, 34, 0.45); }
+}
+.rta-exam .rta-hint { margin-top: 2px; }
 /* ===== layer: layers/89-it.css ===== */
 /* 89-it: IT requests */
 
@@ -7376,7 +7384,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.0.0';
+const APP_VERSION = '3.1.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -31734,8 +31742,12 @@ const RTA_TYPES = [
   { id: 'transport', title: 'VXI Transportation issue', color: VXI_ORANGE, kind: 'request', ask: 'update the following transportation issue' },
   { id: 'other', title: 'Vacations or Other Requests', color: VXI_ORANGE, kind: 'request', ask: 'update the following request' },
   { id: 'abs', title: 'ABS Compensation', color: VXI_ORANGE, kind: 'time', ask: 'update the following ABS compensation' },
+  /* Exam leave has its own email: to Selma in HR, with a line for the WFM team. */
+  { id: 'exam', title: 'Exam Leave', color: VXI_ORANGE, kind: 'exam' },
 ];
 const RTA_GREETING = 'Hello Team,';
+const RTA_EXAM_GREETING = 'Hello Selma,';
+const RTA_EXAM_WFM = '@WFM Team';
 const rtaType = (id) => RTA_TYPES.find((t) => t.id === id);
 
 const rtaClean = (raw) => {
@@ -31749,13 +31761,20 @@ const rtaClean = (raw) => {
       .slice(0, 20)
       .filter((t) => t && rtaType(t.type))
       .map((t) => ({ id: isId(t.id) ? t.id : uid('rt'), type: t.type, dates: (Array.isArray(t.dates) ? t.dates : []).map(day).filter(Boolean).slice(0, 5), rows: (Array.isArray(t.rows) ? t.rows : []).slice(0, 60).map(row) }));
+  const exam = (list) =>
+    (Array.isArray(list) ? list : [])
+      .slice(0, 120)
+      .filter((r) => r && isIsoDate(r.date) && (isId(r.mid) || s(r.name, 100)))
+      .map((r) => ({ id: isId(r.id) ? r.id : uid('ex'), mid: isId(r.mid) ? r.mid : '', name: s(r.name, 100), hrid: s(r.hrid, 30), date: r.date }));
   return {
     lob: s(src.lob, 20) || 'TSX',
     subject: s(src.subject, 200),
     draft: tables(src.draft),
+    exam: exam(src.exam),
+    examSubject: s(src.examSubject, 200),
     /* Agents from other teams, kept so they can be picked again. */
     others: (Array.isArray(src.others) ? src.others : []).slice(0, 40).filter((o) => o && isId(o.id) && s(o.name, 100)).map((o) => ({ id: o.id, name: s(o.name, 100), hrid: s(o.hrid, 30) })),
-    history: (Array.isArray(src.history) ? src.history : []).slice(0, 15).map((x) => ({ at: s(x && x.at, 30), subject: s(x && x.subject, 200), draft: tables(x && x.draft), lob: s(x && x.lob, 20) || 'TSX' })),
+    history: (Array.isArray(src.history) ? src.history : []).slice(0, 15).map((x) => ({ at: s(x && x.at, 30), subject: s(x && x.subject, 200), kind: x && x.kind === 'exam' ? 'exam' : 'rta', draft: tables(x && x.draft), exam: exam(x && x.exam), lob: s(x && x.lob, 20) || 'TSX' })),
   };
 };
 EXT.slice('rta', { initial: () => rtaClean(null), clean: rtaClean });
@@ -31898,6 +31917,46 @@ function rtaEmail(source) {
   return { html, text };
 }
 
+/* ---------- exam leave: its own email to HR ---------- */
+const rtaWeekday = (d) => (isIsoDate(d) ? parseDay(d).toLocaleDateString('en-US', { weekday: 'long' }) : '');
+/** Exam rows in the email's order: by name, then by date. */
+const rtaExamRows = (rows) => rows.slice().sort((a, b) => rtaName(a).localeCompare(rtaName(b)) || (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+function rtaExamGrid(rows, lob = EXT.data.rta.lob) {
+  return { head: ['LOB', 'HRID', 'Name', 'Exam date', 'Day'], rows: rtaExamRows(rows).map((r) => [lob, rtaHr(r), rtaName(r), rtaDate(r.date), rtaWeekday(r.date)]) };
+}
+const rtaExamPeople = (rows) => new Set(rows.map((r) => r.mid || r.name)).size;
+function rtaExamAsk(rows) {
+  return `I would really appreciate your help to approve the exam leave for the following ${rtaExamPeople(rows) === 1 ? 'employee' : 'employees'}.`;
+}
+function rtaExamWfmLine(rows) {
+  return `Appreciate your help to update the exam leave on the schedule for the respective ${rtaExamPeople(rows) === 1 ? 'employee' : 'employees'}, Thanks !!`;
+}
+/** Subject: "Exam Leave Request | TSX | HR IDs". */
+function rtaExamSubject() {
+  const R = EXT.data.rta;
+  if (R.examSubject) return R.examSubject;
+  const ids = [...new Set(rtaExamRows(R.exam).map(rtaHr).filter(Boolean))];
+  return ['Exam Leave Request', R.lob, ids.join(', ')].filter(Boolean).join(' | ');
+}
+/** The exam leave email, in the same Outlook-friendly style as the RTA email. */
+function rtaExamEmail(source) {
+  const R = source || EXT.data.rta;
+  const rows = R.exam;
+  const C = RTA_MAIL;
+  const font = `font-family:${C.font};font-size:11pt;color:${C.text}`;
+  const cell = `border:1px solid ${C.line};padding:4px 12px;white-space:nowrap;font-family:${C.font};font-size:11pt;color:${C.text}`;
+  const p = (t) => `<p style="margin:0 0 0 0;${font}">${t}</p>`;
+  const blank = `<p style="margin:0;${font}">&nbsp;</p>`;
+  const g = rtaExamGrid(rows, R.lob);
+  const title = `<tr><td colspan="${g.head.length}" bgcolor="${C.ink}" style="${cell};border-color:${C.ink};border-bottom:3px solid ${VXI_ORANGE};background:${C.ink};color:#FFFFFF;font-weight:bold;font-size:14pt;letter-spacing:0.5px;text-align:center;padding:7px 12px">Exam Leave</td></tr>`;
+  const head = `<tr>${g.head.map((c) => `<td bgcolor="${C.tint}" style="${cell};background:${C.tint};color:${C.ink};font-weight:bold;text-align:center">${rtaEsc(c)}</td>`).join('')}</tr>`;
+  const body = g.rows.map((r, k) => `<tr>${r.map((c, i) => `<td${k % 2 ? ` bgcolor="${C.stripe}"` : ''} style="${cell};${k % 2 ? `background:${C.stripe};` : ''}text-align:${i === 2 ? 'left' : 'center'}">${rtaEsc(c)}</td>`).join('')}</tr>`).join('');
+  const table = `<table cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;${font}">${title}${head}${body}</table>`;
+  const html = [`<div style="${font}">`, p(rtaEsc(RTA_EXAM_GREETING)), blank, p(rtaEsc(rtaExamAsk(rows))), blank, table, blank, p(`<b>${rtaEsc(RTA_EXAM_WFM)}</b> ${rtaEsc(rtaExamWfmLine(rows))}`), blank, p('BR,'), '</div>'].join('');
+  const text = [RTA_EXAM_GREETING, '', rtaExamAsk(rows), '', 'Exam Leave', g.head.join('\t'), ...g.rows.map((r) => r.join('\t')), '', `${RTA_EXAM_WFM} ${rtaExamWfmLine(rows)}`, '', 'BR,'].join('\n');
+  return { html, text };
+}
+
 /** Put rich HTML on the clipboard (Outlook keeps the table), with plain text as a fallback. */
 async function rtaCopyHtml(html, text) {
   try {
@@ -31930,7 +31989,7 @@ async function rtaCopyHtml(html, text) {
 }
 
 /* ---------- the page ---------- */
-let rtaPick = { type: 'ot', agents: [], date: '', from: '', to: '', request: '', fromText: '', toText: '', dates: [], times: {} };
+let rtaPick = { type: 'ot', agents: [], date: '', from: '', to: '', request: '', fromText: '', toText: '', dates: [], times: {}, examDays: [] };
 
 function rtaAdd() {
   const T = rtaType(rtaPick.type);
@@ -31939,6 +31998,25 @@ function rtaAdd() {
   if (!agents.length) return toast('Choose at least one agent.', { type: 'warn' });
   if (T.kind === 'time' && (!rtaPick.date || !rtaPick.from || !rtaPick.to)) return toast('Add the date and the from and to times.', { type: 'warn' });
   if (T.kind === 'request' && !rtaPick.request) return toast('Write the request.', { type: 'warn' });
+  if (T.kind === 'exam') {
+    const days = [...new Set(rtaPick.examDays.filter(isIsoDate))].sort();
+    if (!days.length) return toast('Add at least one exam day.', { type: 'warn' });
+    let added = 0;
+    agents.forEach((m) =>
+      days.forEach((d) => {
+        if (R.exam.some((r) => (r.mid || r.name) === (m.id || m.name) && r.date === d)) return;
+        R.exam.push({ id: uid('ex'), mid: m.id, name: m.name, hrid: m.hrid, date: d });
+        added++;
+      })
+    );
+    R.examSubject = '';
+    EXT.data.rta = rtaClean(R);
+    EXT.save('rta');
+    rtaPick.agents = [];
+    uiq.ok = 'rta-add';
+    refresh({ panel: false });
+    return toast(added ? `Added to the exam leave email: ${plural(agents.length, 'agent')}, ${plural(days.length, 'day')}` : 'Those exam days are already in the email.', added ? {} : { type: 'warn' });
+  }
   if (T.kind === 'swap') {
     const dates = rtaPick.dates.filter(Boolean);
     if (!dates.length) return toast('Add at least one shift date.', { type: 'warn' });
@@ -31977,9 +32055,10 @@ function rtaNext(T, agentsDone, detailsDone) {
   if (!detailsDone) {
     if (T.kind === 'time') return 'Next: add the date and the from and to times.';
     if (T.kind === 'request') return 'Next: write the request.';
+    if (T.kind === 'exam') return 'Next: add the exam days.';
     return rtaPick.dates.some(Boolean) ? 'Next: type each new shift time.' : 'Next: add a shift date.';
   }
-  return 'Ready. Add it to the email.';
+  return T.kind === 'exam' ? 'Ready. Add it to the exam leave email.' : 'Ready. Add it to the email.';
 }
 
 /** The agent picker shared by Workforce requests and IT requests: my team plus agents from
@@ -32051,6 +32130,82 @@ function rtaAgentPicker(pick, redraw) {
   return [agentTools, agentChips, otherBox];
 }
 
+/** The exam leave email card: to Selma in HR, with the WFM line, its own subject, preview and rows. */
+function rtaExamCard(R, field, redraw, main) {
+  const rows = rtaExamRows(R.exam);
+  const subj = h('input', { class: 'input', value: rtaExamSubject(), maxlength: 200, 'data-fk': 'rta-xsubject' });
+  subj.addEventListener('input', () => {
+    R.examSubject = subj.value.trim();
+    EXT.save('rta');
+  });
+  const preview = h('div', { class: 'rta-preview', 'data-fk': 'rta-xpreview' });
+  if (rows.length) {
+    preview.innerHTML = rtaExamEmail().html;
+    preview.querySelectorAll('tr').forEach((tr, k) => {
+      if (k < 2) return;
+      const r = rows[k - 2];
+      if (r) {
+        tr.setAttribute('data-uiq', `xp:${r.id}`);
+        tr.setAttribute('data-uiq-static', '');
+      }
+    });
+  } else {
+    preview.classList.add('is-empty');
+    preview.append(uiqEmpty({ iconName: 'calendar', title: 'The exam leave email builds itself here', text: 'Pick the agents and the exam days above, then add them. Each day becomes one row.' }));
+  }
+  const copy = async () => {
+    if (!R.exam.length) return toast('Add the exam days first.', { type: 'warn' });
+    const { html, text } = rtaExamEmail();
+    const ok = await rtaCopyHtml(html, text);
+    if (!ok) return toast('The browser blocked copying. Select the email below and copy it.', { type: 'error' });
+    R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaExamSubject(), kind: 'exam', draft: [], exam: JSON.parse(JSON.stringify(R.exam)), lob: R.lob });
+    R.history = R.history.slice(0, 15);
+    EXT.save('rta');
+    toast('Exam leave email copied. Paste it in Outlook to Selma, then copy the subject.', { duration: 6000 });
+    uiq.ok = 'rta-xcopy';
+    redraw();
+  };
+  const list = rows.length
+    ? h(
+        'ul',
+        { class: 'rta-rows', 'aria-label': 'Exam days in this email' },
+        rows.map((r) =>
+          h(
+            'li',
+            { class: 'rta-row', style: `--tc:${VXI_ORANGE}`, 'data-uiq': `xl:${r.id}` },
+            h('span', { class: 'rta-row__type' }, 'Exam Leave'),
+            h('span', { class: 'rta-row__who' }, r.name || rtaName(r)),
+            h('span', { class: 'rta-row__when' }, `${rtaWeekday(r.date)} · ${rtaDate(r.date)}`),
+            h('button', { type: 'button', class: 'btn btn--sm btn--ghost rta-row__x', 'aria-label': 'Remove this day', 'data-fk': `rta-xdel:${r.id}`, onclick: (e) => { if (uiq.leaving) return; R.exam = R.exam.filter((x) => x.id !== r.id); R.examSubject = ''; EXT.save('rta'); uiqLeave(e.currentTarget.closest('.rta-row'), redraw); } }, icon('x'))
+          )
+        )
+      )
+    : null;
+  return h(
+    'section',
+    { class: 'card kt-card rta-card rta-card--mail rta-card--exam', 'aria-labelledby': 'rta-exam', 'data-uiq': 'card:rta-exam', 'data-uiq-scope': 'rta-exam' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('div', { class: 'rta-titlerow' }, h('h2', { class: 'kt-title', id: 'rta-exam' }, icon('calendar'), 'Exam leave email'), h('span', { class: 'rta-pill rta-pill--to' }, 'To Selma, HR'), rows.length ? h('span', { class: 'rta-pill' }, plural(rows.length, 'day')) : null), h('p', { class: 'kt-sub' }, 'Send it to Selma in HR. The line at the bottom asks the WFM team to update the schedule.')),
+      h(
+        'div',
+        { class: 'kt-actions' },
+        h('button', { type: 'button', class: 'btn btn--primary copy-btn', 'data-fk': 'rta-xcopy', onclick: copy, disabled: !rows.length }, icon('copy'), 'Copy email'),
+        h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-xcopy-subject', onclick: (e) => copyText(subj.value, { label: 'Subject', button: e.currentTarget }) }, icon('copy'), 'Copy subject'),
+        rows.length ? h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'rta-xclear', onclick: async () => { if (await confirmDialog({ title: 'Clear the exam leave email?', message: 'All exam days in this email are removed. Emails you copied stay in the list below.', confirmLabel: 'Clear', danger: true })) { R.exam = []; R.examSubject = ''; EXT.save('rta'); redraw(); } } }, icon('trash'), 'Clear') : null
+      )
+    ),
+    h('div', { class: 'rta-meta rta-meta--exam' }, field('Subject', subj)),
+    (() => {
+      const missing = [...new Set(rows.filter((r) => !rtaHr(r)).map((r) => rtaName(r)))];
+      return missing.length ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `No HR ID for ${joinList(missing)}. Load the roster in My agents, or add it with the pencil there.`)) : null;
+    })(),
+    h('div', { class: `rta-paper${rows.length ? '' : ' is-empty'}` }, rows.length ? h('div', { class: 'rta-paper__bar', 'aria-hidden': 'true' }, icon('eye', 'icon--sm'), h('span', null, 'Preview'), h('span', { class: 'rta-paper__note' }, 'This is how it pastes in Outlook')) : null, preview),
+    list
+  );
+}
+
 function rtaRender(main) {
   const R = EXT.data.rta;
   if (!rtaPick.date) rtaPick.date = rtaTomorrow();
@@ -32064,6 +32219,7 @@ function rtaRender(main) {
   const detailsDone = () => {
     if (T.kind === 'time') return !!(rtaPick.date && rtaPick.from && rtaPick.to);
     if (T.kind === 'request') return !!String(rtaPick.request || '').trim();
+    if (T.kind === 'exam') return rtaPick.examDays.some(isIsoDate);
     return rtaPick.dates.some(Boolean) && chosen.length > 0 && chosen.every((m) => rtaPick.dates.every((_, i) => String(rtaPick.times[`${m.id}:${i}`] || '').trim()));
   };
   const sync = () => {
@@ -32091,6 +32247,20 @@ function rtaRender(main) {
     fields = h('div', { class: 'rta-fields' }, field('Date', bind('date', { type: 'date', 'data-fk': 'rta-date' })), field('From (CLT)', bind('from', { type: 'time', 'data-fk': 'rta-from' })), field('To (CLT)', bind('to', { type: 'time', 'data-fk': 'rta-to' })));
   } else if (T.kind === 'request') {
     fields = h('div', { class: 'rta-fields' }, field('Request', bind('request', { type: 'text', maxlength: 120, placeholder: T.id === 'transport' ? 'Pickup was late, no car, wrong address…' : 'Vacation, schedule change, project time…', 'data-fk': 'rta-request' })), field('From', bind('fromText', { type: 'text', maxlength: 40, placeholder: 'Date or time', 'data-fk': 'rta-ftext' })), field('To', bind('toText', { type: 'text', maxlength: 40, placeholder: 'Date or time', 'data-fk': 'rta-ttext' })));
+  } else if (T.kind === 'exam') {
+    if (!rtaPick.examDays.length) rtaPick.examDays = [rtaTomorrow()];
+    const dayInputs = rtaPick.examDays.map((d, i) => {
+      const el = h('input', { class: 'input', type: 'date', value: d, 'data-fk': `rta-xday:${i}`, 'aria-label': `Exam day ${i + 1}` });
+      el.addEventListener('change', () => { rtaPick.examDays[i] = el.value; redraw(); });
+      return h('div', { class: 'rta-sdate', 'data-uiq': `xd:${i}`, 'data-uiq-x': true }, el, rtaPick.examDays.length > 1 ? h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'aria-label': 'Remove this day', onclick: () => { rtaPick.examDays.splice(i, 1); redraw(); } }, icon('x')) : null);
+    });
+    const nDays = rtaPick.examDays.filter(isIsoDate).length;
+    fields = h(
+      'div',
+      { class: 'rta-swap rta-exam' },
+      h('div', { class: 'rta-sdates' }, h('span', { class: 'field__label' }, 'Exam days'), ...dayInputs, rtaPick.examDays.length < 14 ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'rta-addxday', 'data-uiq': 'xd:add', 'data-uiq-x': true, onclick: () => { rtaPick.examDays.push(addDays(rtaPick.examDays[rtaPick.examDays.length - 1] || rtaTomorrow(), 1)); redraw(); } }, icon('plus'), 'Add day') : null),
+      h('p', { class: 'rta-hint' }, icon('info', 'icon--sm'), chosen.length && nDays ? `${plural(chosen.length, 'agent')} × ${plural(nDays, 'day')}: ${plural(chosen.length * nDays, 'row')} in the exam leave email. It goes to Selma in HR, with a line for the WFM team.` : 'Pick the exam days. The exam leave email goes to Selma in HR, with a line for the WFM team to update the schedule.')
+    );
   } else {
     if (!rtaPick.dates.length) rtaPick.dates = [rtaTomorrow()];
     const dateInputs = rtaPick.dates.map((d, i) => {
@@ -32138,7 +32308,7 @@ function rtaRender(main) {
   flow = uiqFlow('rta', [
     { title: 'Request', body: [typeChips], done: true },
     { title: 'Agents', body: [agentTools, agentChips, otherBox], done: chosen.length > 0 },
-    { title: T.kind === 'swap' ? 'Dates and shift times' : 'Details', body: [fields], done: detailsDone() },
+    { title: T.kind === 'swap' ? 'Dates and shift times' : T.kind === 'exam' ? 'Exam days' : 'Details', body: [fields], done: detailsDone() },
   ]);
   hint = h('span', { class: 'rta-add__hint', role: 'status' });
   sync();
@@ -32148,7 +32318,7 @@ function rtaRender(main) {
     h('h2', { class: 'kt-title', id: 'rta-new' }, icon('plus'), 'New request'),
     h('p', { class: 'kt-sub' }, 'Pick the request, the agents and the times. Add as many as you need to one email.'),
     flow.el,
-    h('div', { class: 'rta-add' }, h('button', { type: 'button', class: 'btn btn--primary copy-btn', 'data-fk': 'rta-add', onclick: () => { rtaAdd(); if (hint.isConnected) uiqNudge(hint); } }, icon('plus'), `Add ${T.title} to the email`), hint)
+    h('div', { class: 'rta-add' }, h('button', { type: 'button', class: 'btn btn--primary copy-btn', 'data-fk': 'rta-add', onclick: () => { rtaAdd(); if (hint.isConnected) uiqNudge(hint); } }, icon('plus'), T.kind === 'exam' ? 'Add to the exam leave email' : `Add ${T.title} to the email`), hint)
   );
 
   /* 2. The email */
@@ -32278,18 +32448,21 @@ function rtaRender(main) {
               'li',
               { class: 'rta-hist__row', 'data-uiq': `h:${base}.${n}` },
               h('span', { class: 'rta-hist__s' }, x.subject),
-              h('span', { class: 'rta-hist__m' }, `${x.at.replace('T', ' ')} · ${plural(rtaRowCount(x.draft), 'row')}`),
-              h('button', { type: 'button', class: 'btn btn--sm copy-btn', 'data-fk': `rta-recopy:${i}`, onclick: async (e) => { const btn = e.currentTarget; const { html, text } = rtaEmail({ ...x }); if (await rtaCopyHtml(html, text)) { if (btn.isConnected) flashCopied(btn); toast('Email copied again.'); } } }, icon('copy'), 'Copy again'),
-              h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': `rta-reuse:${i}`, onclick: () => { R.draft = JSON.parse(JSON.stringify(x.draft)); R.subject = ''; EXT.data.rta = rtaClean(R); EXT.save('rta'); redraw(); toast('Loaded into the email. Change the dates, then copy.'); } }, icon('edit'), 'Reuse')
+              h('span', { class: 'rta-hist__m' }, `${x.kind === 'exam' ? 'Exam leave to HR · ' : ''}${x.at.replace('T', ' ')} · ${plural(x.kind === 'exam' ? x.exam.length : rtaRowCount(x.draft), 'row')}`),
+              h('button', { type: 'button', class: 'btn btn--sm copy-btn', 'data-fk': `rta-recopy:${i}`, onclick: async (e) => { const btn = e.currentTarget; const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); if (await rtaCopyHtml(html, text)) { if (btn.isConnected) flashCopied(btn); toast('Email copied again.'); } } }, icon('copy'), 'Copy again'),
+              h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': `rta-reuse:${i}`, onclick: () => { if (x.kind === 'exam') { R.exam = JSON.parse(JSON.stringify(x.exam)); R.examSubject = ''; rtaPick.type = 'exam'; } else { R.draft = JSON.parse(JSON.stringify(x.draft)); R.subject = ''; } EXT.data.rta = rtaClean(R); EXT.save('rta'); redraw(); toast(x.kind === 'exam' ? 'Loaded into the exam leave email. Change the days, then copy.' : 'Loaded into the email. Change the dates, then copy.'); } }, icon('edit'), 'Reuse')
             );
           })
         )
       )
     : null;
 
+  const examCard = R.exam.length || T.kind === 'exam' ? rtaExamCard(R, field, redraw, main) : null;
   const head = pageHead({ eyebrow: 'Team admin', title: 'Workforce requests', sub: 'The RTA email in a few clicks. Times are CLT (Cairo local time).' });
   head.setAttribute('data-uiq-page', 'rta');
-  main.append(...[head, newCard, emailCard, sent].filter(Boolean));
+  /* With Exam Leave picked, its email comes first; the RTA email only shows when it has requests. */
+  const order = T.kind === 'exam' ? [head, newCard, examCard, R.draft.length ? emailCard : null, sent] : [head, newCard, emailCard, examCard, sent];
+  main.append(...order.filter(Boolean));
 }
 
 EXT.view('rta', { title: 'Workforce requests', label: 'Workforce requests', icon: 'calendar', render: rtaRender });
