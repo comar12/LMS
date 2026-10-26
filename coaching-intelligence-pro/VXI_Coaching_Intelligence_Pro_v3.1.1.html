@@ -7384,7 +7384,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.1.0';
+const APP_VERSION = '3.1.1';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -31742,11 +31742,11 @@ const RTA_TYPES = [
   { id: 'transport', title: 'VXI Transportation issue', color: VXI_ORANGE, kind: 'request', ask: 'update the following transportation issue' },
   { id: 'other', title: 'Vacations or Other Requests', color: VXI_ORANGE, kind: 'request', ask: 'update the following request' },
   { id: 'abs', title: 'ABS Compensation', color: VXI_ORANGE, kind: 'time', ask: 'update the following ABS compensation' },
-  /* Exam leave has its own email: to Selma in HR, with a line for the WFM team. */
+  /* Exam leave has its own email: to Salma in HR, with a line for the WFM team. */
   { id: 'exam', title: 'Exam Leave', color: VXI_ORANGE, kind: 'exam' },
 ];
 const RTA_GREETING = 'Hello Team,';
-const RTA_EXAM_GREETING = 'Hello Selma,';
+const RTA_EXAM_GREETING = 'Hello Salma,';
 const RTA_EXAM_WFM = '@WFM Team';
 const rtaType = (id) => RTA_TYPES.find((t) => t.id === id);
 
@@ -32130,7 +32130,7 @@ function rtaAgentPicker(pick, redraw) {
   return [agentTools, agentChips, otherBox];
 }
 
-/** The exam leave email card: to Selma in HR, with the WFM line, its own subject, preview and rows. */
+/** The exam leave email card: to Salma in HR, with the WFM line, its own subject, preview and rows. */
 function rtaExamCard(R, field, redraw, main) {
   const rows = rtaExamRows(R.exam);
   const subj = h('input', { class: 'input', value: rtaExamSubject(), maxlength: 200, 'data-fk': 'rta-xsubject' });
@@ -32161,7 +32161,7 @@ function rtaExamCard(R, field, redraw, main) {
     R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaExamSubject(), kind: 'exam', draft: [], exam: JSON.parse(JSON.stringify(R.exam)), lob: R.lob });
     R.history = R.history.slice(0, 15);
     EXT.save('rta');
-    toast('Exam leave email copied. Paste it in Outlook to Selma, then copy the subject.', { duration: 6000 });
+    toast('Exam leave email copied. Paste it in Outlook to Salma, then copy the subject.', { duration: 6000 });
     uiq.ok = 'rta-xcopy';
     redraw();
   };
@@ -32187,7 +32187,7 @@ function rtaExamCard(R, field, redraw, main) {
     h(
       'div',
       { class: 'kt-head' },
-      h('div', null, h('div', { class: 'rta-titlerow' }, h('h2', { class: 'kt-title', id: 'rta-exam' }, icon('calendar'), 'Exam leave email'), h('span', { class: 'rta-pill rta-pill--to' }, 'To Selma, HR'), rows.length ? h('span', { class: 'rta-pill' }, plural(rows.length, 'day')) : null), h('p', { class: 'kt-sub' }, 'Send it to Selma in HR. The line at the bottom asks the WFM team to update the schedule.')),
+      h('div', null, h('div', { class: 'rta-titlerow' }, h('h2', { class: 'kt-title', id: 'rta-exam' }, icon('calendar'), 'Exam leave email'), h('span', { class: 'rta-pill rta-pill--to' }, 'To Salma, HR'), rows.length ? h('span', { class: 'rta-pill' }, plural(rows.length, 'day')) : null), h('p', { class: 'kt-sub' }, 'Send it to Salma in HR. The line at the bottom asks the WFM team to update the schedule.')),
       h(
         'div',
         { class: 'kt-actions' },
@@ -32259,7 +32259,7 @@ function rtaRender(main) {
       'div',
       { class: 'rta-swap rta-exam' },
       h('div', { class: 'rta-sdates' }, h('span', { class: 'field__label' }, 'Exam days'), ...dayInputs, rtaPick.examDays.length < 14 ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'rta-addxday', 'data-uiq': 'xd:add', 'data-uiq-x': true, onclick: () => { rtaPick.examDays.push(addDays(rtaPick.examDays[rtaPick.examDays.length - 1] || rtaTomorrow(), 1)); redraw(); } }, icon('plus'), 'Add day') : null),
-      h('p', { class: 'rta-hint' }, icon('info', 'icon--sm'), chosen.length && nDays ? `${plural(chosen.length, 'agent')} × ${plural(nDays, 'day')}: ${plural(chosen.length * nDays, 'row')} in the exam leave email. It goes to Selma in HR, with a line for the WFM team.` : 'Pick the exam days. The exam leave email goes to Selma in HR, with a line for the WFM team to update the schedule.')
+      h('p', { class: 'rta-hint' }, icon('info', 'icon--sm'), chosen.length && nDays ? `${plural(chosen.length, 'agent')} × ${plural(nDays, 'day')}: ${plural(chosen.length * nDays, 'row')} in the exam leave email. It goes to Salma in HR, with a line for the WFM team.` : 'Pick the exam days. The exam leave email goes to Salma in HR, with a line for the WFM team to update the schedule.')
     );
   } else {
     if (!rtaPick.dates.length) rtaPick.dates = [rtaTomorrow()];
