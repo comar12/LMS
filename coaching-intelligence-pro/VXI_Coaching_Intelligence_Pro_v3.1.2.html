@@ -7384,7 +7384,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.1.1';
+const APP_VERSION = '3.1.2';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -31879,8 +31879,9 @@ function rtaEmail(source) {
   const tables = draft.map((t) => {
     const T = rtaType(t.type);
     const g = rtaGrid(t, R.lob);
-    /* The request name runs across the whole table, as a big sign. */
-    const title = `<tr><td colspan="${g.head.length}" bgcolor="${C.ink}" style="${cell};border-color:${C.ink};border-bottom:3px solid ${VXI_ORANGE};background:${C.ink};color:#FFFFFF;font-weight:bold;font-size:14pt;letter-spacing:0.5px;text-align:center;padding:7px 12px">${rtaEsc(T.title)}</td></tr>`;
+    /* The request name runs across the whole table, as a big sign, in VXI orange so it stays readable
+       whether Outlook keeps the dark band, turns it black, or drops it. */
+    const title = `<tr><td colspan="${g.head.length}" bgcolor="${C.ink}" style="${cell};border-color:${C.ink};border-bottom:3px solid ${VXI_ORANGE};background:${C.ink};color:${VXI_ORANGE};font-weight:bold;font-size:14pt;letter-spacing:0.5px;text-align:center;padding:7px 12px"><font color="${VXI_ORANGE}"><span style="color:${VXI_ORANGE}">${rtaEsc(T.title)}</span></font></td></tr>`;
     const head = `<tr>${g.head.map((c) => `<td bgcolor="${C.tint}" style="${cell};background:${C.tint};color:${C.ink};font-weight:bold;text-align:center">${rtaEsc(c)}</td>`).join('')}</tr>`;
     const body = g.rows.map((r, k) => `<tr>${r.map((c, i) => `<td${k % 2 ? ` bgcolor="${C.stripe}"` : ''} style="${cell};${k % 2 ? `background:${C.stripe};` : ''}text-align:${i === 2 ? 'left' : 'center'}">${rtaEsc(c)}</td>`).join('')}</tr>`).join('');
     return `<table cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;${font}">${title}${head}${body}</table>`;
@@ -31948,7 +31949,7 @@ function rtaExamEmail(source) {
   const p = (t) => `<p style="margin:0 0 0 0;${font}">${t}</p>`;
   const blank = `<p style="margin:0;${font}">&nbsp;</p>`;
   const g = rtaExamGrid(rows, R.lob);
-  const title = `<tr><td colspan="${g.head.length}" bgcolor="${C.ink}" style="${cell};border-color:${C.ink};border-bottom:3px solid ${VXI_ORANGE};background:${C.ink};color:#FFFFFF;font-weight:bold;font-size:14pt;letter-spacing:0.5px;text-align:center;padding:7px 12px">Exam Leave</td></tr>`;
+  const title = `<tr><td colspan="${g.head.length}" bgcolor="${C.ink}" style="${cell};border-color:${C.ink};border-bottom:3px solid ${VXI_ORANGE};background:${C.ink};color:${VXI_ORANGE};font-weight:bold;font-size:14pt;letter-spacing:0.5px;text-align:center;padding:7px 12px"><font color="${VXI_ORANGE}"><span style="color:${VXI_ORANGE}">Exam Leave</span></font></td></tr>`;
   const head = `<tr>${g.head.map((c) => `<td bgcolor="${C.tint}" style="${cell};background:${C.tint};color:${C.ink};font-weight:bold;text-align:center">${rtaEsc(c)}</td>`).join('')}</tr>`;
   const body = g.rows.map((r, k) => `<tr>${r.map((c, i) => `<td${k % 2 ? ` bgcolor="${C.stripe}"` : ''} style="${cell};${k % 2 ? `background:${C.stripe};` : ''}text-align:${i === 2 ? 'left' : 'center'}">${rtaEsc(c)}</td>`).join('')}</tr>`).join('');
   const table = `<table cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;${font}">${title}${head}${body}</table>`;
