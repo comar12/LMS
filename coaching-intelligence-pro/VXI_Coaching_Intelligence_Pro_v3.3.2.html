@@ -7441,7 +7441,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.3.1';
+const APP_VERSION = '3.3.2';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -36303,14 +36303,23 @@ function rtOpen(sheet, teams) {
   });
   draw();
   cancel.addEventListener('click', () => dlg.close());
-  apply.addEventListener('click', () => {
+  apply.addEventListener('click', async () => {
+    apply.disabled = true;
     const rows = teams.get(tl) || [];
     const added = rtApply(tl, rows, plan);
     const left = plan.leave.length;
     maApplyRoster(sheet);
+    // Every tab follows the new team: the kept exports are loaded again for it.
+    let loaded = 0;
+    try {
+      loaded = await rxReplay();
+    } catch (e) {
+      loaded = 0;
+    }
     dlg.close();
     refresh({ panel: false });
-    toast(`Team updated: ${plural(state.team.members.length, 'agent')}${added ? `, ${added} added` : ''}${left ? `, ${left} moved to Agents who left` : ''}. Load the latest export to see their numbers.`, { duration: 8000 });
+    const team = `Team updated: ${plural(state.team.members.length, 'agent')}${added ? `, ${added} added` : ''}${left ? `, ${left} moved to Agents who left` : ''}.`;
+    toast(loaded ? `${team} Numbers refreshed from your last ${plural(loaded, 'export')}, so every tab shows the new team.` : `${team} Load your latest export once so the new agents get their numbers on every tab.`, { duration: 9000 });
   });
 }
 
@@ -36338,6 +36347,157 @@ maLoadRoster = function () {
   });
   document.body.appendChild(input);
   input.click();
+};
+/* ---------- Every tab follows the roster: replay the last exports ----------
+   An export keeps numbers only for the agents on the team when it is loaded (the snapshot, the
+   weeks, the last day). The last few exports are kept in this browser (IndexedDB, never uploaded),
+   and after a roster update they are loaded again in the same order, so agents who joined get
+   their numbers on every tab without loading the files again. */
+const RX_KEEP = 4;
+const RX_MAX_BYTES = 40 * 1024 * 1024;
+let rxFile = null;
+let rxPending = null;
+let rxReplaying = false;
+
+function rxDb() {
+  return new Promise((resolve) => {
+    try {
+      if (!window.indexedDB) return resolve(null);
+      const req = indexedDB.open('cip-exports', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('files', { keyPath: 'id' });
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch (e) {
+      resolve(null);
+    }
+  });
+}
+async function rxAll() {
+  const db = await rxDb();
+  if (!db) return [];
+  return new Promise((resolve) => {
+    try {
+      const req = db.transaction('files').objectStore('files').getAll();
+      req.onsuccess = () => resolve((req.result || []).sort((a, b) => a.at - b.at));
+      req.onerror = () => resolve([]);
+    } catch (e) {
+      resolve([]);
+    }
+  });
+}
+async function rxSave(rec) {
+  const db = await rxDb();
+  if (!db) return;
+  const list = await rxAll();
+  try {
+    const tx = db.transaction('files', 'readwrite');
+    const store = tx.objectStore('files');
+    // The same file loaded again replaces its older copy; only the newest few are kept.
+    list.filter((x) => x.name === rec.name && x.size === rec.size).forEach((x) => store.delete(x.id));
+    const rest = list.filter((x) => !(x.name === rec.name && x.size === rec.size));
+    rest.slice(0, Math.max(0, rest.length - (RX_KEEP - 1))).forEach((x) => store.delete(x.id));
+    store.put(rec);
+  } catch (e) {
+    /* the numbers are saved either way */
+  }
+}
+async function rxClear() {
+  const db = await rxDb();
+  if (!db) return;
+  try {
+    db.transaction('files', 'readwrite').objectStore('files').clear();
+  } catch (e) {
+    /* nothing kept */
+  }
+}
+
+/* Remember the file the user picked (read once more here, kept only if they confirm the load). */
+const _rxImportDailyFile = importDailyFile;
+importDailyFile = async function (file, ext) {
+  rxFile = null;
+  try {
+    if (file && file.size <= RX_MAX_BYTES) {
+      rxFile = { kind: 'sheet', ext, name: file.name, size: file.size, saved: file.lastModified ? isoDay(new Date(file.lastModified)) : '', data: ext === 'csv' ? await file.text() : await file.arrayBuffer() };
+    }
+  } catch (e) {
+    rxFile = null;
+  }
+  return _rxImportDailyFile(file, ext);
+};
+const _rxSnapshotFromDaily = snapshotFromDaily;
+snapshotFromDaily = function (sheet, fileName) {
+  const r = _rxSnapshotFromDaily(sheet, fileName);
+  if (!rxReplaying) rxPending = rxFile && r && !r.error && r.snapshot ? { ...rxFile, snap: r.snapshot } : null;
+  return r;
+};
+const _rxParseTsxExport = parseTsxExport;
+parseTsxExport = function (text, tlName) {
+  const r = _rxParseTsxExport(text, tlName);
+  if (!rxReplaying && tlName && r && r.snapshot) rxPending = { kind: 'html', name: `dashboard-${tlName}`, size: String(text).length, tl: tlName, data: text, snap: r.snapshot };
+  return r;
+};
+/* The load is confirmed when the snapshot it made is saved. */
+const _rxPersist = persist;
+persist = function (...keys) {
+  if (keys.includes('kpis') && rxPending && state.kpis === rxPending.snap && !rxReplaying) {
+    const { snap, ...rec } = rxPending;
+    rxPending = null;
+    rxSave({ ...rec, id: uid('rx'), at: Date.now() });
+  }
+  _rxPersist(...keys);
+};
+
+/** Load the kept exports again, oldest first, for the current team. Returns how many were loaded. */
+async function rxReplay() {
+  const list = await rxAll();
+  if (!list.length) return 0;
+  let n = 0;
+  rxReplaying = true;
+  try {
+    for (const f of list) {
+      try {
+        let snap = null;
+        if (f.kind === 'html') {
+          const r = parseTsxExport(f.data, f.tl);
+          snap = r && r.snapshot;
+        } else {
+          monthlySaved = f.saved || '';
+          const sheet = f.ext === 'csv' ? readCsv(f.data) : await readXlsx(f.data);
+          const r = snapshotFromDaily(sheet, f.name);
+          snap = r && !r.error && r.team && r.team.length ? r.snapshot : null;
+        }
+        if (!snap) continue;
+        state.kpis = snap;
+        state.team.members.forEach((mem) => {
+          const row = snapRow(mem);
+          if (!row) return;
+          if (!mem.hrid && row.hrid) mem.hrid = row.hrid;
+          if (!mem.bpid && row.bpid) mem.bpid = row.bpid;
+        });
+        persist('kpis', 'team');
+        n++;
+      } catch (e) {
+        /* a file that no longer reads is skipped */
+      }
+    }
+  } finally {
+    rxReplaying = false;
+  }
+  return n;
+}
+
+/* Clear all local data also forgets the kept exports. */
+const _rxClearAllData = clearAllData;
+clearAllData = async function () {
+  const before = state.team;
+  await _rxClearAllData();
+  if (state.team !== before) rxClear();
+};
+/* Restore (Settings, Agents who left) brings the agent's numbers back from the kept exports too. */
+const _rxRosterRestore = rosterRestore;
+rosterRestore = function (i) {
+  _rxRosterRestore(i);
+  rxReplay().then((n) => n && refresh({ panel: false }));
 };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
