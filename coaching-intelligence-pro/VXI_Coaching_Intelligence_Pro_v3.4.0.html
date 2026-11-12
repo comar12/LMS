@@ -2983,6 +2983,10 @@ html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--text-3) 
 .cat-avoid { --cc: var(--c-avoid); --cc-bg: var(--c-avoid-bg); }
 .kpi-tile--avoidance { --kc: var(--c-avoid); --kc-bg: var(--c-avoid-bg); }
 .focus-kpi--avoidance { --kc: var(--c-avoid); }
+.av-stage { font-weight: 700; white-space: nowrap; }
+.av-stage--coach, .av-stage--warned { color: #9a5b00; background: #fff4dc; border-color: #f3d699; }
+.av-stage--hr, .av-stage--referred { color: var(--c-avoid); background: var(--c-avoid-bg); border-color: var(--c-avoid); }
+:root[data-theme="dark"] .av-stage--coach, :root[data-theme="dark"] .av-stage--warned { color: #ffd08a; background: rgba(255, 208, 138, 0.12); border-color: rgba(255, 208, 138, 0.4); }
 /* ===== layer: layers/10-motion.css ===== */
 /* ==========================================================================
    10-motion — one motion system for the whole app.
@@ -7441,7 +7445,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.3.2';
+const APP_VERSION = '3.4.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -36499,6 +36503,335 @@ rosterRestore = function (i) {
   _rxRosterRestore(i);
   rxReplay().then((n) => n && refresh({ panel: false }));
 };
+/* ---------- Call avoidance incident log ----------
+   Each confirmed incident is logged with the agent, date, type and call ID. Zero tolerance:
+   - First incident: coach the agent on the policy (Coach this opens the Builder with the behavior and the evidence).
+   - Any further incident: refer to HR. "HR referral" copies a ready email with every incident and the coaching
+     date, and marks the agent as referred.
+   This month's incidents feed each agent's Call avoidance number (target 0).
+   Slice 'avoidLog' = { items: [{ id, date, member, type, callId, note, coached, hr }] } */
+const AV_TYPES = [
+  { k: 'release', label: 'Released or disconnected the call', opp: 'avoid-release' },
+  { k: 'silent', label: 'Silent or muted greeting', opp: 'avoid-silent-greeting' },
+  { k: 'lag', label: 'Delayed answer (lag)', opp: 'avoid-lag' },
+  { k: 'state', label: 'ACW, AUX or not ready to skip calls', opp: 'avoid-state-misuse' },
+  { k: 'transfer', label: 'Transferred to get rid of the call', opp: 'avoid-transfer-dump' },
+  { k: 'hold', label: 'Held until the customer hung up', opp: 'avoid-hold-abandon' },
+  { k: 'callback', label: 'Asked the customer to call back', opp: 'avoid-call-back-deflect' },
+];
+const avType = (k) => AV_TYPES.find((t) => t.k === k) || AV_TYPES[0];
+/* Newest first: by date, then by when it was logged (several incidents can share a date). */
+const avNewest = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : (b.at || 0) - (a.at || 0));
+
+EXT.slice('avoidLog', {
+  initial: () => ({ items: [] }),
+  clean: (raw) => {
+    const seen = new Set();
+    const items = [];
+    (Array.isArray(raw && raw.items) ? raw.items : []).slice(0, 2000).forEach((x) => {
+      if (!x || typeof x !== 'object' || !isIsoDate(x.date) || !isId(x.member)) return;
+      let id = isId(x.id) ? x.id : uid('av');
+      if (seen.has(id)) id = uid('av');
+      seen.add(id);
+      items.push({
+        id,
+        date: x.date,
+        member: x.member,
+        type: AV_TYPES.some((t) => t.k === x.type) ? x.type : 'release',
+        callId: str(x.callId, 60).replace(/\s+/g, ' ').trim(),
+        note: str(x.note, 300).replace(/\s+/g, ' ').trim(),
+        coached: isIsoDate(x.coached) ? x.coached : '',
+        hr: isIsoDate(x.hr) ? x.hr : '',
+        at: typeof x.at === 'number' && Number.isFinite(x.at) ? x.at : 0,
+      });
+    });
+    items.sort(avNewest);
+    return { items };
+  },
+  merge: (cur, inc) => {
+    const have = new Set(cur.items.map((x) => x.id));
+    const items = cur.items.concat(inc.items.filter((x) => !have.has(x.id)));
+    items.sort(avNewest);
+    return { items };
+  },
+});
+
+const avUi = { member: '', date: '', type: 'release', callId: '', note: '' };
+const avSave = () => EXT.save('avoidLog');
+const avInMonth = (x) => x.date.slice(0, 7) === todayDay().slice(0, 7);
+/** An agent's incidents, oldest first, and where they stand under the zero tolerance policy. */
+function avAgent(memberId) {
+  const list = EXT.data.avoidLog.items.filter((x) => x.member === memberId).slice().sort((a, b) => avNewest(b, a));
+  const coached = list.find((x) => x.coached);
+  const referred = list.filter((x) => x.hr).map((x) => x.hr).sort().pop() || '';
+  const afterRef = referred ? list.filter((x) => !x.hr) : [];
+  let stage = 'none';
+  if (list.length === 1) stage = coached ? 'warned' : 'coach';
+  else if (list.length > 1) stage = referred && !afterRef.length ? 'referred' : 'hr';
+  return { list, n: list.length, month: list.filter(avInMonth).length, coached: coached ? coached.coached : '', referred, stage };
+}
+const AV_STAGE = {
+  coach: { label: 'Coach on the policy', tone: 'near' },
+  warned: { label: 'Coached and warned', tone: 'near' },
+  hr: { label: 'Refer to HR', tone: 'bad' },
+  referred: { label: 'Referred to HR', tone: 'bad' },
+};
+
+/* ---------- The KPI: this month's incidents ---------- */
+const _avHubKpiValues = hubKpiValues;
+hubKpiValues = function (m) {
+  const out = _avHubKpiValues(m);
+  if (m) {
+    const a = avAgent(m.id);
+    if (a.month) out.Avoidance = a.month;
+  }
+  return out;
+};
+const _avMemberKpis = memberKpis;
+memberKpis = function (m) {
+  const out = _avMemberKpis(m);
+  if (!m || out.items.some((x) => x.k === 'Avoidance')) return out;
+  const a = avAgent(m.id);
+  if (!a.month) return out;
+  const item = { k: 'Avoidance', v: a.month, target: 0, meets: false, name: KPI_MEASURE.Avoidance.name, unit: KPI_MEASURE.Avoidance.unit, sub: `${plural(a.month, 'incident')} this month` };
+  out.items.push(item);
+  out.below = out.below.concat(item);
+  return out;
+};
+
+/* ---------- Actions ---------- */
+function avLog() {
+  const m = EXT.memberById(avUi.member);
+  if (!m) {
+    toast('Choose the agent first.', { type: 'warn' });
+    document.getElementById('av-mem')?.focus();
+    return;
+  }
+  const before = avAgent(m.id);
+  EXT.data.avoidLog.items.unshift({ id: uid('av'), date: isIsoDate(avUi.date) ? avUi.date : todayDay(), member: m.id, type: avUi.type, callId: str(avUi.callId, 60).trim(), note: str(avUi.note, 300).replace(/\s+/g, ' ').trim(), coached: '', hr: '', at: Date.now() });
+  EXT.data.avoidLog.items.sort(avNewest);
+  avSave();
+  avUi.callId = '';
+  avUi.note = '';
+  refresh({ panel: false });
+  if (before.n === 0) toast(`Logged for ${memberLabel(m)}. First incident: coach them on the zero tolerance policy.`, { type: 'warn', duration: 7000 });
+  else toast(`Logged for ${memberLabel(m)}: incident ${before.n + 1}. Zero tolerance: refer to HR for an investigation.`, { type: 'error', duration: 9000 });
+}
+
+function avDelete(id) {
+  const items = EXT.data.avoidLog.items;
+  const i = items.findIndex((x) => x.id === id);
+  if (i < 0) return;
+  const [gone] = items.splice(i, 1);
+  avSave();
+  refresh({ panel: false });
+  toast('Incident removed from the log', {
+    duration: 6000,
+    action: {
+      label: 'Undo',
+      fn: () => {
+        items.splice(Math.min(i, items.length), 0, gone);
+        avSave();
+        refresh({ panel: false });
+      },
+    },
+  });
+}
+
+async function avCoach(memberId) {
+  const m = EXT.memberById(memberId);
+  if (!m) return;
+  const a = avAgent(memberId);
+  const last = a.list[a.list.length - 1];
+  if (!last) return;
+  const t = avType(last.type);
+  const ok = await vcBuilderFor(m, 'Avoidance');
+  if (!ok) return;
+  state.builder.kpi = 'Avoidance';
+  const opp = getOpp(t.opp);
+  if (opp) addOppToBuilder(opp.id);
+  vcAppendEvidence(`Call avoidance log: ${t.label.toLowerCase()} on ${fmtDay(last.date, true)}${last.callId ? `, call ID ${last.callId}` : ''}${last.note ? ` (${last.note})` : ''}.`);
+  if (!last.coached) {
+    last.coached = todayDay();
+    avSave();
+  }
+  vcFinishBuilder(m);
+  toast(`Coaching ${memberLabel(m)} on call avoidance. The record states the zero tolerance policy and the HR referral.`);
+}
+
+function avHrText(m, a) {
+  const id = [m.hrid ? `HR ID ${m.hrid}` : '', maReal(m.bpid) ? `BP-ID ${m.bpid}` : ''].filter(Boolean).join(', ');
+  const lines = [
+    `Subject: HR investigation request: call avoidance, ${maFullName(m)}`,
+    '',
+    'Hello HR team,',
+    '',
+    `I am referring ${maFullName(m)}${id ? ` (${id})` : ''} for an HR investigation under the zero tolerance call avoidance policy. The agent has ${a.n} confirmed call avoidance incidents:`,
+    '',
+    ...a.list.map((x, i) => `${i + 1}. ${fmtDay(x.date, true)}: ${avType(x.type).label}${x.callId ? `, call ID ${x.callId}` : ''}${x.note ? `. ${x.note}` : ''}`),
+    '',
+    a.coached
+      ? `The agent was coached on the zero tolerance call avoidance policy on ${fmtDay(a.coached, true)} and was told that any further instance would be referred to HR for an investigation.`
+      : 'The agent was told about the zero tolerance call avoidance policy and that any further instance would be referred to HR for an investigation.',
+    '',
+    'The call recordings and the call and state logs for these dates are available on request. Please let me know the next steps.',
+    '',
+    'Thank you,',
+    state.kpis && state.kpis.tl ? state.kpis.tl : '',
+  ];
+  return lines.join('\n').trim();
+}
+
+async function avRefer(memberId, btn) {
+  const m = EXT.memberById(memberId);
+  if (!m) return;
+  const a = avAgent(memberId);
+  const ok = await copyText(avHrText(m, a), { label: 'HR referral email', button: btn });
+  if (!ok) return;
+  const today = todayDay();
+  a.list.forEach((x) => {
+    if (!x.hr) x.hr = today;
+  });
+  avSave();
+  refresh({ panel: false });
+  toast(`HR referral email copied for ${memberLabel(m)}. Paste it into Outlook. ${memberLabel(m)} is marked as referred to HR.`, { duration: 9000 });
+}
+
+/* ---------- Page ---------- */
+function avForm() {
+  const memSel = h(
+    'select',
+    { class: 'select', id: 'av-mem', 'data-fk': 'av-mem', onchange: (e) => { avUi.member = e.target.value; refresh({ panel: false }); } },
+    h('option', { value: '', selected: !avUi.member }, 'Choose the agent'),
+    state.team.members.map((m) => h('option', { value: m.id, selected: m.id === avUi.member }, memberLabel(m)))
+  );
+  const typeSel = h('select', { class: 'select', id: 'av-type', 'data-fk': 'av-type', onchange: (e) => (avUi.type = e.target.value) }, AV_TYPES.map((t) => h('option', { value: t.k, selected: t.k === avUi.type }, t.label)));
+  const cur = avUi.member ? avAgent(avUi.member) : null;
+  const warn = cur && cur.n
+    ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `${memberLabel(EXT.memberById(avUi.member))} already has ${plural(cur.n, 'incident')}${cur.coached ? `, coached on ${fmtDay(cur.coached)}` : ''}. Another incident means an HR referral.`))
+    : null;
+  return h(
+    'section',
+    { class: 'card si-card si-form', 'aria-labelledby': 'av-form-t' },
+    h('div', { class: 'si-card__head' }, h('span', { class: 'si-card__icon' }, icon('alert')), h('div', null, h('h2', { class: 'si-card__title', id: 'av-form-t' }, 'Log an incident'), h('p', { class: 'si-card__sub' }, 'Log only what you confirmed on the recording and in the call or state logs.'))),
+    h(
+      'div',
+      { class: 'si-form__row' },
+      h('div', { class: 'field si-form__mem' }, h('label', { class: 'field__label', for: 'av-mem' }, 'Agent'), memSel),
+      h('div', { class: 'field si-form__date' }, h('label', { class: 'field__label', for: 'av-date' }, 'Date'), h('input', { class: 'input', id: 'av-date', type: 'date', 'data-fk': 'av-date', max: todayDay(), value: avUi.date || todayDay(), onchange: (e) => (avUi.date = e.target.value) }))
+    ),
+    warn,
+    h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'av-type' }, 'What happened'), typeSel),
+    h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'av-call' }, 'Call ID (optional)'), h('input', { class: 'input', id: 'av-call', type: 'text', maxlength: '60', 'data-fk': 'av-call', autocomplete: 'off', placeholder: 'The call or interaction ID', value: avUi.callId, oninput: (e) => (avUi.callId = e.target.value) })),
+    h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'av-note' }, 'Note (optional)'), h('input', { class: 'input', id: 'av-note', type: 'text', maxlength: '300', 'data-fk': 'av-note', autocomplete: 'off', placeholder: 'What you saw, in a few words', value: avUi.note, oninput: (e) => (avUi.note = e.target.value) })),
+    h('div', { class: 'si-form__go' }, h('span', { class: 'si-form__verdict is-bad' }, icon('alert', 'icon--sm'), 'Zero tolerance'), h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'av-log', onclick: avLog }, icon('plus'), 'Log incident'))
+  );
+}
+
+function avTeamCard() {
+  const month = EXT.data.avoidLog.items.filter(avInMonth);
+  const people = state.team.members.map((m) => ({ m, a: avAgent(m.id) })).filter((x) => x.a.n);
+  const tile = (k, v, sub, cls, i) => h('div', { class: `si-stat ${cls || ''}`, style: `--d:${i * 40}ms` }, h('span', { class: 'si-stat__k' }, k), h('strong', { class: 'si-stat__v' }, v), sub ? h('span', { class: 'si-stat__sub' }, sub) : null);
+  const toRefer = people.filter((x) => x.a.stage === 'hr').length;
+  const toCoach = people.filter((x) => x.a.stage === 'coach').length;
+  return h(
+    'section',
+    { class: `card si-card si-team is-${month.length ? 'bad' : 'good'}`, 'aria-labelledby': 'av-team-t' },
+    h('div', { class: 'si-card__head' }, h('span', { class: 'si-card__icon' }, icon('shield')), h('div', null, h('h2', { class: 'si-card__title', id: 'av-team-t' }, 'Team this month'), h('p', { class: 'si-card__sub' }, 'Target: 0. First incident: coach on the policy. Any further incident: HR investigation.'))),
+    h(
+      'div',
+      { class: 'si-stats' },
+      tile('Incidents this month', String(month.length), month.length ? 'over the target of 0' : 'on target', month.length ? 'is-bad' : 'is-good', 0),
+      tile('Agents involved', String(new Set(month.map((x) => x.member)).size), `of ${plural(state.team.members.length, 'agent')}`, '', 1),
+      tile('To coach', String(toCoach), toCoach ? 'first incident, not coached yet' : 'none waiting', toCoach ? 'is-near' : 'is-good', 2),
+      tile('To refer to HR', String(toRefer), toRefer ? 'repeat incident' : 'none waiting', toRefer ? 'is-bad' : 'is-good', 3)
+    )
+  );
+}
+
+function avAgentsCard() {
+  const order = { hr: 0, coach: 1, warned: 2, referred: 3 };
+  const rows = state.team.members
+    .map((m) => ({ m, a: avAgent(m.id) }))
+    .filter((x) => x.a.n)
+    .sort((x, y) => order[x.a.stage] - order[y.a.stage] || y.a.n - x.a.n || memberLabel(x.m).localeCompare(memberLabel(y.m)));
+  return h(
+    'section',
+    { class: 'card si-card si-agents', 'aria-labelledby': 'av-ag-t' },
+    h('div', { class: 'si-card__head' }, h('span', { class: 'si-card__icon' }, icon('users')), h('div', null, h('h2', { class: 'si-card__title', id: 'av-ag-t' }, 'By agent'), h('p', { class: 'si-card__sub' }, rows.length ? 'HR referrals first, then agents to coach.' : 'No incidents logged. Every agent is on target.'))),
+    rows.length
+      ? h(
+          'ul',
+          { class: 'si-agents__list' },
+          rows.map(({ m, a }, i) => {
+            const st = AV_STAGE[a.stage];
+            const last = a.list[a.list.length - 1];
+            const sub = `${plural(a.n, 'incident')}, last ${fmtDay(last.date)}: ${avType(last.type).label.toLowerCase()}${a.coached ? ` · coached ${fmtDay(a.coached)}` : ''}${a.referred ? ` · referred ${fmtDay(a.referred)}` : ''}`;
+            const action =
+              a.stage === 'coach'
+                ? h('button', { type: 'button', class: 'btn btn--sm btn--primary si-agent__coach', 'data-fk': `av-coach:${m.id}`, onclick: () => avCoach(m.id) }, icon('target'), 'Coach this')
+                : a.stage === 'hr'
+                  ? h('button', { type: 'button', class: 'btn btn--sm btn--primary si-agent__coach', 'data-fk': `av-hr:${m.id}`, title: 'Copy the HR referral email and mark the agent as referred', onclick: (e) => avRefer(m.id, e.currentTarget) }, icon('copy'), 'HR referral')
+                  : a.stage === 'referred'
+                    ? h('button', { type: 'button', class: 'btn btn--sm si-agent__coach', 'data-fk': `av-hr:${m.id}`, title: 'Copy the HR referral email again', onclick: (e) => avRefer(m.id, e.currentTarget) }, icon('copy'), 'Copy email again')
+                    : h('button', { type: 'button', class: 'btn btn--sm si-agent__coach', 'data-fk': `av-coach:${m.id}`, title: 'Open the coaching record again', onclick: () => avCoach(m.id) }, icon('target'), 'Coach again');
+            return h(
+              'li',
+              { class: `si-agent is-${st.tone}`, style: `--d:${Math.min(i, 10) * 30}ms` },
+              h('div', { class: 'si-agent__who' }, h('span', { class: 'si-agent__name' }, memberLabel(m)), h('span', { class: 'si-agent__sub' }, sub)),
+              h('div', { class: 'si-agent__nums' }, h('span', { class: `si-agent__num si-agent__find is-bad` }, h('strong', null, String(a.n)), a.n === 1 ? ' incident' : ' incidents'), h('span', { class: `chip av-stage av-stage--${a.stage}` }, st.label)),
+              action
+            );
+          })
+        )
+      : h('p', { class: 'si-muted' }, 'Nothing logged yet.')
+  );
+}
+
+function avRecentCard() {
+  const items = EXT.data.avoidLog.items.slice(0, 50);
+  return h(
+    'section',
+    { class: 'card si-card si-recent', 'aria-labelledby': 'av-rc-t' },
+    h('div', { class: 'si-card__head' }, h('span', { class: 'si-card__icon' }, icon('list')), h('div', null, h('h2', { class: 'si-card__title', id: 'av-rc-t' }, 'Incident log'), h('p', { class: 'si-card__sub' }, EXT.data.avoidLog.items.length > 50 ? `The latest 50 of ${EXT.data.avoidLog.items.length}` : plural(EXT.data.avoidLog.items.length, 'incident')))),
+    items.length
+      ? h(
+          'ul',
+          { class: 'si-log' },
+          items.map((x) => {
+            const m = EXT.memberById(x.member);
+            return h(
+              'li',
+              { class: 'si-log__row is-bad' },
+              h('span', { class: 'si-log__date' }, fmtDay(x.date)),
+              h('span', { class: 'si-log__who' }, h('span', { class: 'si-log__name' }, m ? memberLabel(m) : 'Removed agent'), x.callId ? h('span', { class: 'chip si-log__prod' }, x.callId) : null),
+              h('span', { class: 'si-log__checks' }, x.hr ? h('span', { class: 'chip av-stage av-stage--referred' }, 'HR') : x.coached ? h('span', { class: 'chip av-stage av-stage--warned' }, 'Coached') : null),
+              h('span', { class: 'si-log__note' }, `${avType(x.type).label}${x.note ? `. ${x.note}` : ''}`),
+              h('button', { type: 'button', class: 'btn btn--sm btn--icon btn--ghost si-log__del', 'aria-label': 'Delete this incident', title: 'Delete', 'data-fk': `av-del:${x.id}`, onclick: () => avDelete(x.id) }, icon('trash'))
+            );
+          })
+        )
+      : emptyState({ iconName: 'alert', title: 'No incidents logged', text: 'Each confirmed call avoidance incident goes here, with the date and call ID, so a repeat is referred to HR with the full history.' })
+  );
+}
+
+EXT.view('avoidlog', {
+  title: 'Call avoidance log',
+  label: 'Call avoidance',
+  icon: 'alert',
+  badge: () => state.team.members.filter((m) => ['coach', 'hr'].includes(avAgent(m.id).stage)).length || null,
+  badgeLabel: 'agents to coach or refer to HR',
+  render(main) {
+    if (avUi.member && !EXT.memberById(avUi.member)) avUi.member = '';
+    put(
+      main,
+      pageHead({ eyebrow: 'Insights', title: 'Call avoidance log', sub: 'Zero tolerance. Log each confirmed incident. The first one is coached on the policy, and any further one is referred to HR for an investigation, with the full history ready to send.' }),
+      h('div', { class: 'si-page' }, avTeamCard(), h('div', { class: 'si-grid' }, avForm(), avAgentsCard()), avRecentCard())
+    );
+  },
+});
+EXT.order.splice(EXT.order.indexOf('avoidlog'), 1);
+EXT.order.splice(EXT.order.indexOf('integrity') + 1, 0, 'avoidlog');
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
 
