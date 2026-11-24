@@ -2822,5 +2822,172 @@ document.getElementById('freshPill').addEventListener('click',()=>document.getEl
     tb.addEventListener('scroll',navFade,{passive:true}); window.addEventListener('scroll',()=>{ if(!NAV_RAF) NAV_RAF=requestAnimationFrame(navStuck); },{passive:true}); let rz=0; window.addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(navMeasure,180); }); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>navInk(true)); }catch(e){ console.error(e); } }; }
 init();
 </script>
+<!-- ================= TEAM SNAPSHOT & DAILY TARGETS (Agents tab) -->
+<style>
+.snap-panel .panel-head{align-items:flex-start}
+.snap-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.snap-bar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:0 24px 14px;font-size:13px;color:var(--muted)}
+.snap-bar label{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--text)}
+.snap-bar input{height:34px;font-size:13px}
+.snap-bar input[type=number]{width:84px}
+.snap-tin{width:76px;height:32px;font-size:13px;font-weight:700;text-align:center}
+.snap-tin::placeholder{color:var(--muted);font-weight:500}
+.snap-from{display:block;font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap}
+.snap-cam{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.snap-att{font-weight:700}.snap-att.good{color:var(--good)}.snap-att.mid{color:var(--warn)}.snap-att.bad{color:var(--bad)}
+.snap-modal{position:fixed;inset:0;z-index:1000;background:rgba(6,20,30,.62);display:flex;align-items:center;justify-content:center;padding:16px}
+.snap-box{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);width:min(760px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}
+.snap-box header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.snap-box header h3{margin:0;font-size:16px}
+.snap-box .snap-prev{overflow:auto;padding:14px;background:var(--soft);flex:1;min-height:0;text-align:center}
+.snap-box .snap-prev img{max-width:100%;height:auto;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.snap-box footer{display:flex;flex-wrap:wrap;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.snap-box footer button{height:38px}
+.snap-x{background:none;border:0;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:4px 8px}
+@media(max-width:600px){.snap-bar{padding:0 12px 12px}.snap-box footer button{flex:1 1 45%}}
+</style>
+<script>
+(function(){
+'use strict';
+/* Per-agent daily targets: a target set for a day carries forward to later days until it is changed.
+   Saved in this browser (localStorage 'tsxAgentTargets'); an agent with no target of their own uses the
+   account rate from Data & settings. */
+const TG_KEY='tsxAgentTargets';
+let TG={byDay:{}}; try{ const s=JSON.parse(localStorage.getItem(TG_KEY)||'null'); if(s&&s.byDay&&typeof s.byDay==='object') TG=s; }catch(e){}
+let TG_DAYS=null; const tgDays=()=>TG_DAYS||(TG_DAYS=Object.keys(TG.byDay).filter(d=>TG.byDay[d]&&Object.keys(TG.byDay[d]).length).sort());
+const tgSave=()=>{ TG_DAYS=null; try{ localStorage.setItem(TG_KEY,JSON.stringify(TG)); }catch(e){ toast('Targets could not be saved in this browser',true); } };
+/* the target in force for an agent on a day: {v, from} (from = the day it was set, null = account rate) */
+function tgOf(hr,day){ const ds=tgDays(); for(let i=ds.length-1;i>=0;i--){ const d=ds[i]; if(d>day) continue; const v=TG.byDay[d][hr]; if(v!=null) return {v:+v,from:d}; } return {v:state.perAgent,from:null}; }
+function tgSet(hr,day,v){ if(v==null||v===''||isNaN(v)){ if(TG.byDay[day]){ delete TG.byDay[day][hr]; if(!Object.keys(TG.byDay[day]).length) delete TG.byDay[day]; } } else { (TG.byDay[day] ||= {})[hr]=Math.max(0,+v); } }
+window.agentDailyTarget=(hr,day)=>tgOf(hr,day).v;
+
+/* today's business day in Cairo (the day runs 14:00 → 07:00, cut at noon) */
+function cairoBizDay(){ try{ const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Cairo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value])); const d=`${p.year}-${p.month}-${p.day}`; return +p.hour<12?addDays(d,-1):d; }catch(e){ return new Date().toISOString().slice(0,10); } }
+let SNAP_DAY=null; const snapDay=()=>SNAP_DAY||(SNAP_DAY=cairoBizDay());
+const tf=v=>{ const s=(+v).toFixed(2).replace(/\.?0+$/,''); return s||'0'; };
+const attCls=a=>a==null?'':a>=1?'good':a>=.5?'mid':'bad';
+
+/* every number the panel and the images show, for the agents in the current scope */
+function snapData(){ if(!C) return null; const day=snapDay(), i0=C.i0, i1=C.i1, last=state.to;
+  const list=C.agents.map(a=>{ const rs=(C.byHr[a.hr]||[]); const dly=new Array(i1-i0+1).fill(0), dxm=new Array(i1-i0+1).fill(0); for(const r of rs){ const i=DI[r.d]; if(i==null||i<i0||i>i1) continue; dly[i-i0]+=r.u; dxm[i-i0]+=r.xm; }
+    let pt=0; const tday=[]; for(let i=i0;i<=i1;i++){ const t=tgOf(a.hr,DATES[i]).v; tday.push(t); pt+=t; } const t=tgOf(a.hr,day);
+    return {hr:a.hr, name:a.name, tl:a.tl, phase:a.phase, xm:a.xm, gsr:a.gsr, u:a.u, perDay:a.perDay, lastDay:dly[dly.length-1], dxm, lastTgt:tday[tday.length-1], dly, tday, pt, att:pt?a.u/pt:null, tgt:t.v, tgtFrom:t.from, explicit:!!(TG.byDay[day]&&TG.byDay[day][a.hr]!=null)}; });
+  list.sort((a,b)=>b.u-a.u||b.xm-a.xm||a.name.localeCompare(b.name)); list.forEach(a=>{ a.rank=list.filter(x=>x.u>a.u).length+1; });
+  const tot=list.reduce((o,a)=>{ o.xm+=a.xm; o.gsr+=a.gsr; o.u+=a.u; o.pt+=a.pt; o.last+=a.lastDay; o.lastT+=a.lastTgt; o.tgt+=a.tgt; return o; },{xm:0,gsr:0,u:0,pt:0,last:0,lastT:0,tgt:0});
+  const preset=({today:'Today','7':'Last 7 days','14':'Last 14 days',mtd:'Fiscal MTD','30':'Last 30 days',all:'All history'})[state.preset]||'Selected period';
+  const team=state.tl!=='All'?state.tl:(state.om!=='All'?state.om:'All teams');
+  return {day, last, list, tot, len:C.len, preset, team, isTeam:state.tl!=='All', period:`${fds(state.from)} – ${fds(state.to)} ${state.to.slice(0,4)}`, partial:typeof partialDay==='function'&&partialDay(i1)}; }
+
+/* ---------------------------------------------------------------- panel */
+function ensurePanel(){ let p=document.getElementById('snapPanel'); if(p) return p; const host=document.getElementById('agentCards'); if(!host) return null;
+  p=document.createElement('div'); p.className='panel snap-panel'; p.id='snapPanel'; p.style.marginBottom='20px';
+  p.innerHTML=`<div class="panel-head"><div><span class="eyebrow">Share with your team</span><h2>Team snapshot &amp; daily targets</h2><p id="snapSub"></p></div><div class="snap-actions"><button type="button" class="primary snap-cam" id="snapTeam"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Team screenshot</button></div></div>
+  <div class="snap-bar"><label>Target day <input type="date" id="snapDay"></label><label>Set everyone to <input type="number" id="snapAll" min="0" step="0.05" placeholder="e.g. 1"></label><button type="button" class="secondary" id="snapAllBtn">Apply to all</button><button type="button" class="text-button" id="snapClear">Clear this day</button><span id="snapNote"></span></div>
+  <div class="table-wrap table-tall" id="snapTable"></div>
+  <div class="table-note"><span>Target = sales (XM lines + GSR units) per day. A target set for a day stays in force on the next days until you change it · agents without one use the account rate from Data &amp; settings · saved in this browser.</span></div>`;
+  host.insertAdjacentElement('afterend',p);
+  const di=p.querySelector('#snapDay'); di.addEventListener('change',()=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(di.value)){ SNAP_DAY=di.value; renderSnap(); } });
+  p.querySelector('#snapAllBtn').addEventListener('click',()=>{ const s=p.querySelector('#snapAll').value.trim(); if(s===''||isNaN(+s)||+s<0){ toast('Type a target first (sales per day)',true); return; } const D=snapData(); if(!D||!D.list.length) return; for(const a of D.list) tgSet(a.hr,D.day,+s); tgSave(); renderSnap(); toast(`Target ${tf(+s)} set for ${D.list.length} agents from ${fd(D.day)}`); });
+  p.querySelector('#snapClear').addEventListener('click',()=>{ const d=snapDay(); const D=snapData(); if(!D) return; let n=0; for(const a of D.list) if(TG.byDay[d]&&TG.byDay[d][a.hr]!=null){ tgSet(a.hr,d,null); n++; } tgSave(); renderSnap(); toast(n?`Cleared ${n} target${n>1?'s':''} set for ${fd(d)}`:`No targets were set for ${fd(d)} in this scope`); });
+  p.querySelector('#snapTeam').addEventListener('click',()=>{ const D=snapData(); if(!D||!D.list.length){ toast('No agents in the current scope',true); return; } if(D.list.length>60){ toast(`${D.list.length} agents in scope – pick a team leader in the filters first`,true); return; } openShare(drawTeam(D), `${D.team} – ${D.preset} – ${D.last}.png`, teamText(D), `${D.team} · team snapshot`); });
+  return p; }
+
+function renderSnap(){ const p=ensurePanel(); if(!p||!C) return; const D=snapData(); if(!D) return;
+  p.querySelector('#snapDay').value=D.day;
+  p.querySelector('#snapSub').textContent=`${D.isTeam?'Team '+D.team:D.team} · ${D.list.length} agents · ${D.preset} (${D.period}) · last day ${fd(D.last)}${D.partial?' (partial)':''} · targets shown for ${fd(D.day)}`;
+  const set=D.list.filter(a=>a.explicit).length; p.querySelector('#snapNote').textContent=set?`${set} of ${D.list.length} set for this day`:'';
+  const host=p.querySelector('#snapTable');
+  host.innerHTML=`<table class="data-table"><thead><tr><th>#</th><th style="text-align:left">Agent</th><th>XM · GSR</th><th>Total</th><th>Last day<br><small>${esc(fds(D.last))}</small></th><th>Per day</th><th>Achieved<br><small>vs period target</small></th><th>Target / day<br><small>${esc(fd(D.day))}</small></th><th>Screenshot</th></tr></thead><tbody>${D.list.map(a=>`<tr data-hr="${esc(a.hr)}"><td>${rankPill(a.u>0?a.rank:null)}</td><td class="c-name" style="text-align:left"><span class="row-name">${esc(a.name)}</span><span class="row-sub">${esc(a.hr)} · ${esc(a.phase)}</span></td><td><b style="color:var(--s1)">${n0(a.xm)}</b> · <b style="color:var(--s2)">${n0(a.gsr)}</b></td><td><b>${n0(a.u)}</b></td><td>${n0(a.lastDay)} <span class="stack-sub">of ${tf(a.lastTgt)}</span></td><td>${n2(a.perDay)}</td><td><span class="snap-att ${attCls(a.att)}">${a.att==null?'–':Math.round(a.att*100)+'%'}</span><span class="stack-sub">${n0(a.u)} of ${tf(a.pt)}</span></td><td><input class="snap-tin" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Target per day for ${esc(a.name)} from ${esc(fd(D.day))}" value="${a.explicit?tf(a.tgt):''}" placeholder="${tf(a.tgt)}"><span class="snap-from">${a.explicit?'set for this day':a.tgtFrom?'from '+esc(fds(a.tgtFrom)):'account rate'}</span></td><td><button type="button" class="secondary snap-cam" data-snap="${esc(a.hr)}"><svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Agent</button></td></tr>`).join('')}</tbody>
+  <tfoot><tr class="total"><td></td><td class="c-name" style="text-align:left"><b>Team total</b></td><td><b style="color:var(--s1)">${n0(D.tot.xm)}</b> · <b style="color:var(--s2)">${n0(D.tot.gsr)}</b></td><td><b>${n0(D.tot.u)}</b></td><td><b>${n0(D.tot.last)}</b> <span class="stack-sub">of ${tf(D.tot.lastT)}</span></td><td>${n2(D.tot.u/Math.max(1,D.len)/Math.max(1,D.list.length))}</td><td><span class="snap-att ${attCls(D.tot.pt?D.tot.u/D.tot.pt:null)}">${D.tot.pt?Math.round(D.tot.u/D.tot.pt*100)+'%':'–'}</span><span class="stack-sub">${n0(D.tot.u)} of ${tf(D.tot.pt)}</span></td><td><b>${tf(D.tot.tgt)}</b><span class="snap-from">team / day</span></td><td></td></tr></tfoot></table>`;
+  host.querySelectorAll('input.snap-tin').forEach(inp=>inp.addEventListener('change',()=>{ const hr=inp.closest('tr').dataset.hr, s=inp.value.trim(); if(s!==''&&(isNaN(+s)||+s<0)){ toast('A target is a number of sales per day',true); return; } tgSet(hr,snapDay(),s===''?null:+s); tgSave(); setTimeout(()=>{ const ae=document.activeElement, fhr=ae&&ae.classList&&ae.classList.contains('snap-tin')?ae.closest('tr').dataset.hr:null, y=host.scrollTop; renderSnap(); host.scrollTop=y; if(fhr){ const n=host.querySelector(`tr[data-hr="${fhr}"] input.snap-tin`); if(n){ n.focus({preventScroll:true}); n.select(); } } },0); })); // redraw after the blur that fired this change, keeping focus on the next box
+  host.querySelectorAll('button[data-snap]').forEach(b=>b.addEventListener('click',()=>{ const D2=snapData(); const a=D2&&D2.list.find(x=>x.hr===b.dataset.snap); if(!a) return; openShare(drawAgent(a,D2), `${a.name} – ${D2.preset} – ${D2.last}.png`, agentText(a,D2), `${a.name} · agent snapshot`); }));
+}
+
+/* ---------------------------------------------------------------- images (canvas, always light so they read well in WhatsApp) */
+const FONT='"Segoe UI",-apple-system,BlinkMacSystemFont,Inter,Roboto,Arial,sans-serif';
+const K={bg:'#f3f6f8',card:'#ffffff',text:'#162d3b',muted:'#5d6b76',line:'#dce4ea',soft:'#f7f9fb',teal:'#007b86',tealSoft:'#e4f4f4',xm:'#1097a3',gsr:'#eb6834',orange:'#e67a3b',navy:'#123448',navy2:'#1a4560',good:'#1b7f5c',goodBg:'#e8f5ef',bad:'#bb4d54',badBg:'#faecef',warn:'#a16b15',warnBg:'#fbf4de',gold:'#c98500'};
+const attK=a=>a==null?[K.muted,K.soft]:a>=1?[K.good,K.goodBg]:a>=.5?[K.warn,K.warnBg]:[K.bad,K.badBg];
+function mk(w,h){ const s=2, c=document.createElement('canvas'); c.width=w*s; c.height=h*s; const g=c.getContext('2d'); g.scale(s,s); g.textBaseline='alphabetic'; return [c,g]; }
+function rr(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+function tx(g,s,x,y,o={}){ g.font=`${o.w||400} ${o.s||14}px ${FONT}`; g.fillStyle=o.c||K.text; g.textAlign=o.a||'left'; let t=String(s); if(o.max){ if(g.measureText(t).width>o.max){ while(t.length>1&&g.measureText(t+'…').width>o.max) t=t.slice(0,-1); t+='…'; } } g.fillText(t,x,y); return g.measureText(t).width; }
+function header(g,W,eyebrow,title,sub,right1,right2){ const gr=g.createLinearGradient(0,0,W,0); gr.addColorStop(0,K.navy); gr.addColorStop(1,K.navy2); g.fillStyle=gr; g.fillRect(0,0,W,118); g.fillStyle=K.orange; g.fillRect(0,118,W,4);
+  tx(g,eyebrow,32,34,{s:12,w:700,c:'#72d7d8'}); tx(g,title,32,72,{s:30,w:700,c:'#ffffff',max:W-330}); tx(g,sub,32,100,{s:14,c:'rgba(225,236,243,.86)',max:W-330});
+  if(right1){ rr(g,W-262,26,230,70,12); g.fillStyle='rgba(255,255,255,.08)'; g.fill(); g.strokeStyle='rgba(255,255,255,.18)'; g.stroke(); tx(g,right1,W-147,52,{s:12,w:600,c:'rgba(225,236,243,.8)',a:'center'}); tx(g,right2,W-147,82,{s:22,w:700,c:'#ffffff',a:'center'}); } }
+function kpi(g,x,y,w,h,label,value,sub,col){ rr(g,x,y,w,h,12); g.fillStyle=K.card; g.fill(); g.strokeStyle=K.line; g.lineWidth=1; g.stroke(); tx(g,label,x+16,y+26,{s:12.5,w:600,c:K.muted,max:w-32}); tx(g,value,x+16,y+62,{s:28,w:700,c:col||K.text,max:w-32}); if(sub) tx(g,sub,x+16,y+86,{s:12.5,c:K.muted,max:w-32}); }
+function footer(g,W,H,D){ g.fillStyle=K.line; g.fillRect(0,H-44,W,1); tx(g,`VXI | TSX · Cairo Repair Sales · data through ${fdl(META.maxDate)}${D.partial?' (last day partial)':''}`,32,H-17,{s:12,c:K.muted,max:W*.62}); const n=new Date(); tx(g,`Generated ${n.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})} ${n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · sales = XM lines + GSR units`,W-32,H-17,{s:12,c:K.muted,a:'right'}); }
+
+function drawTeam(D){ const W=1000, rowH=44, n=D.list.length, tblY=290, H=tblY+46+n*rowH+rowH+40+44; const [c,g]=mk(W,H);
+  g.fillStyle=K.bg; g.fillRect(0,0,W,H);
+  header(g,W,'VXI | TSX · SALES BREAKDOWN',D.isTeam?'Team '+D.team:D.team,`${D.preset} · ${D.period} · ${n} agents`,'TARGET DAY',fd(D.day));
+  const tAtt=D.tot.pt?D.tot.u/D.tot.pt:null, kw=(W-64-36)/4;
+  kpi(g,32,146,kw,104,'Team sales',n0(D.tot.u),`XM ${n0(D.tot.xm)} · GSR ${n0(D.tot.gsr)}`);
+  kpi(g,32+(kw+12),146,kw,104,'Achieved vs target',tAtt==null?'–':Math.round(tAtt*100)+'%',`${n0(D.tot.u)} of ${tf(D.tot.pt)} for the period`,attK(tAtt)[0]);
+  kpi(g,32+(kw+12)*2,146,kw,104,`Last day · ${fds(D.last)}`,n0(D.tot.last),`target ${tf(D.tot.lastT)} · ${D.tot.lastT?Math.round(D.tot.last/D.tot.lastT*100)+'%':'–'}`, D.tot.lastT?attK(D.tot.last/D.tot.lastT)[0]:K.text);
+  kpi(g,32+(kw+12)*3,146,kw,104,`Team target · ${fds(D.day)}`,tf(D.tot.tgt),'sales for the day',K.orange);
+  /* table */
+  const X=32, TW=W-64; const cols=[{k:'#',x:X+14,a:'left'},{k:'Agent',x:X+56,a:'left'},{k:'XM',x:X+372,a:'right'},{k:'GSR',x:X+432,a:'right'},{k:'Total',x:X+500,a:'right'},{k:`Last day`,x:X+578,a:'center'},{k:'Per day',x:X+668,a:'right'},{k:'Achieved',x:X+700,a:'left'},{k:`Target ${fds(D.day)}`,x:X+TW-14,a:'right'}];
+  rr(g,X,tblY-6,TW,46+n*rowH+rowH+12,12); g.fillStyle=K.card; g.fill(); g.strokeStyle=K.line; g.stroke();
+  g.fillStyle=K.soft; g.fillRect(X+1,tblY-5,TW-2,40); for(const cl of cols) tx(g,cl.k.toUpperCase(),cl.x,tblY+20,{s:11,w:700,c:K.muted,a:cl.a});
+  let y=tblY+34; D.list.forEach((a,i)=>{ if(i%2===1){ g.fillStyle='#fafcfd'; g.fillRect(X+1,y,TW-2,rowH); } g.fillStyle=K.line; g.fillRect(X+12,y+rowH-.5,TW-24,.5); const cy=y+rowH/2+5;
+    const medal=a.rank<=3&&a.u>0?[K.gold,'#8a96a3','#b0703c'][a.rank-1]:null; if(medal){ g.beginPath(); g.arc(X+24,cy-5,12,0,Math.PI*2); g.fillStyle=medal; g.fill(); tx(g,a.rank,X+24,cy,{s:12,w:700,c:'#fff',a:'center'}); } else tx(g,a.u>0?a.rank:'–',X+24,cy,{s:13,w:600,c:K.muted,a:'center'});
+    tx(g,a.name,X+56,cy,{s:14.5,w:600,max:250}); if(a.phase&&a.phase!=='Production') tx(g,a.phase,X+56+Math.min(250,g.measureText(a.name).width)+8,cy,{s:11,w:600,c:K.warn});
+    tx(g,n0(a.xm),X+372,cy,{s:14,w:600,c:K.xm,a:'right'}); tx(g,n0(a.gsr),X+432,cy,{s:14,w:600,c:K.gsr,a:'right'}); tx(g,n0(a.u),X+500,cy,{s:15,w:700,a:'right'});
+    tx(g,`${n0(a.lastDay)}`,X+556,cy,{s:14,w:700,a:'right',c:a.lastTgt&&a.lastDay>=a.lastTgt?K.good:K.text}); tx(g,`/${tf(a.lastTgt)}`,X+559,cy,{s:11.5,c:K.muted});
+    tx(g,n2(a.perDay),X+668,cy,{s:14,a:'right'});
+    const [ac]=attK(a.att), bw=90, bx=X+700, by=cy-9; rr(g,bx,by,bw,8,4); g.fillStyle='#e9eff3'; g.fill(); if(a.att){ rr(g,bx,by,Math.max(6,bw*Math.min(1,a.att)),8,4); g.fillStyle=ac; g.fill(); } tx(g,a.att==null?'–':Math.round(a.att*100)+'%',bx+bw+8,cy,{s:13,w:700,c:ac});
+    const pill=tf(a.tgt), pw=Math.max(54,g.measureText(pill).width+28); rr(g,X+TW-14-pw,cy-21,pw,28,14); g.fillStyle='#fdeee4'; g.fill(); g.strokeStyle='#f3c3a3'; g.stroke(); tx(g,pill,X+TW-14-pw/2,cy-2,{s:15,w:700,c:'#b8531d',a:'center'});
+    y+=rowH; });
+  /* total row */
+  const cy=y+rowH/2+5; g.fillStyle=K.tealSoft; g.fillRect(X+1,y,TW-2,rowH); tx(g,'Team total',X+56,cy,{s:14.5,w:700}); tx(g,n0(D.tot.xm),X+372,cy,{s:14,w:700,c:K.xm,a:'right'}); tx(g,n0(D.tot.gsr),X+432,cy,{s:14,w:700,c:K.gsr,a:'right'}); tx(g,n0(D.tot.u),X+500,cy,{s:15,w:700,a:'right'}); tx(g,n0(D.tot.last),X+556,cy,{s:14,w:700,a:'right'}); tx(g,`/${tf(D.tot.lastT)}`,X+559,cy,{s:11.5,c:K.muted}); tx(g,n2(D.tot.u/Math.max(1,D.len)/Math.max(1,n)),X+668,cy,{s:14,w:600,a:'right'}); tx(g,tAtt==null?'–':Math.round(tAtt*100)+'%',X+700,cy,{s:13,w:700,c:attK(tAtt)[0]}); tx(g,tf(D.tot.tgt),X+TW-14-27,cy-2,{s:15,w:700,c:'#b8531d',a:'center'});
+  footer(g,W,H,D); return c; }
+
+function drawAgent(a,D){ const W=900, H=760; const [c,g]=mk(W,H); g.fillStyle=K.bg; g.fillRect(0,0,W,H);
+  header(g,W,'VXI | TSX · AGENT SNAPSHOT',a.name,`${a.tl} · ${a.phase} · ${D.preset} · ${D.period}`,'RANK IN TEAM',`#${a.rank} of ${D.list.length}`);
+  /* target banner */
+  rr(g,32,146,W-64,84,14); const gb=g.createLinearGradient(32,0,W-32,0); gb.addColorStop(0,'#fdeee4'); gb.addColorStop(1,'#fff6ef'); g.fillStyle=gb; g.fill(); g.strokeStyle='#f3c3a3'; g.stroke();
+  tx(g,`YOUR TARGET FOR ${fd(D.day).toUpperCase()}`,56,178,{s:13,w:700,c:'#b8531d'}); tx(g,`${tf(a.tgt)} sale${+a.tgt===1?'':'s'}`,56,214,{s:30,w:700,c:K.text}); tx(g,'XM lines + GSR units',W-56,214,{s:13,c:K.muted,a:'right'}); tx(g,a.tgtFrom&&a.tgtFrom!==D.day?`set ${fds(a.tgtFrom)}`:'',W-56,178,{s:12,c:K.muted,a:'right'});
+  const kw=(W-64-36)/4;
+  kpi(g,32,250,kw,104,'Total sales',n0(a.u),`XM ${n0(a.xm)} · GSR ${n0(a.gsr)}`);
+  kpi(g,32+(kw+12),250,kw,104,'Per day',n2(a.perDay),`over ${D.len} day${D.len>1?'s':''}`);
+  kpi(g,32+(kw+12)*2,250,kw,104,'Achieved vs target',a.att==null?'–':Math.round(a.att*100)+'%',`${n0(a.u)} of ${tf(a.pt)} for the period`,attK(a.att)[0]);
+  kpi(g,32+(kw+12)*3,250,kw,104,`Last day · ${fds(D.last)}`,n0(a.lastDay),`target ${tf(a.lastTgt)}`,a.lastTgt?attK(a.lastDay/a.lastTgt)[0]:K.text);
+  /* daily chart: columns = sales per day, dashed step = that day's target */
+  const cx=32, cy0=374, cw=W-64, ch=316; rr(g,cx,cy0,cw,ch,12); g.fillStyle=K.card; g.fill(); g.strokeStyle=K.line; g.stroke();
+  tx(g,'Sales per day vs target',cx+18,cy0+30,{s:15,w:700}); const lg=cx+cw-18; tx(g,'target',lg,cy0+30,{s:12,c:K.muted,a:'right'}); g.strokeStyle=K.orange; g.setLineDash([5,4]); g.lineWidth=2; g.beginPath(); g.moveTo(lg-74,cy0+26); g.lineTo(lg-48,cy0+26); g.stroke(); g.setLineDash([]); tx(g,'GSR',lg-90,cy0+30,{s:12,c:K.muted,a:'right'}); g.fillStyle=K.gsr; g.fillRect(lg-130,cy0+20,10,10); tx(g,'XM',lg-142,cy0+30,{s:12,c:K.muted,a:'right'}); g.fillStyle=K.xm; g.fillRect(lg-176,cy0+20,10,10);
+  const show=Math.min(31,a.dly.length), off=a.dly.length-show, vals=a.dly.slice(off), tg=a.tday.slice(off), xmA=a.dxm.slice(off);
+  const px=cx+46, pw=cw-66, py=cy0+52, ph=ch-100, mx=Math.max(1,...vals,...tg)*1.15, yv=v=>py+ph-ph*v/mx;
+  g.strokeStyle='#e6edf2'; g.lineWidth=1; const step=mx<=4?1:mx<=10?2:mx<=25?5:10; for(let v=0;v<=mx;v+=step){ const yy=yv(v); g.beginPath(); g.moveTo(px,yy); g.lineTo(px+pw,yy); g.stroke(); tx(g,v,px-8,yy+4,{s:11,c:K.muted,a:'right'}); }
+  const bw=pw/show; for(let k=0;k<show;k++){ const w=Math.min(bw*.68,48), x=px+k*bw+(bw-w)/2, v=vals[k], xv=Math.min(v,xmA[k]); if(v>0){ const yT=yv(v), yX=yv(xv); g.fillStyle=K.gsr; rr(g,x,yT,w,yv(0)-yT,Math.min(4,w/2)); g.fill(); if(xv>0){ g.fillStyle=K.xm; g.fillRect(x,yX,w,yv(0)-yX); } if(show<=16) tx(g,v,x+w/2,yT-6,{s:11,w:700,a:'center'}); }
+    const d=DATES[C.i1-show+1+k]; if(show<=16||k%Math.ceil(show/10)===0||k===show-1) tx(g,show<=10?fd(d):fds(d),x+w/2,py+ph+20,{s:10.5,c:K.muted,a:'center'}); }
+  g.strokeStyle=K.orange; g.lineWidth=2; g.setLineDash([5,4]); g.beginPath(); for(let k=0;k<show;k++){ const yy=yv(tg[k]); if(k===0) g.moveTo(px+k*bw,yy); else g.lineTo(px+k*bw,yy); g.lineTo(px+(k+1)*bw,yy); } g.stroke(); g.setLineDash([]);
+  footer(g,W,H,D); return c; }
+
+/* ---------------------------------------------------------------- WhatsApp text */
+function teamText(D){ const L=[`*${D.isTeam?'Team '+D.team:D.team} – ${D.preset}* (${D.period})`, `Team: *${n0(D.tot.u)}* sales (XM ${n0(D.tot.xm)} · GSR ${n0(D.tot.gsr)})${D.tot.pt?` · ${Math.round(D.tot.u/D.tot.pt*100)}% of target`:''}`, '', `🎯 *Targets for ${fd(D.day)}*`];
+  D.list.forEach(a=>L.push(`${a.rank}. ${a.name} – *${tf(a.tgt)}* · so far ${n0(a.u)}${a.att!=null?` (${Math.round(a.att*100)}%)`:''}`)); L.push('', `Team target for the day: *${tf(D.tot.tgt)}*`); return L.join('\n'); }
+function agentText(a,D){ return [`*${a.name}* – ${D.preset} (${D.period})`, `Sales: *${n0(a.u)}* (XM ${n0(a.xm)} · GSR ${n0(a.gsr)}) · ${n2(a.perDay)} per day`, a.att!=null?`Achieved: *${Math.round(a.att*100)}%* of ${tf(a.pt)}`:'', `Rank in team: #${a.rank} of ${D.list.length}`, '', `🎯 Your target for ${fd(D.day)}: *${tf(a.tgt)}* sale${+a.tgt===1?'':'s'}`].filter(Boolean).join('\n'); }
+
+/* ---------------------------------------------------------------- share dialog */
+function openShare(canvas, filename, text, title){ const fn=filename.replace(/[\\/:*?"<>|]+/g,'-'); canvas.toBlob(blob=>{ if(!blob){ toast('Could not create the image',true); return; }
+  const url=URL.createObjectURL(blob), file=(()=>{ try{ return new File([blob],fn,{type:'image/png'}); }catch(e){ return null; } })();
+  const canShare=!!(file&&navigator.canShare&&navigator.canShare({files:[file]})), canCopy=!!(navigator.clipboard&&window.ClipboardItem);
+  const m=document.createElement('div'); m.className='snap-modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label',title);
+  m.innerHTML=`<div class="snap-box"><header><h3>${esc(title)}</h3><button type="button" class="snap-x" aria-label="Close">×</button></header><div class="snap-prev"><img alt="${esc(title)}" src="${url}"></div><footer>${canShare?'<button type="button" class="primary" data-a="share">Share to WhatsApp…</button>':''}${canCopy?`<button type="button" class="${canShare?'secondary':'primary'}" data-a="copy">Copy image</button>`:''}<button type="button" class="secondary" data-a="dl">Download PNG</button><button type="button" class="secondary" data-a="text">Copy WhatsApp text</button><button type="button" class="secondary" data-a="wa">Open WhatsApp with text</button></footer></div>`;
+  const close=()=>{ m.remove(); URL.revokeObjectURL(url); document.removeEventListener('keydown',esc_); }; const esc_=e=>{ if(e.key==='Escape') close(); };
+  m.addEventListener('click',async e=>{ if(e.target===m||e.target.closest('.snap-x')) return close(); const b=e.target.closest('button[data-a]'); if(!b) return; const k=b.dataset.a;
+    try{ if(k==='share'){ await navigator.share({files:[file],title,text}); }
+      else if(k==='copy'){ await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); toast('Image copied – paste it in WhatsApp (Ctrl+V)'); }
+      else if(k==='dl'){ const l=document.createElement('a'); l.href=url; l.download=fn; document.body.appendChild(l); l.click(); l.remove(); }
+      else if(k==='text'){ await navigator.clipboard.writeText(text); toast('Text copied – paste it in WhatsApp'); }
+      else if(k==='wa'){ window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener'); } }
+    catch(err){ if(err&&err.name==='AbortError') return; toast('That did not work here ('+(err&&err.message||err)+') – try Download PNG',true); } });
+  document.addEventListener('keydown',esc_); document.body.appendChild(m); const f=m.querySelector('footer button'); if(f) f.focus(); },'image/png'); }
+
+/* ---------------------------------------------------------------- hooks: draw with the Agents tab; the per-agent rate change redraws too */
+const base=VIEWS.agents; VIEWS.agents=function(){ base.apply(this,arguments); try{ renderSnap(); }catch(e){ console.error(e); } };
+if(typeof C!=='undefined'&&C&&state.tab==='agents') try{ renderSnap(); }catch(e){ console.error(e); } // the first build ran before this script
+})();
+</script>
+
 </body>
 </html>
