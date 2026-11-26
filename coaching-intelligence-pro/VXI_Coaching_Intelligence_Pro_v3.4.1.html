@@ -6077,7 +6077,8 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .ma-empty { margin: 0 0 14px; }
 
 /* ---------- The table ---------- */
-.ma-table { min-width: 560px; }
+.ma-table { min-width: 980px; }
+.ma-table td.ma-email .ma-id { max-width: 260px; }
 .ma-table tbody tr.is-alt { background: color-mix(in srgb, var(--text) 2.5%, transparent); }
 .ma-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
 .ma-n { width: 36px; text-align: center; color: var(--text-2); font-variant-numeric: tabular-nums; }
@@ -6132,6 +6133,10 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
   .ma-table tbody td.ma-act { order: 2; flex: none; width: auto; margin-left: auto; }
   .ma-table tbody td[data-label="HR ID"] { order: 3; flex: 1 1 40%; min-width: 0; }
   .ma-table tbody td[data-label="BP-ID"] { order: 4; flex: 1 1 40%; min-width: 0; }
+  .ma-table tbody td[data-label="Avaya ID"] { order: 5; flex: 1 1 40%; min-width: 0; }
+  .ma-table tbody td[data-label="Extension"] { order: 6; flex: 1 1 40%; min-width: 0; }
+  .ma-table tbody td[data-label="Comcast email"] { order: 7; flex: 1 1 100%; min-width: 0; }
+  .ma-table td.ma-email .ma-id { max-width: 100%; }
   .ma-table tbody td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; color: var(--text-2); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; }
   .ma-id { padding: 6px 9px; }
 }
@@ -7445,7 +7450,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.4.0';
+const APP_VERSION = '3.4.1';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -7796,6 +7801,14 @@ function piiWarnings(text, opts = {}) {
   const team = typeof state !== 'undefined' && state.team ? state.team.members : [];
   const low = t.toLowerCase();
   if (team.some((m) => [m.hrid, m.bpid].some((v) => v && v.length >= 3 && low.includes(v.toLowerCase())))) out.push('an HRID or BP-ID from your team list');
+  // Avaya IDs, extensions and Comcast emails from My agents (long enough not to match ordinary numbers).
+  let extra = [];
+  try {
+    extra = team.map((m) => maAgentIds(m));
+  } catch (e) {
+    extra = []; // My agents is not set up yet while the app starts
+  }
+  if (extra.some((x) => [x.avaya, x.ext, x.email].some((v) => v && v.length >= 5 && low.includes(v.toLowerCase())))) out.push('an Avaya ID, extension or Comcast email from your team list');
   if (opts.names !== false && team.some((m) => m.name && m.name.length >= 3 && new RegExp(`\\b${m.name.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(t))) out.push('a name from your team list');
   return dedupe(out);
 }
@@ -31652,7 +31665,7 @@ kwCard = function () {
 };
 /* ===== layer: layers/87-myagents.js ===== */
 /* ==========================================================================
-   87-myagents: My agents, the one page that shows HR IDs and BP-IDs
+   87-myagents: My agents, the one page that shows HR IDs, BP-IDs, Avaya IDs, extensions and Comcast emails
    - Every agent with a copy button for the HR ID and the BP-ID, and "Copy all" for Excel.
    - "Load roster" reads the TSX roster (HRID, Agent Name, BP-ID) and fills the IDs.
    - The IDs live in this browser and in the backup file only, never in the app file,
@@ -31696,6 +31709,43 @@ EXT.slice('siteRoster', {
 });
 /** The roster entry for an HR ID (from the last roster loaded), or null. */
 const maRosterInfo = (hrid) => (hrid ? EXT.data.siteRoster.items.find((x) => x.hrid === hrid) || null : null);
+
+/* Avaya ID, extension and Comcast email per team member, kept in this browser and in backups only.
+   A Comcast email is a work address; any other email in the roster is never kept. */
+const MA_EXTRA = ['avaya', 'ext', 'email'];
+/** A work email in lower case, or '' when it does not look like an email. */
+const maCleanEmail = (v) => {
+  const e = str(String(v ?? ''), 120).trim().replace(/^mailto:/i, '').toLowerCase();
+  return /^[a-z0-9._%+'-]+@[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/.test(e) ? e : '';
+};
+EXT.slice('agentIds', {
+  initial: () => ({ items: {} }),
+  clean: (raw) => {
+    const items = {};
+    Object.entries(raw && raw.items && typeof raw.items === 'object' ? raw.items : {})
+      .slice(0, 200)
+      .forEach(([id, v]) => {
+        if (!isId(id) || !v || typeof v !== 'object') return;
+        const o = {};
+        if (typeof v.avaya === 'string') o.avaya = cleanStaffId(v.avaya);
+        if (typeof v.ext === 'string') o.ext = cleanStaffId(v.ext);
+        if (typeof v.email === 'string') o.email = maCleanEmail(v.email);
+        items[id] = o;
+      });
+    return { items };
+  },
+});
+/** A member's Avaya ID, extension and Comcast email. A value typed or loaded here wins; Avaya ID and
+    extension otherwise come from the last roster loaded (an emptied field stays empty). */
+function maAgentIds(m) {
+  const own = (m && EXT.data.agentIds && EXT.data.agentIds.items[m.id]) || {};
+  const r = (m && maRosterInfo(m.hrid)) || {};
+  return {
+    avaya: 'avaya' in own ? own.avaya : r.avaya || '',
+    ext: 'ext' in own ? own.ext : r.ext || '',
+    email: own.email || '',
+  };
+}
 const maFullName = (m) => (EXT.data.agentInfo.items[m.id] || {}).full || m.name || m.code;
 
 /** Read the TSX roster and fill each member's HR ID and BP-ID. Returns how many were filled. */
@@ -31711,6 +31761,16 @@ function maApplyRoster(sheet) {
   const cBp = col(/^bp\s*-?id$/i);
   const cNt = col(/^nt\s*-?id$/i);
   const cols = { bpernr: col(/^bpernr$/i), avaya: col(/^avaya\s*id$/i), ext: col(/^avaya\s*ext/i), ntid: cNt >= 0 ? cNt : col(/^okta$/i) };
+  /* Comcast email: a column named for Comcast, else any email column, keeping only @comcast addresses. */
+  const cComcast = head.findIndex((c) => isText(c, /comcast/i) && isText(c, /e-?\s*mail/i));
+  const cMails = cComcast >= 0 ? [cComcast] : head.map((c, i) => (isText(c, /e-?\s*mail/i) ? i : -1)).filter((i) => i >= 0);
+  const cellMail = (r) => {
+    for (const c of cMails) {
+      const e = maCleanEmail(r[c]);
+      if (e && (cComcast >= 0 || /@([a-z0-9-]+\.)*comcast\.(com|net)$/.test(e))) return e;
+    }
+    return '';
+  };
   /* "NA", "N/A" or "-" in the roster means the ID is not there yet. */
   const cellId = (r, c) => {
     const v = c >= 0 ? String(r[c] ?? '').trim().replace(/\.0+$/, '') : '';
@@ -31718,7 +31778,7 @@ function maApplyRoster(sheet) {
   };
   const list = rows
     .slice(headAt + 1)
-    .map((r) => ({ name: String(r[cName] ?? '').replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(cellId(r, cHr)), bpid: cBp >= 0 ? String(r[cBp] ?? '').trim().toLowerCase() : '', bpernr: cellId(r, cols.bpernr), avaya: cellId(r, cols.avaya), ext: cellId(r, cols.ext), ntid: cellId(r, cols.ntid) }))
+    .map((r) => ({ name: String(r[cName] ?? '').replace(/\s+/g, ' ').trim(), hrid: cleanStaffId(cellId(r, cHr)), bpid: cBp >= 0 ? String(r[cBp] ?? '').trim().toLowerCase() : '', bpernr: cellId(r, cols.bpernr), avaya: cellId(r, cols.avaya), ext: cellId(r, cols.ext), ntid: cellId(r, cols.ntid), email: cellMail(r) }))
     .filter((x) => x.name);
   const seen = new Set();
   EXT.data.siteRoster = EXT.slices.siteRoster.clean({ items: list.filter((x) => x.hrid && !seen.has(x.hrid) && seen.add(x.hrid)).map((x) => ({ name: x.name, hrid: x.hrid, bpid: maReal(x.bpid) ? x.bpid : '', bpernr: x.bpernr, avaya: x.avaya, ext: x.ext, ntid: x.ntid })) });
@@ -31735,6 +31795,15 @@ function maApplyRoster(sheet) {
     if (!hit) return missing.push(m.name || m.code);
     let changed = false;
     EXT.data.agentInfo.items[m.id] = { full: hit.name };
+    /* The roster fills the Avaya ID, extension and Comcast email it has; a blank cell keeps what is there. */
+    const own = { ...(EXT.data.agentIds.items[m.id] || {}) };
+    [['avaya', cleanStaffId(hit.avaya)], ['ext', cleanStaffId(hit.ext)], ['email', hit.email]].forEach(([k, v]) => {
+      if (v && v !== own[k]) {
+        own[k] = v;
+        changed = true;
+      }
+    });
+    EXT.data.agentIds.items[m.id] = own;
     if (hit.hrid && hit.hrid !== m.hrid) {
       m.hrid = hit.hrid;
       changed = true;
@@ -31747,7 +31816,8 @@ function maApplyRoster(sheet) {
   });
   persist('team');
   EXT.save('agentInfo');
-  return { filled, missing, total: state.team.members.length };
+  EXT.save('agentIds');
+  return { filled, missing, total: state.team.members.length, noEmail: !cMails.length };
 }
 
 function maLoadRoster() {
@@ -31767,7 +31837,7 @@ function maLoadRoster() {
     const r = maApplyRoster(sheet);
     if (r.error) return toast(r.error, { type: 'error', duration: 8000 });
     refresh({ panel: false });
-    toast(`IDs updated for ${plural(r.total - r.missing.length, 'agent')}${r.missing.length ? `. Not in the roster: ${joinList(r.missing)}` : ''}.`, { duration: 8000 });
+    toast(`IDs updated for ${plural(r.total - r.missing.length, 'agent')}${r.missing.length ? `. Not in the roster: ${joinList(r.missing)}` : ''}.${r.noEmail ? ' The roster has no Comcast email column; use Edit on a row to type one.' : ''}`, { duration: 8000 });
   });
   document.body.appendChild(input);
   input.click();
@@ -31776,21 +31846,34 @@ function maLoadRoster() {
 function maEdit(m) {
   const hr = h('input', { class: 'input', id: 'ma-hr', value: m.hrid || '', maxlength: 30, autocomplete: 'off' });
   const bp = h('input', { class: 'input', id: 'ma-bp', value: maReal(m.bpid) ? m.bpid : '', maxlength: 30, autocomplete: 'off', placeholder: 'bp-…' });
+  const ids = maAgentIds(m);
+  const av = h('input', { class: 'input', id: 'ma-av', value: ids.avaya, maxlength: 30, autocomplete: 'off', inputmode: 'numeric' });
+  const ex = h('input', { class: 'input', id: 'ma-ex', value: ids.ext, maxlength: 30, autocomplete: 'off', inputmode: 'numeric' });
+  const em = h('input', { class: 'input', id: 'ma-em', type: 'email', value: ids.email, maxlength: 120, autocomplete: 'off', spellcheck: 'false', placeholder: 'name@comcast.com' });
+  const field = (id, label, input) => h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, label), input);
   const cancel = h('button', { type: 'button', class: 'btn' }, 'Cancel');
   const save = h('button', { type: 'button', class: 'btn btn--primary' }, icon('save'), 'Save');
   const modal = openModal({
     title: `${m.name || m.code}: IDs`,
     size: 'sm',
-    body: h('div', { class: 'tr-form' }, h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'ma-hr' }, 'HR ID'), hr), h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'ma-bp' }, 'BP-ID'), bp)),
+    body: h('div', { class: 'tr-form' }, field('ma-hr', 'HR ID', hr), field('ma-bp', 'BP-ID', bp), field('ma-av', 'Avaya ID', av), field('ma-ex', 'Extension', ex), field('ma-em', 'Comcast email', em)),
     footer: [cancel, h('span', { class: 'spacer' }), save],
     initialFocus: hr,
   });
   cancel.addEventListener('click', () => modal.close());
   save.addEventListener('click', () => {
+    const email = maCleanEmail(em.value);
+    if (em.value.trim() && !email) {
+      toast('That Comcast email does not look right. Check it, or leave it empty.', { type: 'error', duration: 6000 });
+      em.focus();
+      return;
+    }
     m.hrid = cleanStaffId(hr.value);
     const b = cleanStaffId(bp.value).toLowerCase();
     if (b) m.bpid = b;
+    EXT.data.agentIds.items[m.id] = { avaya: cleanStaffId(av.value), ext: cleanStaffId(ex.value), email };
     persist('team');
+    EXT.save('agentIds');
     modal.close();
     refresh({ panel: false });
     toast(`IDs saved for ${m.name || m.code}`);
@@ -31809,7 +31892,10 @@ function maRender(main) {
       : h('span', { class: 'ma-missing' }, 'Not loaded');
   const copyAll = (e) => {
     const btn = e.currentTarget;
-    const lines = ['Agent\tHR ID\tBP-ID', ...members.map((m) => `${m.name || m.code}\t${m.hrid || ''}\t${maReal(m.bpid) ? m.bpid : ''}`)];
+    const lines = ['Agent\tHR ID\tBP-ID\tAvaya ID\tExtension\tComcast email', ...members.map((m) => {
+      const x = maAgentIds(m);
+      return `${m.name || m.code}\t${m.hrid || ''}\t${maReal(m.bpid) ? m.bpid : ''}\t${x.avaya}\t${x.ext}\t${x.email}`;
+    })];
     copyText(lines.join('\n'), { label: 'Agent list' }).then((ok) => ok && btn.isConnected && flashCopied(btn));
   };
   const fill = h('span', { class: 'ma-meter__fill', style: `width:${pct}%` });
@@ -31822,12 +31908,12 @@ function maRender(main) {
   const pctPrev = uiq.mem['ma:pct'];
   const pctMoved = uiqChanged('ma:pct', pct);
   const empty = !anyId && members.length
-    ? h('div', { class: 'ma-empty', 'data-uiq': 'empty:ma' }, uiqEmpty({ iconName: 'upload', title: 'Load the roster once to fill every ID', text: 'Pick the TSX roster (.xlsx). Every HR ID and BP-ID fills in by itself and stays in this browser. You can also add one by hand with Add ID.', action: h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'ma-load-cta', onclick: maLoadRoster }, icon('upload'), 'Load roster') }))
+    ? h('div', { class: 'ma-empty', 'data-uiq': 'empty:ma' }, uiqEmpty({ iconName: 'upload', title: 'Load the roster once to fill every ID', text: 'Pick the TSX roster (.xlsx). Every HR ID, BP-ID, Avaya ID, extension and Comcast email fills in by itself and stays in this browser. You can also add one by hand with Add ID.', action: h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'ma-load-cta', onclick: maLoadRoster }, icon('upload'), 'Load roster') }))
     : null;
   const head = pageHead({
     eyebrow: 'Team admin',
     title: 'My agents',
-    sub: 'Every agent with a copyable HR ID and BP-ID. Click an ID to copy it.',
+    sub: 'Every agent with a copyable HR ID, BP-ID, Avaya ID, extension and Comcast email. Click one to copy it.',
     actions: [
       h('button', { type: 'button', class: 'btn btn--sm copy-btn', 'data-fk': 'ma-copy-all', onclick: copyAll, title: 'Copy the whole list, ready to paste in Excel' }, icon('copy'), 'Copy all'),
       h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'ma-load', onclick: maLoadRoster, title: 'Load the TSX roster (.xlsx) to fill the IDs' }, icon('upload'), 'Load roster'),
@@ -31851,13 +31937,14 @@ function maRender(main) {
         h(
           'table',
           { class: 'kt-table ma-table' },
-          h('thead', null, h('tr', null, h('th', { scope: 'col', class: 'ma-n' }, '#'), h('th', { class: 'kt-name', scope: 'col' }, 'Agent'), h('th', { scope: 'col' }, 'HR ID'), h('th', { scope: 'col' }, 'BP-ID'), h('th', { scope: 'col' }, h('span', { class: 'sr-only' }, 'Edit')))),
+          h('thead', null, h('tr', null, h('th', { scope: 'col', class: 'ma-n' }, '#'), h('th', { class: 'kt-name', scope: 'col' }, 'Agent'), h('th', { scope: 'col' }, 'HR ID'), h('th', { scope: 'col' }, 'BP-ID'), h('th', { scope: 'col' }, 'Avaya ID'), h('th', { scope: 'col' }, 'Extension'), h('th', { scope: 'col' }, 'Comcast email'), h('th', { scope: 'col' }, h('span', { class: 'sr-only' }, 'Edit')))),
           h(
             'tbody',
             null,
             members.map((m, i) => {
               const miss = !m.hrid || !maReal(m.bpid);
               const name = m.name || m.code;
+              const x = maAgentIds(m);
               return h(
                 'tr',
                 { class: `kt-tr ma-tr${i % 2 ? ' is-alt' : ''}${miss ? ' is-missing' : ''}`, style: `--i:${Math.min(i, 12)}` },
@@ -31865,6 +31952,9 @@ function maRender(main) {
                 h('th', { class: 'kt-name', scope: 'row' }, name),
                 h('td', { class: 'kt-td', 'data-label': 'HR ID' }, copyBtn(m, m.hrid, 'HR ID', `ma-hr:${i}`, 'hr')),
                 h('td', { class: 'kt-td', 'data-label': 'BP-ID' }, copyBtn(m, maReal(m.bpid) ? m.bpid : '', 'BP-ID', `ma-bp:${i}`, 'bp')),
+                h('td', { class: 'kt-td', 'data-label': 'Avaya ID' }, copyBtn(m, x.avaya, 'Avaya ID', `ma-av:${i}`, 'av')),
+                h('td', { class: 'kt-td', 'data-label': 'Extension' }, copyBtn(m, x.ext, 'Extension', `ma-ex:${i}`, 'ex')),
+                h('td', { class: 'kt-td ma-email', 'data-label': 'Comcast email' }, copyBtn(m, x.email, 'Comcast email', `ma-em:${i}`, 'em')),
                 h('td', { class: 'kt-td ma-act' }, h('button', { type: 'button', class: `btn btn--sm ${miss ? 'ma-add' : 'btn--ghost'}`, 'data-fk': `ma-edit:${i}`, 'aria-label': miss ? `Add ID for ${name}` : `Edit IDs for ${name}`, title: miss ? 'Type the missing ID' : 'Edit the IDs', onclick: () => maEdit(m) }, icon('edit'), miss ? h('span', { class: 'ma-add__t' }, 'Add ID') : null))
               );
             })
@@ -32809,6 +32899,7 @@ function itInfo(id) {
   if (!m && !o) return null;
   const hrid = m ? m.hrid || '' : o.hrid;
   const r = maRosterInfo(hrid) || {};
+  const x = m ? maAgentIds(m) : r;
   const full = rtaCase(m ? maFullName(m) : o.name);
   const parts = full.split(' ').filter(Boolean);
   return {
@@ -32819,8 +32910,8 @@ function itInfo(id) {
     hrid,
     bpid: m && maReal(m.bpid) ? m.bpid : r.bpid || '',
     bpernr: r.bpernr || '',
-    avaya: r.avaya || '',
-    ext: r.ext || '',
+    avaya: x.avaya || '',
+    ext: x.ext || '',
     ntid: r.ntid || '',
   };
 }
@@ -36347,7 +36438,7 @@ maLoadRoster = function () {
     const r = maApplyRoster(sheet);
     if (r.error) return toast(r.error, { type: 'error', duration: 8000 });
     refresh({ panel: false });
-    toast(`IDs updated for ${plural(r.total - r.missing.length, 'agent')}${r.missing.length ? `. Not in the roster: ${joinList(r.missing)}` : ''}.`, { duration: 8000 });
+    toast(`IDs updated for ${plural(r.total - r.missing.length, 'agent')}${r.missing.length ? `. Not in the roster: ${joinList(r.missing)}` : ''}.${r.noEmail ? ' The roster has no Comcast email column; use Edit on a row to type one.' : ''}`, { duration: 8000 });
   });
   document.body.appendChild(input);
   input.click();
