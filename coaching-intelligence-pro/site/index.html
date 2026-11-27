@@ -6270,6 +6270,34 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .tx-callrow__s.is-bad { color: #C2410C; }
 .tx-callrow .tx-risk__badge { font-size: 0.72rem; padding: 2px 8px; text-align: center; }
 .tx-callrow__n { color: var(--text-2); }
+.tx-periods { display: flex; flex-wrap: wrap; gap: 8px; }
+.tx-topics { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.tx-topic { display: grid; gap: 6px; align-content: start; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.tx-topic.is-top { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.tx-topic__n { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent-text, var(--accent)); }
+.tx-topic__t { margin: 0; font-size: 1.05rem; font-weight: 800; }
+.tx-topic__s { margin: 0 0 6px; color: var(--text-2); font-size: 0.86rem; }
+.tx-topic .btn { justify-self: start; }
+.tx-solo { margin-top: 16px; }
+.tx-hm-wrap { overflow-x: auto; }
+.tx-hm { border-collapse: separate; border-spacing: 3px; font-size: 0.82rem; }
+.tx-hm thead th { vertical-align: bottom; font-weight: 750; color: var(--text-2); }
+.tx-hm__h { width: 74px; min-width: 74px; max-width: 74px; height: 120px; padding: 0 2px 6px; }
+.tx-hm__h > span { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.72rem; line-height: 1.2; text-align: center; }
+.tx-hm__agent { min-width: 170px; text-align: left; padding-right: 10px; white-space: nowrap; }
+.tx-hm__who { padding: 0; border: 0; background: none; color: var(--text); font: inherit; font-weight: 700; cursor: pointer; text-align: left; }
+.tx-hm__who:hover { color: var(--accent-text, var(--accent)); text-decoration: underline; }
+.tx-hm__num { min-width: 54px; text-align: center; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.tx-hm__c { height: 34px; text-align: center; border-radius: 7px; font-weight: 750; font-variant-numeric: tabular-nums; color: var(--text); }
+.tx-hm__c.is-0 { background: color-mix(in srgb, var(--success) 9%, transparent); color: color-mix(in srgb, var(--success) 70%, var(--text-2)); font-weight: 400; }
+.tx-hm__c.is-1 { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.tx-hm__c.is-2 { background: color-mix(in srgb, var(--accent) 48%, transparent); }
+.tx-hm__c.is-3 { background: color-mix(in srgb, #C2410C 80%, transparent); color: #fff; }
+.tx-hm__team th, .tx-hm__team td { border-top: 2px solid var(--border); font-weight: 800; color: var(--text); }
+.tx-hm__tot { background: color-mix(in srgb, var(--text) 5%, transparent); line-height: 1.1; }
+.tx-hm__tot small { display: block; font-weight: 600; color: var(--text-2); font-size: 0.68rem; }
+.tx-hm__good { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 14px 0 0; font-size: 0.86rem; color: var(--text-2); }
+.tx-hm__good .icon { color: var(--success); }
 .tx-plan { margin: 0 0 18px; border-top: 4px solid var(--accent); }
 .tx-planlist { display: grid; gap: 10px; margin: 0 0 12px; padding: 0; list-style: none; }
 .tx-planrow { padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: color-mix(in srgb, var(--text) 2%, var(--surface)); }
@@ -7620,7 +7648,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.9.0';
+const APP_VERSION = '3.10.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -39181,7 +39209,7 @@ function txRender(main) {
       )
     );
   }
-  put(main, pageHead({ eyebrow: 'Coaching', title: 'Transcript to coaching', sub: 'Paste a call transcript. The page finds what went well and what should be better, then builds the coaching with feedback and a SMART action plan.' }), h('div', { class: 'tx-page' }, input, out, txPatternCard()));
+  put(main, pageHead({ eyebrow: 'Coaching', title: 'Transcript to coaching', sub: 'Paste a call transcript. The page finds what went well and what should be better, then builds the coaching with feedback and a SMART action plan.', actions: EXT.data.txCalls.items.length ? h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': 'tx-team', onclick: () => navigate('txteam') }, icon('grid'), 'Team heatmap') : null }), h('div', { class: 'tx-page' }, input, out, txPatternCard()));
 }
 
 EXT.view('transcript', { title: 'Transcript to coaching', label: 'Transcript to coaching', icon: 'note', render: txRender });
@@ -39202,6 +39230,342 @@ shellBuildNav = function () {
   return nav;
 };
 
+/* ====================================================================================
+   Team call heatmap: agents x behaviors from the saved transcript calls, for huddles
+   ==================================================================================== */
+let txTeamUi = { period: 30 };
+const TXT_PERIODS = [[7, 'Last 7 days'], [30, 'Last 30 days'], [90, 'Last 90 days'], [0, 'All saved calls']];
+
+function txTeamData(period) {
+  const since = period ? addDays(todayDay(), -(period - 1)) : '';
+  const calls = EXT.data.txCalls.items.filter((c) => (!since || c.day >= since) && EXT.memberById(c.member));
+  const by = new Map();
+  calls.forEach((c) => {
+    if (!by.has(c.member)) by.set(c.member, []);
+    by.get(c.member).push(c);
+  });
+  const agents = [...by.entries()]
+    .map(([id, list]) => ({ m: EXT.memberById(id), calls: list, n: list.length, avg: Math.round(list.reduce((s, c) => s + c.score, 0) / list.length), high: list.filter((c) => c.aicr === 'high').length }))
+    .sort((a, b) => memberLabel(a.m).localeCompare(memberLabel(b.m)));
+  /* Per behavior: calls where it was missed, and which agents. */
+  const opp = new Map();
+  calls.forEach((c) => {
+    c.better.forEach((id, i) => {
+      if (!getOpp(id)) return;
+      const o = opp.get(id) || { id, k: 0, w: 0, agents: new Map() };
+      o.k += 1;
+      o.w += (c.bw && c.bw[i]) || 1;
+      o.agents.set(c.member, (o.agents.get(c.member) || 0) + 1);
+      opp.set(id, o);
+    });
+  });
+  const nAgents = agents.length;
+  const list = [...opp.values()].map((o) => ({ ...o, spread: o.agents.size, rate: calls.length ? o.k / calls.length : 0 }));
+  /* Columns: the gaps that reach the most agents, then the most calls, then the most serious. */
+  const cols = list.slice().sort((a, b) => b.spread - a.spread || b.k - a.k || b.w - a.w).slice(0, 12);
+  /* A huddle topic is a gap shared by the team (at least two agents and 40% of them); a gap that one
+     agent has on most of their calls is for a one-on-one instead. */
+  const minSpread = Math.max(2, Math.ceil(nAgents * 0.4));
+  const huddle = list.filter((o) => huddleOk(getOpp(o.id)) && o.spread >= minSpread).sort((a, b) => b.spread - a.spread || b.w - a.w).slice(0, 3);
+  const solo = [];
+  list.forEach((o) => {
+    if (o.spread !== 1) return;
+    const [mid, k] = [...o.agents.entries()][0];
+    const a = agents.find((x) => x.m.id === mid);
+    if (a && k >= 2 && k / a.n >= 0.5) solo.push({ id: o.id, a, k });
+  });
+  solo.sort((x, y) => y.k / y.a.n - x.k / x.a.n);
+  const went = new Map();
+  calls.forEach((c) => c.went.forEach((id) => getStrength(id) && went.set(id, (went.get(id) || 0) + 1)));
+  const strengths = [...went.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, k]) => ({ id, k }));
+  return { since, calls, agents, cols, huddle, solo: solo.slice(0, 6), strengths, nAgents };
+}
+
+/** Send a team gap to the Team Huddle page, with the matching strength when the team shows it. */
+function txBuildHuddle(oppId, d) {
+  const opp = (DATA.meta.opposites || {})[oppId] || [];
+  const s = opp.find((id) => d.strengths.some((x) => x.id === id)) || opp[0] || null;
+  state.huddle.opp = oppId;
+  if (s && getStrength(s)) state.huddle.strength = s;
+  persist('huddle');
+  navigate('huddle');
+  toast(`Huddle on ${getOpp(oppId).title}: ${d.huddle.find((x) => x.id === oppId) ? `${d.huddle.find((x) => x.id === oppId).spread} of ${d.nAgents} agents missed it` : 'from the team calls'}.`, { duration: 6000 });
+}
+
+/** A picture for the huddle screen: team gaps only, no agent names. */
+function txTeamCanvas(d) {
+  const W = 1080;
+  const P = 56;
+  const S = 2;
+  const font = (getComputedStyle(document.body).fontFamily || 'system-ui, sans-serif').replace(/;/g, '');
+  const F = (w, px) => `${w} ${px}px ${font}`;
+  const gaps = d.cols.slice(0, 8);
+  const rowH = 74;
+  const H = 230 + gaps.length * rowH + (d.strengths.length ? 70 + Math.min(4, d.strengths.length) * 46 : 0) + 80;
+  const cv = document.createElement('canvas');
+  cv.width = W * S;
+  cv.height = H * S;
+  const g = cv.getContext('2d');
+  g.scale(S, S);
+  g.fillStyle = '#F6F2EC';
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = '#121826';
+  g.fillRect(0, 0, W, 170);
+  g.fillStyle = '#F26522';
+  g.fillRect(0, 164, W, 6);
+  g.font = F(800, 22);
+  g.fillText('TEAM HUDDLE', P, 60);
+  g.fillStyle = '#FFFFFF';
+  g.font = F(800, 42);
+  g.fillText('What our calls show', P, 112);
+  g.fillStyle = '#C9CEDA';
+  g.font = F(500, 22);
+  const per = TXT_PERIODS.find(([v]) => v === txTeamUi.period);
+  g.fillText(`${per ? per[1] : ''} · ${plural(d.calls.length, 'call')} · ${plural(d.nAgents, 'agent')}`, P, 148);
+  let y = 210;
+  g.fillStyle = '#C2410C';
+  g.font = F(850, 24);
+  g.fillText('WHERE WE CAN GROW', P, y);
+  y += 24;
+  gaps.forEach((o) => {
+    const pct = Math.round(o.rate * 100);
+    g.fillStyle = '#FFFFFF';
+    g.beginPath();
+    g.roundRect(P, y, W - P * 2, rowH - 12, 14);
+    g.fill();
+    g.fillStyle = '#1C2437';
+    g.font = F(750, 24);
+    const t = getOpp(o.id).title;
+    g.fillText(t.length > 40 ? `${t.slice(0, 38)}…` : t, P + 20, y + 38);
+    /* The label sits right-aligned inside the row; the bar goes just left of it. */
+    const label = `${pct}% of calls · ${o.spread} of ${d.nAgents} agents`;
+    g.font = F(650, 18);
+    const lw = g.measureText(label).width;
+    const bw = 160;
+    const bx = W - P - 20 - lw - 16 - bw;
+    g.fillStyle = '#EFE7DE';
+    g.beginPath();
+    g.roundRect(bx, y + 22, bw, 16, 8);
+    g.fill();
+    g.fillStyle = '#F26522';
+    g.beginPath();
+    g.roundRect(bx, y + 22, Math.max(8, (bw * pct) / 100), 16, 8);
+    g.fill();
+    g.fillStyle = '#5B6475';
+    g.fillText(label, W - P - 20 - lw, y + 37);
+    y += rowH;
+  });
+  if (d.strengths.length) {
+    y += 30;
+    g.fillStyle = '#1E7F5C';
+    g.font = F(850, 24);
+    g.fillText('WHAT WE DO WELL', P, y);
+    y += 16;
+    d.strengths.slice(0, 4).forEach((s) => {
+      g.fillStyle = '#1C2437';
+      g.font = F(650, 23);
+      g.fillText(`✓  ${getStrength(s.id).title} (${s.k} calls)`, P, y + 34);
+      y += 46;
+    });
+  }
+  g.fillStyle = '#5B6475';
+  g.font = F(500, 18);
+  g.fillText('VXI Coaching Intelligence · from analyzed call transcripts · no names', P, H - 32);
+  return cv;
+}
+function txTeamShare(d, copy, btn) {
+  txTeamCanvas(d).toBlob(async (blob) => {
+    if (!blob) return toast('The picture could not be made.', { type: 'error' });
+    if (copy && navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        if (btn && btn.isConnected) flashCopied(btn);
+        toast('Team picture copied. It shows the team gaps only, no names.');
+        return;
+      } catch (e) {
+        /* save instead */
+      }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: `Team_call_gaps_${todayDay()}.png`, style: 'display:none' });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast('Team picture saved.');
+  }, 'image/png');
+}
+
+function txTeamRender(main) {
+  const d = txTeamData(txTeamUi.period);
+  const periodSel = h('div', { class: 'seg tx-periods', role: 'group', 'aria-label': 'Period' }, TXT_PERIODS.map(([v, label]) => h('button', { type: 'button', class: `btn btn--sm${txTeamUi.period === v ? ' btn--primary' : ''}`, 'aria-pressed': String(txTeamUi.period === v), 'data-fk': `txt-period:${v}`, onclick: () => { txTeamUi.period = v; refresh({ panel: false }); } }, label)));
+  const head = pageHead({
+    eyebrow: 'Coaching',
+    title: 'Team call heatmap',
+    sub: 'Every agent against the behaviors their analyzed calls missed. A gap most of the team shares is a huddle topic; a gap one agent keeps missing is a one-on-one.',
+    actions: d.calls.length ? [h('button', { type: 'button', class: 'btn btn--sm copy-btn', 'data-fk': 'txt-copy', title: 'Copy a picture of the team gaps (no names) for the huddle', onclick: (e) => txTeamShare(d, true, e.currentTarget) }, icon('copy'), 'Copy team picture'), h('button', { type: 'button', class: 'btn btn--sm btn--icon', 'data-fk': 'txt-save', 'aria-label': 'Download the team picture', title: 'Download the team picture', onclick: () => txTeamShare(d, false) }, icon('download'))] : null,
+  });
+  if (!d.calls.length) {
+    put(main, head, h('div', { class: 'tx-page' }, periodSel, h('section', { class: 'card kt-card rta-card tx-card' }, emptyState({ iconName: 'grid', title: 'No analyzed calls in this period', text: 'In Transcript to coaching, analyze calls and use Save to history. Each saved call adds a row here, by agent, so you can see what the whole team keeps missing.', action: h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': 'txt-go', onclick: () => navigate('transcript') }, icon('note'), 'Go to Transcript to coaching') }))));
+    return;
+  }
+  /* Huddle topics and one-on-ones */
+  const topics = h(
+    'section',
+    { class: 'card kt-card rta-card tx-card', 'aria-labelledby': 'txt-top' },
+    h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'txt-top' }, icon('megaphone'), 'Huddle topics'), h('p', { class: 'kt-sub' }, `Gaps shared by at least ${Math.max(2, Math.ceil(d.nAgents * 0.4))} of ${plural(d.nAgents, 'agent')}. One click builds the huddle with the matching strength.`))),
+    d.huddle.length
+      ? h(
+          'div',
+          { class: 'tx-topics' },
+          d.huddle.map((o, i) =>
+            h(
+              'div',
+              { class: `tx-topic${i === 0 ? ' is-top' : ''}` },
+              h('span', { class: 'tx-topic__n' }, i === 0 ? 'Top topic' : `Topic ${i + 1}`),
+              h('h3', { class: 'tx-topic__t' }, getOpp(o.id).title),
+              h('p', { class: 'tx-topic__s' }, `${o.spread} of ${d.nAgents} agents · missed on ${o.k} of ${plural(d.calls.length, 'call')} (${Math.round(o.rate * 100)}%)`),
+              h('button', { type: 'button', class: `btn btn--sm${i === 0 ? ' btn--primary' : ''}`, 'data-fk': `txt-huddle:${o.id}`, onclick: () => txBuildHuddle(o.id, d) }, icon('megaphone'), 'Build the huddle')
+            )
+          )
+        )
+      : h('p', { class: 'si-muted' }, d.nAgents < 2 ? 'Save calls for at least two agents to find team-wide gaps.' : 'No gap is shared by enough of the team yet. Coach the one-on-ones below.'),
+    d.solo.length
+      ? h(
+          'div',
+          { class: 'tx-solo' },
+          h('h3', { class: 'tx-col__t tx-col__t--bad' }, icon('target'), 'One-on-one, not a huddle'),
+          h('ul', { class: 'tx-plist' }, d.solo.map((x) => h('li', { class: 'tx-prow' }, h('span', { class: 'tx-prow__t' }, `${memberLabel(x.a.m)}: ${getOpp(x.id).title}`), h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': `txt-solo:${x.a.m.id}:${x.id}`, onclick: () => { txUi.member = x.a.m.id; navigate('transcript'); } }, `${x.k} of ${x.a.n} calls`, icon('arrow-right')))))
+        )
+      : null
+  );
+  /* The heatmap */
+  const cell = (a, o) => {
+    const k = o.agents.get(a.m.id) || 0;
+    const r = k / a.n;
+    const lvl = k === 0 ? 0 : r >= 0.67 ? 3 : r >= 0.34 ? 2 : 1;
+    return h('td', { class: `tx-hm__c is-${lvl}`, title: `${memberLabel(a.m)} · ${getOpp(o.id).title}: missed on ${k} of ${plural(a.n, 'call')}` }, k ? `${k}/${a.n}` : '·');
+  };
+  const map = h(
+    'section',
+    { class: 'card kt-card rta-card tx-card', 'aria-labelledby': 'txt-map' },
+    h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'txt-map' }, icon('grid'), 'Heatmap'), h('p', { class: 'kt-sub' }, `${plural(d.calls.length, 'analyzed call')} · ${plural(d.nAgents, 'agent')}. Darker means missed on more of that agent's calls. Click an agent for their patterns.`))),
+    h(
+      'div',
+      { class: 'kt-scroll tx-hm-wrap' },
+      h(
+        'table',
+        { class: 'tx-hm' },
+        h(
+          'thead',
+          null,
+          h(
+            'tr',
+            null,
+            h('th', { scope: 'col', class: 'tx-hm__agent' }, 'Agent'),
+            h('th', { scope: 'col', class: 'tx-hm__num' }, 'Calls'),
+            h('th', { scope: 'col', class: 'tx-hm__num' }, 'Score'),
+            h('th', { scope: 'col', class: 'tx-hm__num' }, 'High aiCR'),
+            d.cols.map((o) => h('th', { scope: 'col', class: 'tx-hm__h', title: getOpp(o.id).title }, h('span', null, getOpp(o.id).title)))
+          )
+        ),
+        h(
+          'tbody',
+          null,
+          d.agents.map((a) =>
+            h(
+              'tr',
+              null,
+              h('th', { scope: 'row', class: 'tx-hm__agent' }, h('button', { type: 'button', class: 'tx-hm__who', 'data-fk': `txt-agent:${a.m.id}`, onclick: () => { txUi.member = a.m.id; navigate('transcript'); } }, memberLabel(a.m))),
+              h('td', { class: 'tx-hm__num' }, String(a.n)),
+              h('td', { class: `tx-hm__num tx-callrow__s is-${txTone(a.avg)}` }, `${a.avg}%`),
+              h('td', { class: 'tx-hm__num' }, a.high ? String(a.high) : '–'),
+              d.cols.map((o) => cell(a, o))
+            )
+          ),
+          h(
+            'tr',
+            { class: 'tx-hm__team' },
+            h('th', { scope: 'row', class: 'tx-hm__agent' }, 'Team'),
+            h('td', { class: 'tx-hm__num' }, String(d.calls.length)),
+            h('td', { class: 'tx-hm__num' }, `${Math.round(d.calls.reduce((s, c) => s + c.score, 0) / d.calls.length)}%`),
+            h('td', { class: 'tx-hm__num' }, String(d.calls.filter((c) => c.aicr === 'high').length)),
+            d.cols.map((o) => h('td', { class: 'tx-hm__c tx-hm__tot' }, `${Math.round(o.rate * 100)}%`, h('small', null, `${o.spread}/${d.nAgents}`)))
+          )
+        )
+      )
+    ),
+    d.strengths.length ? h('p', { class: 'tx-hm__good' }, icon('thumb', 'icon--sm'), h('strong', null, 'What the team does well: '), d.strengths.map((s) => `${getStrength(s.id).title} (${s.k})`).join(' · ')) : null
+  );
+  put(main, head, h('div', { class: 'tx-page' }, periodSel, topics, map));
+}
+
+EXT.view('txteam', { title: 'Team call heatmap', label: 'Team call heatmap', icon: 'grid', render: txTeamRender });
+/* It sits in the Coaching group, right after Transcript to coaching. */
+const _txTeamNav = shellBuildNav;
+shellBuildNav = function () {
+  const nav = _txTeamNav();
+  const item = nav.querySelector(':scope > .nav__item[data-fk="nav:txteam:"]');
+  const after = nav.querySelector(':scope > .nav__item[data-fk="nav:transcript:"]');
+  if (item && after) {
+    after.after(item);
+    const insights = Array.from(nav.querySelectorAll(':scope > .nav__section')).find((s) => /^insights$/i.test(s.textContent.trim()));
+    if (insights) {
+      const next = insights.nextElementSibling;
+      if (!next || next.classList.contains('nav__section')) insights.remove();
+    }
+  }
+  return nav;
+};
+/* The Team Huddle's suggested topic also counts the gaps on analyzed call transcripts. */
+hsRank = function (from, to) {
+  const tally = {};
+  const add = (id, src, who) => {
+    const t = tally[id] || (tally[id] = { id, total: 0, tracker: 0, voice: 0, calls: 0, who: new Set() });
+    t[src]++;
+    t.total++;
+    if (who) t.who.add(who);
+  };
+  state.tracker.plans.forEach((p) =>
+    (p.logs || []).forEach((l) => {
+      if (!l || l.date < from || l.date > to) return;
+      Object.entries(l.results || {}).forEach(([id, r]) => r === 'miss' && add(id, 'tracker', normalizeText(p.label)));
+    })
+  );
+  hsVoiceItems().forEach((it) => {
+    if (it.date < from || it.date > to) return;
+    const m = typeof it.member === 'string' ? state.team.members.find((x) => x.id === it.member) : null;
+    add(it.opp, 'voice', m ? normalizeText(m.code) : '');
+  });
+  EXT.data.txCalls.items.forEach((c) => {
+    if (c.day < from || c.day > to) return;
+    const m = EXT.memberById(c.member);
+    c.better.forEach((id) => getOpp(id) && add(id, 'calls', m ? normalizeText(m.code) : ''));
+  });
+  const huddleable = (id) => (typeof huddleOk === 'function' ? huddleOk(getOpp(id)) : !!getOpp(id));
+  return Object.values(tally)
+    .filter((t) => getOpp(t.id) && huddleable(t.id))
+    .sort((a, b) => b.who.size - a.who.size || b.total - a.total || b.tracker - a.tracker || getOpp(a.id).title.localeCompare(getOpp(b.id).title))
+    .slice(0, 3)
+    .map((t) => ({ id: t.id, total: t.total, tracker: t.tracker, voice: t.voice, calls: t.calls, agents: t.who.size }));
+};
+const _txHsSources = hsSources;
+hsSources = function (t) {
+  const base = _txHsSources(t);
+  const calls = t && t.calls ? `missed on ${t.calls} analyzed call${t.calls === 1 ? '' : 's'}` : '';
+  return [base, calls].filter(Boolean).join(', ');
+};
+const _txHsCard = hsCard;
+hsCard = function () {
+  const card = _txHsCard();
+  try {
+    const foot = card.querySelector && card.querySelector('.hs-foot');
+    if (foot && EXT.data.txCalls.items.length && !/transcript/i.test(foot.textContent)) foot.append(' Analyzed call transcripts count too (Team call heatmap).');
+  } catch (e) {
+    /* the card is fine without the note */
+  }
+  return card;
+};
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
 
