@@ -7455,7 +7455,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.5.0';
+const APP_VERSION = '3.5.1';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -31993,8 +31993,9 @@ EXT.order.splice(EXT.order.indexOf('numbers') + 1, 0, 'agents');
    - One click opens a new email in Outlook (the computer's email app) with To, CC and the
      subject filled in.
    - A plain text email (HR referral) goes in the body too, so it is ready to send.
-   - An email with tables (WFM requests, exam leave) is put on the clipboard as a real table:
-     a page cannot put a formatted table into a new email, so it is one Ctrl+V in the body.
+   - WFM requests and exam leave go in the body as plain text (a page can only hand Outlook
+     plain text), ready to send. The formatted table is on the clipboard as well, and a very
+     long email (past what a mailto link carries) is one Ctrl+V in the body.
    - To and CC are typed once per kind of email and kept in this browser and in backups.
    ========================================================================== */
 const MAIL_KINDS = ['rta', 'exam', 'hr'];
@@ -32034,7 +32035,7 @@ const MAIL_URL_MAX = 1900;
  * plain = true puts the text in the body; otherwise the formatted email goes on the clipboard.
  * Returns { opened, paste, copied, to }.
  */
-async function mailSend({ kind, subject, html, text, plain }) {
+async function mailSend({ kind, subject, html, text, plain, pasteText }) {
   const rec = EXT.data.mailTo[kind] || { to: '', cc: '' };
   const to = mailList(rec.to);
   const cc = mailList(rec.cc);
@@ -32042,7 +32043,7 @@ async function mailSend({ kind, subject, html, text, plain }) {
   let paste = !plain || url.length > MAIL_URL_MAX;
   if (paste) url = mailtoUrl({ to, cc, subject });
   /* The clipboard always holds the email too, so it can be pasted if the body did not come through. */
-  const copied = html ? await rtaCopyHtml(html, text) : await writeClipboard(cleanCopy(text));
+  const copied = html ? await rtaCopyHtml(html, pasteText || text) : await writeClipboard(cleanCopy(text));
   if (paste && !copied) {
     toast('The browser blocked copying. Select the email on the page and copy it, then paste it in Outlook.', { type: 'error', duration: 8000 });
   }
@@ -32319,6 +32320,42 @@ function rtaExamEmail(source) {
   return { html, text };
 }
 
+/* ---------- plain text for "Open in Outlook": a page can only hand Outlook plain text ---------- */
+/** One table as lines: "- LOB: TSX | HRID: 1 | Name", then the rest of the row on the next line. */
+function rtaPlainTable(title, g) {
+  const lines = [title];
+  g.rows.forEach((r) => {
+    const first = [`${g.head[0]}: ${r[0]}`, r[1] ? `${g.head[1]}: ${r[1]}` : '', r[2]].filter(Boolean).join(' | ');
+    const rest = r.slice(3).map((v, i) => (v ? `${g.head[i + 3]}: ${v}` : '')).filter(Boolean).join(' | ');
+    lines.push(`- ${first}`);
+    if (rest) lines.push(`  ${rest}`);
+  });
+  return lines;
+}
+/** The WFM email as plain text, ready to send. */
+function rtaPlain(source) {
+  const R = source || EXT.data.rta;
+  const draft = R.draft;
+  const transport = rtaTransportLine(draft);
+  return [
+    RTA_GREETING,
+    '',
+    rtaAsk(draft),
+    '',
+    ...draft.flatMap((t) => [...rtaPlainTable(rtaType(t.type).title, rtaGrid(t, R.lob)), '']),
+    'All times are in CLT.',
+    ...(transport ? ['', `@Transportation-EG ${transport}`] : []),
+    '',
+    'BR,',
+  ].join('\n');
+}
+/** The exam leave email as plain text, ready to send. */
+function rtaExamPlain(source) {
+  const R = source || EXT.data.rta;
+  const rows = R.exam;
+  return [RTA_EXAM_GREETING, '', rtaExamAsk(rows), '', ...rtaPlainTable('Exam Leave', rtaExamGrid(rows, R.lob)), '', `${RTA_EXAM_WFM} ${rtaExamWfmLine(rows)}`, '', 'BR,'].join('\n');
+}
+
 /** Put rich HTML on the clipboard (Outlook keeps the table), with plain text as a fallback. */
 async function rtaCopyHtml(html, text) {
   try {
@@ -32576,7 +32613,7 @@ function rtaExamCard(R, field, redraw, main) {
   const outlook = async () => {
     if (!R.exam.length) return toast('Add the exam days first.', { type: 'warn' });
     const { html, text } = rtaExamEmail();
-    const r = await mailSend({ kind: 'exam', subject: subj.value.trim() || rtaExamSubject(), html, text });
+    const r = await mailSend({ kind: 'exam', subject: subj.value.trim() || rtaExamSubject(), html, text: rtaExamPlain(), plain: true, pasteText: text });
     R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaExamSubject(), kind: 'exam', draft: [], exam: JSON.parse(JSON.stringify(R.exam)), lob: R.lob });
     R.history = R.history.slice(0, 15);
     EXT.save('rta');
@@ -32609,7 +32646,7 @@ function rtaExamCard(R, field, redraw, main) {
       h(
         'div',
         { class: 'kt-actions' },
-        h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-xoutlook', onclick: outlook, disabled: !rows.length, title: 'Open a new email in Outlook with To, CC and the subject filled in' }, icon('mail'), 'Open in Outlook'),
+        h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-xoutlook', onclick: outlook, disabled: !rows.length, title: 'Open a new email in Outlook, written and ready to send' }, icon('mail'), 'Open in Outlook'),
         h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-xcopy', onclick: copy, disabled: !rows.length }, icon('copy'), 'Copy email'),
         h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-xcopy-subject', onclick: (e) => copyText(subj.value, { label: 'Subject', button: e.currentTarget }) }, icon('copy'), 'Copy subject'),
         rows.length ? h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'rta-xclear', onclick: async () => { if (await confirmDialog({ title: 'Clear the exam leave email?', message: 'All exam days in this email are removed. Emails you copied stay in the list below.', confirmLabel: 'Clear', danger: true })) { R.exam = []; R.examSubject = ''; EXT.save('rta'); redraw(); } } }, icon('trash'), 'Clear') : null
@@ -32874,7 +32911,7 @@ function rtaRender(main) {
   const openOutlook = async () => {
     if (!R.draft.length) return toast('Add a request first.', { type: 'warn' });
     const { html, text } = rtaEmail();
-    const r = await mailSend({ kind: 'rta', subject: subj.value.trim() || rtaSubject(), html, text });
+    const r = await mailSend({ kind: 'rta', subject: subj.value.trim() || rtaSubject(), html, text: rtaPlain(), plain: true, pasteText: text });
     R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaSubject(), draft: JSON.parse(JSON.stringify(R.draft)), lob: R.lob });
     R.history = R.history.slice(0, 15);
     EXT.save('rta');
@@ -32887,11 +32924,11 @@ function rtaRender(main) {
     h(
       'div',
       { class: 'kt-head' },
-      h('div', null, h('div', { class: 'rta-titlerow' }, h('h2', { class: 'kt-title', id: 'rta-mail' }, icon('chat'), 'The email'), count ? h('span', { class: `rta-pill${countBump ? ' uiq-bump' : ''}` }, plural(count, 'row')) : null), h('p', { class: 'kt-sub' }, 'Open in Outlook starts a new email with To, CC and the subject filled in; press Ctrl+V in the body and Send. The tables stay tables, not a picture.')),
+      h('div', null, h('div', { class: 'rta-titlerow' }, h('h2', { class: 'kt-title', id: 'rta-mail' }, icon('chat'), 'The email'), count ? h('span', { class: `rta-pill${countBump ? ' uiq-bump' : ''}` }, plural(count, 'row')) : null), h('p', { class: 'kt-sub' }, 'Open in Outlook starts a new email with everything written, ready to send. Copy email gives the formatted tables to paste instead.')),
       h(
         'div',
         { class: 'kt-actions' },
-        h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-outlook', onclick: openOutlook, disabled: !R.draft.length, title: 'Open a new email in Outlook with To, CC and the subject filled in' }, icon('mail'), 'Open in Outlook'),
+        h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-outlook', onclick: openOutlook, disabled: !R.draft.length, title: 'Open a new email in Outlook, written and ready to send' }, icon('mail'), 'Open in Outlook'),
         h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-copy', onclick: copyEmail, disabled: !R.draft.length }, icon('copy'), 'Copy email'),
         h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-copy-subject', onclick: (e) => copyText(subj.value, { label: 'Subject', button: e.currentTarget }) }, icon('copy'), 'Copy subject'),
         R.draft.length ? h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'rta-clear', onclick: async () => { if (await confirmDialog({ title: 'Clear this email?', message: 'All requests in this email are removed. Emails you copied stay in the list below.', confirmLabel: 'Clear', danger: true })) { R.draft = []; R.subject = ''; EXT.save('rta'); redraw(); } } }, icon('trash'), 'Clear') : null
@@ -32924,7 +32961,7 @@ function rtaRender(main) {
               h('span', { class: 'rta-hist__s' }, x.subject),
               h('span', { class: 'rta-hist__m' }, `${x.kind === 'exam' ? 'Exam leave to HR · ' : ''}${x.at.replace('T', ' ')} · ${plural(x.kind === 'exam' ? x.exam.length : rtaRowCount(x.draft), 'row')}`),
               h('button', { type: 'button', class: 'btn btn--sm copy-btn', 'data-fk': `rta-recopy:${i}`, onclick: async (e) => { const btn = e.currentTarget; const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); if (await rtaCopyHtml(html, text)) { if (btn.isConnected) flashCopied(btn); toast('Email copied again.'); } } }, icon('copy'), 'Copy again'),
-              h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `rta-reopen:${i}`, title: 'Open this email in Outlook again', onclick: async () => { const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); mailToast(await mailSend({ kind: x.kind === 'exam' ? 'exam' : 'rta', subject: x.subject, html, text }), 'the email'); } }, icon('mail'), 'Outlook'),
+              h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `rta-reopen:${i}`, title: 'Open this email in Outlook again', onclick: async () => { const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); mailToast(await mailSend({ kind: x.kind === 'exam' ? 'exam' : 'rta', subject: x.subject, html, text: x.kind === 'exam' ? rtaExamPlain({ ...x }) : rtaPlain({ ...x }), plain: true, pasteText: text }), 'the email'); } }, icon('mail'), 'Outlook'),
               h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': `rta-reuse:${i}`, onclick: () => { if (x.kind === 'exam') { R.exam = JSON.parse(JSON.stringify(x.exam)); R.examSubject = ''; rtaPick.type = 'exam'; } else { R.draft = JSON.parse(JSON.stringify(x.draft)); R.subject = ''; } EXT.data.rta = rtaClean(R); EXT.save('rta'); redraw(); toast(x.kind === 'exam' ? 'Loaded into the exam leave email. Change the days, then copy.' : 'Loaded into the email. Change the dates, then copy.'); } }, icon('edit'), 'Reuse')
             );
           })
