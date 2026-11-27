@@ -6193,6 +6193,64 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .tx-who__row.is-customer .tx-who__btn { color: var(--accent-text, var(--accent)); }
 .tx-who__row.is-flipped .tx-who__btn { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
 .tx-who__t { color: var(--text); }
+.tx-zone { padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text-2); font-size: 0.68rem; font-weight: 750; letter-spacing: 0.02em; white-space: nowrap; }
+.tx-item__head .tx-zone { margin-left: auto; }
+.tx-item__head .tx-zone + .tx-tag { margin-left: 0; }
+/* Scorecard */
+.tx-score { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; margin: 0 0 16px; }
+.tx-score__all { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 12px 14px; border-radius: 14px; color: #fff; background: #121826; }
+.tx-score__all.is-good { background: linear-gradient(135deg, #1E7F5C, #2E9C72); }
+.tx-score__all.is-ok { background: linear-gradient(135deg, #B7791F, #D69E2E); }
+.tx-score__all.is-bad { background: linear-gradient(135deg, #C2410C, #F26522); }
+.tx-score__v { font-size: 1.9rem; font-weight: 850; line-height: 1; font-variant-numeric: tabular-nums; }
+.tx-score__l { font-weight: 750; font-size: 0.86rem; }
+.tx-score__n { opacity: 0.8; font-size: 0.72rem; }
+.tx-score__areas { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.tx-score__area { display: grid; gap: 5px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.tx-score__top { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; font-size: 0.82rem; }
+.tx-score__name { font-weight: 700; color: var(--text-2); }
+.tx-score__top strong { font-variant-numeric: tabular-nums; }
+.tx-score__bar { height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.tx-score__bar > span { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.tx-score__area.is-good .tx-score__bar > span { background: var(--success); }
+.tx-score__area.is-ok .tx-score__bar > span { background: var(--warning); }
+.tx-score__sub { color: var(--text-2); font-size: 0.72rem; }
+/* aiCR and sales panels */
+.tx-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 0 0 18px; }
+.tx-panel { padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.tx-panel__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tx-panel__t { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1rem; font-weight: 800; }
+.tx-panel__sub { margin: 4px 0 10px; color: var(--text-2); font-size: 0.84rem; }
+.tx-risk { border-top: 4px solid var(--success); }
+.tx-risk.is-medium { border-top-color: var(--warning); }
+.tx-risk.is-high { border-top-color: #C2410C; }
+.tx-risk__badge { padding: 3px 12px; border-radius: 999px; font-weight: 800; font-size: 0.8rem; color: #fff; background: var(--success); }
+.tx-risk__badge.is-medium { background: #B7791F; }
+.tx-risk__badge.is-high { background: #C2410C; }
+.tx-risk__h { margin: 8px 0 4px; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-2); }
+.tx-risk__list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font-size: 0.86rem; }
+.tx-risk__row { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 6px; }
+.tx-risk__row.is-up .tx-risk__sign { color: #C2410C; }
+.tx-risk__row.is-down .tx-risk__sign { color: var(--success); }
+.tx-risk__q { color: var(--text-2); font-style: italic; }
+.tx-sales__n { color: var(--text-2); font-weight: 750; font-size: 0.82rem; }
+.tx-steps { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.tx-step { display: grid; grid-template-columns: 22px 150px minmax(0, 1fr); align-items: center; gap: 8px; font-size: 0.86rem; }
+.tx-step__i { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text-2); }
+.tx-step.is-good .tx-step__i { background: var(--success-soft); color: var(--success); }
+.tx-step.is-bad .tx-step__i { background: color-mix(in srgb, #C2410C 14%, transparent); color: #C2410C; }
+.tx-step.is-ok .tx-step__i { background: var(--warning-soft); color: var(--warning); }
+.tx-step.is-na { opacity: 0.6; }
+.tx-step__l { font-weight: 750; }
+.tx-step__n { color: var(--text-2); }
+.tx-checkgroup { margin-top: 10px; }
+.tx-checkgroup__t { margin: 0; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-2); }
+.tx-checkgroup .tx-checklist { margin-top: 6px; }
+@media (max-width: 800px) {
+  .tx-panels, .tx-score { grid-template-columns: 1fr; }
+  .tx-step { grid-template-columns: 22px minmax(0, 1fr); }
+  .tx-step__n { grid-column: 2; }
+}
 @media (max-width: 800px) {
   .tx-cols { grid-template-columns: 1fr; }
   .tx-private { margin-left: 0; }
@@ -7512,7 +7570,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.6.1';
+const APP_VERSION = '3.7.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -37356,6 +37414,72 @@ const TX = {
   custName: /\b(?:[Mm]y name is|[Tt]his is|[Ii]t's|[Ii]t is|I'm|I am)\s+([A-Z][a-z]{2,})\b/,
   agentAsksName: /\b(?:am i speaking with|is this|speaking with|talking to)\s+(?:mr\.?|mrs\.?|ms\.?|miss)?\s*([A-Z][a-z]{2,})\b/,
 };
+/* Discovery, information, repeat-call (aiCR) phrases */
+const TXD = {
+  start: /\b(when did (it|this|that|the (issue|problem)) (start|begin|happen|first)|how long has (it|this|that)|since when|how often|when was the (last|first) time|how many times (has|did) (it|this))\b/i,
+  scope: /\b(who (else )?(has|knows|uses) (the|your) (password|credentials|account|email|iphone|ipad|phone|tablet|laptop|computer|devices?)|any(one| person)[^.]{0,40}(credentials|password|access)|who has the (iphone|ipad|phone|tablet|laptop|computer)|(which|what|how many|all (of )?(your|the)) (devices?|rooms?|tvs?|boxes|lines|phones|computers|laptops)|(is it|does it happen|happening) (on|in|with) (all|every|one|just|only|other)|wired or (wi-?fi|wireless)|other devices|every (device|channel|room)|just (one|this) (device|tv|room)|only (on|in) (one|this))\b/i,
+  tried: /\b(have you (already )?(tried|restarted|rebooted|reset|done|checked|changed)|what (have|did) you (already )?(try|tried|do)|did you (already )?(try|restart|reboot|reset|change|check)|anything you('ve| have) (tried|done))\b/i,
+  changed: /\b(anything (changed|new|different)|did (anything|something) change|(any )?new (device|router|phone|setup|equipment|password)|did you (move|change|add|install|update)|recently (changed|added|installed|updated|moved)|before (this|it) started)\b/i,
+  see: /\b(what (does|do|did) (it|the (screen|message|light|lights|error|app|email)) (say|show|look like)|(any )?error (message|code)s?|what (color|colour) (is|are) the lights?|what do you see|what (message|email) (are you getting|did you get)|what happens when you)\b/i,
+  repeatCaller: /\b(called (before|already|again|\d+ times|several times|multiple times|many times)|(second|third|fourth|fifth|\d+(st|nd|rd|th)) time|\d+ times|so many times|last time i called|the (other|last|previous) (agent|rep|person|guy|lady)|again and again|over and over|keeps happening|still (not|doesn't|isn't|having))\b/i,
+  history: /\b(i (see|can see|notice|noticed) (that )?(you('ve| have)|your|the) (called|contacted|previous|last|earlier|history|notes|ticket)|previous (call|calls|interaction|ticket|notes)|(your|the) (account )?notes|last time you (called|contacted)|i see (the|your) (history|notes|previous))\b/i,
+  hedge: /\b(i think|i guess|i believe|i assume|maybe|probably|not (100% |completely |really |too )?sure|i('m| am) not certain|should (be|work) (fine|okay|ok)|hopefully|perhaps|might be|i don't (really )?know)\b/gi,
+  confused: /\b(i('m| am) (confused|lost)|what do you mean|i don't (understand|get it)|that doesn't make sense|wait,? what|so what do i (do|need)|i didn't (understand|get|catch) (that|you)|can you explain (that|again)|i'm not following)\b/i,
+  claimFixed: /\b((it|that|everything|the (issue|problem)) (is|should be|will be|has been) (fixed|resolved|working|good|fine)( now)?|you('re| are) all set|all good now|that (should|will) (fix|solve|take care of) (it|that|the))\b/i,
+  diagnose: /\b(i (can )?see (your|the) (signal|modem|gateway|device|equipment|box|connection)|(signal|levels?) (look|are|is)|(running|sending|ran|sent) a (test|refresh|signal|reset|diagnostic)|(check|checking|checked) (the|your) (signal|levels|equipment|connection|line)|speed test|outage|node|in (your|the) area)\b/i,
+  outage: /\b(outage|in (your|the) area|known issue|neighborhood|node)\b/i,
+  selfService: /\b((xfinity|the|our) app|my account|xfinity\.com|online at|self[- ]service|xfinity assistant|text (us|xfinity)|you can (also )?(do|check|reset|restart|manage|pay|see|change|troubleshoot|fix) (it|this|that|your|the)[^.]{0,30}(yourself|app|online|account|anytime)|next time,? you can|if (it|this) happens again,? (you can|just|go|try|restart|open))\b/i,
+  recap: /\b(to recap|just to recap|let me recap|quick recap|to summarize|just to summarize|in summary|(so )?(today )?(we|i) (have )?(went ahead and |just )?(did|done|fixed|reset|updated|changed|refreshed|sent|scheduled|removed|added|cleared|unlocked)\b[^.]{0,60}(today|for you|on your account|so)|what we did today|here's what (we|i) did|so what i('ve| have) done)\b/i,
+  health: /\b(health check|account review|(review|check|look at|went over|looked at) (your|the) account|while i have you|i (also )?(see|noticed|notice) (that )?(you('re| are)|your)[^.]{0,40}(plan|equipment|gateway|modem|bill|promo|promotion|contract|speed)|(your|the) (equipment|gateway|modem) (is|looks) (old|outdated|up to date|fine)|i (also )?checked (your|the))\b/i,
+  pending: /\b(ticket|escalat\w*|technician|tech visit|appointment|refund|credit|callback|call back|follow[- ]up|will be (processed|applied|reviewed|sent)|(within|in) \d+ (hours?|days?|business days?)|case number|request (has been|was) (submitted|sent))\b/i,
+  followUp: /\b(i('ll| will) (call|follow up|check back|reach out|send you|email you|text you)|you('ll| will) (get|receive) (a|an) (text|email|call|confirmation|update)|(ticket|reference|case|confirmation) number|i('ve| have) (set|scheduled) (a|the) (follow[- ]up|callback|call back))\b/i,
+  doubt: /\b(i('ll| will)( have to)? (call|be calling) (back|again)|if it happens again|we('ll| will) see|i hope so|i doubt|not (really )?(sure|convinced)|still (not|doesn't|isn't|having)|that's what (they|the last (one|agent|person)|everyone) said|same thing (as|they) (last time|said)|(it )?doesn't (help|work|make sense)|i('m| am) not (happy|satisfied)|whatever|fine,? i guess|i don't (think|believe) (that|it)('ll| will)? (work|help|fix))\b/i,
+  happy: /\b(perfect|great|awesome|excellent|thank you so much|thanks so much|that helps|that makes sense|it('s| is) working|works now|working now|appreciate (it|your help|that)|you('ve| have) been (great|very helpful|so helpful|helpful)|that's (great|perfect|wonderful))\b/i,
+};
+/* Sales phrases: discovery, seed, offer, value, objections, close, integrity, retention */
+const TXS = {
+  discovery: /\b(how many (people|devices|lines|phones|tvs|users)|who (else )?(uses|lives|is in)|what (do you|does your (family|household|home)) (use|watch|stream|do)|do you (stream|game|work from home|watch|use (a|your) (phone|mobile))|who('s| is) your (mobile|cell|phone|wireless) (provider|carrier|company)|what (phone|carrier|cell provider|mobile provider)|are you (happy|satisfied) with your (mobile|cell|phone|current)|how much (do you|are you) pay(ing)?|how do you (mostly )?use)\b/i,
+  seed: /\b((before|after) (we|i) (finish|wrap up|go|end|hang up)|at the end of (the|our|this) call|(let me|i('ll| will)|i('m| am) going to) (also )?(check|look|see|review)[^.]{0,30}(offer|offers|promo|promos|promotion|promotions|deal|deals|save|saving|savings|value|better|discount)|(more|better|extra) value|get more (out of|from)|ways? to save|you (may|might|could) qualify|(you('re| are)|you might be) eligible for|i see (that )?you('re| are) eligible)\b/i,
+  product: /\b(xfinity mobile|mobile (line|lines|plan|service)|unlimited (plan|data|line)?|xfi complete|xfinity complete|storm[- ]ready|wifi boost|pods?\b|gig(abit)?|faster (speed|internet)|speed upgrade|upgrade (your|the) (speed|plan|internet|package)|now tv|peacock|streaming (bundle|service|package)|xfinity home|home security|flex|stream box|tv (package|service|plan)|home phone|landline|nowbox|whole[- ]home wi-?fi|premium channels?|sports package)\b/i,
+  offerVerb: /\b(would you (like|be interested|want)|i (can|could) (offer|add|get you|set you up|include)|we (have|offer|currently have)|there('s| is) (a|an|this) (promo|promotion|offer|deal|discount)|you (qualify|are eligible)|how about|have you (heard|considered|thought about)|i('d| would) (recommend|suggest)|let me tell you about)\b/i,
+  offerAsk: /\b(would you (like|be interested|want) (to (add|try|hear|upgrade|switch|save)|in (adding|trying|hearing|upgrading|switching|saving))|i (can|could) (offer|add|get you|set you up)|we (have|currently have|are offering) (a|an|some) (promo|promotion|offer|deal|discount|special)|you (qualify|are eligible) for|i('d| would) (recommend|suggest) (our|the|adding|upgrading|xfinity))\b/i,
+  value: /\b(you('ll| would| could| can) (save|get|have|enjoy|never|stop|keep)|(would|will|could|can|it) saves? you|saves you|because (it|they|that)|works with (the|your)|which means|that means|so you (can|could|won't|don't|will)|perfect for|great for|ideal for|since you (mentioned|said|told|work|have|use)|because you('re| are)? |it (will|would) (help|let|give|cover|fix|stop)|save (you )?(\$\s?\d+|money|up to)|lower your|no more (drops|buffering|dead zones))\b/i,
+  objection: /\b(no,? thanks|no thank you|not interested|i('m| am) (good|fine|ok|okay|all set)( with what i have)?|too (expensive|much)|can't afford|(maybe|not) (later|now|today|right now)|i('ll| will) think about it|i don't need|i('m| am) happy with|let me think|i('ll| will) pass|i don't want|not at this time|no,? i('m| am) (good|okay|ok))\b/i,
+  handle: /\b(i (understand|hear you|get (it|that)|totally understand)|what (makes|is) (you|it)|may i ask (why|what)|is it (the|because of the) (price|cost)|actually|that's (exactly )?why|many (customers|people)|no (contract|commitment|obligation)|you can (cancel|try|return|keep)|it would (actually )?(save|lower|cost less|be less)|what if|would it help if|just so you know|the good news)\b/i,
+  close: /\b(would you like (me )?to (add|go ahead|set (that|it) up|sign up|get (that|it) (started|added))|shall i (add|go ahead|set)|can i go ahead (and )?(add|set|place|get|put)|do you want (me )?to (add|go ahead|get)|should i (add|go ahead)|are you ready to|let's get (that|it) (added|set up|started))\b/i,
+  yes: /\b(yes,? (please|go ahead|let's do it|add it|sign me up|i('d| would) like)|sure,? (go ahead|add it|let's do it|why not)|let's do (it|that)|sign me up|i('ll| will) take it|sounds good,? (let's|go ahead)|go ahead and (add|do)|okay,? (add|let's do) it)\b/i,
+  maybe: /\b(maybe|i guess|not sure|i suppose|i don't know|if you (say|think) so|whatever)\b/i,
+  added: /\b(i('ve| have) (added|placed|submitted|activated|ordered|set up|upgraded)|(it's|it is|that's|that has) (been )?(added|placed|submitted|activated|upgraded)|i('m| am) (adding|placing|submitting|upgrading) (it|that|the|your))\b/i,
+  consent: /\b(do (i|we) have your (permission|consent|approval|ok|okay)|do you (agree|authorize|approve|consent)|is it (ok|okay|alright) (if i|to) (add|place|go ahead|submit)|can i get (your|a) (verbal )?(yes|consent|approval|ok)|i (need|just need) (your|a) (verbal )?(yes|consent|approval))\b/i,
+  price: /\b(\$\s?\d+|\d+ dollars|per month|a month|monthly (total|price|rate|bill|charge)|your (new )?(bill|total|monthly)|the (total|price|cost) (will be|is|comes to)|plus tax(es)?)\b/i,
+  promo: /\b(for (the first )?\d+ (months?|years?)|(promo|promotional|promotion) (ends|lasts|price|period|term|expires)|after (that|the promo|the promotion|\d+ months)|regular (price|rate)|goes (back )?(up|to) \$?\d+|then it('s| is| will be) \$?\d+)\b/i,
+  orderRecap: /\b((let me|just to|i('ll| will)|i want to) (recap|confirm|read back|go over|review) (your|the|this) (order|changes|new (plan|service|line))|(so|to confirm),? (we('re| are)|i('m| am)) adding|you('re| are) (getting|adding) [^.]{0,40} for \$?\d+)\b/i,
+  leaving: /\b(cancel(l?ing)? (my|the|this) (service|account|internet|plan)|switch(ing)? (to|over to) (verizon|t-mobile|at&t|spectrum|starlink|fios|another|a different)|(verizon|t-mobile|at&t|spectrum|starlink|fios) (is|has|offers|offered) (cheaper|better|a better)|cheaper (option|elsewhere|somewhere)|disconnect (my|the) service|leave xfinity|i want to cancel)\b/i,
+  retain: /\b(may i ask (why|what)|what('s| is) (making|causing) you|i('d| would) (hate|love) to|before you (go|leave|cancel)|let me see what (i can|we can)|i (can|could) (offer|lower|reduce|match)|we (can|could) (lower|reduce|adjust)|is it the (price|cost|service)|what would (make you|it take))\b/i,
+};
+const TX_AREAS = [
+  { key: 'connect', label: 'Connect' },
+  { key: 'discover', label: 'Discover' },
+  { key: 'resolve', label: 'Resolve' },
+  { key: 'prevent', label: 'Prevent repeat calls' },
+  { key: 'sales', label: 'Sales' },
+  { key: 'integrity', label: 'Sales integrity' },
+  { key: 'close', label: 'Close' },
+];
+/** What the call is about, so the right checks apply. */
+function txCallType(turns) {
+  const t = turns.map((x) => x.text).join(' ').toLowerCase();
+  const n = (re) => (t.match(re) || []).length;
+  const score = {
+    access: n(/\b(password|sign[- ]?in|log ?in|locked out|username|two[- ]step|verification code|imap|email (account|settings)|comcast\.net|reset (my|the|your) password)\b/g) * 2,
+    billing: n(/\b(bill|billing|charge|charged|payment|pay|credit|refund|price|rate|promo|promotion|late fee|balance|\$\s?\d+)\b/g),
+    tech: n(/\b(internet|wi-?fi|signal|modem|gateway|router|box|cable|outage|slow|dropping|drops|disconnect\w*|no service|picture|channel|freez\w*|buffer\w*|restart|reboot|speed)\b/g),
+    sales: n(/\b(add a line|new line|upgrade|switch to xfinity|sign up|new service|order)\b/g) * 2,
+  };
+  const best = Object.entries(score).sort((a, b) => b[1] - a[1])[0];
+  return best[1] >= 2 ? best[0] : 'general';
+}
+const TX_TYPE_LABEL = { tech: 'Technical', access: 'Account access', billing: 'Billing', sales: 'Sales', general: 'General' };
 const TX_SPEECH_WPS = 2.6; // spoken words per second, to tell talk time from silence between timed lines
 
 /** Run every check. Returns { went, better, checks, stats }. */
@@ -37365,15 +37489,21 @@ function txAnalyze(turns) {
   const went = [];
   const better = [];
   const checks = [];
+  /* Every finding and check belongs to an area of the call (the scorecard). */
+  let AREA = 'connect';
+  const type = txCallType(turns);
+  /* Repeat-call (aiCR) risk: what raises it (+) and what lowers it (-). */
+  const riskList = [];
+  const risk = (pts, label, quote) => riskList.push({ pts, label, quote: quote || null });
   const add = (list, id, weight, why, quotes) => {
     const have = list.find((x) => x.id === id);
     if (have) {
       have.weight = Math.max(have.weight, weight);
       return;
     }
-    list.push({ id, weight, why, quotes: (quotes || []).filter(Boolean).slice(0, 2) });
+    list.push({ id, weight, why, area: AREA, quotes: (quotes || []).filter(Boolean).slice(0, 2) });
   };
-  const check = (label, status, note) => checks.push({ label, status, note });
+  const check = (label, status, note) => checks.push({ area: AREA, label, status, note });
   const first = (list, re) => list.find((x) => re.test(x.text));
   const all = (list, re) => list.filter((x) => re.test(x.text));
   const countIn = (list, re) => list.reduce((n, x) => n + (x.text.match(re) || []).length, 0);
@@ -37430,6 +37560,8 @@ function txAnalyze(turns) {
   if (ack) {
     add(went, 's-acknowledgement', 2, 'Acknowledged the concern early.', [txQuote(ack, TX.ack)]);
     check('Acknowledgement', 'good', 'Early in the call');
+  } else if (first(early, TX.empathy)) {
+    check('Acknowledgement', 'ok', 'Answered with empathy, no restating of the issue');
   } else {
     const issue = C.slice(0, 4).filter((x) => !/\d{4}/.test(x.text)).sort((x, y) => txWords(y.text) - txWords(x.text))[0] || C[0];
     add(better, 'com-missing-acknowledgement', 2, 'No acknowledgement of the concern in the first part of the call.', [txQuote(issue)]);
@@ -37464,6 +37596,7 @@ function txAnalyze(turns) {
   } else check('Assurance', 'ok', 'Late in the call');
 
   /* Probing */
+  AREA = 'discover';
   const qs = [];
   A.forEach((x) => x.text.split(/(?<=[.!?])\s+/).forEach((sen) => {
     const asks = TX.question.test(sen) || /^\s*(okay,?\s*|so,?\s*|and\s+|um,?\s*)?(is|are|do|does|did|who|what|which|when|where|why|how|have|has)\b[^.]{6,}/i.test(sen);
@@ -37486,6 +37619,7 @@ function txAnalyze(turns) {
   } else check('Probing questions', 'ok', `${qs.length} questions`);
 
   /* Hold */
+  AREA = 'resolve';
   const holds = all(A, TX.holdStrong).length ? all(A, TX.holdStrong) : all(A, TX.hold).filter((x) => /\b(hold|moment|bear with me|sec|second|minute)\b/i.test(x.text));
   if (holds.length) {
     const asked = holds.some((x) => TX.permission.test(x.text));
@@ -37539,6 +37673,7 @@ function txAnalyze(turns) {
   }
 
   /* Listening: the customer repeating themselves, being cut off */
+  AREA = 'connect';
   const repeat = first(C, /\b(i (already|just) (told|said|gave|explained)|as i (said|told you|mentioned)|like i (said|told you)|i said that|you('re| are) not listening|let me finish|can i finish)\b/i);
   const cut = turns.filter((x, i) => x.who === 'customer' && /(--|—|…|\.\.\.)\s*$/.test(x.text) && turns[i + 1] && turns[i + 1].who === 'agent').length;
   if (repeat) {
@@ -37568,6 +37703,7 @@ function txAnalyze(turns) {
   }
 
   /* Ownership */
+  AREA = 'resolve';
   const own = first(A, TX.ownership);
   const noOwn = first(A, TX.noOwnership);
   if (noOwn) {
@@ -37604,6 +37740,7 @@ function txAnalyze(turns) {
     add(better, 'own-confirm-resolution', 2, 'Troubleshot the issue but did not confirm it was fixed.', []);
     check('Confirmed the fix', 'bad', 'Not confirmed');
   } else check('Confirmed the fix', 'na', 'No troubleshooting in the call');
+  AREA = 'prevent';
   const when = first(A, TX.timeframe);
   if (when) {
     add(went, 's-timeframe', 1, 'Gave a clear timeframe.', [txQuote(when, TX.timeframe)]);
@@ -37612,12 +37749,9 @@ function txAnalyze(turns) {
     add(better, 'own-expectation-setting', 1, 'Said "soon" or "shortly" without a timeframe.', [txQuote(first(A, /\b(soon|shortly|a while|at some point|eventually)\b/i), /\b(soon|shortly|a while|at some point|eventually)\b/i)]);
     check('Expectations', 'bad', 'Vague timeframe');
   } else check('Expectations', 'na', 'No timeframe needed');
-  const teach = first(A, TX.education);
-  if (teach) add(went, 's-education', 1, 'Showed the customer how to handle it next time.', [txQuote(teach, TX.education)]);
-  const offer = first(A, TX.offer);
-  if (offer) add(went, 's-relevant-offer', 1, 'Made an offer.', [txQuote(offer, TX.offer)]);
 
   /* Closing */
+  AREA = 'close';
   const lastBits = lateText;
   const closeHits = (TX.anythingElse.test(lastBits) ? 1 : 0) + (TX.closingWords.test(lastBits) ? 1 : 0);
   if (closeHits === 2) {
@@ -37630,15 +37764,308 @@ function txAnalyze(turns) {
     check('Call closing', 'bad', 'No closing');
   } else check('Call closing', 'ok', TX.anythingElse.test(lastBits) ? 'Asked "anything else?", no warm close' : 'Warm close, no "anything else?"');
 
+  /* ====================== Discovery in depth ====================== */
+  AREA = 'discover';
+  const askList = qs.map((q) => q.sen);
+  const askedAny = (re) => askList.find((s) => re.test(s)) || (A.find((x) => re.test(x.text)) || {}).text;
+  const disc = [
+    { key: 'start', label: 'When it started', re: TXD.start, id: 'dis-issue-start', types: ['tech', 'access'] },
+    { key: 'scope', label: 'Which devices, services or people', re: TXD.scope, id: 'dis-issue-scope', types: ['tech', 'access'] },
+    { key: 'tried', label: 'What was already tried', re: TXD.tried, id: 'dis-prior-troubleshooting', types: ['tech', 'access'] },
+    { key: 'changed', label: 'What changed recently', re: TXD.changed, id: 'dis-recent-changes', types: ['tech', 'access'] },
+    { key: 'see', label: 'What they see (lights, errors, messages)', re: TXD.see, id: 'dis-error-details', types: ['tech', 'access'] },
+  ].filter((d) => d.types.includes(type));
+  const covered = disc.filter((d) => askedAny(d.re));
+  const missed = disc.filter((d) => !askedAny(d.re));
+  if (disc.length) {
+    if (covered.length >= 3) add(went, 's-probing', 3, `Discovery covered ${joinList(covered.map((d) => d.label.toLowerCase()))}.`, [txQuote(first(A, covered[0].re), covered[0].re)]);
+    covered.forEach((d) => check(`Discovery: ${d.label}`, 'good', 'Asked'));
+    /* The two most telling gaps become findings; the rest show in the checks. */
+    missed.forEach((d, i) => {
+      check(`Discovery: ${d.label}`, 'bad', 'Not asked');
+      if (i < 2 && qs.length > 0) add(better, d.id, covered.length ? 1 : 2, `Did not ask ${d.label.toLowerCase()}.`, []);
+    });
+  }
+  /* A repeat caller: did the agent own the history? */
+  const repeatSaid = first(C, TXD.repeatCaller);
+  const historySeen = first(A, TXD.history);
+  if (repeatSaid) {
+    if (historySeen) {
+      check('Repeat caller', 'good', 'History acknowledged');
+      risk(-1, 'Acknowledged the earlier contacts', txQuote(historySeen, TXD.history));
+    } else {
+      add(better, 'own-repeat-contacts', 2, 'The customer said this has happened before, and the earlier contacts were not acknowledged or used.', [txQuote(repeatSaid, TXD.repeatCaller)]);
+      check('Repeat caller', 'bad', 'History not acknowledged');
+    }
+    risk(2, 'The customer has called about this before', txQuote(repeatSaid, TXD.repeatCaller));
+  }
+
+  /* ====================== Information and the fix ====================== */
+  AREA = 'resolve';
+  const hedges = countIn(A, TXD.hedge);
+  if (hedges >= 3) {
+    add(better, 'tech-knowledge-gap', 2, `Sounded unsure ${hedges} times ("I think", "maybe", "probably"), so the information may not be right.`, [txQuote(first(A, new RegExp(TXD.hedge.source, 'i')), new RegExp(TXD.hedge.source, 'i'))]);
+    check('Sure of the information', 'bad', `${hedges} unsure phrases`);
+    risk(2, 'Unsure or possibly wrong information');
+  } else check('Sure of the information', 'good', hedges ? `${hedges} unsure phrase${hedges > 1 ? 's' : ''}` : 'Clear answers');
+  const confused = first(C, TXD.confused);
+  if (confused) {
+    add(better, 'tech-explanations', 2, 'The customer said they did not follow the explanation.', [txQuote(confused, TXD.confused)]);
+    check('Clear explanation', 'bad', 'Customer was confused');
+    risk(1, 'The customer was confused by the explanation', txQuote(confused, TXD.confused));
+  }
+  const claimed = first(A, TXD.claimFixed);
+  if (claimed && !tested && fixing) {
+    add(better, 'own-premature-resolution', 2, 'Said it was fixed before the customer tested it.', [txQuote(claimed, TXD.claimFixed)]);
+    risk(2, 'Called it fixed without a live test', txQuote(claimed, TXD.claimFixed));
+  }
+  if (type === 'tech' && fixing) {
+    const deeper = A.some((x) => TXD.diagnose.test(x.text));
+    const reboot = A.some((x) => /\b(restart|reboot|unplug|power cycle)\b/i.test(x.text));
+    if (deeper) {
+      add(went, 's-troubleshooting', 1, 'Checked the signal, equipment or outages, not only a restart.', [txQuote(first(A, TXD.diagnose), TXD.diagnose)]);
+      check('Diagnosis', 'good', 'Signal, equipment or outage checked');
+    } else if (reboot) {
+      add(better, 'tech-reboot-only', 2, 'A restart was the only fix; no signal, equipment or outage check.', [txQuote(first(A, /\b(restart|reboot|unplug|power cycle)\b/i), /\b(restart|reboot|unplug|power cycle)\b/i)]);
+      check('Diagnosis', 'bad', 'Restart only');
+      risk(2, 'Restart was the only fix');
+    }
+    const outage = first(A, TXD.outage);
+    if (outage) add(went, 's-outage-check', 1, 'Checked for an outage.', [txQuote(outage, TXD.outage)]);
+  }
+  if (tested) risk(-2, 'The customer tested the fix live', txQuote(tested, TX.testFix));
+  else if (fixing && !stopped) risk(2, 'The fix was not tested with the customer');
+
+  /* ====================== Preventing the repeat call ====================== */
+  AREA = 'prevent';
+  const selfServe = first(A, TXD.selfService);
+  if (selfServe) {
+    add(went, 's-education', 2, 'Showed a self-service option or how to handle it next time.', [txQuote(selfServe, TXD.selfService)]);
+    check('Self-service and education', 'good', 'Given');
+    risk(-1, 'Self-service or education given', txQuote(selfServe, TXD.selfService));
+  } else if (!stopped && type !== 'sales') {
+    add(better, 'own-incomplete-education', 2, 'No self-service option (app, My Account) and no "if it happens again" steps.', []);
+    check('Self-service and education', 'bad', 'Not given');
+    risk(1, 'No self-service option or "if it happens again" steps');
+  } else check('Self-service and education', 'na', stopped ? 'The transcript stops before the end' : 'Not needed');
+  const recap = first(A.slice(Math.floor(A.length / 2)), TXD.recap);
+  if (recap) {
+    add(went, 's-closing', 2, 'Recapped what was done.', [txQuote(recap, TXD.recap)]);
+    check('Recap', 'good', 'Recapped the call');
+    risk(-1, 'Recapped what was done', txQuote(recap, TXD.recap));
+  } else if (!stopped) {
+    if (!went.some((x) => x.id === 's-closing')) add(better, 'com-closing', 1, 'No recap of what was done and what happens next.', []);
+    check('Recap', 'bad', 'No recap');
+    risk(1, 'No recap of what was done');
+  } else check('Recap', 'na', 'The transcript stops before the end');
+  const health = first(A, TXD.health);
+  if (health) {
+    check('Account health check', 'good', 'Looked at the account and equipment');
+    risk(-1, 'Account or equipment health check', txQuote(health, TXD.health));
+  } else check('Account health check', stopped ? 'na' : 'ok', stopped ? 'The transcript stops before the end' : 'No health check heard');
+  const pending = A.some((x) => TXD.pending.test(x.text));
+  const followUp = first(A, TXD.followUp);
+  if (pending) {
+    if (followUp || when) {
+      if (followUp) add(went, 's-followup', 1, 'Set the follow-up for what is still pending.', [txQuote(followUp, TXD.followUp)]);
+      check('Follow-up on pending work', 'good', 'Follow-up or timeframe given');
+    } else if (!stopped) {
+      add(better, 'own-missing-followup', 2, 'Something is still pending (ticket, visit, credit) with no follow-up or reference given.', [txQuote(first(A, TXD.pending), TXD.pending)]);
+      check('Follow-up on pending work', 'bad', 'Nothing set');
+      risk(2, 'Pending work with no follow-up');
+    }
+  }
+  /* Was the customer convinced by the end? */
+  const tail = C.slice(-3);
+  const doubt = tail.find((x) => TXD.doubt.test(x.text));
+  const happy = tail.find((x) => TXD.happy.test(x.text));
+  if (doubt) {
+    const answered = A.some((a) => turns.indexOf(a) > turns.indexOf(doubt) && (TX.assurance.test(a.text) || TX.timeframe.test(a.text) || TXD.recap.test(a.text) || TXD.followUp.test(a.text)));
+    add(better, 'own-objections', answered ? 2 : 3, answered ? 'The customer still sounded unsure about the fix at the end.' : 'The customer was not convinced by the resolution, and the doubt was not answered.', [txQuote(doubt, TXD.doubt)]);
+    check('Customer convinced', 'bad', 'Doubt at the end');
+    risk(3, 'The customer did not sound convinced', txQuote(doubt, TXD.doubt));
+  } else if (happy) {
+    check('Customer convinced', 'good', 'Ended positive');
+    risk(-2, 'The customer ended positive', txQuote(happy, TXD.happy));
+    if (tested) add(went, 's-resolution', 2, 'Resolved it, and the customer confirmed it at the end.', [txQuote(happy, TXD.happy)]);
+  } else check('Customer convinced', stopped ? 'na' : 'ok', stopped ? 'The transcript stops before the end' : 'No clear sign either way');
+  if (noOwn) risk(2, 'Sent the customer elsewhere');
+  if (later) risk(2, 'Asked the customer to call back');
+  if (xfer) risk(1, 'Transferred the call');
+  if (qs.length === 0) risk(2, 'No probing questions');
+  else if (missed.length >= 3 && disc.length) risk(1, `Discovery missed ${missed.length} areas`);
+  if (when) risk(-1, 'Clear timeframe given', txQuote(when, TX.timeframe));
+
+  /* ====================== Sales ====================== */
+  AREA = 'sales';
+  const sales = { steps: [], applies: true };
+  const step = (key, label, status, note) => sales.steps.push({ key, label, status, note });
+  const angry = !!first(C, /\b(supervisor|manager|cancel\w*|ridiculous|unacceptable|furious|lawyer|bbb|fcc)\b/i);
+  /* An offer only fits once the customer's issue is handled and they are not upset or unconvinced. */
+  const unfixed = !!doubt || (fixing && !tested && !happy);
+  const salesFit = !angry && !stopped && !unfixed;
+  const sDisc = first(A, TXS.discovery);
+  const seed = first(A, TXS.seed);
+  const offers = A.filter((x) => TXS.offerAsk.test(x.text) || (TXS.product.test(x.text) && TXS.offerVerb.test(x.text)));
+  const offer = offers[0];
+  const offerAt = offer ? turns.indexOf(offer) : -1;
+  const afterOffer = (list) => list.filter((x) => offerAt >= 0 && turns.indexOf(x) > offerAt);
+  const resolvedAt = tested ? turns.indexOf(tested) : -1;
+  step('discovery', 'Sales discovery', sDisc ? 'good' : offer ? 'bad' : 'na', sDisc ? 'Asked about the household or usage' : offer ? 'Offer made without discovery' : 'No sales discovery');
+  if (sDisc) add(went, 's-sales-discovery', 2, 'Asked about the household or how they use the service.', [txQuote(sDisc, TXS.discovery)]);
+  else if (offer) add(better, 'sales-missing-discovery', 2, 'Made an offer without asking about the household or usage first.', []);
+  if (seed) {
+    add(went, 's-plant-seed', 2, 'Planted the seed: told the customer they would look for offers or more value.', [txQuote(seed, TXS.seed)]);
+    step('seed', 'Plant the seed', 'good', 'Mentioned offers or more value');
+  } else if (!offer && salesFit) {
+    add(better, 'sales-plant-seed', 2, 'No mention of offers, savings or more value from the plan.', []);
+    step('seed', 'Plant the seed', 'bad', 'Not done');
+  } else step('seed', 'Plant the seed', offer ? 'ok' : 'na', offer ? 'Went straight to an offer' : angry ? 'Not suitable on this call' : stopped ? 'The transcript stops before the end' : 'Fix the issue first');
+  if (offer) {
+    add(went, 's-relevant-offer', 2, 'Offered a product or upgrade.', [txQuote(offer, TXS.product.test(offer.text) ? TXS.product : TXS.offerAsk)]);
+    step('offer', 'Offer', 'good', 'Product offered');
+    if (resolvedAt >= 0 && offerAt < resolvedAt && type === 'tech') {
+      add(better, 'sales-pitch-before-resolve', 1, 'Pitched before the fix was confirmed.', [txQuote(offer, TXS.offerAsk)]);
+    }
+    const valueTurn = [offer, ...afterOffer(A).slice(0, 2)].find((x) => TXS.value.test(x.text));
+    if (valueTurn) {
+      add(went, 's-value', 2, 'Tied the offer to what it gives the customer.', [txQuote(valueTurn, TXS.value)]);
+      step('value', 'Value', 'good', 'Benefit explained');
+    } else {
+      add(better, 'sales-offer-value', 2, 'Gave the offer without saying what it would do for this customer.', [txQuote(offer, TXS.offerAsk)]);
+      step('value', 'Value', 'bad', 'No benefit given');
+    }
+    /* Objections: a no after the offer, and what the agent did next. */
+    const no = afterOffer(C).find((x) => TXS.objection.test(x.text));
+    if (no) {
+      const reply = A.find((x) => turns.indexOf(x) > turns.indexOf(no));
+      const handled = reply && TXS.handle.test(reply.text);
+      const repitch = reply && !handled && (TXS.offerAsk.test(reply.text) || TXS.close.test(reply.text) || TXS.product.test(reply.text));
+      const no2 = reply ? C.find((x) => turns.indexOf(x) > turns.indexOf(reply) && TXS.objection.test(x.text)) : null;
+      const pushedAfter = no2 && A.find((x) => turns.indexOf(x) > turns.indexOf(no2) && (TXS.offerAsk.test(x.text) || TXS.close.test(x.text)));
+      if (handled) {
+        add(went, 's-objection', 2, 'Answered the objection instead of dropping the offer.', [txQuote(reply, TXS.handle)]);
+        step('objection', 'Objection handling', 'good', 'Handled');
+      } else if (repitch) {
+        add(better, 'sales-weak-objection', 2, 'Repeated the offer without asking what was behind the no.', [txQuote(no, TXS.objection), txQuote(reply, TXS.close.test(reply.text) ? TXS.close : TXS.offerAsk)]);
+        step('objection', 'Objection handling', 'bad', 'Repeated the pitch instead of answering');
+      } else {
+        add(better, 'sales-weak-objection', 2, 'Dropped the offer at the first objection without asking what was behind it.', [txQuote(no, TXS.objection)]);
+        step('objection', 'Objection handling', 'bad', 'Dropped at the first no');
+      }
+      if (pushedAfter) {
+        add(better, 'integrity-pressure-after-no', 3, 'Kept pushing after a second clear no.', [txQuote(no2, TXS.objection), txQuote(pushedAfter, TXS.offerAsk)]);
+        step('respect', 'Respected a no', 'bad', 'Pushed after a second no');
+      } else if (no2) {
+        add(went, 's-integrity-respected-no', 1, 'Accepted the second no.', [txQuote(no2, TXS.objection)]);
+        step('respect', 'Respected a no', 'good', 'Accepted it');
+      }
+    } else step('objection', 'Objection handling', 'na', 'No objection');
+    const close = [offer, ...afterOffer(A)].find((x) => TXS.close.test(x.text));
+    const yes = afterOffer(C).find((x) => TXS.yes.test(x.text));
+    if (close) {
+      add(went, 's-sales-close', 1, 'Asked for the decision.', [txQuote(close, TXS.close)]);
+      step('close', 'Close', 'good', yes ? 'Asked, and the customer agreed' : 'Asked for the decision');
+    } else if (!no) {
+      add(better, 'sales-closing', 1, 'Made the offer but never asked for a decision.', []);
+      step('close', 'Close', 'bad', 'No ask');
+    } else step('close', 'Close', 'na', 'Customer declined');
+
+    /* Integrity: only once something is being added. */
+    const added = A.find((x) => turns.indexOf(x) > offerAt && TXS.added.test(x.text));
+    if (yes || added) {
+      AREA = 'integrity';
+      const consent = A.find((x) => turns.indexOf(x) > offerAt && TXS.consent.test(x.text));
+      const price = A.find((x) => turns.indexOf(x) >= offerAt && TXS.price.test(x.text));
+      const promo = A.find((x) => turns.indexOf(x) >= offerAt && TXS.promo.test(x.text));
+      const promoTalk = A.some((x) => turns.indexOf(x) >= offerAt && /\b(promo|promotion|promotional|discount|deal)\b/i.test(x.text));
+      const orderRecap = A.find((x) => turns.indexOf(x) > offerAt && TXS.orderRecap.test(x.text));
+      const unsure = added && C.slice().reverse().find((x) => turns.indexOf(x) < turns.indexOf(added) && turns.indexOf(x) > offerAt);
+      if (consent || (yes && !(unsure && TXS.maybe.test(unsure.text)))) {
+        if (consent) add(went, 's-integrity-consent', 2, 'Got a clear yes before adding it.', [txQuote(consent, TXS.consent)]);
+        check('Consent', 'good', consent ? 'Asked for consent' : 'Clear yes from the customer');
+      } else if (unsure && TXS.maybe.test(unsure.text)) {
+        add(better, 'integrity-assumed-consent', 3, 'Added it after a "maybe" or "I guess", not a clear yes.', [txQuote(unsure, TXS.maybe), txQuote(added, TXS.added)]);
+        check('Consent', 'bad', 'Assumed from a maybe');
+      } else {
+        add(better, 'integrity-no-verbal-consent', 3, 'Added it without a clear verbal yes.', [txQuote(added, TXS.added)]);
+        check('Consent', 'bad', 'No clear yes');
+      }
+      if (price) {
+        add(went, 's-integrity-price-recap', 2, 'Gave the price.', [txQuote(price, TXS.price)]);
+        check('Price given', 'good', 'Monthly price stated');
+      } else {
+        add(better, 'sales-pricing-disclosure', 2, 'The new monthly price was not stated.', []);
+        check('Price given', 'bad', 'Not stated');
+      }
+      if (promoTalk) {
+        if (promo) {
+          add(went, 's-integrity-promo-terms', 1, 'Said how long the promotion lasts and what comes after.', [txQuote(promo, TXS.promo)]);
+          check('Promo terms', 'good', 'Term and price after given');
+        } else {
+          add(better, 'integrity-promo-term-disclosure', 2, 'Mentioned a promotion without saying when it ends or what the price becomes.', []);
+          check('Promo terms', 'bad', 'Not given');
+        }
+      }
+      if (orderRecap) {
+        add(went, 's-integrity-order-recap', 1, 'Read back the order before submitting it.', [txQuote(orderRecap, TXS.orderRecap)]);
+        check('Order recap', 'good', 'Read back');
+      } else {
+        add(better, 'integrity-no-order-recap', 2, 'Did not read back the order before submitting it.', []);
+        check('Order recap', 'bad', 'Not read back');
+      }
+      step('integrity', 'Integrity', checks.filter((c) => c.area === 'integrity').some((c) => c.status === 'bad') ? 'bad' : 'good', 'Consent, price, terms, recap');
+      AREA = 'sales';
+    }
+  } else {
+    step('offer', 'Offer', salesFit ? 'bad' : 'na', angry ? 'Not suitable on this call' : stopped ? 'The transcript stops before the end' : unfixed ? 'Fix the issue first' : 'No offer');
+    if (salesFit && (happy || tested)) add(better, 'sales-missing-offer', 1, 'The issue was solved and the customer was happy, and no offer was made.', []);
+  }
+  /* Retention: the customer talks about leaving. */
+  const leaving = first(C, TXS.leaving);
+  if (leaving) {
+    const saved = A.find((x) => turns.indexOf(x) > turns.indexOf(leaving) && TXS.retain.test(x.text));
+    if (saved) {
+      add(went, 's-retention', 2, 'Asked why and worked to keep the customer.', [txQuote(saved, TXS.retain)]);
+      step('retention', 'Retention', 'good', 'Worked the save');
+    } else {
+      add(better, type === 'billing' ? 'bill-cancellation-risk' : 'sales-retention', 3, 'The customer mentioned leaving or a competitor, and the agent did not ask why or offer options.', [txQuote(leaving, TXS.leaving)]);
+      step('retention', 'Retention', 'bad', 'Not addressed');
+    }
+  }
+  sales.steps.forEach((x) => check(`Sales: ${x.label}`, x.status, x.note));
+  AREA = 'close';
+
   /* Talk numbers */
   const aw = A.reduce((n, x) => n + txWords(x.text), 0);
   const cw = C.reduce((n, x) => n + txWords(x.text), 0);
   const len = timed.length >= 2 ? timed[timed.length - 1].t - timed[0].t : null;
-  const stats = { cut: stopped, turns: turns.length, agentPct: aw + cw ? Math.round((aw / (aw + cw)) * 100) : 0, questions: qs.length, length: len };
+  const stats = { type, cut: stopped, turns: turns.length, agentPct: aw + cw ? Math.round((aw / (aw + cw)) * 100) : 0, questions: qs.length, length: len };
 
   /* Only behaviors the library has; strongest first. */
   const real = (list, get) => list.filter((x) => get(x.id)).sort((x, y) => y.weight - x.weight);
-  return { went: real(went, getStrength), better: real(better, getOpp), checks, stats };
+  /* aiCR: add up what raises and lowers the chance of a repeat call. */
+  const riskScore = riskList.reduce((n, x) => n + x.pts, 0);
+  const aicr = {
+    score: riskScore,
+    level: riskScore >= 5 ? 'high' : riskScore >= 2 ? 'medium' : 'low',
+    raises: riskList.filter((x) => x.pts > 0).sort((a, b) => b.pts - a.pts),
+    lowers: riskList.filter((x) => x.pts < 0).sort((a, b) => a.pts - b.pts),
+    partial: stopped,
+  };
+  /* Scorecard: per area, good counts 1, partly 0.5, a gap 0; areas with nothing to judge are left out. */
+  const areas = TX_AREAS.map((a) => {
+    const list = checks.filter((c) => c.area === a.key && c.status !== 'na');
+    const pts = list.reduce((n, c) => n + (c.status === 'good' ? 1 : c.status === 'ok' ? 0.5 : 0), 0);
+    return { ...a, n: list.length, score: list.length ? Math.round((pts / list.length) * 100) : null, gaps: list.filter((c) => c.status === 'bad').length };
+  }).filter((a) => a.n);
+  /* With a high repeat-call risk, the behaviors that drive aiCR come first among equals. */
+  const better2 = real(better, getOpp);
+  if (aicr.level === 'high') {
+    const ai = (x) => ((getOpp(x.id).kpi || [])[0] === 'aiCR' ? 2 : (getOpp(x.id).kpi || []).includes('aiCR') ? 1 : 0);
+    better2.sort((x, y) => y.weight - x.weight || ai(y) - ai(x));
+  }
+  return { went: real(went, getStrength), better: better2, checks, stats, aicr, sales, areas };
 }
 
 /* ---------- actions ---------- */
@@ -37663,6 +38090,10 @@ function txEvidence(r) {
   const lines = ['From the call transcript:'];
   r.went.filter((x) => txUi.pickS.has(x.id)).forEach((x) => lines.push(`- Went well, ${getStrength(x.id).title}: ${x.why}${x.quotes[0] ? ` ${fmt(x.quotes[0])}` : ''}`));
   r.better.filter((x) => txUi.pickO.has(x.id)).forEach((x) => lines.push(`- To improve, ${getOpp(x.id).title}: ${x.why}${x.quotes[0] ? ` ${fmt(x.quotes[0])}` : ''}`));
+  const a = r.aicr;
+  lines.push(`- Repeat call risk (aiCR): ${a.level[0].toUpperCase()}${a.level.slice(1)}${a.raises.length ? `. Raised by: ${a.raises.map((x) => x.label.toLowerCase()).join('; ')}` : ''}${a.lowers.length ? `. Lowered by: ${a.lowers.map((x) => x.label.toLowerCase()).join('; ')}` : ''}.`);
+  const sp = r.sales.steps.filter((x) => x.status !== 'na');
+  if (sp.length) lines.push(`- Sales path: ${sp.map((x) => `${x.label} ${x.status === 'good' ? 'done' : x.status === 'bad' ? 'missed' : 'partly'}`).join(', ')}.`);
   return lines.join('\n');
 }
 
@@ -37689,6 +38120,45 @@ async function txBuild() {
 }
 
 /* ---------- the page ---------- */
+const txTone = (score) => (score == null ? 'na' : score >= 80 ? 'good' : score >= 50 ? 'ok' : 'bad');
+function txScorecard(r) {
+  if (!r.areas.length) return null;
+  const all = r.areas.reduce((n, a) => n + a.score * a.n, 0) / r.areas.reduce((n, a) => n + a.n, 0);
+  return h(
+    'div',
+    { class: 'tx-score', role: 'group', 'aria-label': 'Call scorecard' },
+    h('div', { class: `tx-score__all is-${txTone(all)}` }, h('span', { class: 'tx-score__v' }, `${Math.round(all)}%`), h('span', { class: 'tx-score__l' }, 'Call score'), h('span', { class: 'tx-score__n' }, 'from the words')),
+    h(
+      'div',
+      { class: 'tx-score__areas' },
+      r.areas.map((a) => h('div', { class: `tx-score__area is-${txTone(a.score)}`, title: `${a.n} checks, ${a.gaps} gap${a.gaps === 1 ? '' : 's'}` }, h('div', { class: 'tx-score__top' }, h('span', { class: 'tx-score__name' }, a.label), h('strong', null, `${a.score}%`)), h('span', { class: 'tx-score__bar' }, h('span', { style: `width:${a.score}%` })), h('span', { class: 'tx-score__sub' }, a.gaps ? `${a.gaps} gap${a.gaps === 1 ? '' : 's'}` : 'No gaps')))
+    )
+  );
+}
+function txAicrPanel(a) {
+  const label = { low: 'Low', medium: 'Medium', high: 'High' }[a.level];
+  const row = (x, up) => h('li', { class: `tx-risk__row ${up ? 'is-up' : 'is-down'}` }, h('span', { class: 'tx-risk__sign', 'aria-hidden': 'true' }, up ? '▲' : '▼'), h('span', null, x.label, x.quote ? h('span', { class: 'tx-risk__q' }, ` “${x.quote.text}”`) : null));
+  return h(
+    'section',
+    { class: `tx-panel tx-risk is-${a.level}`, 'aria-label': 'Repeat call risk' },
+    h('div', { class: 'tx-panel__head' }, h('h3', { class: 'tx-panel__t' }, icon('refresh'), 'Repeat call risk (aiCR)'), h('span', { class: `tx-risk__badge is-${a.level}` }, label)),
+    h('p', { class: 'tx-panel__sub' }, a.level === 'high' ? 'This customer is likely to call back about the same issue.' : a.level === 'medium' ? 'Some signs this customer may call back.' : 'Few signs of a repeat call.', a.partial ? ' The transcript stops early, so this is partial.' : ''),
+    a.raises.length ? h('div', null, h('h4', { class: 'tx-risk__h' }, 'Raises the risk'), h('ul', { class: 'tx-risk__list' }, a.raises.map((x) => row(x, true)))) : null,
+    a.lowers.length ? h('div', null, h('h4', { class: 'tx-risk__h' }, 'Lowers the risk'), h('ul', { class: 'tx-risk__list' }, a.lowers.map((x) => row(x, false)))) : null
+  );
+}
+function txSalesPanel(sales) {
+  const ic = { good: 'check', bad: 'x', ok: 'info', na: 'more' };
+  const done = sales.steps.filter((x) => x.status === 'good').length;
+  const judged = sales.steps.filter((x) => x.status !== 'na').length;
+  return h(
+    'section',
+    { class: 'tx-panel tx-sales', 'aria-label': 'Sales path' },
+    h('div', { class: 'tx-panel__head' }, h('h3', { class: 'tx-panel__t' }, icon('tag'), 'Sales path'), judged ? h('span', { class: 'tx-sales__n' }, `${done} of ${judged}`) : null),
+    h('p', { class: 'tx-panel__sub' }, 'Discovery, seed, offer, value, objections, close and integrity.'),
+    h('ol', { class: 'tx-steps' }, sales.steps.map((x) => h('li', { class: `tx-step is-${x.status}` }, h('span', { class: 'tx-step__i' }, icon(ic[x.status], 'icon--sm')), h('span', { class: 'tx-step__l' }, x.label), h('span', { class: 'tx-step__n' }, x.note))))
+  );
+}
 function txItem(x, kind) {
   const isS = kind === 's';
   const def = isS ? getStrength(x.id) : getOpp(x.id);
@@ -37709,6 +38179,7 @@ function txItem(x, kind) {
       { class: 'tx-item__head' },
       box,
       h('span', { class: 'tx-item__title' }, def.title),
+      x.area ? h('span', { class: `tx-zone tx-zone--${x.area}` }, (TX_AREAS.find((a) => a.key === x.area) || {}).label || '') : null,
       !isS && on ? h('span', { class: `tx-tag${idx < FOCUS_MAX ? ' is-focus' : ''}` }, idx < FOCUS_MAX ? 'Focus' : 'Parked') : null
     ),
     h('p', { class: 'tx-item__why' }, x.why),
@@ -37757,7 +38228,9 @@ function txRender(main) {
       txUi.parts
         ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, 'The transcript has no speaker names, so the page worked out who said what. Check "Who said what" below; click a paragraph\'s label to switch it, and the results update.'))
         : null,
-      h('div', { class: 'tx-stats' }, stat(txUi.parts ? 'Turns' : 'Lines', String(st.turns)), st.length != null ? stat('Call length', txClock(st.length)) : null, stat('Agent talk', `${st.agentPct}%`), stat('Questions asked', String(st.questions))),
+      h('div', { class: 'tx-stats' }, stat('Call type', TX_TYPE_LABEL[st.type] || 'General'), stat(txUi.parts ? 'Turns' : 'Lines', String(st.turns)), st.length != null ? stat('Call length', txClock(st.length)) : null, stat('Agent talk', `${st.agentPct}%`), stat('Questions asked', String(st.questions))),
+      txScorecard(r),
+      h('div', { class: 'tx-panels' }, txAicrPanel(r.aicr), txSalesPanel(r.sales)),
       h(
         'div',
         { class: 'tx-cols' },
@@ -37788,7 +38261,7 @@ function txRender(main) {
         'details',
         { class: 'tx-checks' },
         h('summary', null, `What the page checked (${r.checks.length})`),
-        h('ul', { class: 'tx-checklist' }, r.checks.map((c) => h('li', { class: `tx-check is-${c.status}` }, icon(statusIcon[c.status], 'icon--sm'), h('span', { class: 'tx-check__l' }, c.label), h('span', { class: 'tx-check__n' }, c.note))))
+        TX_AREAS.filter((a) => r.checks.some((c) => c.area === a.key)).map((a) => h('div', { class: 'tx-checkgroup' }, h('h4', { class: 'tx-checkgroup__t' }, a.label), h('ul', { class: 'tx-checklist' }, r.checks.filter((c) => c.area === a.key).map((c) => h('li', { class: `tx-check is-${c.status}` }, icon(statusIcon[c.status], 'icon--sm'), h('span', { class: 'tx-check__l' }, c.label), h('span', { class: 'tx-check__n' }, c.note))))))
       )
     );
   }
