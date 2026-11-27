@@ -6184,6 +6184,15 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .tx-check.is-bad .icon { color: var(--accent-text, var(--accent)); }
 .tx-check.is-ok .icon { color: var(--warning); }
 .tx-check.is-na { opacity: 0.6; }
+.tx-wholist { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; max-height: 520px; overflow: auto; }
+.tx-who__row { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: start; gap: 10px; padding: 6px 8px; border-radius: 9px; font-size: 0.86rem; }
+.tx-who__row.is-agent { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.tx-who__row.is-customer { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.tx-who__btn { display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; padding: 3px 8px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-size: 0.74rem; font-weight: 750; cursor: pointer; }
+.tx-who__btn:hover { border-color: var(--accent); }
+.tx-who__row.is-customer .tx-who__btn { color: var(--accent-text, var(--accent)); }
+.tx-who__row.is-flipped .tx-who__btn { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
+.tx-who__t { color: var(--text); }
 @media (max-width: 800px) {
   .tx-cols { grid-template-columns: 1fr; }
   .tx-private { margin-left: 0; }
@@ -7503,7 +7512,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.6.0';
+const APP_VERSION = '3.6.1';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -37174,7 +37183,7 @@ EXT.order.splice(EXT.order.indexOf('integrity') + 1, 0, 'avoidlog');
    - The transcript is kept in memory only, never saved, and numbers and emails in quotes are hidden.
    ========================================================================== */
 
-let txUi = { text: '', member: '', result: null, pickS: new Set(), pickO: new Set(), error: '' };
+let txUi = { text: '', member: '', result: null, pickS: new Set(), pickO: new Set(), error: '', flips: new Set(), ranText: '' };
 
 /* ---------- reading the transcript ---------- */
 const TX_AGENT_RE = /^(agent|rep|representative|advocate|associate|csr|employee|tech|technician|specialist|consultant|support|vxi|comcast|xfinity|me)\b/i;
@@ -37184,8 +37193,45 @@ const txSecs = (t) => t.split(':').map(Number).reduce((a, b) => a * 60 + b, 0);
 const txClock = (s) => (s == null ? '' : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`);
 const txWords = (s) => (String(s).match(/[A-Za-z0-9']+/g) || []).length;
 
+/* ---------- transcripts without speaker names: guess who is talking ----------
+   Many call tools export plain paragraphs. Each paragraph is scored on how agents and customers talk
+   (phrases, then "you/your" against "I/my/me"); when that is unclear, the shape of the talk decides:
+   an answer follows a question, a short reply follows the agent, otherwise the speaker carries on.
+   The coach can switch any paragraph, so a wrong guess is one click. */
+const TX_AGENT_CUES = /\b((can|may|how can|how may) i (help|assist)|thank(s| you) for (calling|contacting|holding|waiting|your patience)|may i have|could i have|can i have|please provide|let me (ask|check|see|look|pull|verify|confirm|go ahead|help)|i('ve| have) sent you|i('ll| will) (send|do|help|check|make|take|go ahead|transfer|reset|be happy)|i('m| am) (truly |so |really |very )?sorry|i apologi[sz]e|i do see|i can see|on (my|our) (end|side|system)|(just )?(want|wanted) to make sure|on the same page|am i correct|is that correct|let me ask you|is there anything else|how is your day|make your day|no worries|i got you|bear with me|one moment|one[- ]time (pin|code)|text message to your|give me your|verify|for your patience|have a (great|nice|good|wonderful))\b/gi;
+const TX_CUST_CUES = /\b(i have a question|my (password|account|bill|internet|wifi|tv|box|wife|husband|children|kids|phone|email|son|daughter|service|modem)|i('ve| have) been|i don't know|i tried|i('m| am) not|i wanna|i want to know|i heard|i called|it keeps|it's just me|that's a good question|i don't think|frustrat\w*|ridiculous|i('m| am) calling)\b/gi;
+const TX_ASK_START = /^\s*(okay[,.]?\s*|ok[,.]?\s*|so[,.]?\s*|and\s+|um[,.]?\s*)?((on|in|at|for|from|to) (which|what)\b|(is|are|do|does|did|who|what|which|when|where|why|how|can|could|would|have|has|may)\b)/i;
+const txSentences = (t) => String(t).split(/(?<=[.!?])\s+/).filter(Boolean);
+const txIsAsk = (t) => /\?\s*$/.test(t) || txSentences(t).some((x) => TX_ASK_START.test(x)) || /\b(am i correct|is that correct|please|may i have|give me your|provide)\b/i.test(t);
+function txGuess(chunks, flips) {
+  const out = [];
+  chunks.forEach((text, i) => {
+    const n = (re) => (text.match(re) || []).length;
+    const bare = text.replace(/\bthank(s| you)\b/gi, ''); // "thank you" says nothing about who speaks
+    const np = (re) => (bare.match(re) || []).length;
+    const short = txWords(text) <= 4;
+    /* In a short line one pronoun says a lot ("Your wife okay.", "My phone sure."). */
+    const pw = short ? 1 : 0.5;
+    let score = 2 * n(TX_AGENT_CUES) - 2 * n(TX_CUST_CUES) + pw * np(/\b(you|your|yours)\b/gi) - pw * np(/\b(i|my|me|mine)\b/gi);
+    /* A question to "you", or a who/which/what question, is usually the agent probing. */
+    if (TX_ASK_START.test(text) && (/\b(you|your)\b/i.test(text) || /^\s*(okay[,.]?\s*|so[,.]?\s*)?(who|which|what|when|where|how)\b/i.test(text))) score += 1;
+    const prev = out[i - 1];
+    let who;
+    if (score >= 1) who = 'agent';
+    else if (score <= -1) who = 'customer';
+    else if (!prev) who = 'agent';
+    else if (txIsAsk(chunks[i - 1])) who = prev.who === 'agent' ? 'customer' : 'agent';
+    else if (short && prev.who === 'agent') who = 'customer';
+    else if (short && prev.who === 'customer' && /^\s*(okay|ok|alright|perfect|great|got it)\b/i.test(text)) who = 'agent';
+    else who = prev.who;
+    if (flips && flips.has(i)) who = who === 'agent' ? 'customer' : 'agent';
+    out.push({ who, text, i });
+  });
+  return out;
+}
+
 /** Turns: [{ who: 'agent' | 'customer', t: seconds | null, text }], or { error }. */
-function txParse(raw) {
+function txParse(raw, flips) {
   const lines = String(raw || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean);
   if (!lines.length) return { error: 'Paste a transcript first.' };
   const split = (line) => {
@@ -37218,7 +37264,21 @@ function txParse(raw) {
     else if (raw2.length) raw2[raw2.length - 1].text += ` ${p.label ? `${p.label}: ` : ''}${p.text}`;
   });
   const labels = [...new Set(raw2.map((x) => x.label))];
-  if (labels.length < 2) return { error: 'The page could not tell who is speaking. Start each line with "Agent:" or "Customer:" (a name or "Speaker 1:" works too).' };
+  if (labels.length < 2) {
+    /* No speaker names: paragraphs (or lines, when there are no blank lines) are guessed. */
+    const text = String(raw || '').replace(/\r/g, '');
+    const chunks = (/\n\s*\n/.test(text) ? text.split(/\n\s*\n/) : text.split('\n')).map((x) => x.replace(/\s+/g, ' ').trim()).filter(Boolean);
+    if (chunks.length < 3) return { error: 'The page could not tell who is speaking. Put each speaker on their own paragraph, or start lines with "Agent:" and "Customer:".' };
+    const parts = txGuess(chunks, flips);
+    const turns = [];
+    parts.forEach((x) => {
+      const last = turns[turns.length - 1];
+      if (last && last.who === x.who) last.text += ` ${x.text}`;
+      else turns.push({ who: x.who, t: null, text: x.text });
+    });
+    if (!turns.some((x) => x.who === 'agent') || !turns.some((x) => x.who === 'customer')) return { error: 'The page could not tell the agent from the customer. Start lines with "Agent:" and "Customer:".' };
+    return { turns, parts, guessed: true };
+  }
   const role = new Map();
   labels.forEach((l) => {
     if (TX_AGENT_RE.test(l)) role.set(l, 'agent');
@@ -37248,7 +37308,8 @@ const txMask = (s) => String(s).replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/g
 /** The sentence of a turn that matched, shortened. */
 function txQuote(turn, re) {
   const sentences = turn.text.split(/(?<=[.!?])\s+/);
-  let s = (re && sentences.find((x) => re.test(x))) || sentences[0] || turn.text;
+  const telling = () => sentences.find((x) => TX.emotion.test(x)) || sentences.slice(0, 5).reduce((a, b) => (txWords(b) > txWords(a) ? b : a), sentences[0] || '');
+  let s = (re && sentences.find((x) => re.test(x))) || telling() || turn.text;
   if (re) re.lastIndex = 0;
   s = txMask(s.trim());
   if (s.length > 170) s = `${s.slice(0, 167).replace(/\s+\S*$/, '')}…`;
@@ -37257,15 +37318,15 @@ function txQuote(turn, re) {
 
 /* ---------- the checks ---------- */
 const TX = {
-  opening: /\b(thank(s| you) for (calling|contacting|choosing)|welcome to|my name is|this is \w+ (from|with|at)|how (can|may|could) i (help|assist)|what can i do for you)\b/i,
-  ack: /\b(i (understand|see|hear you|got it)|so (you're|you are|your|the issue)|it sounds like|i see that|thanks? (you )?for (letting me know|explaining|sharing|telling)|just to (confirm|make sure)|if i understand|let me make sure i understand|to make sure i understand)\b/i,
-  empathy: /\b(i('m| am) (so |really |very |truly )?sorry (to hear|that|about|for the|you)|(that|this|it) (must be|sounds|is|has been) (so |really |very |quite |incredibly )?(frustrating|annoying|stressful|difficult|hard|inconvenient|upsetting|disappointing)|i can (only )?(imagine|understand how)|i know how (frustrating|annoying|stressful|hard|important|inconvenient)|i('d| would) (feel|be) the same|that's (not|no) (fun|good)|i completely understand)\b/i,
+  opening: /\b(thank(s| you) for (calling|contacting|choosing)|welcome to|my name is|this is \w+ (from|with|at)|(how )?(can|may|could) i (help|assist)( you)?|what can i do for you)\b/i,
+  ack: /\b(i (understand|see|hear you|got it)|(want|wanted|just want) to make sure|on the same page|am i correct|is that correct|you mentioned|so (you're|you are|your|the issue)|it sounds like|i see that|thanks? (you )?for (letting me know|explaining|sharing|telling)|just to (confirm|make sure)|if i understand|let me make sure i understand|to make sure i understand)\b/i,
+  empathy: /\b(i('m| am) (so |really |very |truly |extremely )?sorry (to hear|that|about|for (the|this|that|all)|you|if you|for any|about the)|i apologi[sz]e for (the|this|any)|(that|this|it) (must be|sounds|is|has been) (so |really |very |quite |incredibly )?(frustrating|annoying|stressful|difficult|hard|inconvenient|upsetting|disappointing)|i can (only )?(imagine|understand how)|i know how (frustrating|annoying|stressful|hard|important|inconvenient)|i('d| would) (feel|be) the same|that's (not|no) (fun|good)|i completely understand)\b/i,
   understandOnly: /\bi understand\b/i,
-  emotion: /\b(frustrat\w*|annoy\w*|angry|upset|ridiculous|unacceptable|terrible|horrible|awful|fed up|sick (and tired )?of|tired of|(second|third|fourth|fifth|\d+(st|nd|rd|th)) time|again and again|keeps? (dropping|happening|going (out|down)|disconnecting)|all (day|week|month)|every (day|night)|work(ing)? from home|supervisor|manager|cancel\w*|not happy|disappointed|waste of)\b/i,
-  assurance: /\b(i('ll| will| can|'m going to| am going to) (help|get (this|that|you|it)|fix|take care|sort|make sure|resolve|work on)|we('ll| will) (get|fix|sort|figure|take care)|let's (get|fix|figure|sort|take care)|(you're|you are) in (good|the right) hands|i('ve| have) got (you|this))\b/i,
+  emotion: /\b(frustrat\w*|annoy\w*|angry|upset|ridiculous|unacceptable|terrible|horrible|awful|fed up|sick (and tired )?of|tired of|(second|third|fourth|fifth|\d+(st|nd|rd|th)) time|\d+ times|so many times|over and over|again and again|keeps? (dropping|happening|going (out|down)|disconnecting)|all (day|week|month)|every (day|night)|work(ing)? from home|supervisor|manager|cancel\w*|not happy|disappointed|waste of)\b/i,
+  assurance: /\b(i('ll| will| can|'m going to| am going to) (help|get (this|that|you|it)|fix|take care|sort|make sure|resolve|work on|do (my|our) best|do everything)|(do|doing) (my|our) best to help|we('ll| will) (get|fix|sort|figure|take care)|let's (get|fix|figure|sort|take care)|(you're|you are) in (good|the right) hands|i('ve| have) got (you|this))\b/i,
   question: /\?/,
-  verifyQ: /\b(how (can|may|could) i (help|assist)|what can i do for you|account number|phone number|last (four|4)|social|pin|passcode|date of birth|address|zip|name on the account|spell|verify|verification|security question|anything else|is there anything|best (number|email)|email address)\b/i,
-  openQ: /^\s*(so,?\s*|and,?\s*|okay,?\s*|ok,?\s*|alright,?\s*)?(what|how|when|where|why|which|tell me|walk me|describe|can you (tell|describe|walk|explain) me|could you (tell|describe|walk|explain))\b/i,
+  verifyQ: /\b(how (can|may|could) i (help|assist)|(can|may) i help you|what can i do for you|first and last name|your (full )?name|one[- ]time (pin|code)|text message|pin\b|how is your day|account number|phone number|last (four|4)|social|pin|passcode|date of birth|address|zip|name on the account|spell|verify|verification|security question|anything else|is there anything|best (number|email)|email address)\b/i,
+  openQ: /^\s*(so,?\s*|and,?\s*|okay,?\s*|ok,?\s*|alright,?\s*|um,?\s*)?(what|how|when|where|why|which|who|tell me|walk me|describe|can you (tell|describe|walk|explain) me|could you (tell|describe|walk|explain))\b/i,
   closedQ: /^\s*(so,?\s*|and,?\s*|okay,?\s*|ok,?\s*)?(is|are|do|does|did|have|has|can|could|will|would|was|were|should)\b/i,
   hold: /\b((place|put) (you|the call|your call) on (a )?(brief |quick |short )?hold|on (a )?(brief |quick |short )?hold|hold (on|for)|one moment|bear with me|give me (a|one) (sec|second|moment|minute)|let me (check|look|research|pull)( that| this| into)? (for|while|real quick|quickly)?)\b/i,
   holdStrong: /\b((place|put) (you|the call|your call) on (a )?(brief |quick |short )?hold|on (a )?(brief |quick |short )?hold)\b/i,
@@ -37278,7 +37339,7 @@ const TX = {
   negative: /\b(i can't|we can't|i cannot|we cannot|won't be able|unable to|not possible|no way|(that's|it's) (our|the|company) policy|you (have|need) to|unfortunately|(it's|that's) not my|there's nothing (i|we) can do)\b/gi,
   casual: /\b(yeah|yep|yup|nope|gonna|wanna|gotta|dude|bro|buddy|my bad|no worries|cool|totally|whatever|uh-huh|kinda|sorta)\b/gi,
   sorry: /\b(sorry|apologi[sz]e|apologies)\b/gi,
-  ownership: /\b(i('ll| will) (take care|make sure|personally|handle|follow up|stay with you|get this (fixed|sorted|done|resolved))|i('m| am) going to (fix|take care|handle|make sure|stay)|let me (take care|fix|handle|get this)|i('ll| will) be the one|i('ll| will) own)\b/i,
+  ownership: /\b(i('ll| will) (take care|make sure|personally|handle|follow up|stay with you|do everything|get this (fixed|sorted|done|resolved))|i('m| am) going to (fix|take care|handle|make sure|stay)|let me (take care|fix|handle|get this)|i('ll| will) be the one|i('ll| will) own)\b/i,
   noOwnership: /\b(you('ll| will) (have|need) to call|that's not (my|our) (department|job|area)|i can't help (you )?with|there's nothing i can do|you need to (contact|call|reach out to)|not something (i|we) (handle|do))\b/i,
   blame: /\b(the (other|last|previous) (agent|rep|representative|person)|another department|(they|someone|whoever) (should have|messed|made a mistake|did it wrong)|not (my|our) fault|that's on them|the system is (bad|terrible|always|so slow|down again))\b/i,
   guarantee: /\b(i (guarantee|promise)|100 ?%|definitely (will|won't)|this will never happen again|it will (never|definitely)|for sure it will)\b/i,
@@ -37317,8 +37378,13 @@ function txAnalyze(turns) {
   const all = (list, re) => list.filter((x) => re.test(x.text));
   const countIn = (list, re) => list.reduce((n, x) => n + (x.text.match(re) || []).length, 0);
   const firstAgent = A.slice(0, 2);
-  const early = A.slice(0, Math.max(4, Math.ceil(A.length * 0.3)));
+  const early = A.slice(0, Math.max(6, Math.ceil(A.length * 0.45)));
   const late = A.slice(-3);
+  /* A transcript that stops mid-call (the customer still talking, no goodbye) cannot be judged on the
+     closing or on whether the fix was confirmed. */
+  const lastTurn = turns[turns.length - 1];
+  const lateText = late.map((x) => x.text).join(' ');
+  const stopped = lastTurn.who === 'customer' && !/\b(bye|goodbye|thank|thanks|have a)\b/i.test(lastTurn.text.slice(-120)) && !TX.closingWords.test(lateText) && !TX.anythingElse.test(lateText);
 
   /* Opening */
   const openHits = firstAgent.reduce((n, x) => n + (x.text.match(new RegExp(TX.opening.source, 'gi')) || []).length, 0);
@@ -37400,7 +37466,8 @@ function txAnalyze(turns) {
   /* Probing */
   const qs = [];
   A.forEach((x) => x.text.split(/(?<=[.!?])\s+/).forEach((sen) => {
-    if (TX.question.test(sen) && !TX.verifyQ.test(sen)) qs.push({ turn: x, sen });
+    const asks = TX.question.test(sen) || /^\s*(okay,?\s*|so,?\s*|and\s+|um,?\s*)?(is|are|do|does|did|who|what|which|when|where|why|how|have|has)\b[^.]{6,}/i.test(sen);
+    if (asks && !TX.verifyQ.test(sen)) qs.push({ turn: x, sen });
   }));
   const openQs = qs.filter((q) => TX.openQ.test(q.sen));
   const closedQs = qs.filter((q) => !TX.openQ.test(q.sen) && TX.closedQ.test(q.sen));
@@ -37531,6 +37598,8 @@ function txAnalyze(turns) {
   if (tested) {
     add(went, 's-tested-fix', 2, 'Had the customer confirm the fix worked.', [txQuote(tested, TX.testFix)]);
     check('Confirmed the fix', 'good', 'Tested with the customer');
+  } else if (fixing && stopped) {
+    check('Confirmed the fix', 'na', 'The transcript stops before the end of the call');
   } else if (fixing) {
     add(better, 'own-confirm-resolution', 2, 'Troubleshot the issue but did not confirm it was fixed.', []);
     check('Confirmed the fix', 'bad', 'Not confirmed');
@@ -37549,11 +37618,13 @@ function txAnalyze(turns) {
   if (offer) add(went, 's-relevant-offer', 1, 'Made an offer.', [txQuote(offer, TX.offer)]);
 
   /* Closing */
-  const lastBits = late.map((x) => x.text).join(' ');
+  const lastBits = lateText;
   const closeHits = (TX.anythingElse.test(lastBits) ? 1 : 0) + (TX.closingWords.test(lastBits) ? 1 : 0);
   if (closeHits === 2) {
     add(went, 's-closing', 2, 'Offered more help and closed warmly.', [txQuote(first(late, TX.closingWords), TX.closingWords)]);
     check('Call closing', 'good', 'Anything else, and a warm close');
+  } else if (closeHits === 0 && stopped) {
+    check('Call closing', 'na', 'The transcript stops before the end of the call');
   } else if (closeHits === 0) {
     add(better, 'com-closing', 2, 'No "anything else?" and no closing.', [txQuote(A[A.length - 1])]);
     check('Call closing', 'bad', 'No closing');
@@ -37563,7 +37634,7 @@ function txAnalyze(turns) {
   const aw = A.reduce((n, x) => n + txWords(x.text), 0);
   const cw = C.reduce((n, x) => n + txWords(x.text), 0);
   const len = timed.length >= 2 ? timed[timed.length - 1].t - timed[0].t : null;
-  const stats = { turns: turns.length, agentPct: aw + cw ? Math.round((aw / (aw + cw)) * 100) : 0, questions: qs.length, length: len };
+  const stats = { cut: stopped, turns: turns.length, agentPct: aw + cw ? Math.round((aw / (aw + cw)) * 100) : 0, questions: qs.length, length: len };
 
   /* Only behaviors the library has; strongest first. */
   const real = (list, get) => list.filter((x) => get(x.id)).sort((x, y) => y.weight - x.weight);
@@ -37571,8 +37642,11 @@ function txAnalyze(turns) {
 }
 
 /* ---------- actions ---------- */
-function txRun() {
-  const p = txParse(txUi.text);
+function txRun(quiet) {
+  if (txUi.text !== txUi.ranText) txUi.flips = new Set();
+  txUi.ranText = txUi.text;
+  const p = txParse(txUi.text, txUi.flips);
+  txUi.parts = p.parts || null;
   txUi.error = p.error || '';
   txUi.result = p.error ? null : txAnalyze(p.turns);
   if (txUi.result) {
@@ -37581,7 +37655,7 @@ function txRun() {
     txUi.pickO = new Set(txUi.result.better.slice(0, FOCUS_MAX).map((x) => x.id));
   }
   refresh({ panel: false });
-  if (txUi.result) setTimeout(() => { const el = document.querySelector('[data-fk="tx-results"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+  if (txUi.result && !quiet) setTimeout(() => { const el = document.querySelector('[data-fk="tx-results"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
 }
 
 function txEvidence(r) {
@@ -37655,7 +37729,7 @@ function txRender(main) {
   const input = h(
     'section',
     { class: 'card kt-card rta-card tx-card', 'aria-labelledby': 'tx-in' },
-    h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'tx-in' }, icon('note'), 'Paste the transcript'), h('p', { class: 'kt-sub' }, 'Lines that start with "Agent:" and "Customer:" work best. Times like [00:01:23] let the page find long silences.'))),
+    h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'tx-in' }, icon('note'), 'Paste the transcript'), h('p', { class: 'kt-sub' }, 'Paste it as it comes: with "Agent:" and "Customer:" labels, or as plain paragraphs (the page works out who is speaking). Times like [00:01:23] let it find long silences.'))),
     h('div', { class: 'tx-form' }, h('label', { class: 'field rta-field', for: 'tx-agent' }, h('span', { class: 'field__label' }, 'Agent'), sel)),
     area,
     txUi.error ? h('p', { class: 'notice', role: 'alert' }, icon('alert'), h('span', { class: 'notice__body' }, txUi.error)) : null,
@@ -37679,7 +37753,11 @@ function txRender(main) {
         h('div', null, h('h2', { class: 'kt-title', id: 'tx-out' }, icon('clipboard'), 'What the call shows'), h('p', { class: 'kt-sub' }, 'Tick what to coach. The page reads words, not tone, so check the picks against the call.')),
         h('div', { class: 'kt-actions' }, h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'tx-build', disabled: !nS && !nO, onclick: txBuild }, icon('arrow-right'), 'Build coaching and action plan'))
       ),
-      h('div', { class: 'tx-stats' }, stat('Lines', String(st.turns)), st.length != null ? stat('Call length', txClock(st.length)) : null, stat('Agent talk', `${st.agentPct}%`), stat('Questions asked', String(st.questions))),
+      st.cut ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, 'The transcript seems to stop before the call ends, so the closing and whether the fix was confirmed were not judged. Paste the whole call to include them.')) : null,
+      txUi.parts
+        ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, 'The transcript has no speaker names, so the page worked out who said what. Check "Who said what" below; click a paragraph\'s label to switch it, and the results update.'))
+        : null,
+      h('div', { class: 'tx-stats' }, stat(txUi.parts ? 'Turns' : 'Lines', String(st.turns)), st.length != null ? stat('Call length', txClock(st.length)) : null, stat('Agent talk', `${st.agentPct}%`), stat('Questions asked', String(st.questions))),
       h(
         'div',
         { class: 'tx-cols' },
@@ -37687,6 +37765,25 @@ function txRender(main) {
         h('div', { class: 'tx-col' }, h('h3', { class: 'tx-col__t tx-col__t--bad' }, icon('target'), 'Should be better', h('span', { class: 'tx-count' }, `${nO} of ${r.better.length}`)), r.better.length ? h('ul', { class: 'tx-list' }, r.better.map((x) => txItem(x, 'o'))) : h('p', { class: 'si-muted' }, 'No gaps found in the words. Listen to the call for tone and accuracy.'))
       ),
       nO > FOCUS_MAX ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, `${focusRuleText()} The first ${FOCUS_MAX} ticked become the focus with the action plan.`)) : null,
+      txUi.parts
+        ? h(
+            'details',
+            { class: 'tx-checks tx-who', open: txUi.whoOpen || null, ontoggle: (e) => (txUi.whoOpen = e.currentTarget.open) },
+            h('summary', null, `Who said what (${txUi.parts.filter((x) => x.who === 'agent').length} agent, ${txUi.parts.filter((x) => x.who === 'customer').length} customer paragraphs)`),
+            h(
+              'ol',
+              { class: 'tx-wholist' },
+              txUi.parts.map((x) =>
+                h(
+                  'li',
+                  { class: `tx-who__row is-${x.who}${txUi.flips.has(x.i) ? ' is-flipped' : ''}` },
+                  h('button', { type: 'button', class: 'tx-who__btn', 'data-fk': `tx-flip:${x.i}`, title: 'Switch the speaker', 'aria-label': `${x.who === 'agent' ? 'Agent' : 'Customer'}. Switch the speaker`, onclick: () => { if (txUi.flips.has(x.i)) txUi.flips.delete(x.i); else txUi.flips.add(x.i); txRun(true); } }, x.who === 'agent' ? 'Agent' : 'Customer', icon('refresh', 'icon--sm')),
+                  h('span', { class: 'tx-who__t' }, txMask(x.text.length > 240 ? `${x.text.slice(0, 237)}…` : x.text))
+                )
+              )
+            )
+          )
+        : null,
       h(
         'details',
         { class: 'tx-checks' },
