@@ -6294,6 +6294,11 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 }
 /* Exam leave: its own email to HR */
 .rta-meta--exam { grid-template-columns: minmax(0, 1fr); }
+.rta-meta--to { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.rta-meta--to .input.is-invalid { border-color: var(--warning); box-shadow: 0 0 0 2px color-mix(in srgb, var(--warning) 25%, transparent); }
+.av-mail { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--border); }
+.av-mail__t { margin: 0 0 8px; color: var(--text-2); font-size: 0.82rem; font-weight: 700; }
+@media (max-width: 600px) { .rta-meta--to { grid-template-columns: 1fr; } }
 .rta-pill--to { background: #121826; color: #fff; box-shadow: inset 0 -2px 0 #F26522; }
 :root[data-theme='dark'] .rta-pill--to { background: #0B1020; border: 1px solid rgba(242, 101, 34, 0.45); }
 @media (prefers-color-scheme: dark) {
@@ -7402,7 +7407,7 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover { background-color: 
   <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.6 12.3V4.7a1.1 1.1 0 0 1 1.1-1.1h7.6l8.2 8.2a1.6 1.6 0 0 1 0 2.3l-6.8 6.8a1.6 1.6 0 0 1-2.3 0z"/><circle cx="8.2" cy="8.2" r="1.5"/></symbol>
   <symbol id="i-pipette" viewBox="0 0 24 24"><path d="M14.6 4.6l4.8 4.8M18.6 3.4a2.1 2.1 0 0 1 3 3l-2.4 2.4-3-3z"/><path d="M15.4 7.6L6.2 16.8 5 20l3.2-1.2 9.2-9.2"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4L11.6 6"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.6-1.6"/></symbol>
-  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol><symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c.6-3.1 2.8-5 5.5-5s4.9 1.9 5.5 5"/><path d="M15.5 4.9a3.2 3.2 0 0 1 0 6.2M17.6 14.7c1.7.6 2.9 2.3 3.3 4.8"/></symbol>
   <symbol id="i-checklist" viewBox="0 0 24 24"><path d="M4 6.5l1.6 1.6L8.8 5M4 12.5l1.6 1.6 3.2-3.1M4 18.5l1.6 1.6 3.2-3.1M12 7h8M12 13h8M12 19h8"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/></symbol>
@@ -7450,7 +7455,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.4.1';
+const APP_VERSION = '3.5.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -31982,6 +31987,94 @@ EXT.view('agents', { title: 'My agents', label: 'My agents', icon: 'users', rend
 /* My agents sits after Agent numbers. */
 EXT.order.splice(EXT.order.indexOf('agents'), 1);
 EXT.order.splice(EXT.order.indexOf('numbers') + 1, 0, 'agents');
+/* ===== layer: layers/87b-outlook.js ===== */
+/* ==========================================================================
+   87b-outlook: "Open in Outlook" for every email the app writes
+   - One click opens a new email in Outlook (the computer's email app) with To, CC and the
+     subject filled in.
+   - A plain text email (HR referral) goes in the body too, so it is ready to send.
+   - An email with tables (WFM requests, exam leave) is put on the clipboard as a real table:
+     a page cannot put a formatted table into a new email, so it is one Ctrl+V in the body.
+   - To and CC are typed once per kind of email and kept in this browser and in backups.
+   ========================================================================== */
+const MAIL_KINDS = ['rta', 'exam', 'hr'];
+EXT.slice('mailTo', {
+  initial: () => ({ rta: { to: '', cc: '' }, exam: { to: '', cc: '' }, hr: { to: '', cc: '' } }),
+  clean: (raw) => {
+    const out = {};
+    MAIL_KINDS.forEach((k) => {
+      const v = raw && raw[k] && typeof raw[k] === 'object' ? raw[k] : {};
+      out[k] = { to: str(v.to, 600).trim(), cc: str(v.cc, 600).trim() };
+    });
+    return out;
+  },
+});
+/** Addresses typed with ; or , or spaces, cleaned; anything that is not an email is left out. */
+const mailList = (v) => [...new Set(String(v || '').split(/[;,\s]+/).map((x) => maCleanEmail(x)).filter(Boolean))];
+const mailPasteKey = () => (/Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent || '') ? 'Cmd+V' : 'Ctrl+V');
+/** A mailto: link. Outlook separates addresses with ";" and wants CRLF line breaks. */
+const mailAddr = (e) => encodeURIComponent(e).replace(/%40/g, '@');
+function mailtoUrl({ to = [], cc = [], subject = '', body = '' }) {
+  const q = [];
+  if (cc.length) q.push(`cc=${cc.map(mailAddr).join(';')}`);
+  if (subject) q.push(`subject=${encodeURIComponent(subject)}`);
+  if (body) q.push(`body=${encodeURIComponent(body.replace(/\r?\n/g, '\r\n'))}`);
+  return `mailto:${to.map(mailAddr).join(';')}${q.length ? `?${q.join('&')}` : ''}`;
+}
+function mailOpen(url) {
+  const a = h('a', { href: url, style: 'display:none' });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+/* Outlook (and Windows) cut long mailto links, so a long plain text email is pasted instead. */
+const MAIL_URL_MAX = 1900;
+/**
+ * Open a new email in Outlook. opts: { kind, subject, html?, text, plain? }
+ * plain = true puts the text in the body; otherwise the formatted email goes on the clipboard.
+ * Returns { opened, paste, copied, to }.
+ */
+async function mailSend({ kind, subject, html, text, plain }) {
+  const rec = EXT.data.mailTo[kind] || { to: '', cc: '' };
+  const to = mailList(rec.to);
+  const cc = mailList(rec.cc);
+  let url = plain ? mailtoUrl({ to, cc, subject, body: text }) : '';
+  let paste = !plain || url.length > MAIL_URL_MAX;
+  if (paste) url = mailtoUrl({ to, cc, subject });
+  /* The clipboard always holds the email too, so it can be pasted if the body did not come through. */
+  const copied = html ? await rtaCopyHtml(html, text) : await writeClipboard(cleanCopy(text));
+  if (paste && !copied) {
+    toast('The browser blocked copying. Select the email on the page and copy it, then paste it in Outlook.', { type: 'error', duration: 8000 });
+  }
+  mailOpen(url);
+  return { opened: true, paste, copied, to };
+}
+/** The toast after Outlook was asked to open. */
+function mailToast(r, what) {
+  const who = r.to.length ? ` to ${joinList(r.to)}` : '';
+  const step = r.paste ? (r.copied ? ` Click in the body, press ${mailPasteKey()}, then Send.` : '') : ' Check it, then Send.';
+  const tip = r.to.length ? '' : ' Tip: add the To address once on this page and it fills in every time.';
+  toast(`Opening ${what} in Outlook${who}.${step}${tip}`, { duration: 9000 });
+}
+/** To and CC fields for one kind of email, saved as they are typed. */
+function mailFields(kind, field, cls = '') {
+  const rec = EXT.data.mailTo[kind];
+  const mk = (key, ph) => {
+    const inp = h('input', { class: 'input', type: 'text', inputmode: 'email', value: rec[key], maxlength: 600, autocomplete: 'off', spellcheck: 'false', placeholder: ph, 'data-fk': `mail-${kind}-${key}` });
+    inp.addEventListener('input', () => {
+      EXT.data.mailTo[kind][key] = inp.value.trim().slice(0, 600);
+      EXT.save('mailTo');
+    });
+    inp.addEventListener('blur', () => {
+      const bad = inp.value.split(/[;,\s]+/).filter((x) => x && !maCleanEmail(x));
+      inp.classList.toggle('is-invalid', bad.length > 0);
+      inp.title = bad.length ? `Not an email: ${bad.join(', ')}` : '';
+    });
+    return inp;
+  };
+  return h('div', { class: `rta-meta rta-meta--to ${cls}`.trim() }, field('To', mk('to', kind === 'exam' ? "Salma's email" : kind === 'hr' ? 'HR email' : 'WFM / RTA team email')), field('CC', mk('cc', 'Optional, separate with ;')));
+}
+
 /* ===== layer: layers/88-rta.js ===== */
 /* ==========================================================================
    88-rta: Workforce requests, the RTA email in a few clicks
@@ -32480,6 +32573,16 @@ function rtaExamCard(R, field, redraw, main) {
     uiq.ok = 'rta-xcopy';
     redraw();
   };
+  const outlook = async () => {
+    if (!R.exam.length) return toast('Add the exam days first.', { type: 'warn' });
+    const { html, text } = rtaExamEmail();
+    const r = await mailSend({ kind: 'exam', subject: subj.value.trim() || rtaExamSubject(), html, text });
+    R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaExamSubject(), kind: 'exam', draft: [], exam: JSON.parse(JSON.stringify(R.exam)), lob: R.lob });
+    R.history = R.history.slice(0, 15);
+    EXT.save('rta');
+    mailToast(r, 'the exam leave email');
+    redraw();
+  };
   const list = rows.length
     ? h(
         'ul',
@@ -32506,12 +32609,14 @@ function rtaExamCard(R, field, redraw, main) {
       h(
         'div',
         { class: 'kt-actions' },
-        h('button', { type: 'button', class: 'btn btn--primary copy-btn', 'data-fk': 'rta-xcopy', onclick: copy, disabled: !rows.length }, icon('copy'), 'Copy email'),
+        h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-xoutlook', onclick: outlook, disabled: !rows.length, title: 'Open a new email in Outlook with To, CC and the subject filled in' }, icon('mail'), 'Open in Outlook'),
+        h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-xcopy', onclick: copy, disabled: !rows.length }, icon('copy'), 'Copy email'),
         h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-xcopy-subject', onclick: (e) => copyText(subj.value, { label: 'Subject', button: e.currentTarget }) }, icon('copy'), 'Copy subject'),
         rows.length ? h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'rta-xclear', onclick: async () => { if (await confirmDialog({ title: 'Clear the exam leave email?', message: 'All exam days in this email are removed. Emails you copied stay in the list below.', confirmLabel: 'Clear', danger: true })) { R.exam = []; R.examSubject = ''; EXT.save('rta'); redraw(); } } }, icon('trash'), 'Clear') : null
       )
     ),
     h('div', { class: 'rta-meta rta-meta--exam' }, field('Subject', subj)),
+    mailFields('exam', field),
     (() => {
       const missing = [...new Set(rows.filter((r) => !rtaHr(r)).map((r) => rtaName(r)))];
       return missing.length ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `No HR ID for ${joinList(missing)}. Load the roster in My agents, or add it with the pencil there.`)) : null;
@@ -32766,22 +32871,34 @@ function rtaRender(main) {
     uiq.ok = 'rta-copy';
     redraw();
   };
+  const openOutlook = async () => {
+    if (!R.draft.length) return toast('Add a request first.', { type: 'warn' });
+    const { html, text } = rtaEmail();
+    const r = await mailSend({ kind: 'rta', subject: subj.value.trim() || rtaSubject(), html, text });
+    R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaSubject(), draft: JSON.parse(JSON.stringify(R.draft)), lob: R.lob });
+    R.history = R.history.slice(0, 15);
+    EXT.save('rta');
+    mailToast(r, 'the email');
+    redraw();
+  };
   const emailCard = h(
     'section',
     { class: 'card kt-card rta-card rta-card--mail', 'aria-labelledby': 'rta-mail', 'data-uiq-scope': 'rta-mail' },
     h(
       'div',
       { class: 'kt-head' },
-      h('div', null, h('div', { class: 'rta-titlerow' }, h('h2', { class: 'kt-title', id: 'rta-mail' }, icon('chat'), 'The email'), count ? h('span', { class: `rta-pill${countBump ? ' uiq-bump' : ''}` }, plural(count, 'row')) : null), h('p', { class: 'kt-sub' }, 'Copy it and paste it in Outlook. The tables stay tables, not a picture.')),
+      h('div', null, h('div', { class: 'rta-titlerow' }, h('h2', { class: 'kt-title', id: 'rta-mail' }, icon('chat'), 'The email'), count ? h('span', { class: `rta-pill${countBump ? ' uiq-bump' : ''}` }, plural(count, 'row')) : null), h('p', { class: 'kt-sub' }, 'Open in Outlook starts a new email with To, CC and the subject filled in; press Ctrl+V in the body and Send. The tables stay tables, not a picture.')),
       h(
         'div',
         { class: 'kt-actions' },
-        h('button', { type: 'button', class: 'btn btn--primary copy-btn', 'data-fk': 'rta-copy', onclick: copyEmail, disabled: !R.draft.length }, icon('copy'), 'Copy email'),
+        h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'rta-outlook', onclick: openOutlook, disabled: !R.draft.length, title: 'Open a new email in Outlook with To, CC and the subject filled in' }, icon('mail'), 'Open in Outlook'),
+        h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-copy', onclick: copyEmail, disabled: !R.draft.length }, icon('copy'), 'Copy email'),
         h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'rta-copy-subject', onclick: (e) => copyText(subj.value, { label: 'Subject', button: e.currentTarget }) }, icon('copy'), 'Copy subject'),
         R.draft.length ? h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'rta-clear', onclick: async () => { if (await confirmDialog({ title: 'Clear this email?', message: 'All requests in this email are removed. Emails you copied stay in the list below.', confirmLabel: 'Clear', danger: true })) { R.draft = []; R.subject = ''; EXT.save('rta'); redraw(); } } }, icon('trash'), 'Clear') : null
       )
     ),
     h('div', { class: 'rta-meta' }, field('Subject', subj), field('LOB', lob)),
+    mailFields('rta', field),
     missingHr.length ? h('p', { class: 'notice', role: 'note' }, icon('alert'), h('span', { class: 'notice__body' }, `No HR ID for ${joinList(missingHr)}. Load the roster in My agents, or add it with the pencil there.`)) : null,
     h('div', { class: `rta-paper${R.draft.length ? '' : ' is-empty'}` }, R.draft.length ? h('div', { class: 'rta-paper__bar', 'aria-hidden': 'true' }, icon('eye', 'icon--sm'), h('span', null, 'Preview'), h('span', { class: 'rta-paper__note' }, 'This is how it pastes in Outlook')) : null, preview),
     rowsList
@@ -32807,6 +32924,7 @@ function rtaRender(main) {
               h('span', { class: 'rta-hist__s' }, x.subject),
               h('span', { class: 'rta-hist__m' }, `${x.kind === 'exam' ? 'Exam leave to HR · ' : ''}${x.at.replace('T', ' ')} · ${plural(x.kind === 'exam' ? x.exam.length : rtaRowCount(x.draft), 'row')}`),
               h('button', { type: 'button', class: 'btn btn--sm copy-btn', 'data-fk': `rta-recopy:${i}`, onclick: async (e) => { const btn = e.currentTarget; const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); if (await rtaCopyHtml(html, text)) { if (btn.isConnected) flashCopied(btn); toast('Email copied again.'); } } }, icon('copy'), 'Copy again'),
+              h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `rta-reopen:${i}`, title: 'Open this email in Outlook again', onclick: async () => { const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); mailToast(await mailSend({ kind: x.kind === 'exam' ? 'exam' : 'rta', subject: x.subject, html, text }), 'the email'); } }, icon('mail'), 'Outlook'),
               h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': `rta-reuse:${i}`, onclick: () => { if (x.kind === 'exam') { R.exam = JSON.parse(JSON.stringify(x.exam)); R.examSubject = ''; rtaPick.type = 'exam'; } else { R.draft = JSON.parse(JSON.stringify(x.draft)); R.subject = ''; } EXT.data.rta = rtaClean(R); EXT.save('rta'); redraw(); toast(x.kind === 'exam' ? 'Loaded into the exam leave email. Change the days, then copy.' : 'Loaded into the email. Change the dates, then copy.'); } }, icon('edit'), 'Reuse')
             );
           })
@@ -36777,15 +36895,20 @@ async function avRefer(memberId, btn) {
   const m = EXT.memberById(memberId);
   if (!m) return;
   const a = avAgent(memberId);
-  const ok = await copyText(avHrText(m, a), { label: 'HR referral email', button: btn });
-  if (!ok) return;
+  /* The first line is the subject; the rest is the body, so Outlook opens it ready to send. */
+  const lines = avHrText(m, a).split('\n');
+  const subject = lines[0].replace(/^Subject:\s*/, '');
+  const body = lines.slice(1).join('\n').trim();
+  const r = await mailSend({ kind: 'hr', subject, text: body, plain: true });
+  if (btn && btn.isConnected && r.copied) flashCopied(btn);
   const today = todayDay();
   a.list.forEach((x) => {
     if (!x.hr) x.hr = today;
   });
   avSave();
   refresh({ panel: false });
-  toast(`HR referral email copied for ${memberLabel(m)}. Paste it into Outlook. ${memberLabel(m)} is marked as referred to HR.`, { duration: 9000 });
+  mailToast(r, `the HR referral email for ${memberLabel(m)}`);
+  toast(`${memberLabel(m)} is marked as referred to HR.`, { duration: 6000 });
 }
 
 /* ---------- Page ---------- */
@@ -36862,9 +36985,9 @@ function avAgentsCard() {
               a.stage === 'coach'
                 ? h('button', { type: 'button', class: 'btn btn--sm btn--primary si-agent__coach', 'data-fk': `av-coach:${m.id}`, onclick: () => avCoach(m.id) }, icon('target'), 'Coach this')
                 : a.stage === 'hr'
-                  ? h('button', { type: 'button', class: 'btn btn--sm btn--primary si-agent__coach', 'data-fk': `av-hr:${m.id}`, title: 'Copy the HR referral email and mark the agent as referred', onclick: (e) => avRefer(m.id, e.currentTarget) }, icon('copy'), 'HR referral')
+                  ? h('button', { type: 'button', class: 'btn btn--sm btn--primary si-agent__coach', 'data-fk': `av-hr:${m.id}`, title: 'Open the HR referral email in Outlook and mark the agent as referred', onclick: (e) => avRefer(m.id, e.currentTarget) }, icon('mail'), 'HR referral')
                   : a.stage === 'referred'
-                    ? h('button', { type: 'button', class: 'btn btn--sm si-agent__coach', 'data-fk': `av-hr:${m.id}`, title: 'Copy the HR referral email again', onclick: (e) => avRefer(m.id, e.currentTarget) }, icon('copy'), 'Copy email again')
+                    ? h('button', { type: 'button', class: 'btn btn--sm si-agent__coach', 'data-fk': `av-hr:${m.id}`, title: 'Open the HR referral email in Outlook again', onclick: (e) => avRefer(m.id, e.currentTarget) }, icon('mail'), 'Email again')
                     : h('button', { type: 'button', class: 'btn btn--sm si-agent__coach', 'data-fk': `av-coach:${m.id}`, title: 'Open the coaching record again', onclick: () => avCoach(m.id) }, icon('target'), 'Coach again');
             return h(
               'li',
@@ -36875,7 +36998,10 @@ function avAgentsCard() {
             );
           })
         )
-      : h('p', { class: 'si-muted' }, 'Nothing logged yet.')
+      : h('p', { class: 'si-muted' }, 'Nothing logged yet.'),
+    rows.some(({ a }) => a.stage === 'hr' || a.stage === 'referred')
+      ? h('div', { class: 'av-mail' }, h('p', { class: 'av-mail__t' }, 'HR referral email goes to'), mailFields('hr', (label, input) => h('label', { class: 'field rta-field' }, h('span', { class: 'field__label' }, label), input)))
+      : null
   );
 }
 
