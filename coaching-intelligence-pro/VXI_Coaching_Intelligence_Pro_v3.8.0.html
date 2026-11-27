@@ -6246,6 +6246,39 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .tx-checkgroup { margin-top: 10px; }
 .tx-checkgroup__t { margin: 0; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-2); }
 .tx-checkgroup .tx-checklist { margin-top: 6px; }
+.tx-form { grid-template-columns: minmax(0, 320px) minmax(0, 200px); }
+.tx-item__practice { margin: 8px 0 0 28px; }
+.btn.is-saved { border-color: color-mix(in srgb, var(--success) 45%, var(--border)); color: var(--success); }
+.tx-pattern.is-empty .kt-head { margin-bottom: 0; }
+.tx-stat.is-up .tx-stat__v { color: var(--success); }
+.tx-stat.is-down .tx-stat__v { color: #C2410C; }
+.tx-plist { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.tx-prow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; font-size: 0.9rem; }
+.tx-prow__t { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--text); }
+.tx-prow__t .tx-tag { margin-left: 0; }
+.tx-prow__n { color: var(--text-2); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.tx-pbar { grid-column: 1 / -1; height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.tx-pbar > span { display: block; height: 100%; border-radius: inherit; }
+.tx-pbar.is-bad > span { background: var(--accent); }
+.tx-pbar.is-good > span { background: var(--success); }
+.tx-calls { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.tx-callrow { display: grid; grid-template-columns: 110px 120px 60px 110px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 9px; background: color-mix(in srgb, var(--text) 3%, transparent); font-size: 0.86rem; }
+.tx-callrow__d { font-weight: 700; }
+.tx-callrow__s { font-weight: 800; font-variant-numeric: tabular-nums; }
+.tx-callrow__s.is-good { color: var(--success); }
+.tx-callrow__s.is-ok { color: var(--warning); }
+.tx-callrow__s.is-bad { color: #C2410C; }
+.tx-callrow .tx-risk__badge { font-size: 0.72rem; padding: 2px 8px; text-align: center; }
+.tx-callrow__n { color: var(--text-2); }
+.tx-fromcalls { margin: 0 0 18px; }
+.tx-fcrow { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--text) 3%, transparent); font-size: 0.88rem; }
+.tx-fcrow__t { font-weight: 750; }
+.tx-fcrow__b { color: var(--text-2); }
+@media (max-width: 800px) { .tx-fcrow { grid-template-columns: 1fr auto auto; } .tx-fcrow__b { grid-column: 1 / -1; } }
+@media (max-width: 800px) {
+  .tx-form { grid-template-columns: 1fr; }
+  .tx-callrow { grid-template-columns: 1fr 1fr auto; }
+}
 @media (max-width: 800px) {
   .tx-panels, .tx-score { grid-template-columns: 1fr; }
   .tx-step { grid-template-columns: 22px minmax(0, 1fr); }
@@ -7570,7 +7603,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.7.0';
+const APP_VERSION = '3.8.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -37241,7 +37274,7 @@ EXT.order.splice(EXT.order.indexOf('integrity') + 1, 0, 'avoidlog');
    - The transcript is kept in memory only, never saved, and numbers and emails in quotes are hidden.
    ========================================================================== */
 
-let txUi = { text: '', member: '', result: null, pickS: new Set(), pickO: new Set(), error: '', flips: new Set(), ranText: '' };
+let txUi = { text: '', member: '', day: '', result: null, pickS: new Set(), pickO: new Set(), error: '', flips: new Set(), ranText: '', savedHash: '' };
 
 /* ---------- reading the transcript ---------- */
 const TX_AGENT_RE = /^(agent|rep|representative|advocate|associate|csr|employee|tech|technician|specialist|consultant|support|vxi|comcast|xfinity|me)\b/i;
@@ -38107,6 +38140,7 @@ async function txBuild() {
   if (!opps.length && !strengths.length) return toast('Tick at least one item.', { type: 'warn' });
   const kpi = (opps.map((id) => getOpp(id)).flatMap((o) => o.kpi || []).find((k) => COACH_KPIS.includes(k))) || 'tNPS';
   if (!(await vcBuilderFor(m, kpi))) return;
+  txSaveCall();
   const b = state.builder;
   strengths.forEach((id) => {
     if (!b.strengths.some((s) => s.id === id)) b.strengths.push({ id, v: 0 });
@@ -38117,6 +38151,678 @@ async function txBuild() {
   const focusN = opps.length - parked;
   const parts = [strengths.length ? `${plural(strengths.length, 'thing')} went well` : '', focusN ? `${plural(focusN, 'focus behavior')} with feedback and the action plan` : '', parked ? `${parked} parked for the next session` : ''].filter(Boolean);
   toast(`Coaching for ${memberLabel(m)}: ${joinList(parts)}. The quotes are in the evidence.${focusN ? '' : ' Add one behavior in the Builder for the action plan.'}`, { duration: 9000 });
+}
+
+
+/* ====================================================================================
+   Call history per agent (patterns), practice from the gap, and the feedback card
+   ==================================================================================== */
+
+/* ---------- call history: scores and finding ids only, never the transcript or quotes ---------- */
+const TX_STEP_KEYS = ['discovery', 'seed', 'offer', 'value', 'objection', 'respect', 'close', 'integrity', 'retention'];
+EXT.slice('txCalls', {
+  initial: () => ({ items: [] }),
+  clean: (raw) => {
+    const ids = (v) => [...new Set((Array.isArray(v) ? v : []).filter(isId))].slice(0, 60);
+    const items = (Array.isArray(raw && raw.items) ? raw.items : [])
+      .filter((x) => x && isId(x.id) && isId(x.member) && isIsoDate(x.day))
+      .slice(-1500)
+      .map((x) => ({
+        id: x.id,
+        member: x.member,
+        day: x.day,
+        at: typeof x.at === 'number' && Number.isFinite(x.at) ? x.at : 0,
+        hash: str(x.hash, 20),
+        type: ['tech', 'access', 'billing', 'sales', 'general'].includes(x.type) ? x.type : 'general',
+        score: clampInt(x.score, 0, 100, 0),
+        aicr: ['low', 'medium', 'high'].includes(x.aicr) ? x.aicr : 'low',
+        went: ids(x.went),
+        better: ids(x.better),
+        bw: (Array.isArray(x.bw) ? x.bw : []).slice(0, 60).map((w) => clampInt(w, 1, 3, 1)),
+        sales: Object.fromEntries(Object.entries(x.sales && typeof x.sales === 'object' ? x.sales : {}).filter(([k, v]) => TX_STEP_KEYS.includes(k) && ['good', 'bad', 'ok'].includes(v))),
+      }));
+    return { items };
+  },
+});
+/** A short fingerprint of the transcript, so the same call is not saved twice (the text itself is not kept). */
+function txHash(text) {
+  const t = String(text || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  let h1 = 5381;
+  let h2 = 52711;
+  for (let i = 0; i < t.length; i++) {
+    const c = t.charCodeAt(i);
+    h1 = (h1 * 33) ^ c;
+    h2 = (h2 * 33) ^ c;
+  }
+  return `${(h1 >>> 0).toString(36)}${(h2 >>> 0).toString(36)}`;
+}
+const txScoreOf = (r) => (r.areas.length ? Math.round(r.areas.reduce((n, a) => n + a.score * a.n, 0) / r.areas.reduce((n, a) => n + a.n, 0)) : 0);
+const txCallsFor = (memberId) => EXT.data.txCalls.items.filter((x) => x.member === memberId).sort((a, b) => (a.day < b.day ? -1 : a.day > b.day ? 1 : a.at - b.at));
+/** Save (or update) this call in the agent's history. Returns 'saved', 'updated' or ''. */
+function txSaveCall() {
+  const r = txUi.result;
+  const m = EXT.memberById(txUi.member);
+  if (!r || !m) return '';
+  const hash = txHash(txUi.ranText);
+  const items = EXT.data.txCalls.items;
+  const have = items.find((x) => x.member === m.id && x.hash === hash);
+  const rec = {
+    id: have ? have.id : uid('txc'),
+    member: m.id,
+    day: isIsoDate(txUi.day) ? txUi.day : todayDay(),
+    at: Date.now(),
+    hash,
+    type: r.stats.type,
+    score: txScoreOf(r),
+    aicr: r.aicr.level,
+    went: r.went.map((x) => x.id),
+    better: r.better.map((x) => x.id),
+    bw: r.better.map((x) => x.weight),
+    sales: Object.fromEntries(r.sales.steps.filter((x) => x.status !== 'na').map((x) => [x.key, x.status])),
+  };
+  if (have) Object.assign(have, rec);
+  else items.push(rec);
+  EXT.data.txCalls = EXT.slices.txCalls.clean(EXT.data.txCalls);
+  EXT.save('txCalls');
+  txUi.savedHash = `${m.id}:${hash}`;
+  return have ? 'updated' : 'saved';
+}
+const txIsSaved = () => !!txUi.result && txUi.savedHash === `${txUi.member}:${txHash(txUi.ranText)}`;
+
+/** What repeats across an agent's saved calls. */
+function txPattern(memberId) {
+  const calls = txCallsFor(memberId);
+  const n = calls.length;
+  if (!n) return null;
+  const count = (key) => {
+    const map = new Map();
+    calls.forEach((c) => c[key].forEach((id, i) => {
+      const cur = map.get(id) || { k: 0, w: 0 };
+      cur.k += 1;
+      cur.w += key === 'better' ? (c.bw && c.bw[i]) || 1 : 1;
+      map.set(id, cur);
+    }));
+    return [...map.entries()].map(([id, v]) => ({ id, k: v.k, w: v.w, pct: Math.round((v.k / n) * 100) }));
+  };
+  /* A gap counts as a pattern when it shows on at least two calls and a third of them. It ranks by how
+     often it happens times how serious it was each time, then by whether it drives repeat calls. */
+  const gaps = count('better').filter((x) => getOpp(x.id) && x.k >= 2 && x.pct >= 34).sort((a, b) => b.w - a.w || b.k - a.k || (getOpp(b.id).kpi || []).includes('aiCR') - (getOpp(a.id).kpi || []).includes('aiCR'));
+  const goods = count('went').filter((x) => getStrength(x.id) && x.k >= 2 && x.pct >= 50).sort((a, b) => b.k - a.k);
+  const avg = Math.round(calls.reduce((s, c) => s + c.score, 0) / n);
+  const half = Math.floor(n / 2);
+  const trend = n >= 4 ? Math.round(calls.slice(half).reduce((s, c) => s + c.score, 0) / (n - half) - calls.slice(0, half).reduce((s, c) => s + c.score, 0) / half) : null;
+  const rate = (key) => {
+    const seen = calls.filter((c) => c.sales[key]);
+    return seen.length ? { k: seen.filter((c) => c.sales[key] === 'good').length, n: seen.length } : null;
+  };
+  return { calls, n, avg, trend, high: calls.filter((c) => c.aicr === 'high').length, gaps, goods, seed: rate('seed'), offer: rate('offer'), objection: rate('objection') };
+}
+function txPatternEvidence(m, p) {
+  const lines = [`Pattern across ${plural(p.n, 'analyzed call')} (${fmtDay(p.calls[0].day)} to ${fmtDay(p.calls[p.n - 1].day)}), average call score ${p.avg}%:`];
+  p.gaps.slice(0, 5).forEach((x) => lines.push(`- Gap, ${getOpp(x.id).title}: ${x.k} of ${p.n} calls`));
+  p.goods.slice(0, 3).forEach((x) => lines.push(`- Did well, ${getStrength(x.id).title}: ${x.k} of ${p.n} calls`));
+  if (p.high) lines.push(`- Repeat call risk (aiCR) high on ${p.high} of ${p.n} calls`);
+  if (p.seed) lines.push(`- Planted the seed on ${p.seed.k} of ${p.seed.n} calls where it fit`);
+  return lines.join('\n');
+}
+async function txCoachPattern() {
+  const m = EXT.memberById(txUi.member);
+  const p = m && txPattern(m.id);
+  if (!p || !p.gaps.length) return toast('No repeating gaps yet. Save a few more calls for this agent.', { type: 'warn' });
+  const opps = p.gaps.slice(0, 4).map((x) => x.id);
+  const strengths = p.goods.slice(0, 3).map((x) => x.id);
+  const kpi = opps.map((id) => getOpp(id)).flatMap((o) => o.kpi || []).find((k) => COACH_KPIS.includes(k)) || 'tNPS';
+  if (!(await vcBuilderFor(m, kpi))) return;
+  const b = state.builder;
+  strengths.forEach((id) => {
+    if (!b.strengths.some((s) => s.id === id)) b.strengths.push({ id, v: 0 });
+  });
+  const parked = opps.map((id) => addOppToBuilder(id)).filter((x) => x === 'parked').length;
+  vcAppendEvidence(txPatternEvidence(m, p));
+  vcFinishBuilder(m);
+  toast(`Coaching ${memberLabel(m)} on the pattern across ${plural(p.n, 'call')}: ${plural(opps.length - parked, 'focus behavior')}${parked ? `, ${parked} parked` : ''}. The counts are in the evidence.`, { duration: 9000 });
+}
+function txDeleteCall(id) {
+  EXT.data.txCalls.items = EXT.data.txCalls.items.filter((x) => x.id !== id);
+  EXT.save('txCalls');
+  if (txUi.savedHash && !EXT.data.txCalls.items.some((x) => `${x.member}:${x.hash}` === txUi.savedHash)) txUi.savedHash = '';
+  refresh({ panel: false });
+}
+
+/* ---------- practice from the gap: a Practice Lab role-play built from the call ---------- */
+EXT.slice('txPractice', {
+  initial: () => ({ items: [] }),
+  clean: (raw) => {
+    const s = (v, n) => str(v, n).trim();
+    const items = (Array.isArray(raw && raw.items) ? raw.items : [])
+      .filter((x) => x && isId(x.id) && /^pr-tx-/.test(x.id) && Array.isArray(x.rubric) && x.rubric.length && Array.isArray(x.lines))
+      .slice(-60)
+      .map((x) => ({
+        id: x.id,
+        type: s(x.type, 20) || 'service',
+        title: s(x.title, 120),
+        kpi: (Array.isArray(x.kpi) ? x.kpi : []).map((k) => s(k, 20)).slice(0, 4),
+        level: clampInt(x.level, 1, 3, 1),
+        minutes: clampInt(x.minutes, 2, 30, 6),
+        brief: s(x.brief, 600),
+        persona: s(x.persona, 800),
+        lines: x.lines.slice(0, 8).map((l) => ({ when: s(l && l.when, 120), say: s(l && l.say, 300) })).filter((l) => l.say),
+        rubric: x.rubric.slice(0, 6).map((r) => ({ step: s(r && r.step, 40), look: s(r && r.look, 300) })).filter((r) => r.step),
+        model: (Array.isArray(x.model) ? x.model : []).map((v) => s(v, 400)).filter(Boolean).slice(0, 4),
+        debrief: (Array.isArray(x.debrief) ? x.debrief : []).map((v) => s(v, 300)).filter(Boolean).slice(0, 4),
+        fromCall: true,
+      }));
+    return { items };
+  },
+});
+/* The library (and so the Practice Lab's own list) is frozen; role-plays built from calls live beside it:
+   in the Lab's lookup table, in the check that restores a role-play after a reload, and in their own
+   "From your calls" list on the Lab's home. */
+function txRegisterScenario(sc) {
+  if (!sc) return;
+  if (!REVIEW_TYPE_MAP[sc.type]) sc.type = 'service';
+  PRACTICE_MAP[sc.id] = sc;
+}
+try {
+  EXT.data.txPractice.items.forEach(txRegisterScenario);
+} catch (e) {
+  /* a bad saved role-play must never stop the app */
+}
+sanitizePractice = function (o) {
+  const src = o && typeof o === 'object' ? o : {};
+  const p = defaultPractice();
+  const scen = Object.fromEntries(DATA.practice.scenarios.concat(EXT.data.txPractice.items).map((s) => [s.id, s]));
+  if (src.filter === 'all' || REVIEW_TYPE_IDS.includes(src.filter)) p.filter = src.filter;
+  const member = (v) => (isId(v) ? v : '');
+  const marks = (sc, m) => Object.fromEntries(Object.entries(m && typeof m === 'object' ? m : {}).filter(([k, v]) => sc.rubric.some((r) => r.step === k) && (v === 'met' || v === 'gap')));
+  const c = src.current;
+  if (c && typeof c === 'object' && scen[c.id]) {
+    const sc = scen[c.id];
+    p.current = {
+      id: c.id,
+      stage: PRACTICE_STAGES.includes(c.stage) ? c.stage : 'brief',
+      who: c.who === 'one' ? 'one' : 'team',
+      member: member(c.member),
+      marks: marks(sc, c.marks),
+      said: [...new Set(Array.isArray(c.said) ? c.said : [])].filter((i) => Number.isInteger(i) && i >= 0 && i < sc.lines.length),
+      acc: clampInt(c.acc, 0, 4 * 3600000, 0),
+      runAt: 0,
+      saved: c.saved === true,
+    };
+  }
+  for (const x of Array.isArray(src.history) ? src.history.slice(-500) : []) {
+    if (!x || typeof x !== 'object' || !scen[x.scenario] || !isIsoDate(x.date)) continue;
+    p.history.push({ id: isId(x.id) ? x.id : uid('prx'), date: x.date, scenario: x.scenario, member: member(x.member), marks: marks(scen[x.scenario], x.marks), secs: clampInt(x.secs, 0, 4 * 3600, 0) });
+  }
+  return p;
+};
+/* The Lab's home lists the role-plays built from calls under its own heading. */
+const _txPracticeLanding = renderPracticeLanding;
+renderPracticeLanding = function (main) {
+  _txPracticeLanding(main);
+  const mine = EXT.data.txPractice.items.slice().reverse().filter((x) => PRACTICE_MAP[x.id]);
+  if (!mine.length) return;
+  const del = (id) => {
+    if (state.practice.current && state.practice.current.id === id) return toast('This role-play is in progress. Finish or leave it first.', { type: 'warn' });
+    if (state.practice.history.some((x) => x.scenario === id)) return toast('This role-play has scored sessions in the history, so it is kept.', { type: 'warn' });
+    EXT.data.txPractice.items = EXT.data.txPractice.items.filter((x) => x.id !== id);
+    EXT.save('txPractice');
+    delete PRACTICE_MAP[id];
+    refresh({ panel: false });
+  };
+  const card = h(
+    'section',
+    { class: 'card kt-card rta-card tx-card tx-fromcalls', 'aria-labelledby': 'tx-fc' },
+    h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'tx-fc' }, icon('note'), 'From your calls'), h('p', { class: 'kt-sub' }, 'Role-plays built in Transcript to coaching, from the gaps on real calls.'))),
+    h(
+      'ul',
+      { class: 'tx-calls' },
+      mine.map((sc) => h('li', { class: 'tx-fcrow' }, h('span', { class: 'tx-fcrow__t' }, sc.title), h('span', { class: 'tx-fcrow__b' }, sc.brief.length > 140 ? `${sc.brief.slice(0, 137)}…` : sc.brief), h('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-fk': `tx-fc-start:${sc.id}`, onclick: () => startPractice(sc.id) }, icon('chat'), 'Start'), h('button', { type: 'button', class: 'btn btn--sm btn--icon btn--ghost', 'aria-label': `Delete ${sc.title}`, title: 'Delete', 'data-fk': `tx-fc-del:${sc.id}`, onclick: () => del(sc.id) }, icon('trash'))))
+    )
+  );
+  const head = main.querySelector('.page-head, header');
+  if (head && head.nextSibling) head.parentNode.insertBefore(card, head.nextSibling.nextSibling || null);
+  else main.appendChild(card);
+};
+
+/* What the customer says to test each gap, and what they say when the agent gets it right. */
+const TXP_LINES = {
+  'com-missing-empathy': [['If the agent goes straight to steps', "Do you understand I've been dealing with this all week? I work from home."], ['If the agent names how it affects you', "Thank you. Yes, it's been really stressful."]],
+  'com-generic-empathy': [['If the agent only says "I understand"', "You keep saying you understand, but it's still not working."]],
+  'com-missing-acknowledgement': [['If the agent moves on without restating the issue', 'Wait, did you get what I said the problem is?']],
+  'com-weak-assurance': [['After explaining the issue', 'So can you actually fix this, or not?']],
+  'com-opening': [['As soon as the call connects', "Hello? Is this Xfinity? I have a problem with my service."]],
+  'com-closing': [['When the agent starts to wrap up', 'Okay... so what exactly did you do, and what happens now?']],
+  'com-customer-name': [['When giving your name', 'My name is Linda, by the way.']],
+  'com-negative-language': [['When the agent says what they cannot do', "Then what CAN you do for me?"]],
+  'com-casual-language': [['Any time', 'Sorry, who am I speaking with again?']],
+  'com-interrupting': [['If the agent talks over you', 'Can you let me finish, please?']],
+  'com-repeating-questions': [['If the agent asks again', 'I already told you that.']],
+  'dis-missing-probing': [['If the agent starts fixing before asking questions', "Don't you need to know more before you start?"]],
+  'dis-insufficient-probing': [['After the first question', "It's not just that. It also happens at night."]],
+  'dis-closed-questions': [['To yes/no questions', 'Yes. (answer only what is asked, give no detail)']],
+  'dis-issue-start': [['Only if asked when it started', 'It started last Tuesday, after the storm.']],
+  'dis-issue-scope': [['Only if asked about devices', "It's every device in the house, wired and Wi-Fi."]],
+  'dis-prior-troubleshooting': [['If the agent asks you to restart', 'I restarted it three times already this morning.']],
+  'dis-recent-changes': [['Only if asked what changed', 'Oh, I did get a new router last week.']],
+  'dis-error-details': [['Only if asked what you see', 'The light on the box is blinking orange.']],
+  'hold-dead-air': [['During any silence', 'Hello? Are you still there?']],
+  'hold-no-permission': [['If you are put on hold without being asked', "Wait, I didn't say you could put me on hold."]],
+  'hold-no-estimate': [['When put on hold', 'How long is this going to take?']],
+  'hold-no-updates': [['After a long hold', "I've been waiting forever. What's going on?"]],
+  'hold-unexplained-silence': [['During any pause', 'Hello?']],
+  'own-lack-ownership': [['If the agent points you elsewhere', "So I have to call someone else now? Can't you do it?"]],
+  'own-confirm-resolution': [['If the agent closes without testing', 'So is it fixed? How would I know?']],
+  'own-premature-resolution': [['If the agent says it is fixed', "It's still not loading on my end."]],
+  'own-call-back-later': [['If the agent asks you to call back', "I don't want to call back. Can you finish it now?"]],
+  'own-blaming-others': [['When the history comes up', 'The last person said it was fixed too.']],
+  'own-unsupported-guarantees': [['Near the end', 'So you promise this will never happen again?']],
+  'own-transfer-process': [['When the agent transfers you', 'Why are you transferring me? Will I have to explain everything again?']],
+  'own-expectation-setting': [['Near the end', 'When exactly will this be done?']],
+  'own-missing-followup': [['Near the end', 'And how will I know when it is done?']],
+  'own-repeat-contacts': [['At the start', "This is the third time I'm calling about this."]],
+  'own-objections': [['After the fix', "That's what the last agent said. If it happens again I'll call back."]],
+  'own-incomplete-education': [['Near the end', 'What do I do if it happens again tonight?']],
+  'tech-knowledge-gap': [['After an explanation', 'Are you sure? That doesn\'t sound right.']],
+  'tech-explanations': [['After a technical explanation', "I'm sorry, what does that mean?"]],
+  'tech-reboot-only': [['If the agent only asks for a restart', 'Restarting it never fixes it for long.']],
+  'sales-plant-seed': [['Once the issue is fixed', "Great, thanks. That's all I needed."]],
+  'sales-missing-offer': [['Mention in passing', "My phone bill with Verizon is so expensive too."]],
+  'sales-missing-discovery': [['If the agent pitches right away', 'Why would I need that?']],
+  'sales-offer-value': [['After the offer', 'Okay, but what does that do for me?']],
+  'sales-weak-objection': [['After the offer', "No thanks, it's too expensive."], ['If the agent asks what is behind it', "Well... I'm paying 140 dollars with Verizon right now."]],
+  'sales-closing': [['After hearing the value', "Hmm, that does sound good."]],
+  'sales-pitch-before-resolve': [['If the agent pitches before the fix', 'Can we fix my internet first?']],
+  'integrity-pressure-after-no': [['After the first offer', 'No thanks.'], ['If the agent pitches again', "No. I said I'm not interested."]],
+  'integrity-assumed-consent': [['When asked to add it', 'Maybe... I guess.']],
+  'integrity-no-verbal-consent': [['After the offer', 'That sounds interesting.']],
+  'integrity-promo-term-disclosure': [['After the price', 'And it stays at that price?']],
+  'integrity-no-order-recap': [['Before the order is placed', 'Okay, go ahead.']],
+  'sales-pricing-disclosure': [['After the offer', 'So what will my bill be?']],
+  'bill-cancellation-risk': [['Early', 'Spectrum is cheaper. I want to cancel.']],
+  'sales-retention': [['Early', "I'm thinking of switching to another provider."]],
+};
+const TXP_TYPE = { tech: 'tech', billing: 'billing', access: 'service', sales: 'sales', general: 'service' };
+const TXP_DEFAULT_STEPS = { tech: ['open', 'discover', 'fix', 'confirm'], billing: ['empathize', 'review', 'explain', 'confirm'], service: ['open', 'listen', 'resolve', 'close'], sales: [] };
+/** The review step that covers an opportunity, for a review type. */
+const txpStepFor = (typeId, oppId) => (REVIEW_TYPE_MAP[typeId] ? reviewItems(typeId).find((it) => (it.gaps || []).includes(oppId)) : null);
+function txpCommit(o) {
+  const b = o.b && typeof o.b === 'object' ? o.b : null;
+  return (b && (b.commit || b.focus)) || o.desc;
+}
+/** Build a Practice Lab scenario from one gap. call: { type, issue, feel, quote } (all optional). */
+function txpScenario(oppId, call, agentName) {
+  const o = getOpp(oppId);
+  if (!o) return null;
+  const area = (call && call.area) || '';
+  let type = TXP_TYPE[(call && call.type) || 'general'] || 'service';
+  if ((area === 'sales' || area === 'integrity' || /^(sales|integrity)-/.test(oppId)) && REVIEW_TYPE_MAP.sales) type = 'sales';
+  if (!REVIEW_TYPE_MAP[type]) type = 'service';
+  /* Rubric: the step this gap belongs to first, then the steps of a normal call of this type. */
+  const items = reviewItems(type);
+  const main = txpStepFor(type, oppId);
+  const commit = txpCommit(o);
+  const rubric = [];
+  if (main) rubric.push({ step: main.id, look: `${commit.charAt(0).toUpperCase()}${commit.slice(1)}.`.replace(/\.\.$/, '.') });
+  (call && call.others ? call.others : []).forEach((id) => {
+    const st = txpStepFor(type, id);
+    if (st && !rubric.some((r) => r.step === st.id) && rubric.length < 3) rubric.push({ step: st.id, look: st.good || st.title });
+  });
+  (TXP_DEFAULT_STEPS[type] || []).concat(items.filter((it) => it.group === 'flow').map((it) => it.id)).forEach((id) => {
+    const st = items.find((it) => it.id === id);
+    if (st && rubric.length < 5 && !rubric.some((r) => r.step === id)) rubric.push({ step: id, look: st.good || st.title });
+  });
+  if (!rubric.length) return null;
+  const issue = call && call.issue ? call.issue : '';
+  const lines = [];
+  if (issue) lines.push({ when: 'Opening', say: issue });
+  (TXP_LINES[oppId] || [['When the moment comes', o.desc]]).forEach(([when, say]) => lines.push({ when, say }));
+  if (call && call.quote && !lines.some((l) => l.say === call.quote)) lines.push({ when: 'A line from the real call', say: call.quote });
+  const feel = call && call.feel;
+  const persona = `Play the customer from this call${feel ? ': frustrated and short on patience, not rude' : ', calm but expecting good service'}. Use the lines below. Stay ${feel ? 'tense' : 'neutral'} until the agent does this: ${commit.replace(/\.$/, '')}. When they do, relax and cooperate; if they don't, use the follow-up line.`;
+  const hash = txHash(`${oppId}|${issue}|${agentName || ''}`).slice(0, 10);
+  return {
+    id: `pr-tx-${hash}`,
+    type,
+    title: `From the call: ${o.title}`,
+    kpi: (o.kpi || []).slice(0, 3),
+    level: 1,
+    minutes: 6,
+    brief: `${agentName ? `${agentName}'s` : 'A real'} ${TX_TYPE_LABEL[(call && call.type) || 'general'].toLowerCase()} call. ${issue ? `The customer said: "${issue}" ` : ''}On the call: ${(call && call.why) || o.desc} Practice this moment until it sounds natural.`,
+    persona,
+    lines,
+    rubric,
+    model: (o.example || []).map((e) => e.say).filter(Boolean).slice(0, 3),
+    debrief: [...(o.questions || []).slice(0, 2), 'What will you say on your next call when this moment comes up?'],
+    fromCall: true,
+  };
+}
+function txPractice(sc) {
+  if (!sc) return toast('No practice could be built for this one.', { type: 'warn' });
+  const list = EXT.data.txPractice.items.filter((x) => x.id !== sc.id);
+  list.push(sc);
+  EXT.data.txPractice = EXT.slices.txPractice.clean({ items: list });
+  EXT.save('txPractice');
+  const clean = EXT.data.txPractice.items.find((x) => x.id === sc.id);
+  txRegisterScenario(clean);
+  startPractice(clean.id);
+  const c = state.practice.current;
+  if (c && txUi.member && EXT.memberById(txUi.member)) {
+    c.who = 'one';
+    c.member = txUi.member;
+    savePractice();
+  }
+  navigate('practice');
+  toast('Role-play ready in the Practice Lab, built from the call. You play the customer.', { duration: 7000 });
+}
+/** The customer's issue line from the call, masked, for the role-play opening. */
+function txIssueLine() {
+  const p = txParse(txUi.ranText, txUi.flips);
+  if (!p.turns) return '';
+  const c = p.turns.filter((x) => x.who === 'customer').slice(0, 3);
+  const pick = c.map((t) => txQuote(t)).filter((q) => q && q.text && q.text.split(' ').length >= 5 && !/\[number\]|\[email\]/.test(q.text))[0];
+  return pick ? pick.text.replace(/…$/, '') : '';
+}
+function txPracticeGap(x) {
+  const r = txUi.result;
+  const m = EXT.memberById(txUi.member);
+  const custQuote = (x.quotes || []).find((q) => q.who === 'customer' && !/\[number\]|\[email\]/.test(q.text));
+  const feel = r.checks.some((c) => c.label === 'Empathy' && /upset/i.test(c.note)) || r.aicr.level === 'high';
+  const others = r.better.filter((y) => y.id !== x.id && txUi.pickO.has(y.id)).map((y) => y.id);
+  txPractice(txpScenario(x.id, { type: r.stats.type, area: x.area, issue: txIssueLine(), feel, quote: custQuote ? custQuote.text.replace(/…$/, '') : '', why: x.why, others }, m ? memberLabel(m) : ''));
+}
+function txPracticePattern() {
+  const m = EXT.memberById(txUi.member);
+  const p = m && txPattern(m.id);
+  if (!p || !p.gaps.length) return;
+  const top = p.gaps[0];
+  const types = p.calls.map((c) => c.type);
+  const type = types.sort((a, b) => types.filter((t) => t === b).length - types.filter((t) => t === a).length)[0];
+  txPractice(txpScenario(top.id, { type, why: `${getOpp(top.id).title} came up on ${top.k} of ${p.n} analyzed calls.`, others: p.gaps.slice(1, 3).map((g) => g.id), feel: p.high > 0 }, memberLabel(m)));
+}
+
+/* ---------- the feedback card: a picture to paste anywhere ---------- */
+function txCardCanvas() {
+  const r = txUi.result;
+  const m = EXT.memberById(txUi.member);
+  const W = 1080;
+  const P = 56;
+  const S = 2;
+  const font = (getComputedStyle(document.body).fontFamily || 'system-ui, sans-serif').replace(/;/g, '');
+  const F = (w, px) => `${w} ${px}px ${font}`;
+  const meas = document.createElement('canvas').getContext('2d');
+  const wrap = (text, f, maxW) => {
+    meas.font = f;
+    const out = [];
+    let line = '';
+    String(text || '').split(/\s+/).forEach((w) => {
+      const t = line ? `${line} ${w}` : w;
+      if (meas.measureText(t).width > maxW && line) {
+        out.push(line);
+        line = w;
+      } else line = t;
+    });
+    if (line) out.push(line);
+    return out;
+  };
+  const C = { ink: '#121826', text: '#1C2437', soft: '#5B6475', line: '#E7E2DB', paper: '#FFFFFF', bg: '#F6F2EC', orange: '#F26522', green: '#1E7F5C', greenSoft: '#E5F3EC', orangeSoft: '#FDEBE1', amber: '#B7791F' };
+  const went = r.went.filter((x) => txUi.pickS.has(x.id)).slice(0, 4);
+  const focus = r.better.filter((x) => txUi.pickO.has(x.id));
+  const score = txScoreOf(r);
+  const blocks = [];
+  /* Lay everything out first (to know the height), then draw. */
+  const sec = (title, color, items) => {
+    if (!items.length) return;
+    blocks.push({ kind: 'title', text: title, color, h: 54 });
+    items.forEach((it) => {
+      const t = wrap(it.title, F(750, 28), W - P * 2 - 48);
+      const why = wrap(it.why, F(400, 23), W - P * 2 - 48);
+      const say = it.say ? wrap(`Try saying: "${it.say}"`, F('italic 400', 23), W - P * 2 - 72) : [];
+      blocks.push({ kind: 'item', color, t, why, say, h: 22 + t.length * 36 + why.length * 31 + (say.length ? 14 + say.length * 31 + 16 : 0) + 18 });
+    });
+  };
+  sec('What went well', C.green, went.map((x) => ({ title: getStrength(x.id).title, why: x.why })));
+  sec('Focus for your next calls', C.orange, focus.slice(0, FOCUS_MAX).map((x) => {
+    const o = getOpp(x.id);
+    return { title: o.title, why: x.why, say: ((o.example || [])[0] || {}).say || '' };
+  }));
+  if (focus.length > FOCUS_MAX) blocks.push({ kind: 'note', text: `Next time: ${focus.slice(FOCUS_MAX).map((x) => getOpp(x.id).title).join(' · ')}`, h: 44 });
+  const steps = r.sales.steps.filter((x) => x.status !== 'na');
+  if (steps.length) {
+    meas.font = F(650, 20);
+    let rowsN = 1;
+    let xx = P;
+    steps.forEach((st) => {
+      const w = meas.measureText(`✓ ${st.label}`).width + 28;
+      if (xx + w > W - P) {
+        rowsN += 1;
+        xx = P;
+      }
+      xx += w + 10;
+    });
+    blocks.push({ kind: 'sales', steps, h: 72 + rowsN * 48 });
+  }
+  const headH = 210;
+  const statH = 130;
+  const footH = 70;
+  const H = headH + statH + blocks.reduce((n, b) => n + b.h, 0) + footH + 30;
+  const cv = document.createElement('canvas');
+  cv.width = W * S;
+  cv.height = H * S;
+  const g = cv.getContext('2d');
+  g.scale(S, S);
+  g.fillStyle = C.bg;
+  g.fillRect(0, 0, W, H);
+  /* Header */
+  g.fillStyle = C.ink;
+  g.fillRect(0, 0, W, headH);
+  g.fillStyle = C.orange;
+  g.fillRect(0, headH - 6, W, 6);
+  g.fillStyle = C.orange;
+  g.font = F(800, 22);
+  g.fillText('CALL FEEDBACK', P, 66);
+  g.fillStyle = '#FFFFFF';
+  g.font = F(800, 46);
+  g.fillText(m ? memberLabel(m) : 'Agent', P, 124);
+  g.fillStyle = '#C9CEDA';
+  g.font = F(500, 24);
+  g.fillText(`${fmtDay(isIsoDate(txUi.day) ? txUi.day : todayDay(), true)} · ${TX_TYPE_LABEL[r.stats.type] || 'General'} call`, P, 168);
+  /* Score and aiCR */
+  let y = headH + 24;
+  const tile = (x, w, label, val, color) => {
+    g.fillStyle = C.paper;
+    g.beginPath();
+    g.roundRect(x, y, w, 92, 16);
+    g.fill();
+    g.fillStyle = color;
+    g.font = F(850, 40);
+    g.fillText(val, x + 22, y + 52);
+    g.fillStyle = C.soft;
+    g.font = F(650, 19);
+    g.fillText(label.toUpperCase(), x + 22, y + 78);
+  };
+  const tone = score >= 80 ? C.green : score >= 50 ? C.amber : C.orange;
+  const third = (W - P * 2 - 32) / 3;
+  tile(P, third, 'Call score', `${score}%`, tone);
+  const lv = r.aicr.level;
+  tile(P + third + 16, third, 'Repeat call risk', lv[0].toUpperCase() + lv.slice(1), lv === 'high' ? C.orange : lv === 'medium' ? C.amber : C.green);
+  const sDone = steps.filter((x) => x.status === 'good').length;
+  tile(P + (third + 16) * 2, third, 'Sales path', steps.length ? `${sDone} of ${steps.length}` : '–', C.ink);
+  y = headH + statH;
+  /* Sections */
+  blocks.forEach((b) => {
+    if (b.kind === 'title') {
+      g.fillStyle = b.color;
+      g.font = F(850, 26);
+      g.fillText(b.text.toUpperCase(), P, y + 38);
+      y += b.h;
+    } else if (b.kind === 'item') {
+      const h0 = b.h - 18;
+      g.fillStyle = C.paper;
+      g.beginPath();
+      g.roundRect(P, y, W - P * 2, h0, 16);
+      g.fill();
+      g.fillStyle = b.color;
+      g.fillRect(P, y + 12, 6, h0 - 24);
+      let ty = y + 46;
+      g.fillStyle = C.text;
+      g.font = F(750, 28);
+      b.t.forEach((l) => {
+        g.fillText(l, P + 30, ty);
+        ty += 36;
+      });
+      g.fillStyle = C.soft;
+      g.font = F(400, 23);
+      b.why.forEach((l) => {
+        g.fillText(l, P + 30, ty - 4);
+        ty += 31;
+      });
+      if (b.say.length) {
+        ty += 4;
+        g.fillStyle = C.orangeSoft;
+        g.beginPath();
+        g.roundRect(P + 26, ty - 30, W - P * 2 - 52, b.say.length * 31 + 18, 12);
+        g.fill();
+        g.fillStyle = C.text;
+        g.font = F('italic 400', 23);
+        b.say.forEach((l) => {
+          g.fillText(l, P + 44, ty);
+          ty += 31;
+        });
+      }
+      y += b.h;
+    } else if (b.kind === 'note') {
+      g.fillStyle = C.soft;
+      g.font = F(600, 22);
+      g.fillText(b.text.length > 80 ? `${b.text.slice(0, 78)}…` : b.text, P, y + 28);
+      y += b.h;
+    } else if (b.kind === 'sales') {
+      g.fillStyle = C.ink;
+      g.font = F(850, 26);
+      g.fillText('SALES PATH', P, y + 38);
+      let x = P;
+      let cy = y + 62;
+      g.font = F(650, 20);
+      b.steps.forEach((st) => {
+        const label = `${st.status === 'good' ? '✓' : st.status === 'bad' ? '✗' : '•'} ${st.label}`;
+        const w = g.measureText(label).width + 28;
+        if (x + w > W - P) {
+          x = P;
+          cy += 48;
+        }
+        g.fillStyle = st.status === 'good' ? C.greenSoft : st.status === 'bad' ? C.orangeSoft : '#EFEAE3';
+        g.beginPath();
+        g.roundRect(x, cy, w, 38, 19);
+        g.fill();
+        g.fillStyle = st.status === 'good' ? C.green : st.status === 'bad' ? '#C2410C' : C.soft;
+        g.fillText(label, x + 14, cy + 26);
+        x += w + 10;
+      });
+      y += b.h;
+    }
+  });
+  g.fillStyle = C.soft;
+  g.font = F(500, 19);
+  g.fillText('VXI Coaching Intelligence · from the call transcript', P, H - 34);
+  return cv;
+}
+function txCardShare(copy, btn) {
+  if (!txUi.result) return;
+  const name = `Call_feedback_${(memberLabel(EXT.memberById(txUi.member) || { name: 'agent' }) || 'agent').replace(/[^A-Za-z0-9]+/g, '_')}_${isIsoDate(txUi.day) ? txUi.day : todayDay()}.png`;
+  txCardCanvas().toBlob(async (blob) => {
+    if (!blob) return toast('The picture could not be made.', { type: 'error' });
+    if (copy && navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        if (btn && btn.isConnected) flashCopied(btn);
+        toast('Feedback card copied. Paste it in Teams, WhatsApp or anywhere.');
+        return;
+      } catch (e) {
+        /* fall back to saving the file */
+      }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: name, style: 'display:none' });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast('Feedback card saved as a picture.');
+  }, 'image/png');
+}
+
+/* ---------- the patterns card ---------- */
+function txPatternCard() {
+  const m = EXT.memberById(txUi.member);
+  if (!m) return null;
+  const p = txPattern(m.id);
+  if (!p) {
+    return h(
+      'section',
+      { class: 'card kt-card rta-card tx-card tx-pattern is-empty', 'aria-labelledby': 'tx-pat' },
+      h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'tx-pat' }, icon('trend'), `Patterns for ${memberLabel(m)}`), h('p', { class: 'kt-sub' }, 'Save analyzed calls to this agent\'s history. After two or more, what keeps repeating shows here, so you coach the pattern, not one call.')))
+    );
+  }
+  const bar = (pct, cls) => h('span', { class: `tx-pbar ${cls}` }, h('span', { style: `width:${pct}%` }));
+  const rate = (label, x) => (x ? h('div', { class: 'tx-stat' }, h('span', { class: 'tx-stat__v' }, `${x.k} of ${x.n}`), h('span', { class: 'tx-stat__l' }, label)) : null);
+  return h(
+    'section',
+    { class: 'card kt-card rta-card tx-card tx-pattern', 'aria-labelledby': 'tx-pat', 'data-fk': 'tx-pattern' },
+    h(
+      'div',
+      { class: 'kt-head' },
+      h('div', null, h('h2', { class: 'kt-title', id: 'tx-pat' }, icon('trend'), `Patterns for ${memberLabel(m)}`), h('p', { class: 'kt-sub' }, `${plural(p.n, 'analyzed call')}, ${fmtDay(p.calls[0].day)} to ${fmtDay(p.calls[p.n - 1].day)}. Only scores and findings are kept, never the transcript.`)),
+      h(
+        'div',
+        { class: 'kt-actions' },
+        p.gaps.length ? h('button', { type: 'button', class: 'btn', 'data-fk': 'tx-pat-practice', onclick: txPracticePattern }, icon('chat'), 'Practice the top gap') : null,
+        h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'tx-pat-coach', disabled: !p.gaps.length, onclick: txCoachPattern }, icon('arrow-right'), 'Coach the pattern')
+      )
+    ),
+    h(
+      'div',
+      { class: 'tx-stats' },
+      h('div', { class: 'tx-stat' }, h('span', { class: 'tx-stat__v' }, `${p.avg}%`), h('span', { class: 'tx-stat__l' }, 'Average call score')),
+      p.trend != null ? h('div', { class: `tx-stat ${p.trend > 2 ? 'is-up' : p.trend < -2 ? 'is-down' : ''}` }, h('span', { class: 'tx-stat__v' }, `${p.trend > 0 ? '+' : ''}${p.trend} pts`), h('span', { class: 'tx-stat__l' }, 'Recent calls vs earlier')) : null,
+      h('div', { class: 'tx-stat' }, h('span', { class: 'tx-stat__v' }, `${p.high} of ${p.n}`), h('span', { class: 'tx-stat__l' }, 'High aiCR risk')),
+      rate('Planted the seed', p.seed),
+      rate('Made an offer', p.offer)
+    ),
+    p.n < 2 ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, 'One call saved. Patterns show from the second call on.')) : null,
+    h(
+      'div',
+      { class: 'tx-cols' },
+      h(
+        'div',
+        { class: 'tx-col' },
+        h('h3', { class: 'tx-col__t tx-col__t--bad' }, icon('target'), 'Keeps missing'),
+        p.gaps.length
+          ? h('ul', { class: 'tx-plist' }, p.gaps.slice(0, 6).map((x, i) => h('li', { class: 'tx-prow' }, h('span', { class: 'tx-prow__t' }, getOpp(x.id).title, i < FOCUS_MAX ? h('span', { class: 'tx-tag is-focus' }, 'Focus') : null), h('span', { class: 'tx-prow__n' }, `${x.k} of ${p.n} calls`), bar(x.pct, 'is-bad'))))
+          : h('p', { class: 'si-muted' }, p.n < 2 ? 'Needs at least two calls.' : 'Nothing repeats on a third of the calls or more.')
+      ),
+      h(
+        'div',
+        { class: 'tx-col' },
+        h('h3', { class: 'tx-col__t tx-col__t--good' }, icon('thumb'), 'Keeps doing well'),
+        p.goods.length
+          ? h('ul', { class: 'tx-plist' }, p.goods.slice(0, 6).map((x) => h('li', { class: 'tx-prow' }, h('span', { class: 'tx-prow__t' }, getStrength(x.id).title), h('span', { class: 'tx-prow__n' }, `${x.k} of ${p.n} calls`), bar(x.pct, 'is-good'))))
+          : h('p', { class: 'si-muted' }, p.n < 2 ? 'Needs at least two calls.' : 'No strength on half the calls yet.')
+      )
+    ),
+    h(
+      'details',
+      { class: 'tx-checks' },
+      h('summary', null, `Saved calls (${p.n})`),
+      h(
+        'ul',
+        { class: 'tx-calls' },
+        p.calls
+          .slice()
+          .reverse()
+          .map((c) => h('li', { class: 'tx-callrow' }, h('span', { class: 'tx-callrow__d' }, fmtDay(c.day)), h('span', null, TX_TYPE_LABEL[c.type] || 'General'), h('span', { class: `tx-callrow__s is-${txTone(c.score)}` }, `${c.score}%`), h('span', { class: `tx-risk__badge is-${c.aicr}` }, `aiCR ${c.aicr}`), h('span', { class: 'tx-callrow__n' }, `${c.better.length} gaps · ${c.went.length} strengths`), h('button', { type: 'button', class: 'btn btn--sm btn--icon btn--ghost', 'aria-label': 'Delete this saved call', title: 'Delete', 'data-fk': `tx-del:${c.id}`, onclick: () => txDeleteCall(c.id) }, icon('trash'))))
+      )
+    )
+  );
 }
 
 /* ---------- the page ---------- */
@@ -38183,6 +38889,7 @@ function txItem(x, kind) {
       !isS && on ? h('span', { class: `tx-tag${idx < FOCUS_MAX ? ' is-focus' : ''}` }, idx < FOCUS_MAX ? 'Focus' : 'Parked') : null
     ),
     h('p', { class: 'tx-item__why' }, x.why),
+    !isS ? h('button', { type: 'button', class: 'btn btn--sm tx-item__practice', 'data-fk': `tx-practice:${x.id}`, title: 'Build a role-play from this call for the Practice Lab', onclick: () => txPracticeGap(x) }, icon('chat'), 'Practice this') : null,
     x.quotes.length ? h('ul', { class: 'tx-quotes' }, x.quotes.map((q) => h('li', { class: `tx-q tx-q--${q.who}` }, h('span', { class: 'tx-q__who' }, `${q.who === 'agent' ? 'Agent' : 'Customer'}${q.t != null ? ` · ${txClock(q.t)}` : ''}`), h('span', { class: 'tx-q__t' }, `“${q.text}”`)))) : null
   );
 }
@@ -38191,7 +38898,13 @@ function txRender(main) {
   const members = state.team.members.slice().sort((a, b) => memberLabel(a).localeCompare(memberLabel(b)));
   if (!txUi.member && state.builder.agent && EXT.memberById(state.builder.agent)) txUi.member = state.builder.agent;
   const sel = h('select', { class: 'select', id: 'tx-agent', 'data-fk': 'tx-agent' }, h('option', { value: '' }, 'Choose the agent'), members.map((m) => h('option', { value: m.id, selected: m.id === txUi.member }, memberLabel(m))));
-  sel.addEventListener('change', () => (txUi.member = sel.value));
+  sel.addEventListener('change', () => {
+    txUi.member = sel.value;
+    refresh({ panel: false });
+  });
+  if (!isIsoDate(txUi.day)) txUi.day = todayDay();
+  const dayIn = h('input', { class: 'input', type: 'date', id: 'tx-day', 'data-fk': 'tx-day', value: txUi.day, max: todayDay() });
+  dayIn.addEventListener('change', () => (txUi.day = isIsoDate(dayIn.value) ? dayIn.value : todayDay()));
   const area = h('textarea', { class: 'textarea tx-area', id: 'tx-text', rows: '12', spellcheck: 'false', 'data-fk': 'tx-text', placeholder: 'Agent: Thank you for calling Xfinity, my name is Sara. How can I help you today?\nCustomer: My internet keeps dropping, this is the third time this week.\nAgent: I am so sorry to hear that, I know how frustrating that is. Let\'s get it fixed...' });
   area.value = txUi.text;
   area.addEventListener('input', () => (txUi.text = area.value));
@@ -38201,7 +38914,7 @@ function txRender(main) {
     'section',
     { class: 'card kt-card rta-card tx-card', 'aria-labelledby': 'tx-in' },
     h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'tx-in' }, icon('note'), 'Paste the transcript'), h('p', { class: 'kt-sub' }, 'Paste it as it comes: with "Agent:" and "Customer:" labels, or as plain paragraphs (the page works out who is speaking). Times like [00:01:23] let it find long silences.'))),
-    h('div', { class: 'tx-form' }, h('label', { class: 'field rta-field', for: 'tx-agent' }, h('span', { class: 'field__label' }, 'Agent'), sel)),
+    h('div', { class: 'tx-form' }, h('label', { class: 'field rta-field', for: 'tx-agent' }, h('span', { class: 'field__label' }, 'Agent'), sel), h('label', { class: 'field rta-field', for: 'tx-day' }, h('span', { class: 'field__label' }, 'Call date'), dayIn)),
     area,
     txUi.error ? h('p', { class: 'notice', role: 'alert' }, icon('alert'), h('span', { class: 'notice__body' }, txUi.error)) : null,
     h('div', { class: 'tx-actions' }, run, txUi.text || txUi.result ? clear : null, h('span', { class: 'tx-private' }, icon('lock', 'icon--sm'), 'Read in this browser only. Not saved, not sent anywhere.'))
@@ -38222,7 +38935,14 @@ function txRender(main) {
         'div',
         { class: 'kt-head' },
         h('div', null, h('h2', { class: 'kt-title', id: 'tx-out' }, icon('clipboard'), 'What the call shows'), h('p', { class: 'kt-sub' }, 'Tick what to coach. The page reads words, not tone, so check the picks against the call.')),
-        h('div', { class: 'kt-actions' }, h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'tx-build', disabled: !nS && !nO, onclick: txBuild }, icon('arrow-right'), 'Build coaching and action plan'))
+        h(
+          'div',
+          { class: 'kt-actions' },
+          h('button', { type: 'button', class: 'btn copy-btn', 'data-fk': 'tx-card-copy', title: 'Copy the feedback card as a picture to paste in Teams, WhatsApp or anywhere', onclick: (e) => txCardShare(true, e.currentTarget) }, icon('copy'), 'Copy feedback card'),
+          h('button', { type: 'button', class: 'btn btn--icon', 'data-fk': 'tx-card-save', title: 'Download the feedback card', 'aria-label': 'Download the feedback card', onclick: () => txCardShare(false) }, icon('download')),
+          h('button', { type: 'button', class: `btn${txIsSaved() ? ' is-saved' : ''}`, 'data-fk': 'tx-save', disabled: !EXT.memberById(txUi.member), title: EXT.memberById(txUi.member) ? 'Save this call to the agent\'s history for patterns' : 'Pick the agent first', onclick: () => { const how = txSaveCall(); refresh({ panel: false }); if (how) toast(how === 'saved' ? 'Call saved to the agent\'s history. Patterns update below.' : 'This call was already saved; it is updated.'); } }, icon(txIsSaved() ? 'check' : 'save'), txIsSaved() ? 'Saved' : 'Save to history'),
+          h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'tx-build', disabled: !nS && !nO, onclick: txBuild }, icon('arrow-right'), 'Build coaching and action plan')
+        )
       ),
       st.cut ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, 'The transcript seems to stop before the call ends, so the closing and whether the fix was confirmed were not judged. Paste the whole call to include them.')) : null,
       txUi.parts
@@ -38265,7 +38985,7 @@ function txRender(main) {
       )
     );
   }
-  put(main, pageHead({ eyebrow: 'Coaching', title: 'Transcript to coaching', sub: 'Paste a call transcript. The page finds what went well and what should be better, then builds the coaching with feedback and a SMART action plan.' }), h('div', { class: 'tx-page' }, input, out));
+  put(main, pageHead({ eyebrow: 'Coaching', title: 'Transcript to coaching', sub: 'Paste a call transcript. The page finds what went well and what should be better, then builds the coaching with feedback and a SMART action plan.' }), h('div', { class: 'tx-page' }, input, out, txPatternCard()));
 }
 
 EXT.view('transcript', { title: 'Transcript to coaching', label: 'Transcript to coaching', icon: 'note', render: txRender });
