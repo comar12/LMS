@@ -7455,7 +7455,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.5.1';
+const APP_VERSION = '3.5.2';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -32035,11 +32035,12 @@ const MAIL_URL_MAX = 1900;
  * plain = true puts the text in the body; otherwise the formatted email goes on the clipboard.
  * Returns { opened, paste, copied, to }.
  */
-async function mailSend({ kind, subject, html, text, plain, pasteText }) {
+async function mailSend({ kind, subject, html, text, textShort, plain, pasteText }) {
   const rec = EXT.data.mailTo[kind] || { to: '', cc: '' };
   const to = mailList(rec.to);
   const cc = mailList(rec.cc);
   let url = plain ? mailtoUrl({ to, cc, subject, body: text }) : '';
+  if (plain && url.length > MAIL_URL_MAX && textShort) url = mailtoUrl({ to, cc, subject, body: textShort });
   let paste = !plain || url.length > MAIL_URL_MAX;
   if (paste) url = mailtoUrl({ to, cc, subject });
   /* The clipboard always holds the email too, so it can be pasted if the body did not come through. */
@@ -32328,12 +32329,40 @@ function rtaPlainTable(title, g) {
     const first = [`${g.head[0]}: ${r[0]}`, r[1] ? `${g.head[1]}: ${r[1]}` : '', r[2]].filter(Boolean).join(' | ');
     const rest = r.slice(3).map((v, i) => (v ? `${g.head[i + 3]}: ${v}` : '')).filter(Boolean).join(' | ');
     lines.push(`- ${first}`);
-    if (rest) lines.push(`  ${rest}`);
+    if (rest) lines.push(`${'\u00A0'.repeat(4)}${rest}`);
   });
   return lines;
 }
-/** The WFM email as plain text, ready to send. */
-function rtaPlain(source) {
+/* The tidy layout: a title line with the LOB, a rule, then each agent numbered with the HR ID,
+   and the details on an indented line. Outlook drops leading spaces, so the indent is no-break spaces.
+   Plain ASCII where it reads as well: every other character costs 6 to 9 in the mailto link. */
+const RTA_NB = '\u00A0';
+const rtaDayShort = (d) => (isIsoDate(d) ? `${parseDay(d).toLocaleDateString('en-US', { weekday: 'short' })}, ${rtaDate(d)}` : '');
+function rtaPrettyBlock(title, lob, items) {
+  const lines = [`${title.replace(/\s*\/\s*/g, ' / ').toUpperCase()}${lob ? ` (${lob})` : ''}`];
+  items.forEach((it, i) => {
+    lines.push(`${i + 1}. ${it.name}${it.hr ? ` - HRID ${it.hr}` : ''}`);
+    if (it.detail) lines.push(`${RTA_NB.repeat(4)}${it.detail}`);
+  });
+  return lines;
+}
+/** One WFM request as a tidy block. */
+function rtaPrettyTable(t, lob) {
+  const T = rtaType(t.type);
+  const items = t.rows.map((r) => {
+    let detail;
+    if (T.kind === 'swap') detail = t.dates.map((d, i) => `${rtaDayShort(d)}: ${r.times[i] || '-'}`).join(' | ');
+    else if (T.kind === 'request') detail = [r.request ? `Request: ${r.request}` : '', r.fromText ? `From: ${r.fromText}` : '', r.toText ? `To: ${r.toText}` : ''].filter(Boolean).join(' | ');
+    else {
+      const time = r.from || r.to ? `Time: ${rtaTime(r.from) || '?'} to ${rtaTime(r.to) || '?'}` : '';
+      detail = [r.date ? `Date: ${rtaDayShort(r.date)}` : '', time].filter(Boolean).join(' | ');
+    }
+    return { name: rtaName(r), hr: rtaHr(r), detail };
+  });
+  return rtaPrettyBlock(T.title, lob, items);
+}
+/** The WFM email as plain text, ready to send. compact = the shorter layout for long emails. */
+function rtaPlain(source, compact) {
   const R = source || EXT.data.rta;
   const draft = R.draft;
   const transport = rtaTransportLine(draft);
@@ -32342,7 +32371,7 @@ function rtaPlain(source) {
     '',
     rtaAsk(draft),
     '',
-    ...draft.flatMap((t) => [...rtaPlainTable(rtaType(t.type).title, rtaGrid(t, R.lob)), '']),
+    ...draft.flatMap((t) => [...(compact ? rtaPlainTable(rtaType(t.type).title, rtaGrid(t, R.lob)) : rtaPrettyTable(t, R.lob)), '']),
     'All times are in CLT.',
     ...(transport ? ['', `@Transportation-EG ${transport}`] : []),
     '',
@@ -32350,10 +32379,11 @@ function rtaPlain(source) {
   ].join('\n');
 }
 /** The exam leave email as plain text, ready to send. */
-function rtaExamPlain(source) {
+function rtaExamPlain(source, compact) {
   const R = source || EXT.data.rta;
   const rows = R.exam;
-  return [RTA_EXAM_GREETING, '', rtaExamAsk(rows), '', ...rtaPlainTable('Exam Leave', rtaExamGrid(rows, R.lob)), '', `${RTA_EXAM_WFM} ${rtaExamWfmLine(rows)}`, '', 'BR,'].join('\n');
+  const pretty = () => rtaPrettyBlock('Exam Leave', R.lob, rtaExamRows(rows).map((r) => ({ name: rtaName(r), hr: rtaHr(r), detail: `Exam: ${rtaWeekday(r.date)}, ${rtaDate(r.date)}` })));
+  return [RTA_EXAM_GREETING, '', rtaExamAsk(rows), '', ...(compact ? rtaPlainTable('Exam Leave', rtaExamGrid(rows, R.lob)) : pretty()), '', `${RTA_EXAM_WFM} ${rtaExamWfmLine(rows)}`, '', 'BR,'].join('\n');
 }
 
 /** Put rich HTML on the clipboard (Outlook keeps the table), with plain text as a fallback. */
@@ -32613,7 +32643,7 @@ function rtaExamCard(R, field, redraw, main) {
   const outlook = async () => {
     if (!R.exam.length) return toast('Add the exam days first.', { type: 'warn' });
     const { html, text } = rtaExamEmail();
-    const r = await mailSend({ kind: 'exam', subject: subj.value.trim() || rtaExamSubject(), html, text: rtaExamPlain(), plain: true, pasteText: text });
+    const r = await mailSend({ kind: 'exam', subject: subj.value.trim() || rtaExamSubject(), html, text: rtaExamPlain(), textShort: rtaExamPlain(null, true), plain: true, pasteText: text });
     R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaExamSubject(), kind: 'exam', draft: [], exam: JSON.parse(JSON.stringify(R.exam)), lob: R.lob });
     R.history = R.history.slice(0, 15);
     EXT.save('rta');
@@ -32911,7 +32941,7 @@ function rtaRender(main) {
   const openOutlook = async () => {
     if (!R.draft.length) return toast('Add a request first.', { type: 'warn' });
     const { html, text } = rtaEmail();
-    const r = await mailSend({ kind: 'rta', subject: subj.value.trim() || rtaSubject(), html, text: rtaPlain(), plain: true, pasteText: text });
+    const r = await mailSend({ kind: 'rta', subject: subj.value.trim() || rtaSubject(), html, text: rtaPlain(), textShort: rtaPlain(null, true), plain: true, pasteText: text });
     R.history.unshift({ at: new Date().toISOString().slice(0, 16), subject: rtaSubject(), draft: JSON.parse(JSON.stringify(R.draft)), lob: R.lob });
     R.history = R.history.slice(0, 15);
     EXT.save('rta');
@@ -32961,7 +32991,7 @@ function rtaRender(main) {
               h('span', { class: 'rta-hist__s' }, x.subject),
               h('span', { class: 'rta-hist__m' }, `${x.kind === 'exam' ? 'Exam leave to HR · ' : ''}${x.at.replace('T', ' ')} · ${plural(x.kind === 'exam' ? x.exam.length : rtaRowCount(x.draft), 'row')}`),
               h('button', { type: 'button', class: 'btn btn--sm copy-btn', 'data-fk': `rta-recopy:${i}`, onclick: async (e) => { const btn = e.currentTarget; const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); if (await rtaCopyHtml(html, text)) { if (btn.isConnected) flashCopied(btn); toast('Email copied again.'); } } }, icon('copy'), 'Copy again'),
-              h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `rta-reopen:${i}`, title: 'Open this email in Outlook again', onclick: async () => { const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); mailToast(await mailSend({ kind: x.kind === 'exam' ? 'exam' : 'rta', subject: x.subject, html, text: x.kind === 'exam' ? rtaExamPlain({ ...x }) : rtaPlain({ ...x }), plain: true, pasteText: text }), 'the email'); } }, icon('mail'), 'Outlook'),
+              h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `rta-reopen:${i}`, title: 'Open this email in Outlook again', onclick: async () => { const { html, text } = x.kind === 'exam' ? rtaExamEmail({ ...x }) : rtaEmail({ ...x }); mailToast(await mailSend({ kind: x.kind === 'exam' ? 'exam' : 'rta', subject: x.subject, html, text: x.kind === 'exam' ? rtaExamPlain({ ...x }) : rtaPlain({ ...x }), textShort: x.kind === 'exam' ? rtaExamPlain({ ...x }, true) : rtaPlain({ ...x }, true), plain: true, pasteText: text }), 'the email'); } }, icon('mail'), 'Outlook'),
               h('button', { type: 'button', class: 'btn btn--sm btn--ghost', 'data-fk': `rta-reuse:${i}`, onclick: () => { if (x.kind === 'exam') { R.exam = JSON.parse(JSON.stringify(x.exam)); R.examSubject = ''; rtaPick.type = 'exam'; } else { R.draft = JSON.parse(JSON.stringify(x.draft)); R.subject = ''; } EXT.data.rta = rtaClean(R); EXT.save('rta'); redraw(); toast(x.kind === 'exam' ? 'Loaded into the exam leave email. Change the days, then copy.' : 'Loaded into the email. Change the dates, then copy.'); } }, icon('edit'), 'Reuse')
             );
           })
