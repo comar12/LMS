@@ -6140,6 +6140,54 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
   .ma-table tbody td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; color: var(--text-2); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; }
   .ma-id { padding: 6px 9px; }
 }
+/* ===== layer: layers/95-transcript.css ===== */
+/* 95-transcript: Transcript to coaching */
+.tx-page { display: grid; gap: 18px; }
+.tx-card { margin: 0; }
+.tx-form { display: grid; grid-template-columns: minmax(0, 320px); gap: 10px; margin-bottom: 12px; }
+.tx-area { width: 100%; min-height: 220px; font-family: var(--font-mono, ui-monospace, Menlo, Consolas, monospace); font-size: 0.86rem; line-height: 1.55; resize: vertical; }
+.tx-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.tx-private { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; color: var(--text-2); font-size: 0.8rem; }
+.tx-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 4px 0 16px; }
+.tx-stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.tx-stat__v { font-size: 1.2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text); }
+.tx-stat__l { font-size: 0.76rem; font-weight: 650; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.04em; }
+.tx-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tx-col__t { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 1rem; font-weight: 800; }
+.tx-col__t--good { color: var(--success); }
+.tx-col__t--bad { color: var(--accent-text, var(--accent)); }
+.tx-count { margin-left: auto; color: var(--text-2); font-size: 0.78rem; font-weight: 650; }
+.tx-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.tx-item { padding: 12px 14px; border: 1px solid var(--border); border-left-width: 4px; border-radius: 12px; background: var(--surface); opacity: 0.72; transition: opacity 0.2s, box-shadow 0.2s; }
+.tx-item.is-on { opacity: 1; box-shadow: var(--shadow-xs); }
+.tx-item--good { border-left-color: var(--success); }
+.tx-item--bad { border-left-color: var(--accent); }
+.tx-item__head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.tx-item__box { width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
+.tx-item--good .tx-item__box { accent-color: var(--success); }
+.tx-item__title { font-weight: 750; color: var(--text); }
+.tx-tag { margin-left: auto; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text-2); font-size: 0.72rem; font-weight: 750; }
+.tx-tag.is-focus { background: var(--accent-soft); color: var(--accent-text); }
+.tx-item__why { margin: 6px 0 0 28px; color: var(--text-2); font-size: 0.88rem; }
+.tx-quotes { display: grid; gap: 6px; margin: 8px 0 0 28px; padding: 0; list-style: none; }
+.tx-q { display: grid; gap: 2px; padding: 7px 10px; border-radius: 9px; background: color-mix(in srgb, var(--text) 4%, transparent); font-size: 0.86rem; }
+.tx-q--customer { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.tx-q__who { color: var(--text-2); font-size: 0.72rem; font-weight: 750; text-transform: uppercase; letter-spacing: 0.04em; }
+.tx-q__t { color: var(--text); font-style: italic; }
+.tx-checks { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+.tx-checks > summary { cursor: pointer; color: var(--text-2); font-weight: 700; font-size: 0.88rem; }
+.tx-checklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 16px; margin: 10px 0 0; padding: 0; list-style: none; }
+.tx-check { display: flex; align-items: center; gap: 8px; font-size: 0.86rem; }
+.tx-check__l { font-weight: 700; color: var(--text); }
+.tx-check__n { color: var(--text-2); }
+.tx-check.is-good .icon { color: var(--success); }
+.tx-check.is-bad .icon { color: var(--accent-text, var(--accent)); }
+.tx-check.is-ok .icon { color: var(--warning); }
+.tx-check.is-na { opacity: 0.6; }
+@media (max-width: 800px) {
+  .tx-cols { grid-template-columns: 1fr; }
+  .tx-private { margin-left: 0; }
+}
 /* ===== layer: layers/88-rta.css ===== */
 /* 88-rta: Workforce requests (the chips, the agent picker and the step layout are shared with IT requests) */
 .rta-card { margin-bottom: 18px; }
@@ -7455,7 +7503,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.5.2';
+const APP_VERSION = '3.6.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -37116,6 +37164,558 @@ EXT.view('avoidlog', {
 });
 EXT.order.splice(EXT.order.indexOf('avoidlog'), 1);
 EXT.order.splice(EXT.order.indexOf('integrity') + 1, 0, 'avoidlog');
+/* ===== layer: layers/95-transcript.js ===== */
+/* ==========================================================================
+   95-transcript: Transcript to coaching
+   - Paste a call transcript. The page reads it in this browser (no AI service, nothing is sent)
+     and finds what went well and what should be better, each with a line from the call.
+   - The picks map to the library, so "Build coaching" opens the Builder with Things Went Well,
+     the focus behaviors (feedback and the SMART action plan) and the quotes as evidence.
+   - The transcript is kept in memory only, never saved, and numbers and emails in quotes are hidden.
+   ========================================================================== */
+
+let txUi = { text: '', member: '', result: null, pickS: new Set(), pickO: new Set(), error: '' };
+
+/* ---------- reading the transcript ---------- */
+const TX_AGENT_RE = /^(agent|rep|representative|advocate|associate|csr|employee|tech|technician|specialist|consultant|support|vxi|comcast|xfinity|me)\b/i;
+const TX_CUST_RE = /^(customer|caller|client|cust|subscriber|member|user|account holder)\b/i;
+const TX_TIME_RE = /[[(]?\b((?:\d{1,2}:)?\d{1,2}:\d{2})(?:\.\d+)?\b[\])]?/;
+const txSecs = (t) => t.split(':').map(Number).reduce((a, b) => a * 60 + b, 0);
+const txClock = (s) => (s == null ? '' : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`);
+const txWords = (s) => (String(s).match(/[A-Za-z0-9']+/g) || []).length;
+
+/** Turns: [{ who: 'agent' | 'customer', t: seconds | null, text }], or { error }. */
+function txParse(raw) {
+  const lines = String(raw || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean);
+  if (!lines.length) return { error: 'Paste a transcript first.' };
+  const split = (line) => {
+    let t = null;
+    let rest = line;
+    const lead = rest.match(/^\s*[[(]?((?:\d{1,2}:)?\d{1,2}:\d{2})(?:\.\d+)?[\])]?\s*[-–—|]?\s*/);
+    if (lead) {
+      t = txSecs(lead[1]);
+      rest = rest.slice(lead[0].length);
+    }
+    const m = rest.match(/^([^:：]{1,40}?)\s*[:：]\s*(.*)$/);
+    if (!m) return { t, label: '', text: rest };
+    let label = m[1];
+    const inLabel = label.match(TX_TIME_RE);
+    if (inLabel) {
+      if (t == null) t = txSecs(inLabel[1]);
+      label = label.replace(TX_TIME_RE, '');
+    }
+    label = label.replace(/[[\]()]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!label || label.split(' ').length > 4 || /\d{3,}/.test(label)) return { t, label: '', text: rest };
+    return { t, label: label.toLowerCase(), text: m[2] };
+  };
+  const parts = lines.map(split);
+  const count = new Map();
+  parts.forEach((p) => p.label && count.set(p.label, (count.get(p.label) || 0) + 1));
+  const ok = (l) => l && (TX_AGENT_RE.test(l) || TX_CUST_RE.test(l) || /^speaker\s*\w+$/.test(l) || count.get(l) >= 2);
+  const raw2 = [];
+  parts.forEach((p) => {
+    if (ok(p.label)) raw2.push({ label: p.label, t: p.t, text: p.text });
+    else if (raw2.length) raw2[raw2.length - 1].text += ` ${p.label ? `${p.label}: ` : ''}${p.text}`;
+  });
+  const labels = [...new Set(raw2.map((x) => x.label))];
+  if (labels.length < 2) return { error: 'The page could not tell who is speaking. Start each line with "Agent:" or "Customer:" (a name or "Speaker 1:" works too).' };
+  const role = new Map();
+  labels.forEach((l) => {
+    if (TX_AGENT_RE.test(l)) role.set(l, 'agent');
+    else if (TX_CUST_RE.test(l)) role.set(l, 'customer');
+  });
+  const unknown = labels.filter((l) => !role.has(l));
+  if (unknown.length) {
+    const hasAgent = [...role.values()].includes('agent');
+    const hasCust = [...role.values()].includes('customer');
+    if (hasAgent && !hasCust) unknown.forEach((l) => role.set(l, 'customer'));
+    else if (hasCust && !hasAgent) unknown.forEach((l) => role.set(l, 'agent'));
+    else {
+      /* Two unnamed speakers: the agent is the one who opens like an agent. */
+      const score = (l) => raw2.filter((x) => x.label === l).reduce((n, x) => n + (/(thank you for calling|thanks for calling|my name is|how (can|may) i (help|assist)|let me|i('ll| will) (check|look|help)|your account)/i.test(x.text) ? 1 : 0), 0);
+      const ranked = unknown.slice().sort((a, b) => score(b) - score(a) || raw2.findIndex((x) => x.label === a) - raw2.findIndex((x) => x.label === b));
+      ranked.forEach((l, i) => role.set(l, i === 0 && !hasAgent ? 'agent' : 'customer'));
+    }
+  }
+  const turns = raw2.map((x) => ({ who: role.get(x.label), t: x.t, text: x.text.replace(/\s+/g, ' ').trim() })).filter((x) => x.text);
+  if (!turns.some((x) => x.who === 'agent') || !turns.some((x) => x.who === 'customer')) return { error: 'Both the agent and the customer need lines in the transcript.' };
+  return { turns };
+}
+
+/* ---------- quotes ---------- */
+/** Hide numbers of 4+ digits and emails (accounts, phones, addresses) in a quote. */
+const txMask = (s) => String(s).replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]').replace(/\d[\d\s-]{2,}\d/g, (m) => ((m.match(/\d/g) || []).length >= 4 ? '[number]' : m));
+/** The sentence of a turn that matched, shortened. */
+function txQuote(turn, re) {
+  const sentences = turn.text.split(/(?<=[.!?])\s+/);
+  let s = (re && sentences.find((x) => re.test(x))) || sentences[0] || turn.text;
+  if (re) re.lastIndex = 0;
+  s = txMask(s.trim());
+  if (s.length > 170) s = `${s.slice(0, 167).replace(/\s+\S*$/, '')}…`;
+  return { who: turn.who, t: turn.t, text: s };
+}
+
+/* ---------- the checks ---------- */
+const TX = {
+  opening: /\b(thank(s| you) for (calling|contacting|choosing)|welcome to|my name is|this is \w+ (from|with|at)|how (can|may|could) i (help|assist)|what can i do for you)\b/i,
+  ack: /\b(i (understand|see|hear you|got it)|so (you're|you are|your|the issue)|it sounds like|i see that|thanks? (you )?for (letting me know|explaining|sharing|telling)|just to (confirm|make sure)|if i understand|let me make sure i understand|to make sure i understand)\b/i,
+  empathy: /\b(i('m| am) (so |really |very |truly )?sorry (to hear|that|about|for the|you)|(that|this|it) (must be|sounds|is|has been) (so |really |very |quite |incredibly )?(frustrating|annoying|stressful|difficult|hard|inconvenient|upsetting|disappointing)|i can (only )?(imagine|understand how)|i know how (frustrating|annoying|stressful|hard|important|inconvenient)|i('d| would) (feel|be) the same|that's (not|no) (fun|good)|i completely understand)\b/i,
+  understandOnly: /\bi understand\b/i,
+  emotion: /\b(frustrat\w*|annoy\w*|angry|upset|ridiculous|unacceptable|terrible|horrible|awful|fed up|sick (and tired )?of|tired of|(second|third|fourth|fifth|\d+(st|nd|rd|th)) time|again and again|keeps? (dropping|happening|going (out|down)|disconnecting)|all (day|week|month)|every (day|night)|work(ing)? from home|supervisor|manager|cancel\w*|not happy|disappointed|waste of)\b/i,
+  assurance: /\b(i('ll| will| can|'m going to| am going to) (help|get (this|that|you|it)|fix|take care|sort|make sure|resolve|work on)|we('ll| will) (get|fix|sort|figure|take care)|let's (get|fix|figure|sort|take care)|(you're|you are) in (good|the right) hands|i('ve| have) got (you|this))\b/i,
+  question: /\?/,
+  verifyQ: /\b(how (can|may|could) i (help|assist)|what can i do for you|account number|phone number|last (four|4)|social|pin|passcode|date of birth|address|zip|name on the account|spell|verify|verification|security question|anything else|is there anything|best (number|email)|email address)\b/i,
+  openQ: /^\s*(so,?\s*|and,?\s*|okay,?\s*|ok,?\s*|alright,?\s*)?(what|how|when|where|why|which|tell me|walk me|describe|can you (tell|describe|walk|explain) me|could you (tell|describe|walk|explain))\b/i,
+  closedQ: /^\s*(so,?\s*|and,?\s*|okay,?\s*|ok,?\s*)?(is|are|do|does|did|have|has|can|could|will|would|was|were|should)\b/i,
+  hold: /\b((place|put) (you|the call|your call) on (a )?(brief |quick |short )?hold|on (a )?(brief |quick |short )?hold|hold (on|for)|one moment|bear with me|give me (a|one) (sec|second|moment|minute)|let me (check|look|research|pull)( that| this| into)? (for|while|real quick|quickly)?)\b/i,
+  holdStrong: /\b((place|put) (you|the call|your call) on (a )?(brief |quick |short )?hold|on (a )?(brief |quick |short )?hold)\b/i,
+  permission: /\b((may|can|could) i (place|put) you on (a )?(brief |quick |short )?hold|is it (ok|okay|alright|all right) (if|for me to)|do you mind if i|would it be (ok|okay|alright) (if|to)|would you mind if i)\b/i,
+  estimate: /\b(\d+|a|one|two|three|four|five|couple|few)( of)? (minutes?|mins?|seconds?|secs?|moments?)\b/i,
+  thanksHold: /\b(thank(s| you) (so much )?for (holding|waiting|your patience|being patient|bearing with me)|sorry (for|about) the (wait|hold))\b/i,
+  checkIn: /\b(still (there|with me|working on|checking|looking)|i('m| am) still (working|checking|looking)|just (an )?update|thank you for (continuing to )?hold)/i,
+  silenceMark: /^\s*[[(]\s*(silence|pause|dead air|no response|hold music|music)\b/i,
+  areYouThere: /\b(hello\?|are you (still )?there|you still there|did i lose you|anyone there)\b/i,
+  negative: /\b(i can't|we can't|i cannot|we cannot|won't be able|unable to|not possible|no way|(that's|it's) (our|the|company) policy|you (have|need) to|unfortunately|(it's|that's) not my|there's nothing (i|we) can do)\b/gi,
+  casual: /\b(yeah|yep|yup|nope|gonna|wanna|gotta|dude|bro|buddy|my bad|no worries|cool|totally|whatever|uh-huh|kinda|sorta)\b/gi,
+  sorry: /\b(sorry|apologi[sz]e|apologies)\b/gi,
+  ownership: /\b(i('ll| will) (take care|make sure|personally|handle|follow up|stay with you|get this (fixed|sorted|done|resolved))|i('m| am) going to (fix|take care|handle|make sure|stay)|let me (take care|fix|handle|get this)|i('ll| will) be the one|i('ll| will) own)\b/i,
+  noOwnership: /\b(you('ll| will) (have|need) to call|that's not (my|our) (department|job|area)|i can't help (you )?with|there's nothing i can do|you need to (contact|call|reach out to)|not something (i|we) (handle|do))\b/i,
+  blame: /\b(the (other|last|previous) (agent|rep|representative|person)|another department|(they|someone|whoever) (should have|messed|made a mistake|did it wrong)|not (my|our) fault|that's on them|the system is (bad|terrible|always|so slow|down again))\b/i,
+  guarantee: /\b(i (guarantee|promise)|100 ?%|definitely (will|won't)|this will never happen again|it will (never|definitely)|for sure it will)\b/i,
+  callBack: /\b(call (us )?back (later|tomorrow|in (a|an) (few|couple|hour))|try calling (back|again)|call back when|give us a call back)\b/i,
+  transfer: /\b(transfer(ring)? (you|the call|your call)|(connect|send) you to (the|our|a) (\w+ )?(team|department|specialist))\b/i,
+  transferWhy: /\b(because|the reason|they (can|will|specialize|handle)|the right (team|department|person)|specialist|best (team|people) to)\b/i,
+  troubleshoot: /\b(restart|reboot|reset|unplug|plug (it )?back|refresh|signal|modem|gateway|router|cable box|receiver|wifi|wi-fi|connection|outage|technician|tech visit)\b/i,
+  testFix: /\b(is (it|that|everything|the (internet|service|tv|wifi|connection|box)) (working|back|up|loading|fixed)|working now|can you (check|test|try|confirm|see if)|did (that|it) (work|fix|help|resolve)|is that (better|working)|(go ahead and|please) (test|try|check|open|load)|confirm (it|that|the) (works|is working))\b/i,
+  timeframe: /\b((within|in) (\d+|a|an|one|two|three|24|48|72) (hours?|days?|business days?|minutes|weeks?)|by (tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday|end of (the )?(day|week))|(technician|tech) will (arrive|come|be there)|you('ll| will) (receive|get|see) (a|an|the|your)|next (bill|billing cycle|statement))\b/i,
+  anythingElse: /\b(anything else|is there (anything|something) (else|more)|any other (questions|concerns))\b/i,
+  closingWords: /\b(thank(s| you) for (calling|contacting|choosing|your time|being)|have a (great|nice|good|wonderful|lovely)|take care|enjoy (your|the rest))\b/i,
+  education: /\b(next time|in the future|you can (also )?(use|check|do this|reset|restart|go to|manage)|(xfinity|the|our) app|self[- ]service|my account|online at)\b/i,
+  offer: /\b(would you (be interested|like to (hear|add|upgrade))|we (have|offer|currently have) (a|an|some) (promotion|promo|deal|offer|discount)|i can (offer|add|upgrade|get you)|upgrade|better (deal|plan|speed))\b/i,
+  custName: /\b(?:[Mm]y name is|[Tt]his is|[Ii]t's|[Ii]t is|I'm|I am)\s+([A-Z][a-z]{2,})\b/,
+  agentAsksName: /\b(?:am i speaking with|is this|speaking with|talking to)\s+(?:mr\.?|mrs\.?|ms\.?|miss)?\s*([A-Z][a-z]{2,})\b/,
+};
+const TX_SPEECH_WPS = 2.6; // spoken words per second, to tell talk time from silence between timed lines
+
+/** Run every check. Returns { went, better, checks, stats }. */
+function txAnalyze(turns) {
+  const A = turns.filter((x) => x.who === 'agent');
+  const C = turns.filter((x) => x.who === 'customer');
+  const went = [];
+  const better = [];
+  const checks = [];
+  const add = (list, id, weight, why, quotes) => {
+    const have = list.find((x) => x.id === id);
+    if (have) {
+      have.weight = Math.max(have.weight, weight);
+      return;
+    }
+    list.push({ id, weight, why, quotes: (quotes || []).filter(Boolean).slice(0, 2) });
+  };
+  const check = (label, status, note) => checks.push({ label, status, note });
+  const first = (list, re) => list.find((x) => re.test(x.text));
+  const all = (list, re) => list.filter((x) => re.test(x.text));
+  const countIn = (list, re) => list.reduce((n, x) => n + (x.text.match(re) || []).length, 0);
+  const firstAgent = A.slice(0, 2);
+  const early = A.slice(0, Math.max(4, Math.ceil(A.length * 0.3)));
+  const late = A.slice(-3);
+
+  /* Opening */
+  const openHits = firstAgent.reduce((n, x) => n + (x.text.match(new RegExp(TX.opening.source, 'gi')) || []).length, 0);
+  const openTurn = first(firstAgent, TX.opening);
+  if (openHits >= 2) {
+    add(went, 's-opening', 2, 'Opened with a greeting and an offer to help.', [txQuote(openTurn, TX.opening)]);
+    check('Call opening', 'good', 'Greeting and offer to help');
+  } else if (openHits === 0) {
+    add(better, 'com-opening', 2, 'No greeting, name or offer to help in the first lines.', [txQuote(A[0])]);
+    check('Call opening', 'bad', 'No greeting or offer to help');
+  } else check('Call opening', 'ok', 'Partly there');
+
+  /* Customer name */
+  let name = '';
+  for (const x of C.slice(0, 6)) {
+    const m = x.text.match(TX.custName);
+    if (m && !/^(calling|having|trying|just|not|very|really|so|here|good|fine|okay|still|sorry)$/i.test(m[1])) {
+      name = m[1];
+      break;
+    }
+  }
+  if (!name) for (const x of A.slice(0, 6)) {
+    const m = x.text.match(TX.agentAsksName);
+    if (m) {
+      name = m[1];
+      break;
+    }
+  }
+  if (name) {
+    const nameRe = new RegExp(`\\b${name}\\b`, 'i');
+    const used = A.filter((x) => nameRe.test(x.text));
+    if (used.length >= 2) {
+      add(went, 's-rapport', 1, `Used the customer's name (${used.length} times).`, [txQuote(used[used.length - 1], nameRe)]);
+      check("Customer's name", 'good', `Used ${used.length} times`);
+    } else if (used.length === 0) {
+      add(better, 'com-customer-name', 1, `The customer gave their name (${name}), and it was never used.`, []);
+      check("Customer's name", 'bad', 'Never used');
+    } else check("Customer's name", 'ok', 'Used once');
+  } else check("Customer's name", 'na', 'Name not found in the transcript');
+
+  /* Acknowledgement */
+  const ack = first(early, TX.ack);
+  if (ack) {
+    add(went, 's-acknowledgement', 2, 'Acknowledged the concern early.', [txQuote(ack, TX.ack)]);
+    check('Acknowledgement', 'good', 'Early in the call');
+  } else {
+    const issue = C.slice(0, 4).filter((x) => !/\d{4}/.test(x.text)).sort((x, y) => txWords(y.text) - txWords(x.text))[0] || C[0];
+    add(better, 'com-missing-acknowledgement', 2, 'No acknowledgement of the concern in the first part of the call.', [txQuote(issue)]);
+    check('Acknowledgement', 'bad', 'Not found early in the call');
+  }
+
+  /* Empathy, against what the customer felt */
+  const feel = first(C, TX.emotion);
+  const emp = all(A, TX.empathy);
+  const understandN = countIn(A, new RegExp(TX.understandOnly.source, 'gi'));
+  if (emp.length) {
+    add(went, 's-empathy', feel ? 3 : 2, feel ? 'Answered how the customer felt with empathy.' : 'Showed empathy.', [txQuote(emp[0], TX.empathy)]);
+    check('Empathy', 'good', feel ? 'Customer was upset, agent responded' : 'Present');
+  } else if (feel) {
+    if (understandN >= 3) {
+      add(better, 'com-generic-empathy', 2, `The customer was upset; the only empathy was "I understand" (${understandN} times).`, [txQuote(feel, TX.emotion)]);
+      check('Empathy', 'bad', 'Only "I understand"');
+    } else {
+      add(better, 'com-missing-empathy', 3, 'The customer showed frustration and the agent did not respond to it.', [txQuote(feel, TX.emotion)]);
+      check('Empathy', 'bad', 'Customer upset, no empathy');
+    }
+  } else check('Empathy', 'na', 'Customer did not sound upset');
+
+  /* Assurance */
+  const assure = first(A.slice(0, Math.max(6, Math.ceil(A.length * 0.4))), TX.assurance);
+  if (assure) {
+    add(went, 's-assurance', 2, 'Told the customer early that they would help.', [txQuote(assure, TX.assurance)]);
+    check('Assurance', 'good', 'Early');
+  } else if (!first(A, TX.assurance)) {
+    add(better, 'com-weak-assurance', 1, 'No clear "I will help you" or "let\'s get this fixed".', []);
+    check('Assurance', 'bad', 'Not found');
+  } else check('Assurance', 'ok', 'Late in the call');
+
+  /* Probing */
+  const qs = [];
+  A.forEach((x) => x.text.split(/(?<=[.!?])\s+/).forEach((sen) => {
+    if (TX.question.test(sen) && !TX.verifyQ.test(sen)) qs.push({ turn: x, sen });
+  }));
+  const openQs = qs.filter((q) => TX.openQ.test(q.sen));
+  const closedQs = qs.filter((q) => !TX.openQ.test(q.sen) && TX.closedQ.test(q.sen));
+  if (openQs.length >= 2) {
+    add(went, 's-probing', 2, `Asked ${openQs.length} open questions to understand the issue.`, [{ who: 'agent', t: openQs[0].turn.t, text: txMask(openQs[0].sen) }]);
+    check('Probing questions', 'good', `${qs.length} questions, ${openQs.length} open`);
+  } else if (qs.length === 0) {
+    add(better, 'dis-missing-probing', 3, 'No questions about the issue before acting.', []);
+    check('Probing questions', 'bad', 'None');
+  } else if (qs.length <= 2) {
+    add(better, 'dis-insufficient-probing', 2, `Only ${plural(qs.length, 'question')} about the issue.`, [{ who: 'agent', t: qs[0].turn.t, text: txMask(qs[0].sen) }]);
+    check('Probing questions', 'bad', `${qs.length} only`);
+  } else if (closedQs.length >= 3 && openQs.length === 0) {
+    add(better, 'dis-closed-questions', 2, `${closedQs.length} yes/no questions and no open ones.`, [{ who: 'agent', t: closedQs[0].turn.t, text: txMask(closedQs[0].sen) }]);
+    check('Probing questions', 'bad', 'Only yes/no questions');
+  } else check('Probing questions', 'ok', `${qs.length} questions`);
+
+  /* Hold */
+  const holds = all(A, TX.holdStrong).length ? all(A, TX.holdStrong) : all(A, TX.hold).filter((x) => /\b(hold|moment|bear with me|sec|second|minute)\b/i.test(x.text));
+  if (holds.length) {
+    const asked = holds.some((x) => TX.permission.test(x.text));
+    const timed = holds.some((x) => TX.estimate.test(x.text));
+    const thanked = first(A, TX.thanksHold);
+    if (asked && timed) {
+      add(went, 's-hold', 2, 'Asked before the hold and said how long it would take.', [txQuote(holds.find((x) => TX.permission.test(x.text)), TX.permission)]);
+      check('Hold', 'good', `Permission and time given${thanked ? ', thanked after' : ''}`);
+    } else {
+      if (!asked) add(better, 'hold-no-permission', 2, 'Placed the customer on hold without asking first.', [txQuote(holds[0], TX.hold)]);
+      if (!timed) add(better, 'hold-no-estimate', 1, 'No time given for the hold.', [txQuote(holds[0], TX.hold)]);
+      check('Hold', 'bad', [!asked ? 'no permission' : '', !timed ? 'no time given' : ''].filter(Boolean).join(', '));
+    }
+  } else check('Hold', 'na', 'No hold in the call');
+
+  /* Silence: from times, from [silence] marks, and from "are you there?" */
+  const timed = turns.filter((x) => x.t != null);
+  const gaps = [];
+  let holdOpen = null;
+  if (timed.length >= 4) {
+    for (let i = 0; i < turns.length - 1; i++) {
+      const a = turns[i];
+      const b = turns[i + 1];
+      if (a.who === 'agent' && TX.hold.test(a.text)) holdOpen = a;
+      if (a.t == null || b.t == null || b.t <= a.t) continue;
+      const gap = b.t - a.t - txWords(a.text) / TX_SPEECH_WPS;
+      if (gap < 20) continue;
+      gaps.push({ at: a, next: b, gap: Math.round(gap), hold: !!holdOpen });
+      if (holdOpen && b.who === 'agent') holdOpen = null;
+    }
+  }
+  const deadAir = gaps.filter((g) => !g.hold && g.gap >= 25);
+  const longHolds = gaps.filter((g) => g.hold && g.gap >= 120);
+  const marks = turns.filter((x) => TX.silenceMark.test(x.text));
+  const there = first(C, TX.areYouThere);
+  if (deadAir.length) {
+    const worst = deadAir.slice().sort((x, y) => y.gap - x.gap)[0];
+    add(better, 'hold-dead-air', deadAir.length >= 2 ? 3 : 2, `${plural(deadAir.length, 'silence')} of 25 seconds or more without a hold, the longest about ${worst.gap} seconds at ${txClock(worst.at.t)}.`, [txQuote(worst.at), txQuote(worst.next)]);
+    check('Silence', 'bad', `${deadAir.length} long silences`);
+  } else if (there) {
+    add(better, marks.length ? 'hold-dead-air' : 'hold-unexplained-silence', 2, 'The customer had to ask if the agent was still there.', [txQuote(there, TX.areYouThere)]);
+    check('Silence', 'bad', 'Customer asked "are you there?"');
+  } else if (marks.length) {
+    add(better, 'hold-dead-air', 1, `${plural(marks.length, 'silence')} marked in the transcript.`, [txQuote(marks[0])]);
+    check('Silence', 'bad', 'Marked in the transcript');
+  } else check('Silence', timed.length >= 4 ? 'good' : 'na', timed.length >= 4 ? 'No long silences' : 'No times in the transcript to measure');
+  if (longHolds.length) {
+    const checked = A.some((x) => TX.checkIn.test(x.text));
+    if (checked) add(went, 's-hold-checkin', 1, 'Came back during a long hold.', [txQuote(first(A, TX.checkIn), TX.checkIn)]);
+    else add(better, 'hold-no-updates', 2, `A hold of about ${Math.round(longHolds[0].gap / 60)} minutes with no check-back.`, [txQuote(longHolds[0].at)]);
+  }
+
+  /* Listening: the customer repeating themselves, being cut off */
+  const repeat = first(C, /\b(i (already|just) (told|said|gave|explained)|as i (said|told you|mentioned)|like i (said|told you)|i said that|you('re| are) not listening|let me finish|can i finish)\b/i);
+  const cut = turns.filter((x, i) => x.who === 'customer' && /(--|—|…|\.\.\.)\s*$/.test(x.text) && turns[i + 1] && turns[i + 1].who === 'agent').length;
+  if (repeat) {
+    const notListening = /not listening|let me finish|can i finish/i.test(repeat.text);
+    add(better, notListening ? 'com-interrupting' : 'com-repeating-questions', 2, notListening ? 'The customer asked to be heard out.' : 'The customer had to repeat information.', [txQuote(repeat)]);
+    check('Listening', 'bad', 'Customer had to repeat or asked to finish');
+  } else if (cut >= 2) {
+    add(better, 'com-interrupting', 2, `The customer was cut off ${cut} times.`, []);
+    check('Listening', 'bad', `Cut off ${cut} times`);
+  } else check('Listening', 'good', 'No repeats or cut-offs');
+
+  /* Language */
+  const neg = countIn(A, TX.negative);
+  if (neg >= 3) {
+    add(better, 'com-negative-language', 2, `${neg} "can't / unfortunately / you have to" phrases.`, [txQuote(first(A, new RegExp(TX.negative.source, 'i')), new RegExp(TX.negative.source, 'i'))]);
+    check('Positive language', 'bad', `${neg} negative phrases`);
+  } else check('Positive language', 'good', neg ? `${neg} negative phrase${neg > 1 ? 's' : ''}` : 'None negative');
+  const cas = countIn(A, TX.casual);
+  if (cas >= 3) {
+    add(better, 'com-casual-language', 1, `${cas} casual words (yeah, gonna, no worries).`, [txQuote(first(A, new RegExp(TX.casual.source, 'i')), new RegExp(TX.casual.source, 'i'))]);
+    check('Professional language', 'bad', `${cas} casual words`);
+  } else check('Professional language', 'good', 'Professional');
+  const sorry = countIn(A, TX.sorry);
+  if (sorry >= 4) {
+    add(better, 'com-over-apologizing', 1, `Apologized ${sorry} times.`, []);
+    check('Apologies', 'bad', `${sorry} apologies`);
+  }
+
+  /* Ownership */
+  const own = first(A, TX.ownership);
+  const noOwn = first(A, TX.noOwnership);
+  if (noOwn) {
+    add(better, 'own-lack-ownership', 3, 'Sent the customer somewhere else instead of owning it.', [txQuote(noOwn, TX.noOwnership)]);
+    check('Ownership', 'bad', 'Pushed the customer elsewhere');
+  } else if (own) {
+    add(went, 's-ownership', 2, 'Took ownership of the issue.', [txQuote(own, TX.ownership)]);
+    check('Ownership', 'good', 'Owned it');
+  } else check('Ownership', 'ok', 'No clear ownership line');
+  const blame = first(A, TX.blame);
+  if (blame) add(better, 'own-blaming-others', 2, 'Blamed someone else or the system.', [txQuote(blame, TX.blame)]);
+  const promise = first(A, TX.guarantee);
+  if (promise) add(better, 'own-unsupported-guarantees', 2, 'Promised something that cannot be guaranteed.', [txQuote(promise, TX.guarantee)]);
+  const later = first(A, TX.callBack);
+  if (later) add(better, 'own-call-back-later', 2, 'Asked the customer to call back.', [txQuote(later, TX.callBack)]);
+  const xfer = first(A, TX.transfer);
+  if (xfer) {
+    const i = A.indexOf(xfer);
+    const why = [A[i - 1], xfer, A[i + 1]].some((x) => x && TX.transferWhy.test(x.text));
+    if (why) add(went, 's-transfer', 1, 'Explained why the call was being transferred.', [txQuote(xfer, TX.transfer)]);
+    else add(better, 'own-transfer-process', 1, 'Transferred without explaining why.', [txQuote(xfer, TX.transfer)]);
+    check('Transfer', why ? 'good' : 'bad', why ? 'Reason explained' : 'No reason given');
+  }
+
+  /* Resolution */
+  const fixing = A.some((x) => TX.troubleshoot.test(x.text));
+  const tested = first(A.slice(Math.floor(A.length / 3)), TX.testFix);
+  if (tested) {
+    add(went, 's-tested-fix', 2, 'Had the customer confirm the fix worked.', [txQuote(tested, TX.testFix)]);
+    check('Confirmed the fix', 'good', 'Tested with the customer');
+  } else if (fixing) {
+    add(better, 'own-confirm-resolution', 2, 'Troubleshot the issue but did not confirm it was fixed.', []);
+    check('Confirmed the fix', 'bad', 'Not confirmed');
+  } else check('Confirmed the fix', 'na', 'No troubleshooting in the call');
+  const when = first(A, TX.timeframe);
+  if (when) {
+    add(went, 's-timeframe', 1, 'Gave a clear timeframe.', [txQuote(when, TX.timeframe)]);
+    check('Expectations', 'good', 'Timeframe given');
+  } else if (A.some((x) => /\b(soon|shortly|a while|at some point|eventually)\b/i.test(x.text))) {
+    add(better, 'own-expectation-setting', 1, 'Said "soon" or "shortly" without a timeframe.', [txQuote(first(A, /\b(soon|shortly|a while|at some point|eventually)\b/i), /\b(soon|shortly|a while|at some point|eventually)\b/i)]);
+    check('Expectations', 'bad', 'Vague timeframe');
+  } else check('Expectations', 'na', 'No timeframe needed');
+  const teach = first(A, TX.education);
+  if (teach) add(went, 's-education', 1, 'Showed the customer how to handle it next time.', [txQuote(teach, TX.education)]);
+  const offer = first(A, TX.offer);
+  if (offer) add(went, 's-relevant-offer', 1, 'Made an offer.', [txQuote(offer, TX.offer)]);
+
+  /* Closing */
+  const lastBits = late.map((x) => x.text).join(' ');
+  const closeHits = (TX.anythingElse.test(lastBits) ? 1 : 0) + (TX.closingWords.test(lastBits) ? 1 : 0);
+  if (closeHits === 2) {
+    add(went, 's-closing', 2, 'Offered more help and closed warmly.', [txQuote(first(late, TX.closingWords), TX.closingWords)]);
+    check('Call closing', 'good', 'Anything else, and a warm close');
+  } else if (closeHits === 0) {
+    add(better, 'com-closing', 2, 'No "anything else?" and no closing.', [txQuote(A[A.length - 1])]);
+    check('Call closing', 'bad', 'No closing');
+  } else check('Call closing', 'ok', TX.anythingElse.test(lastBits) ? 'Asked "anything else?", no warm close' : 'Warm close, no "anything else?"');
+
+  /* Talk numbers */
+  const aw = A.reduce((n, x) => n + txWords(x.text), 0);
+  const cw = C.reduce((n, x) => n + txWords(x.text), 0);
+  const len = timed.length >= 2 ? timed[timed.length - 1].t - timed[0].t : null;
+  const stats = { turns: turns.length, agentPct: aw + cw ? Math.round((aw / (aw + cw)) * 100) : 0, questions: qs.length, length: len };
+
+  /* Only behaviors the library has; strongest first. */
+  const real = (list, get) => list.filter((x) => get(x.id)).sort((x, y) => y.weight - x.weight);
+  return { went: real(went, getStrength), better: real(better, getOpp), checks, stats };
+}
+
+/* ---------- actions ---------- */
+function txRun() {
+  const p = txParse(txUi.text);
+  txUi.error = p.error || '';
+  txUi.result = p.error ? null : txAnalyze(p.turns);
+  if (txUi.result) {
+    /* Pre-tick the three strongest went-wells and the two strongest opportunities (the focus rule). */
+    txUi.pickS = new Set(txUi.result.went.slice(0, 3).map((x) => x.id));
+    txUi.pickO = new Set(txUi.result.better.slice(0, FOCUS_MAX).map((x) => x.id));
+  }
+  refresh({ panel: false });
+  if (txUi.result) setTimeout(() => { const el = document.querySelector('[data-fk="tx-results"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+}
+
+function txEvidence(r) {
+  const fmt = (q) => `"${q.text}"${q.t != null ? ` (${txClock(q.t)})` : ''}`;
+  const lines = ['From the call transcript:'];
+  r.went.filter((x) => txUi.pickS.has(x.id)).forEach((x) => lines.push(`- Went well, ${getStrength(x.id).title}: ${x.why}${x.quotes[0] ? ` ${fmt(x.quotes[0])}` : ''}`));
+  r.better.filter((x) => txUi.pickO.has(x.id)).forEach((x) => lines.push(`- To improve, ${getOpp(x.id).title}: ${x.why}${x.quotes[0] ? ` ${fmt(x.quotes[0])}` : ''}`));
+  return lines.join('\n');
+}
+
+async function txBuild() {
+  const r = txUi.result;
+  if (!r) return;
+  const m = EXT.memberById(txUi.member);
+  if (!m) return toast('Pick the agent first.', { type: 'warn' });
+  const opps = r.better.filter((x) => txUi.pickO.has(x.id)).map((x) => x.id);
+  const strengths = r.went.filter((x) => txUi.pickS.has(x.id)).map((x) => x.id);
+  if (!opps.length && !strengths.length) return toast('Tick at least one item.', { type: 'warn' });
+  const kpi = (opps.map((id) => getOpp(id)).flatMap((o) => o.kpi || []).find((k) => COACH_KPIS.includes(k))) || 'tNPS';
+  if (!(await vcBuilderFor(m, kpi))) return;
+  const b = state.builder;
+  strengths.forEach((id) => {
+    if (!b.strengths.some((s) => s.id === id)) b.strengths.push({ id, v: 0 });
+  });
+  const parked = opps.map((id) => addOppToBuilder(id)).filter((x) => x === 'parked').length;
+  vcAppendEvidence(txEvidence(r));
+  vcFinishBuilder(m);
+  const focusN = opps.length - parked;
+  const parts = [strengths.length ? `${plural(strengths.length, 'thing')} went well` : '', focusN ? `${plural(focusN, 'focus behavior')} with feedback and the action plan` : '', parked ? `${parked} parked for the next session` : ''].filter(Boolean);
+  toast(`Coaching for ${memberLabel(m)}: ${joinList(parts)}. The quotes are in the evidence.${focusN ? '' : ' Add one behavior in the Builder for the action plan.'}`, { duration: 9000 });
+}
+
+/* ---------- the page ---------- */
+function txItem(x, kind) {
+  const isS = kind === 's';
+  const def = isS ? getStrength(x.id) : getOpp(x.id);
+  const set = isS ? txUi.pickS : txUi.pickO;
+  const on = set.has(x.id);
+  const idx = isS ? null : [...txUi.result.better.filter((y) => txUi.pickO.has(y.id))].findIndex((y) => y.id === x.id);
+  const box = h('input', { type: 'checkbox', class: 'tx-item__box', checked: on, 'data-fk': `tx-${kind}:${x.id}`, 'aria-label': `Use ${def.title}` });
+  box.addEventListener('change', () => {
+    if (box.checked) set.add(x.id);
+    else set.delete(x.id);
+    refresh({ panel: false });
+  });
+  return h(
+    'li',
+    { class: `tx-item tx-item--${isS ? 'good' : 'bad'}${on ? ' is-on' : ''}` },
+    h(
+      'label',
+      { class: 'tx-item__head' },
+      box,
+      h('span', { class: 'tx-item__title' }, def.title),
+      !isS && on ? h('span', { class: `tx-tag${idx < FOCUS_MAX ? ' is-focus' : ''}` }, idx < FOCUS_MAX ? 'Focus' : 'Parked') : null
+    ),
+    h('p', { class: 'tx-item__why' }, x.why),
+    x.quotes.length ? h('ul', { class: 'tx-quotes' }, x.quotes.map((q) => h('li', { class: `tx-q tx-q--${q.who}` }, h('span', { class: 'tx-q__who' }, `${q.who === 'agent' ? 'Agent' : 'Customer'}${q.t != null ? ` · ${txClock(q.t)}` : ''}`), h('span', { class: 'tx-q__t' }, `“${q.text}”`)))) : null
+  );
+}
+
+function txRender(main) {
+  const members = state.team.members.slice().sort((a, b) => memberLabel(a).localeCompare(memberLabel(b)));
+  if (!txUi.member && state.builder.agent && EXT.memberById(state.builder.agent)) txUi.member = state.builder.agent;
+  const sel = h('select', { class: 'select', id: 'tx-agent', 'data-fk': 'tx-agent' }, h('option', { value: '' }, 'Choose the agent'), members.map((m) => h('option', { value: m.id, selected: m.id === txUi.member }, memberLabel(m))));
+  sel.addEventListener('change', () => (txUi.member = sel.value));
+  const area = h('textarea', { class: 'textarea tx-area', id: 'tx-text', rows: '12', spellcheck: 'false', 'data-fk': 'tx-text', placeholder: 'Agent: Thank you for calling Xfinity, my name is Sara. How can I help you today?\nCustomer: My internet keeps dropping, this is the third time this week.\nAgent: I am so sorry to hear that, I know how frustrating that is. Let\'s get it fixed...' });
+  area.value = txUi.text;
+  area.addEventListener('input', () => (txUi.text = area.value));
+  const run = h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'tx-run', onclick: () => { txUi.text = area.value; txRun(); } }, icon('sparkle'), 'Analyze the call');
+  const clear = h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'tx-clear', onclick: () => { txUi = { ...txUi, text: '', result: null, error: '', pickS: new Set(), pickO: new Set() }; refresh({ panel: false }); } }, icon('x'), 'Clear');
+  const input = h(
+    'section',
+    { class: 'card kt-card rta-card tx-card', 'aria-labelledby': 'tx-in' },
+    h('div', { class: 'kt-head' }, h('div', null, h('h2', { class: 'kt-title', id: 'tx-in' }, icon('note'), 'Paste the transcript'), h('p', { class: 'kt-sub' }, 'Lines that start with "Agent:" and "Customer:" work best. Times like [00:01:23] let the page find long silences.'))),
+    h('div', { class: 'tx-form' }, h('label', { class: 'field rta-field', for: 'tx-agent' }, h('span', { class: 'field__label' }, 'Agent'), sel)),
+    area,
+    txUi.error ? h('p', { class: 'notice', role: 'alert' }, icon('alert'), h('span', { class: 'notice__body' }, txUi.error)) : null,
+    h('div', { class: 'tx-actions' }, run, txUi.text || txUi.result ? clear : null, h('span', { class: 'tx-private' }, icon('lock', 'icon--sm'), 'Read in this browser only. Not saved, not sent anywhere.'))
+  );
+
+  const r = txUi.result;
+  let out = null;
+  if (r) {
+    const st = r.stats;
+    const stat = (label, val) => h('div', { class: 'tx-stat' }, h('span', { class: 'tx-stat__v' }, val), h('span', { class: 'tx-stat__l' }, label));
+    const nS = r.went.filter((x) => txUi.pickS.has(x.id)).length;
+    const nO = r.better.filter((x) => txUi.pickO.has(x.id)).length;
+    const statusIcon = { good: 'check', bad: 'alert', ok: 'info', na: 'more' };
+    out = h(
+      'section',
+      { class: 'card kt-card rta-card tx-card', 'aria-labelledby': 'tx-out', 'data-fk': 'tx-results' },
+      h(
+        'div',
+        { class: 'kt-head' },
+        h('div', null, h('h2', { class: 'kt-title', id: 'tx-out' }, icon('clipboard'), 'What the call shows'), h('p', { class: 'kt-sub' }, 'Tick what to coach. The page reads words, not tone, so check the picks against the call.')),
+        h('div', { class: 'kt-actions' }, h('button', { type: 'button', class: 'btn btn--primary', 'data-fk': 'tx-build', disabled: !nS && !nO, onclick: txBuild }, icon('arrow-right'), 'Build coaching and action plan'))
+      ),
+      h('div', { class: 'tx-stats' }, stat('Lines', String(st.turns)), st.length != null ? stat('Call length', txClock(st.length)) : null, stat('Agent talk', `${st.agentPct}%`), stat('Questions asked', String(st.questions))),
+      h(
+        'div',
+        { class: 'tx-cols' },
+        h('div', { class: 'tx-col' }, h('h3', { class: 'tx-col__t tx-col__t--good' }, icon('thumb'), 'Things went well', h('span', { class: 'tx-count' }, `${nS} of ${r.went.length}`)), r.went.length ? h('ul', { class: 'tx-list' }, r.went.map((x) => txItem(x, 's'))) : h('p', { class: 'si-muted' }, 'Nothing clear in the words. Add strengths in the Builder.')),
+        h('div', { class: 'tx-col' }, h('h3', { class: 'tx-col__t tx-col__t--bad' }, icon('target'), 'Should be better', h('span', { class: 'tx-count' }, `${nO} of ${r.better.length}`)), r.better.length ? h('ul', { class: 'tx-list' }, r.better.map((x) => txItem(x, 'o'))) : h('p', { class: 'si-muted' }, 'No gaps found in the words. Listen to the call for tone and accuracy.'))
+      ),
+      nO > FOCUS_MAX ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, `${focusRuleText()} The first ${FOCUS_MAX} ticked become the focus with the action plan.`)) : null,
+      h(
+        'details',
+        { class: 'tx-checks' },
+        h('summary', null, `What the page checked (${r.checks.length})`),
+        h('ul', { class: 'tx-checklist' }, r.checks.map((c) => h('li', { class: `tx-check is-${c.status}` }, icon(statusIcon[c.status], 'icon--sm'), h('span', { class: 'tx-check__l' }, c.label), h('span', { class: 'tx-check__n' }, c.note))))
+      )
+    );
+  }
+  put(main, pageHead({ eyebrow: 'Coaching', title: 'Transcript to coaching', sub: 'Paste a call transcript. The page finds what went well and what should be better, then builds the coaching with feedback and a SMART action plan.' }), h('div', { class: 'tx-page' }, input, out));
+}
+
+EXT.view('transcript', { title: 'Transcript to coaching', label: 'Transcript to coaching', icon: 'note', render: txRender });
+/* It sits in the Coaching group, right after Call Review. */
+const _txBuildNav = shellBuildNav;
+shellBuildNav = function () {
+  const nav = _txBuildNav();
+  const item = nav.querySelector(':scope > .nav__item[data-fk="nav:transcript:"]');
+  const review = nav.querySelector(':scope > .nav__item[data-fk="nav:call-review:"]');
+  if (item && review) {
+    review.after(item);
+    const insights = Array.from(nav.querySelectorAll(':scope > .nav__section')).find((s) => /^insights$/i.test(s.textContent.trim()));
+    if (insights) {
+      const next = insights.nextElementSibling;
+      if (!next || next.classList.contains('nav__section')) insights.remove();
+    }
+  }
+  return nav;
+};
+
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
 
