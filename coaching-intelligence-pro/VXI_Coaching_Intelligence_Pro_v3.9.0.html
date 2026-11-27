@@ -6270,6 +6270,23 @@ input[type="checkbox"]:checked:focus:not(:focus-visible) { animation: btn-pop 0.
 .tx-callrow__s.is-bad { color: #C2410C; }
 .tx-callrow .tx-risk__badge { font-size: 0.72rem; padding: 2px 8px; text-align: center; }
 .tx-callrow__n { color: var(--text-2); }
+.tx-plan { margin: 0 0 18px; border-top: 4px solid var(--accent); }
+.tx-planlist { display: grid; gap: 10px; margin: 0 0 12px; padding: 0; list-style: none; }
+.tx-planrow { padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: color-mix(in srgb, var(--text) 2%, var(--surface)); }
+.tx-planrow__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tx-planrow__t { font-weight: 750; }
+.tx-verdict { padding: 3px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 800; white-space: nowrap; }
+.tx-verdict.is-good { background: var(--success-soft); color: var(--success); }
+.tx-verdict.is-bad { background: color-mix(in srgb, #C2410C 14%, transparent); color: #C2410C; }
+.tx-verdict.is-ok { background: var(--warning-soft); color: var(--warning); }
+.tx-verdict.is-na { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text-2); }
+.tx-planrow__why { margin: 6px 0 0; font-size: 0.86rem; color: var(--text); }
+.tx-planrow__ba { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 6px 0 0; font-size: 0.8rem; color: var(--text-2); }
+.tx-plan__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tx-plan__ok { display: inline-flex; align-items: center; gap: 6px; color: var(--success); font-weight: 700; font-size: 0.86rem; }
+.tx-before { margin: 10px 0; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 0.86rem; }
+.tx-before__t { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; font-weight: 750; color: var(--text-2); }
+.tx-before ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
 .tx-fromcalls { margin: 0 0 18px; }
 .tx-fcrow { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--text) 3%, transparent); font-size: 0.88rem; }
 .tx-fcrow__t { font-weight: 750; }
@@ -7603,7 +7620,7 @@ const DATA = {"meta":{"categories":[{"id":"com","nav":"Communication","label":"C
    00-core: constants, DOM helpers, text helpers
    ========================================================================== */
 
-const APP_VERSION = '3.8.0';
+const APP_VERSION = '3.9.0';
 const META = DATA.meta;
 const GUIDES = DATA.guides;
 const CATS = META.categories;
@@ -24895,9 +24912,10 @@ openLogDialog = function (planId, kind, opts = {}) {
   // Updating a call review already logged from the same Call Review: same log, same place in the count.
   const replacing = kind === 'call' && opts.replace && p.logs.includes(opts.replace) ? opts.replace : null;
   const replacingNth = replacing ? p.logs.filter((l) => l.kind === 'call').indexOf(replacing) + 1 : 0;
-  const date = h('input', { class: 'input', id: 'tr-date', type: 'date', value: replacing ? replacing.date : todayDay(), min: p.start, max: todayDay() });
+  const date = h('input', { class: 'input', id: 'tr-date', type: 'date', value: replacing ? replacing.date : isIsoDate(opts.date) && opts.date >= p.start && opts.date <= todayDay() ? opts.date : todayDay(), min: p.start, max: todayDay() });
   const note = h('textarea', { class: 'textarea', id: 'tr-note', rows: '2', maxlength: '300', placeholder: 'Optional and private. Never copied into coaching text.' });
   if (replacing && replacing.note) note.value = replacing.note;
+  else if (opts.note) note.value = String(opts.note).slice(0, 300);
   const noteWarn = h('div');
   note.addEventListener('input', () => {
     noteWarn.replaceChildren();
@@ -38825,6 +38843,183 @@ function txPatternCard() {
   );
 }
 
+
+/* ---------- follow-up: check a coached agent's next calls against the plan ---------- */
+/* Which check on the page judges each behavior, when it is not in the findings themselves. */
+const TXJ = {
+  'com-opening': 'Call opening', 'com-customer-name': "Customer's name", 'com-missing-acknowledgement': 'Acknowledgement',
+  'com-missing-empathy': 'Empathy', 'com-generic-empathy': 'Empathy', 'com-weak-assurance': 'Assurance',
+  'dis-missing-probing': 'Probing questions', 'dis-insufficient-probing': 'Probing questions', 'dis-closed-questions': 'Probing questions',
+  'dis-issue-start': 'Discovery: When it started', 'dis-issue-scope': 'Discovery: Which devices', 'dis-prior-troubleshooting': 'Discovery: What was already tried',
+  'dis-recent-changes': 'Discovery: What changed recently', 'dis-error-details': 'Discovery: What they see',
+  'hold-no-permission': 'Hold', 'hold-no-estimate': 'Hold', 'hold-dead-air': 'Silence', 'hold-unexplained-silence': 'Silence',
+  'com-interrupting': 'Listening', 'com-repeating-questions': 'Listening', 'com-active-listening': 'Listening',
+  'com-negative-language': 'Positive language', 'com-casual-language': 'Professional language', 'com-over-apologizing': 'Apologies',
+  'own-lack-ownership': 'Ownership', 'own-confirm-resolution': 'Confirmed the fix', 'own-premature-resolution': 'Confirmed the fix',
+  'own-expectation-setting': 'Expectations', 'com-closing': 'Call closing', 'own-repeat-contacts': 'Repeat caller',
+  'tech-knowledge-gap': 'Sure of the information', 'tech-explanations': 'Clear explanation', 'tech-reboot-only': 'Diagnosis',
+  'own-incomplete-education': 'Self-service and education', 'own-missing-followup': 'Follow-up on pending work', 'own-objections': 'Customer convinced',
+  'own-transfer-process': 'Transfer', 'sales-plant-seed': 'Sales: Plant the seed', 'sales-missing-offer': 'Sales: Offer',
+  'sales-missing-discovery': 'Sales: Sales discovery', 'sales-offer-value': 'Sales: Value', 'sales-weak-objection': 'Sales: Objection handling',
+  'sales-closing': 'Sales: Close', 'integrity-pressure-after-no': 'Sales: Respected a no', 'integrity-no-verbal-consent': 'Consent',
+  'integrity-assumed-consent': 'Consent', 'integrity-promo-term-disclosure': 'Promo terms', 'integrity-no-order-recap': 'Order recap',
+  'sales-pricing-disclosure': 'Price given', 'sales-retention': 'Sales: Retention', 'bill-cancellation-risk': 'Sales: Retention',
+};
+/** Met / not met / not seen for one plan behavior on the analyzed call, with the reason. */
+function txVerdict(r, oppId) {
+  const gap = r.better.find((x) => x.id === oppId);
+  if (gap) return { pick: 'miss', why: gap.why, quote: gap.quotes[0] || null };
+  const opp = (DATA.meta.opposites || {})[oppId] || [];
+  const good = r.went.find((x) => opp.includes(x.id));
+  if (good) return { pick: 'met', why: good.why, quote: good.quotes[0] || null };
+  const label = TXJ[oppId];
+  const c = label ? r.checks.find((x) => x.label.startsWith(label)) : null;
+  if (c && c.status === 'good') return { pick: 'met', why: `${c.label}: ${c.note}.`, quote: null };
+  if (c && c.status === 'bad') return { pick: 'miss', why: `${c.label}: ${c.note}.`, quote: null };
+  if (c && c.status === 'ok') return { pick: '', why: `${c.label}: ${c.note}. Partly there, so you decide.`, quote: null };
+  if (c && c.status === 'na') return { pick: 'na', why: `${c.label}: ${c.note}.`, quote: null };
+  return { pick: '', why: 'Not something the words show. Listen to the call and decide.', quote: null };
+}
+/* Calls already logged from a transcript, so the same call updates its review instead of adding one. */
+EXT.slice('txLogged', {
+  initial: () => ({ items: {} }),
+  clean: (raw) => {
+    const items = {};
+    Object.entries(raw && raw.items && typeof raw.items === 'object' ? raw.items : {})
+      .slice(-500)
+      .forEach(([k, v]) => {
+        if (/^[a-z0-9-]{2,80}:[a-z0-9]{2,20}$/.test(k) && isId(v)) items[k] = v;
+      });
+    return { items };
+  },
+});
+/** Before coaching (saved transcript calls before the session) and since (the plan's call reviews), per behavior. */
+function txBeforeAfter(p, memberId, oppId) {
+  const before = EXT.data.txCalls.items.filter((c) => c.member === memberId && c.day < p.start);
+  const missedBefore = before.filter((c) => c.better.includes(oppId)).length;
+  const logs = p.logs.filter((l) => l.kind === 'call' && ['met', 'miss'].includes(l.results[oppId]));
+  const metAfter = logs.filter((l) => l.results[oppId] === 'met').length;
+  return { beforeN: before.length, missedBefore, afterN: logs.length, metAfter };
+}
+const txBeforeText = (x) => (x.beforeN ? `Before coaching: missed on ${x.missedBefore} of ${plural(x.beforeN, 'analyzed call')}` : 'Before coaching: no analyzed calls');
+const txAfterText = (x) => (x.afterN ? `Since coaching: met on ${x.metAfter} of ${plural(x.afterN, 'reviewed call')}` : 'Since coaching: no call reviews yet');
+function txLogToPlan(p) {
+  const r = txUi.result;
+  const m = EXT.memberById(txUi.member);
+  if (!r || !m) return;
+  const day = isIsoDate(txUi.day) ? txUi.day : todayDay();
+  if (day < p.start) return toast(`This call is from before the coaching session (${fmtDay(p.start)}). Change the call date, or save it to history as a "before" call.`, { type: 'warn', duration: 8000 });
+  const picks = {};
+  planCallFocus(p).forEach((o) => {
+    const v = txVerdict(r, o.id);
+    if (v.pick) picks[o.id] = v.pick;
+  });
+  const key = `${p.id}:${txHash(txUi.ranText)}`;
+  const prev = p.logs.find((l) => l.id === EXT.data.txLogged.items[key]) || null;
+  txSaveCall();
+  openLogDialog(p.id, 'call', {
+    prefill: { picks, source: 'call transcript' },
+    replace: prev,
+    date: day,
+    note: prev ? '' : 'Checked from the call transcript.',
+    onSaved: (log) => {
+      EXT.data.txLogged.items[key] = log.id;
+      EXT.save('txLogged');
+      if (state.ui.view === 'transcript') refresh({ panel: false });
+    },
+  });
+}
+/** The follow-up panel on the results: the plan's behaviors on this call, before and since coaching. */
+function txPlanPanel() {
+  const r = txUi.result;
+  const m = EXT.memberById(txUi.member);
+  const p = m ? flowActivePlan(m) : null;
+  if (!r || !p) return null;
+  const focus = planCallFocus(p);
+  if (!focus.length) return null;
+  const c = planCounts(p);
+  const day = isIsoDate(txUi.day) ? txUi.day : todayDay();
+  const early = day < p.start;
+  const key = `${p.id}:${txHash(txUi.ranText)}`;
+  const logged = p.logs.some((l) => l.id === EXT.data.txLogged.items[key]);
+  const chip = { met: ['Met', 'is-good'], miss: ['Not met', 'is-bad'], na: ['N/A', 'is-na'], '': ['You decide', 'is-ok'] };
+  return h(
+    'section',
+    { class: 'tx-panel tx-plan', 'aria-labelledby': 'tx-plan-t', 'data-fk': 'tx-plan' },
+    h(
+      'div',
+      { class: 'tx-panel__head' },
+      h('h3', { class: 'tx-panel__t', id: 'tx-plan-t' }, icon('calendar'), `Follow-up plan · ${memberLabel(m)}`),
+      h('span', { class: 'tx-sales__n' }, c.callTarget ? `${Math.min(c.calls, c.callTarget)} of ${c.callTarget} call reviews` : `${plural(c.calls, 'call review')}`)
+    ),
+    h('p', { class: 'tx-panel__sub' }, `Coached ${fmtDay(p.start)}. Did this call show the behaviors from the plan?`),
+    early ? h('p', { class: 'notice', role: 'note' }, icon('info'), h('span', { class: 'notice__body' }, `This call (${fmtDay(day)}) is from before the coaching session. Save it to history as a "before" call, or change the call date to log it.`)) : null,
+    h(
+      'ul',
+      { class: 'tx-planlist' },
+      focus.map((o) => {
+        const v = txVerdict(r, o.id);
+        const ba = txBeforeAfter(p, m.id, o.id);
+        const [label, cls] = chip[v.pick];
+        return h(
+          'li',
+          { class: 'tx-planrow' },
+          h('div', { class: 'tx-planrow__top' }, h('span', { class: 'tx-planrow__t' }, o.title), h('span', { class: `tx-verdict ${cls}` }, label)),
+          h('p', { class: 'tx-planrow__why' }, v.why, v.quote ? h('span', { class: 'tx-risk__q' }, ` “${v.quote.text}”`) : null),
+          h('p', { class: 'tx-planrow__ba' }, h('span', null, txBeforeText(ba)), h('span', null, txAfterText(ba)))
+        );
+      })
+    ),
+    h(
+      'div',
+      { class: 'tx-plan__actions' },
+      h('button', { type: 'button', class: `btn ${logged ? '' : 'btn--primary'}`, 'data-fk': 'tx-plan-log', disabled: early, onclick: () => txLogToPlan(p) }, icon(logged ? 'refresh' : 'plus'), logged ? 'Update the logged review' : 'Log this call to the plan'),
+      logged ? h('span', { class: 'tx-plan__ok' }, icon('check', 'icon--sm'), 'Logged on the plan') : null,
+      h('button', { type: 'button', class: 'btn btn--ghost', 'data-fk': 'tx-plan-open', onclick: () => navigate('tracker') }, icon('arrow-right'), 'Open the tracker')
+    )
+  );
+}
+/** From the tracker: open the transcript page for the plan's agent. */
+function txCheckFromPlan(p) {
+  const m = memberByCode(p.label);
+  if (!m) return toast('This plan is for someone not on your team list, so the transcript cannot be linked to it.', { type: 'warn' });
+  txUi = { ...txUi, member: m.id, text: '', result: null, error: '', flips: new Set(), ranText: '', day: todayDay() };
+  navigate('transcript');
+  setTimeout(() => {
+    const t = document.querySelector('[data-fk="tx-text"]');
+    if (t) t.focus();
+  }, 120);
+  toast(`Paste ${memberLabel(m)}'s call. The plan's behaviors are checked on it.`, { duration: 6000 });
+}
+/* The tracker's plan card: a "Check a call transcript" action, and the before-coaching counts. */
+const _txPlanCard = planCard;
+planCard = function (p, idx) {
+  const el = _txPlanCard(p, idx);
+  try {
+    const m = memberByCode(p.label);
+    const acts = el.querySelector('.plan__actions');
+    if (m && acts && p.status === 'active' && planCallFocus(p).length) {
+      const btn = h('button', { type: 'button', class: 'btn btn--sm', 'data-fk': `tr-tx:${p.id}`, title: 'Paste a call transcript; the plan behaviors are checked and the review is filled in', onclick: () => txCheckFromPlan(p) }, icon('note'), 'Check a call transcript');
+      const log = acts.querySelector(`[data-fk="tr-log:${p.id}"]`);
+      if (log) log.after(btn);
+      else acts.prepend(btn);
+    }
+    const before = m ? EXT.data.txCalls.items.filter((c) => c.member === m.id && c.day < p.start) : [];
+    if (before.length) {
+      const rows = planCallFocus(p).map((o) => {
+        const ba = txBeforeAfter(p, m.id, o.id);
+        return h('li', null, h('strong', null, o.title), `: missed on ${ba.missedBefore} of ${ba.beforeN} analyzed calls before coaching`, ba.afterN ? `, met on ${ba.metAfter} of ${ba.afterN} reviewed since` : '');
+      });
+      const box = h('div', { class: 'tx-before' }, h('p', { class: 'tx-before__t' }, icon('trend', 'icon--sm'), 'Before and since coaching (from call transcripts)'), h('ul', null, rows));
+      if (acts) acts.before(box);
+      else el.appendChild(box);
+    }
+  } catch (e) {
+    /* the card still shows without the extras */
+  }
+  return el;
+};
+
 /* ---------- the page ---------- */
 const txTone = (score) => (score == null ? 'na' : score >= 80 ? 'good' : score >= 50 ? 'ok' : 'bad');
 function txScorecard(r) {
@@ -38950,6 +39145,7 @@ function txRender(main) {
         : null,
       h('div', { class: 'tx-stats' }, stat('Call type', TX_TYPE_LABEL[st.type] || 'General'), stat(txUi.parts ? 'Turns' : 'Lines', String(st.turns)), st.length != null ? stat('Call length', txClock(st.length)) : null, stat('Agent talk', `${st.agentPct}%`), stat('Questions asked', String(st.questions))),
       txScorecard(r),
+      txPlanPanel(),
       h('div', { class: 'tx-panels' }, txAicrPanel(r.aicr), txSalesPanel(r.sales)),
       h(
         'div',
